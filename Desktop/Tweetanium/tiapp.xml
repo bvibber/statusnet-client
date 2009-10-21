@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ti:app xmlns:ti='http://ti.appcelerator.org'>
+<!-- These values are edited/maintained by Titanium Developer -->
+<id>com.appcelerator.desktop.tweetanium</id>
+<name>Tweetanium</name>
+<version>1.0</version>
+<publisher>kevin</publisher>
+<url>http://www.appcelerator.com</url>
+<icon>img/header.png</icon>
+<copyright>2009 by Kevin Whinnery and Appcelerator Inc.</copyright>
+<!-- Window Definition - these values can be edited -->
+<window>
+	<id>initial</id>
+	<title>Tweetanium</title>
+	<url>app://index.html</url>
+	<width>420</width>
+	<max-width>420</max-width>
+	<min-width>420</min-width>
+	<height>610</height>
+	<max-height>610</max-height>
+	<min-height>610</min-height>
+	<fullscreen>false</fullscreen>
+	<resizable>false</resizable>
+	<chrome scrollbars="true">true</chrome>
+	<maximizable>false</maximizable>
+	<minimizable>true</minimizable>
+	<closeable>true</closeable>
+	<x>0</x>
+	<y>0</y>
+</window>
+</ti:app>
