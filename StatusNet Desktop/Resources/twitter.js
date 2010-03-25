@@ -6,7 +6,7 @@ function TwitterClient(_username,_password) {
     $("#nav img").show();
     $.ajax({
       method:"GET",
-      url: "http://search.twitter.com/search.rss?q=%22appcelerator%22+OR+%22appcelerator+titanium%22+OR+%40titanium+OR+%40appcelerator+OR+%23titanium+OR+%23appcelerator&rpp=30",
+      url: "http://identi.ca/rss",
       dataType:"text",
       success:function(data) {
         $("#nav img").hide();
@@ -22,19 +22,11 @@ function TwitterClient(_username,_password) {
           xmlDoc=parser.parseFromString(data,"text/xml");
         }
 
-        $(xmlDoc).find("rss channel item").each(function() {
-          var image = $(this).find("[nodeName=google:image_link]").text();
-
-          var date = $(this).find("pubDate").text();
-          var parts = date.split(' ');
-          date = parts[2] + ' ' + parts[1] + ' ' + parts[3] + ' ' + convertDate(parts[4].substring(0,5));
-
-          var desc = $(this).find("description").text();
-
-          var author = $(this).find("author").text();
-          var parts = author.split('(');
-          author = parts[1].substring(0,parts[1].length-1);
-
+        $(xmlDoc).find("item").each(function() {
+          var image = $(this).find("[nodeName=statusnet:postIcon]").attr("rdf:resource");
+          var date = $(this).find("[nodeName=dc:date]").text();
+          var desc = $(this).find("[nodeName=content:encoded]").text();
+          var author = $(this).find("[nodeName=dc:creator]").text();
           var link = $(this).find("link").text();
           var idx = link.indexOf('statuses');
           link = link.substring(0,idx);
@@ -58,21 +50,4 @@ function TwitterClient(_username,_password) {
       }
     });
   };
-}
-
-function convertDate(str) {
-  var parts = str.split(':');
-  var hour = parseInt(parts[0]);
-  var minutes = parts[1];
-  var ampm = 'am';
-  if (hour > 12)
-  {
-    hour = hour - 12;
-    ampm = 'pm';
-  }
-  else if (hour == 0)
-  {
-    hour = 12;
-  }
-  return hour + ":" + minutes + ampm;
 }
