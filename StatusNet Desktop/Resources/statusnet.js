@@ -1,8 +1,20 @@
-function TwitterClient(_username,_password) {
-  this.username = _username;
-  this.password = _password;
+function StatusNetClient(_username,_password,_apiroot) {
+  this.username  = _username;
+  this.password  = _password;
+  this.apiroot   = _apiroot;
+  this._timeline = "friends_timeline"; // which timeline are we currently showing?
 
-  this.getAppceleratorTweets = function() {
+  this.refresh = function() {
+       switch (this._timeline) {
+       case "friends_timeline":
+            this.getFriendsTimeline();
+            break;
+       default:
+            throw new Exception("Gah wrong timeline");
+       }
+  }
+
+  this.getFriendsTimeline = function() {
     $("#nav img").show();
     $.ajax({
       method:"GET",
