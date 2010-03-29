@@ -1,15 +1,17 @@
 $(function() {
 
+     initPanel();
+    
      var db = StatusNet.getDB();
 
      var ac = StatusNetAccount.getDefault(db);
 
      var snc = null;
 
-     if (ac == null) {
+     if (ac === null) {
           ld = new LoginDialog(function(account) {
                ac = account;
-//               ac.ensure(db);
+               ac.ensure(db);
                snc = new StatusNetClient(ac);
                snc.getFriendsTimeline();
                });

@@ -1,25 +1,34 @@
 <html>
-<head>
-	<link rel="stylesheet" href="style.css" type="text/css" charset="utf-8">
-	<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
-	<script type="text/javascript" src="statusnet.js"></script>
-	<script src="index.js" type="text/javascript" charset="utf-8"></script>
-</head>
-<body>
-	<div id="sidebar">
-		<img id="main_logo" src="/img/bird.png"></img>
-		<div id="profile">
-			<img src="/img/profile.jpg" class="rounded"></img>
-		</div>
-		<img src="/img/blue/Chat.png"></img>
-		<img src="/img/At.png"></img>
-		<img src="/img/Mail.png"></img>
-		<img src="/img/Magnifier.png"></img>
-	</div>
-	<div id="content">
-		<div id="body">
-			<div id="tweets"></div>
-		</div>
-	</div>
-</body>
+    <head>
+	    <link rel="stylesheet" href="display.css" type="text/css" charset="utf-8">
+	    <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+	    <script type="text/javascript" src="statusnet.js"></script>
+	    <script src="index.js" type="text/javascript" charset="utf-8"></script>
+    </head>
+        <body>
+            <div id="content">
+
+            </div>
+
+            <div id="aside_primary" class="aside">
+                <address>
+                    <img class="logo" src="logo.png"/>
+                </address>
+    <!--
+                <form id="form_notice">
+                        <textarea name="status_textarea" id="notice_data-text" rows="2" cols="20"/>
+                </form>
+    -->
+                <ul class="nav">
+                    <!-- replace with logged in user's avatar -->
+                    <li id="nav_timeline_personal"><a href="http://identi.ca/csarven/all/rss" title="Personal and friends">Personal</a></li>
+
+                    <!-- show only if logged in -->
+                    <li id="nav_timeline_replies"><a href="http://identi.ca/csarven/replies/rss" title="Replies to you">Replies</a></li>
+                    <li id="nav_timeline_favorites"><a href="http://identi.ca/csarven/favorites/rss" title="Your favourites">Favorites</a></li>
+                    <li id="nav_timeline_public"><a href="http://identi.ca/rss" title="Public timeline">Public</a></li>
+                </ul>
+            </div>
+
+        </body>
 </html>
