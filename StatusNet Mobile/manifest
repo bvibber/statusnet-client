@@ -1,8 +1,8 @@
 #appname: StatusNet Mobile
 #publisher: zcopley
-#url: http://status.net
+#url: StatusNet, Inc.
 #image: appicon.png
-#appid: net.status.mobile.client
+#appid: new.status.client.mobile
 #desc: undefined
 #type: mobile
-#guid: 825e53c6-868d-4a06-8d26-39923f31a2f4
+#guid: cca143fb-473f-4e8c-9bcb-91b02a08e548
