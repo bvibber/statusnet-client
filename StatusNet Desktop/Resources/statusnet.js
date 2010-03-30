@@ -27,8 +27,7 @@ StatusNet.getDB = function() {
         var separator = Titanium.Filesystem.getSeparator();
         var dbFile = Titanium.Filesystem.getFile(Titanium.Filesystem.getResourcesDirectory() + separator + "statusnet.db");
         this.db = Titanium.Database.openFile(dbFile);
-        rs = this.db.execute("CREATE TABLE IF NOT EXISTS account (username varchar(255), password varchar(255), apiroot varchar(255), is_default integer default 0, PRIMARY KEY (username, apiroot))");
-        rs.close();
+        this.db.execute("CREATE TABLE IF NOT EXISTS account (username varchar(255), password varchar(255), apiroot varchar(255), is_default integer default 0, PRIMARY KEY (username, apiroot))");
      }
      return this.db;
 }
@@ -55,7 +54,6 @@ function StatusNetAccount(_username, _password, _apiroot) {
 
             Titanium.API.debug('inserted ' + db.rowsAffected + 'rows');
 
-            rs.close();
 
           }
 
@@ -100,9 +98,20 @@ function LoginDialog(_onSuccess) {
         $("#content").append("<form id='loginform' method='GET'><br />Username: <input id='username' type='text' /><br />Password: <input id='password' type='password' /><br />API root: <input id='apiroot' type='text' /><br /><input type='button' name='Login' id='loginbutton' value='Login'/></form>");
         succfunc = this._onSuccess;
         $("#loginbutton").click(function() {
+
+            var rootstr = $("#apiroot").val();
+            var apiroot;
+
+            lastchar = rootstr.charAt(rootstr.length - 1);
+            if (lastchar === '/') {
+                apiroot = rootstr;
+            } else {
+                apiroot = rootstr + '/';
+            }
+
             var account = new StatusNetAccount($("#username").val(),
                                                $("#password").val(),
-                                               $("#apiroot").val());
+                                               apiroot);
             //alert("Got account: " + account.username + ", " + account.password + ", " + account.apiroot);
 
             account.fetchUrl('account/verify_credentials.xml',
@@ -116,6 +125,20 @@ function LoginDialog(_onSuccess) {
 function StatusNetClient(_account) {
     this.account  = _account;
     this._timeline = "friends_timeline"; // which timeline are we currently showing?
+
+    var server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
+
+    var personal = server + this.account.username + '/all';
+    $('ul.nav li#nav_timeline_personal > a').attr('href', personal);
+
+    var replies = server + this.account.username + '/replies';
+    $('ul.nav li#nav_timeline_replies > a').attr('href', replies);
+
+    var favorites = server + this.account.username + '/favorites';
+    $('ul.nav li#nav_timeline_favorites > a').attr('href', favorites);
+
+    var public_timeline = server;
+    $('ul.nav li#nav_timeline_public > a').attr('href', public_timeline);
 
     this.refresh = function() {
         switch (this._timeline) {

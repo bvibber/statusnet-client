@@ -1,7 +1,7 @@
 $(function() {
 
      initPanel();
-    
+
      var db = StatusNet.getDB();
 
      var ac = StatusNetAccount.getDefault(db);
@@ -22,9 +22,9 @@ $(function() {
           snc.getFriendsTimeline();
      }
 
-     $("a.external").live("click", function() {
-          Titanium.Desktop.openURL($(this).attr("href"));
-          return false;
+     $('a[rel=external]').live('click', function() {
+         Titanium.Desktop.openURL($(this).attr('href'));
+         return false;
      });
 
      $("#refresh").click(function() {
@@ -33,4 +33,7 @@ $(function() {
           }
           return false;
      });
+
+
+
 });
