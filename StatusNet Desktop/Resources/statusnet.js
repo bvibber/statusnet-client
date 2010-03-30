@@ -142,7 +142,7 @@ function StatusNetClient(_account) {
 
     this.refresh = function() {
 
-        $('ul.notices li').remove();
+        $('ul.notices').remove();
 
         switch (this._timeline) {
             case "friends_timeline":
