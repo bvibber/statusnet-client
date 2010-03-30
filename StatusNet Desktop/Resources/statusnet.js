@@ -141,6 +141,9 @@ function StatusNetClient(_account) {
     $('ul.nav li#nav_timeline_public > a').attr('href', public_timeline);
 
     this.refresh = function() {
+
+        $('ul.notices li').remove();
+
         switch (this._timeline) {
             case "friends_timeline":
                 this.getFriendsTimeline();

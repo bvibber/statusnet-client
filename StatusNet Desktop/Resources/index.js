@@ -27,7 +27,7 @@ $(function() {
          return false;
      });
 
-     $("#refresh").click(function() {
+     $("#content").click(function() {
           if (snc != null) {
                snc.refresh();
           }
