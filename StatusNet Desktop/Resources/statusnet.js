@@ -3,24 +3,6 @@ function StatusNet() {
 
 StatusNet.db = null;
 
-initPanel = function() {
-
-    Titanium.API.debug('in initPanel');
-    $('.nav').hide();
-
-    $('address').click(function() {
-        if ($('#aside_primary').hasClass('open') === true) {
-            $('#aside_primary').removeClass('open');
-            $('.nav').hide();
-        }
-        else {
-            $('#aside_primary').addClass('open');
-            $('.nav').show();
-        }
-    });
-}
-
-
 StatusNet.getDB = function() {
     if (this.db === null) {
 

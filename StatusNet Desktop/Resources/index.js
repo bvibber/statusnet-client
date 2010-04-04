@@ -1,7 +1,5 @@
 $(function() {
 
-     initPanel();
-
      var db = StatusNet.getDB();
 
      var ac = StatusNetAccount.getDefault(db);
