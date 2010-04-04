@@ -173,8 +173,6 @@ function StatusNetClient(_account) {
 
             $("#nav img").hide();
 
-            html.push('<ul class="notices">');
-
             $(data).find('feed > entry').each(function() {
                 var avatar = $(this).find('link[rel=avatar][media:width=48]').attr('href');
                 var date = $(this).find('published').text();
@@ -182,19 +180,15 @@ function StatusNetClient(_account) {
                 var author = $(this).find('author name').text();
                 var link = $(this).find('author uri').text();
 
-                html.push('<li class="notice">');
-                html.push('    <div class="entry-title">');
-                html.push('        <span class="author vcard"><a class="url" href="'+link+'">'+'<img class="photo" height="48px" width="48px" src="'+avatar+'"/>'+' '+author+'</a></span>');
-                html.push('        <p class="entry-content">'+desc+'</p>');
-                html.push('    </div>');
 
-                html.push('    <div class="entry-content">');
-                html.push('        <abbr>'+date+'</abbr>');
-                html.push('    </div>');
-                html.push('</li>');
+                html.push('<div style="margin:5px 0 10px 0;padding:5px;-webkit-border-radius:5px;background-color:#f2f2f2;">');
+                html.push('   <div style="float:right;margin:5px 0 5px 10px;"><a href="'+link+'"><img height="48px" width="48px" src="'+avatar+'"/></a></div>');
+                html.push('   <div><a style="font-size:14px;color:#000;text-decoration:none;font-weight:bold;" href="'+link+'">' + author + '</a><br/>');
+                html.push('   <small style="font-size:0.8em;">' + date + '</small></div>');
+                html.push('   <div style="margin-top:3px">'+desc +'<br/></div>');
+                html.push('</div>');
+                html.push('<div style="clear:both;"></div>');
             });
-
-            html.push('</ul>');
 
             $('#content').append(html.join(''));
             $('#content a').attr('rel', 'external');
