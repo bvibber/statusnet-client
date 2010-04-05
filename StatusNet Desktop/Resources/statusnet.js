@@ -131,41 +131,52 @@ function LoginDialog(_onSuccess) {
 	 */
     this.show = function() {
         $("#content").append("<form id='loginform' method='GET'><br />Username: <input id='username' type='text' /><br />Password: <input id='password' type='password' /><br />API root: <input id='apiroot' type='text' /><br /><input type='button' name='Login' id='loginbutton' value='Login'/></form>");
-        succfunc = this._onSuccess;
-        $("#loginbutton").click(function() {
-
-            var rootstr = $("#apiroot").val();
-            var apiroot;
-
-            lastchar = rootstr.charAt(rootstr.length - 1);
-            if (lastchar === '/') {
-                apiroot = rootstr;
-            } else {
-                apiroot = rootstr + '/';
-            }
-
-            var account = new StatusNetAccount($("#username").val(),
-                                               $("#password").val(),
-                                               apiroot);
-            //alert("Got account: " + account.username + ", " + account.password + ", " + account.apiroot);
-
-            account.fetchUrl('account/verify_credentials.xml',
-                function(status, data) {
-                    $("#loginform").hide();
-                    alert("Successful login");
-
-                    // Update the avatar in the sidebar
-                    account.avatar = $(data).find('profile_image_url').text();
-                    $('#nav_timeline_profile a > img').attr("src", account.avatar);
-
-                    succfunc(account);
-                },
-                function(status, error) { alert("Got an error!"); });
-            return false;
-        });
-
+        var self = this;
+        $("#loginform").submit(function() {
+			self.onSubmit();
+		});
+		$("#loginbutton").click(function() {
+			self.onSubmit();
+		});
     }
     
+	/**
+	 * Handle login form processing.
+	 * 
+	 * Credentials are checked asynchronously; on success we'll
+	 * hide the dialog and open up a friends timeline view.
+	 */
+    this.onSubmit = function() {
+		var rootstr = $("#apiroot").val();
+		var apiroot;
+
+		lastchar = rootstr.charAt(rootstr.length - 1);
+		if (lastchar === '/') {
+			apiroot = rootstr;
+		} else {
+			apiroot = rootstr + '/';
+		}
+
+		var account = new StatusNetAccount($("#username").val(),
+										   $("#password").val(),
+										   apiroot);
+		//alert("Got account: " + account.username + ", " + account.password + ", " + account.apiroot);
+
+        var succfunc = this._onSuccess;
+		account.fetchUrl('account/verify_credentials.xml',
+			function(status, data) {
+				$("#loginform").hide();
+				Titanium.API.debug("Successful login");
+
+				// Update the avatar in the sidebar
+				account.avatar = $(data).find('profile_image_url').text();
+				$('#nav_timeline_profile a > img').attr("src", account.avatar);
+
+				succfunc(account);
+			},
+			function(status, error) { alert("Got an error!"); });
+		return false;
+	}
 }
 
 /**
