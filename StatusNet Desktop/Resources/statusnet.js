@@ -1,8 +1,17 @@
 function StatusNet() {
 }
 
+/**
+ * Live database connection for local storage, if opened.
+ * Most callers should rather use getDB().
+ * @access private
+ */
 StatusNet.db = null;
 
+/**
+ * Lazy-open our local storage database.
+ * @return database object
+ */
 StatusNet.getDB = function() {
     if (this.db === null) {
 
@@ -14,6 +23,14 @@ StatusNet.getDB = function() {
      return this.db;
 }
 
+/**
+ * Account info management constructor.
+ * 
+ * @param string _username
+ * @param string _password
+ * @param string _apiroot API base URL, eg 'http://identi.ca/api'
+ * @return StatusNetAccount object
+ */
 function StatusNetAccount(_username, _password, _apiroot) {
 
     Titanium.API.debug('in StatusNetAccount()');
@@ -22,6 +39,12 @@ function StatusNetAccount(_username, _password, _apiroot) {
     this.password = _password;
     this.apiroot  = _apiroot;
 
+	/**
+	 * Make sure we've recorded account credentials to the local database.
+	 * If not already done, saves them.
+	 * 
+	 * @return boolean success
+	 */
     this.ensure = function(db) {
 
         Titanium.API.debug('in ensure()');
@@ -42,6 +65,15 @@ function StatusNetAccount(_username, _password, _apiroot) {
           return true;
      }
 
+	/**
+	 * Start an asynchronous, authenticated API call.
+	 * Currently only supports GET requests; any needed parameters
+	 * must be in the method, as part of the path or query string.
+	 * 
+	 * @param string method URL fragment, appended to API root to create final URL.
+	 * @param callable onSuccess callback function called after successful HTTP fetch: function(status, data)
+	 * @param callable onError callback function called if there's a low-level HTTP error: function(status, thrown)
+	 */
      this.fetchUrl = function(method, onSuccess, onError) {
 
          Titanium.API.debug('in fetchUrl()');
@@ -59,6 +91,12 @@ function StatusNetAccount(_username, _password, _apiroot) {
     }
 }
 
+/**
+ * Load up the default account's credentials from the local database,
+ * if any.
+ * 
+ * @return mixed StatusNetAccount object or null
+ */
 StatusNetAccount.getDefault = function(db) {
 
     Titanium.API.debug('in StatusNetAccount.getDefault()');
@@ -73,9 +111,24 @@ StatusNetAccount.getDefault = function(db) {
     }
 }
 
+/**
+ * Constructor for UI controller for login dialog.
+ * 
+ * @param callback _onSuccess: function (StatusNetAccount account)
+ * @return LoginDialog object
+ */
 function LoginDialog(_onSuccess) {
     this._onSuccess = _onSuccess;
 
+	/**
+	 * Build the login dialog in our HTML view.
+	 * 
+	 * After a successful login, the dialog is hidden, the avatar
+	 * in the sidebar is updated to match the account and control
+	 * transfers to the callback function provided to our constructor.
+	 * 
+	 * @return void
+	 */
     this.show = function() {
         $("#content").append("<form id='loginform' method='GET'><br />Username: <input id='username' type='text' /><br />Password: <input id='password' type='password' /><br />API root: <input id='apiroot' type='text' /><br /><input type='button' name='Login' id='loginbutton' value='Login'/></form>");
         succfunc = this._onSuccess;
@@ -115,6 +168,12 @@ function LoginDialog(_onSuccess) {
     
 }
 
+/**
+ * Constructor for UI manager class for the client.
+ *
+ * @param StatusNetAccount _account
+ * @return StatusNetClient object
+ */
 function StatusNetClient(_account) {
     this.account  = _account;
     this._timeline = "friends_timeline"; // which timeline are we currently showing?
@@ -133,6 +192,12 @@ function StatusNetClient(_account) {
     var public_timeline = server;
     $('ul.nav li#nav_timeline_public > a').attr('href', public_timeline);
 
+	/**
+	 * Clear the current notice list, then start reloading it.
+	 * 
+	 * @fixme May be best not to clear the old notices until
+	 *        the async load is complete.
+	 */
     this.refresh = function() {
 
         $('ul.notices').remove();
@@ -146,6 +211,11 @@ function StatusNetClient(_account) {
         }
     }
 
+	/**
+	 * Start an asynchronous loading of the friends timeline.
+	 * Upon successful completion, the notice list is filled
+	 * out with notices from the timeline.
+	 */
     this.getFriendsTimeline = function() {
 
         Titanium.API.debug("in getFriendsTimeline()");
@@ -181,12 +251,11 @@ function StatusNetClient(_account) {
 
             $('#content').append(html.join(''));
             $('#content a').attr('rel', 'external');
-    },
+		},
+		function(status, thrown) {
+			//Hrm, should probably do something here...
+		});
 
-    function(status, thrown) {
-        //Hrm, should probably do something here...
-    });
-
-  };
+	};
 
 }
