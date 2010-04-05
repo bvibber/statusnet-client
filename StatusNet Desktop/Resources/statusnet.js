@@ -103,7 +103,7 @@ function LoginDialog(_onSuccess) {
 
                     // Update the avatar in the sidebar
                     account.avatar = $(data).find('profile_image_url').text();
-                    $('#profile > img').attr("src", account.avatar);
+                    $('#nav_timeline_profile a > img').attr("src", account.avatar);
 
                     succfunc(account);
                 },
@@ -112,8 +112,7 @@ function LoginDialog(_onSuccess) {
         });
 
     }
-
-
+    
 }
 
 function StatusNetClient(_account) {
@@ -122,14 +121,14 @@ function StatusNetClient(_account) {
 
     var server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
 
+    var profile = server + this.account.username;
+    $('ul.nav li#nav_timeline_profile > a').attr('href', profile);
+
     var personal = server + this.account.username + '/all';
     $('ul.nav li#nav_timeline_personal > a').attr('href', personal);
 
     var replies = server + this.account.username + '/replies';
     $('ul.nav li#nav_timeline_replies > a').attr('href', replies);
-
-    var favorites = server + this.account.username + '/favorites';
-    $('ul.nav li#nav_timeline_favorites > a').attr('href', favorites);
 
     var public_timeline = server;
     $('ul.nav li#nav_timeline_public > a').attr('href', public_timeline);
@@ -151,8 +150,6 @@ function StatusNetClient(_account) {
 
         Titanium.API.debug("in getFriendsTimeline()");
 
-        $("#nav img").show();
-
         $('address').addClass('processing');
 
         this.account.fetchUrl('statuses/friends_timeline.atom',
@@ -164,8 +161,6 @@ function StatusNetClient(_account) {
             var html = [];
 
             Titanium.API.debug('Fetching friends_timline.atom');
-
-            $("#nav img").hide();
 
             $(data).find('feed > entry').each(function() {
                 var avatar = $(this).find('link[rel=avatar][media:width=48]').attr('href');
@@ -189,7 +184,6 @@ function StatusNetClient(_account) {
     },
 
     function(status, thrown) {
-        $("#nav img").hide();
         //Hrm, should probably do something here...
     });
 

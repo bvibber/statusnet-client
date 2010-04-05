@@ -1,20 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
     <head>
         <link rel="stylesheet" href="display.css" type="text/css" charset="utf-8">
-        <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
-        <script type="text/javascript" src="statusnet.js"></script>
-        <script type="text/javascript" src="index.js"></script>
+        <script type="text/javascript" src="jquery-1.4.2.min.js">
+</script>
+        <script type="text/javascript" src="statusnet.js">
+</script>
+        <script type="text/javascript" src="index.js">
+</script>
+        <title></title>
     </head>
     <body>
         <div id="sidebar">
-            <img id="main_logo" src="/images/logo.png"></img>
-            <div id="profile">
-                <img src="/images/default-avatar-stream.png" class="rounded"></img>
-            </div>
-            <img src="/images/blue/Chat.png"></img>
-            <img src="/images/At.png"></img>
-            <img src="/images/Mail.png"></img>
-            <img src="/images/Magnifier.png"></img>
+            <ul class="nav">
+                <li id="nav_timeline_public">
+                    <a href="#" rel="external"><img id="main_logo" src="/images/logo.png" name="main_logo"></a>
+                </li>
+                <li id="nav_timeline_profile">
+                    <a href="#" rel="external"><img src="/images/default-avatar-stream.png" class="rounded"></a>
+                </li>
+                <li id="nav_timeline_personal">
+                    <a href="#" rel="external"><img src="/images/blue/Chat.png"></a>
+                </li>
+                <li id="nav_timeline_replies">
+                    <a href="#" rel="external"><img src="/images/At.png"></a>
+                </li>
+                <li id="nav_timeline_inbox">
+                    <img src="/images/Mail.png">
+                </li>
+                <li id="nav_timeline_search">
+                    <img src="/images/Magnifier.png">
+                </li>
+            </ul>
         </div>
         <div id="content">
             <div id="body">
