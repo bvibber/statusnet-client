@@ -97,11 +97,23 @@ function LoginDialog(_onSuccess) {
             //alert("Got account: " + account.username + ", " + account.password + ", " + account.apiroot);
 
             account.fetchUrl('account/verify_credentials.xml',
-                             function(status, data) { $("#loginform").hide(); alert("Successful login"); succfunc(account); },
-                             function(status, error) { alert("Got an error!"); });
+                function(status, data) {
+                    $("#loginform").hide();
+                    alert("Successful login");
+
+                    // Update the avatar in the sidebar
+                    account.avatar = $(data).find('profile_image_url').text();
+                    $('#profile > img').attr("src", account.avatar);
+
+                    succfunc(account);
+                },
+                function(status, error) { alert("Got an error!"); });
             return false;
         });
+
     }
+
+
 }
 
 function StatusNetClient(_account) {
