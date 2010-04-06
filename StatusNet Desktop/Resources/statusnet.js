@@ -246,20 +246,27 @@ function StatusNetClient(_account) {
             Titanium.API.debug('Fetching friends_timline.atom');
 
             $(data).find('feed > entry').each(function() {
-                var avatar = $(this).find('link[rel=avatar][media:width=48]').attr('href');
+				// note: attribute selectors seem to have problems with [media:width=48]
+				var avatar = 'about:blank';
+				$(this).find('link[rel=avatar]').each(function(i, el) {
+					if ($(el).attr('media:width') == '48') {
+						avatar = $(el).attr('href');
+					}
+				});
+                Titanium.API.debug(avatar);
                 var date = $(this).find('published').text();
                 var desc = $(this).find('content').text();
                 var author = $(this).find('author name').text();
                 var link = $(this).find('author uri').text();
 
 
-                html.push('<div style="margin:5px 0 10px 0;padding:5px;-webkit-border-radius:5px;background-color:#f2f2f2;">');
-                html.push('   <div style="float:right;margin:5px 0 5px 10px;"><a href="'+link+'"><img height="48px" width="48px" src="'+avatar+'"/></a></div>');
-                html.push('   <div><a style="font-size:14px;color:#000;text-decoration:none;font-weight:bold;" href="'+link+'">' + author + '</a><br/>');
-                html.push('   <small style="font-size:0.8em;">' + date + '</small></div>');
-                html.push('   <div style="margin-top:3px">'+desc +'<br/></div>');
+                html.push('<div class="notice">');
+                html.push('   <div class="avatar"><a href="'+link+'"><img src="'+avatar+'"/></a></div>');
+                html.push('   <div><a class="author" href="'+link+'">' + author + '</a><br/>');
+                html.push('   <small class="date">' + date + '</small></div>');
+                html.push('   <div class="content">'+desc +'<br/></div>');
                 html.push('</div>');
-                html.push('<div style="clear:both;"></div>');
+                html.push('<div class="clear"></div>');
             });
 
             $('#content').append(html.join(''));

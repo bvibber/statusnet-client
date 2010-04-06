@@ -73,3 +73,34 @@ a {
   line-height:1.5em;
   margin:3px 0 3px 0;
 }
+
+
+.notice {
+	margin:5px 0 10px 0;
+	padding:5px;
+	-webkit-border-radius:5px;
+	background-color:#f2f2f2;
+}
+.notice .avatar {
+	float:right;
+	margin:5px 0 5px 10px;
+}
+.notice .avatar img {
+	width: 48px;
+	height: 48px;
+}
+.notice .author {
+	font-size:14px;
+	color:#000;
+	text-decoration:none;
+	font-weight:bold;
+}
+.notice .date {
+	font-size:0.8em;
+}
+.notice .content {
+	margin-top:3px;
+}
+.notice .clear {
+	clear:both;
+}
