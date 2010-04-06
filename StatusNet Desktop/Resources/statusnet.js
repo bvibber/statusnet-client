@@ -233,12 +233,9 @@ function StatusNetClient(_account) {
 
         Titanium.API.debug("in getFriendsTimeline()");
 
-        $('address').addClass('processing');
-
         this.account.fetchUrl('statuses/friends_timeline.atom',
             function(status, data) {
 
-            $('address').removeClass('processing');
             $('#nav_timeline_public').addClass('current');
 
             var html = [];
