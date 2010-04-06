@@ -16,7 +16,7 @@ StatusNet.getDB = function() {
     if (this.db === null) {
 
         var separator = Titanium.Filesystem.getSeparator();
-        var dbFile = Titanium.Filesystem.getFile(Titanium.Filesystem.getResourcesDirectory() + separator + "statusnet.db");
+        var dbFile = Titanium.Filesystem.getFile(Titanium.Filesystem.getApplicationDataDirectory() + separator + "statusnet.db");
         this.db = Titanium.Database.openFile(dbFile);
         this.db.execute("CREATE TABLE IF NOT EXISTS account (username varchar(255), password varchar(255), apiroot varchar(255), is_default integer default 0, PRIMARY KEY (username, apiroot))");
      }
@@ -44,6 +44,7 @@ function StatusNetAccount(_username, _password, _apiroot) {
 	 * If not already done, saves them.
 	 * 
 	 * @return boolean success
+	 * @fixme escape values going into SQL!
 	 */
     this.ensure = function(db) {
 
@@ -107,6 +108,7 @@ StatusNetAccount.getDefault = function(db) {
         Titanium.API.debug('found an account');
         return new StatusNetAccount(row.fieldByName("username"), row.fieldByName("password"), row.fieldByName("apiroot"));
     } else {
+        Titanium.API.debug('did not find an account');
         return null;
     }
 }
