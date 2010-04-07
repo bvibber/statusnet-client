@@ -2,22 +2,20 @@ $(function() {
 
      var db = StatusNet.getDB();
 
-     var ac = StatusNetAccount.getDefault(db);
+     var ac = StatusNet.Account.getDefault(db);
 
      var snc = null;
 
      if (ac === null) {
-          ld = new LoginDialog(function(account) {
+          ld = new StatusNet.LoginDialog(function(account) {
                ac = account;
                ac.ensure(db);
-               snc = new StatusNetClient(ac);
-               snc.getFriendsTimeline();
+               snc = new StatusNet.Client(ac);
                });
 
           ld.show();
      } else {
-          snc = new StatusNetClient(ac);
-          snc.getFriendsTimeline();
+          snc = new StatusNet.Client(ac);
      }
 
      $('a[rel=external]').live('click', function() {
