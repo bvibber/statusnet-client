@@ -95,6 +95,26 @@ StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
              onError(status, thrown);
          }
     });
+
+}
+
+StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError) {
+
+    Titanium.API.debug('in postUrl()');
+
+     $.ajax({ url: this.apiroot + method,
+         username: this.username,
+         password: this.password,
+         type: 'POST',
+         data: data,
+         dataType: 'json',
+         success: function(data, status, xhr) {
+             onSuccess(status, data);
+         },
+         error: function(xhr, status, thrown) {
+             onError(xhr, status, thrown);
+         }
+    });
 }
 
 /**
@@ -208,18 +228,18 @@ StatusNet.Client = function(_account) {
 
     this.timeline.update();
 
-    var server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
+    this.server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
 
-    var profile = server + this.account.username;
+    var profile = this.server + this.account.username;
     $('ul.nav li#nav_timeline_profile > a').attr('href', profile);
 
-    var personal = server + this.account.username + '/all';
+    var personal = this.server + this.account.username + '/all';
     $('ul.nav li#nav_timeline_personal > a').attr('href', personal);
 
-    var replies = server + this.account.username + '/replies';
+    var replies = this.server + this.account.username + '/replies';
     $('ul.nav li#nav_timeline_replies > a').attr('href', replies);
 
-    var public_timeline = server;
+    var public_timeline = this.server;
     $('ul.nav li#nav_timeline_public > a').attr('href', public_timeline);
 
     /**
@@ -244,6 +264,53 @@ StatusNet.Client = function(_account) {
 }
 
 /**
+ * Post a notice
+ */
+StatusNet.Client.prototype.postNotice = function()
+{
+    var url = 'statuses/update.json';
+
+    var noticeText = $('#notice_textarea').val();
+
+    var params = { status: noticeText,
+                   source: 'StatusNet Desktop'
+                 };
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            Titanium.API.debug(data);
+            Titanium.API.debug(data.user);
+
+            var status = {};
+
+            status.noticeId = data.id;
+            status.avatar = data.user.profile_image_url;
+            status.date = data.created_at;
+            status.desc = data.text;
+            status.author = data.user.screen_name;
+            status.link = that.account.server + '/' + data.user.screen_name;
+
+            that.timeline.addStatus(status, true);
+            that.view.show();
+
+            //$('#statuses > div.notice:first').before(data.text);
+        },
+        function(xhr, status, thrown) {
+            Titanium.API.debug(
+                XMLHttpRequest.status +
+                ' - ' +
+                XMLHttpRequest.responseText
+            );
+
+            alert('Couldn\'t post notice - ' + XMLHttpRequest.status);
+        }
+    );
+
+}
+
+/**
  * Constructor for base timeline model class
  *
  * @param StatusNet.Client       client the controller
@@ -258,6 +325,26 @@ StatusNet.Timeline = function(client, view) {
     this._statuses = new Array();
 
     Titanium.API.debug("StatusNet.Timeline constructor");
+}
+
+/**
+ * Add a notice to the Timeline if it's not already in it.
+ */
+StatusNet.Timeline.prototype.addStatus = function(status, prepend) {
+
+    // dedupe here?
+    for (i = 0; i < this._statuses.length; i++) {
+        if (this._statuses[i].noticeId === status.noticeId) {
+            Titanium.API.debug("skipping duplicate notice: " + status.noticeId);
+            return;
+        }
+    }
+
+    if (prepend) {
+        this._statuses.unshift(status);
+    } else {
+        this._statuses.push(status);
+    }
 }
 
 /**
@@ -285,15 +372,22 @@ StatusNet.Timeline.prototype.update = function() {
                         status.avatar = $(el).attr('href');
                     }
                 });
-                Titanium.API.debug(status.avatar);
+
+                // Pull notice ID from permalink
+                var idRegexp = /(\d)+$/;
+                var permalink = $(this).find('id').text();
+                result = permalink.match(idRegexp);
+
+                if (result) {
+                    status.noticeId = result[0];
+                }
+
                 status.date = $(this).find('published').text();
                 status.desc = $(this).find('content').text();
                 status.author = $(this).find('author name').text();
                 status.link = $(this).find('author uri').text();
 
-                Titanium.API.debug("got status");
-
-                that._statuses.push(status);
+                that.addStatus(status, false);
 
             });
 
@@ -337,7 +431,7 @@ StatusNet.TimelineView.prototype.show = function () {
 
     if (statuses) {
 
-        var html = [];
+        var html = new Array();
 
         for (i = 0; i < statuses.length; i++) {
             html.push('<div class="notice">');
@@ -349,8 +443,9 @@ StatusNet.TimelineView.prototype.show = function () {
             html.push('<div class="clear"></div>');
         }
 
-        $('#content').append(html.join(''));
-        $('#content a').attr('rel', 'external');
+        $('#statuses').empty();
+        $('#statuses').append(html.join(''));
+        $('.notice a').attr('rel', 'external');
     }
 
 }

@@ -30,6 +30,9 @@ $(function() {
           return false;
      });
 
+     // @todo move to a general init
+     $('#update_button').bind('click', function() { snc.postNotice(); });
+
 
 
 });
