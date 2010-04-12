@@ -258,6 +258,11 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             this.view = new StatusNet.TimelineViewMentions(this);
             this.timeline = new StatusNet.TimelineMentions(this);
             break;
+        case 'favorites':
+            this._timeline = 'favorites';
+            this.view = new StatusNet.TimelineViewFavorites(this);
+            this.timeline = new StatusNet.TimelineFavorites(this);
+            break;
         default:
             throw new Exception("Gah wrong timeline");
     }
@@ -294,6 +299,7 @@ StatusNet.Client.prototype.init = function() {
     $('#friends_img').bind('click', function() { that.switchTimeline('friends') });
     $('#user_img').bind('click', function() { that.switchTimeline('user') });
     $('#mentions_img').bind('click', function() { that.switchTimeline('mentions') });
+    $('#favorites_img').bind('click', function() { that.switchTimeline('favorites') });
 
     // until we have private message timelines working
     var inbox = this.server + this.account.username + '/inbox';
@@ -555,7 +561,7 @@ StatusNet.TimelineMentions = function(client) {
 StatusNet.TimelineMentions.prototype = heir(StatusNet.Timeline.prototype);
 
 /**
- * Constructor for a view for Mentions timeline
+ * Constructor for a view for mentions timeline
  */
 StatusNet.TimelineViewMentions = function(client) {
     StatusNet.TimelineView.call(this, client);
@@ -588,7 +594,7 @@ StatusNet.TimelineViewPublic = function(client) {
 StatusNet.TimelineViewPublic.prototype = heir(StatusNet.TimelineView.prototype);
 
 /**
- * Constructor for use timeline model
+ * Constructor for user timeline model
  */
 StatusNet.TimelineUser = function(client) {
     StatusNet.Timeline.call(this, client);
@@ -601,12 +607,35 @@ StatusNet.TimelineUser = function(client) {
 StatusNet.TimelineUser.prototype = heir(StatusNet.Timeline.prototype);
 
 /**
- * Constructor for a view for Mentions timeline
+ * Constructor for user's timeline
  */
 StatusNet.TimelineViewUser = function(client) {
     StatusNet.TimelineView.call(this, client);
 }
 
-// Make StatusNet.TimelineViewPublic inherit TimelineView's prototype
+// Make StatusNet.TimelineViewUser inherit TimelineView's prototype
 StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
+
+/**
+ * Constructor for favorites timeline model
+ */
+StatusNet.TimelineFavorites = function(client) {
+    StatusNet.Timeline.call(this, client);
+
+    this.url = 'favorites.atom';
+
+}
+
+// Make StatusNet.TimelineFavorites inherit Timeline's prototype
+StatusNet.TimelineFavorites.prototype = heir(StatusNet.Timeline.prototype);
+
+/**
+ * Constructor for a view for favorites timeline
+ */
+StatusNet.TimelineViewFavorites = function(client) {
+    StatusNet.TimelineView.call(this, client);
+}
+
+// Make StatusNet.TimelineViewFavorites inherit TimelineView's prototype
+StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototype);
 
