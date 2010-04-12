@@ -218,48 +218,102 @@ StatusNet.LoginDialog = function(_onSuccess) {
  * @return StatusNet.Client object
  */
 StatusNet.Client = function(_account) {
+
     this.account  = _account;
+
+    this.init();
+
     this._timeline = "friends_timeline"; // which timeline are we currently showing?
 
-    this.timeline = null;
-
     this.view = new StatusNet.TimelineViewFriends(this);
-    this.timeline = new StatusNet.TimelineFriends(this);
+    this.timeline =  new StatusNet.TimelineFriends(this);
 
     this.timeline.update();
 
+}
+
+StatusNet.Client.prototype.switchTimeline = function(timeline) {
+
+    Titanium.API.debug("StatusNet.Client.prototype.switchTimeline()");
+
+    switch (timeline) {
+
+        case 'public':
+            this._timeline = 'public';
+            this.view = new StatusNet.TimelineViewPublic(this);
+            this.timeline = new StatusNet.TimelinePublic(this);
+            break;
+        case 'user':
+            this._timeline = 'user';
+            this.view = new StatusNet.TimelineViewUser(this);
+            this.timeline = new StatusNet.TimelineUser(this);
+            break;
+        case "friends":
+            this._timeline = 'friends';
+            this.view = new StatusNet.TimelineViewFriends(this);
+            this.timeline = new StatusNet.TimelineFriends(this);
+            break;
+        case 'mentions':
+            this._timeline = 'mentions';
+            this.view = new StatusNet.TimelineViewMentions(this);
+            this.timeline = new StatusNet.TimelineMentions(this);
+            break;
+        default:
+            throw new Exception("Gah wrong timeline");
+    }
+
+    this.timeline.update();
+
+}
+
+/**
+ * Clear the current notice list, then start reloading it.
+ */
+StatusNet.Client.prototype.refresh = function() {
+    switch (this._timeline) {
+        case "friends_timeline":
+            this.timeline.update();
+            break;
+        default:
+            throw new Exception("Gah wrong timeline");
+    }
+}
+
+/**
+ * General initialization stuff
+ */
+StatusNet.Client.prototype.init = function() {
+
+    that = this;
+
     this.server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
 
-    var profile = this.server + this.account.username;
-    $('ul.nav li#nav_timeline_profile > a').attr('href', profile);
+    // Add event handlers for buttons
 
-    var personal = this.server + this.account.username + '/all';
-    $('ul.nav li#nav_timeline_personal > a').attr('href', personal);
+    $('#public_img').bind('click', function() { that.switchTimeline('public') });
+    $('#friends_img').bind('click', function() { that.switchTimeline('friends') });
+    $('#user_img').bind('click', function() { that.switchTimeline('user') });
+    $('#mentions_img').bind('click', function() { that.switchTimeline('mentions') });
 
-    var replies = this.server + this.account.username + '/replies';
-    $('ul.nav li#nav_timeline_replies > a').attr('href', replies);
+    // until we have private message timelines working
+    var inbox = this.server + this.account.username + '/inbox';
+    $('ul.nav li#nav_timeline_inbox > a').attr('href', inbox);
 
-    var public_timeline = this.server;
-    $('ul.nav li#nav_timeline_public > a').attr('href', public_timeline);
+    // until we have built-in search working
+    var search = this.server + 'search/notice';
+    $('ul.nav li#nav_timeline_search > a').attr('href', search);
 
-    /**
-     * Clear the current notice list, then start reloading it.
-     *
-     * @fixme May be best not to clear the old notices until
-     *        the async load is complete.
-     */
-    this.refresh = function() {
+    // post a new notice
+    $('#update_button').bind('click', function() { that.postNotice(); });
 
-        $('ul.notices').remove();
+    // refresh timeline when window is clicked
+    $("#content").bind('click', function() { that.refresh(); });
 
-        switch (this._timeline) {
-            case "friends_timeline":
-                this.timeline.update();
-                break;
-            default:
-                throw new Exception("Gah wrong timeline");
-        }
-    }
+    // make links open in an external browser window
+    $('a[rel=external]').live('click', function() {
+        Titanium.Desktop.openURL($(this).attr('href'));
+        return false;
+    });
 
 }
 
@@ -359,7 +413,7 @@ StatusNet.Timeline.prototype.update = function() {
 
         function(status, data) {
 
-            Titanium.API.debug('Fetching ' + this.url);
+            Titanium.API.debug('Fetching ' + that.url);
 
             $(data).find('feed > entry').each(function() {
 
@@ -468,6 +522,8 @@ function heir(p) {
 StatusNet.TimelineFriends = function(client) {
     StatusNet.Timeline.call(this, client);
 
+    // set window title here?
+
     this.url = 'statuses/friends_timeline.atom';
 
 }
@@ -485,5 +541,72 @@ StatusNet.TimelineViewFriends = function(client) {
 // Make StatusNet.TimelineViewFriends inherit TimelineView's prototype
 StatusNet.TimelineViewFriends.prototype = heir(StatusNet.TimelineView.prototype);
 
+/**
+ * Constructor for mentions timeline model
+ */
+StatusNet.TimelineMentions = function(client) {
+    StatusNet.Timeline.call(this, client);
 
+    this.url = 'statuses/mentions.atom';
+
+}
+
+// Make StatusNet.TimelineMentions inherit Timeline's prototype
+StatusNet.TimelineMentions.prototype = heir(StatusNet.Timeline.prototype);
+
+/**
+ * Constructor for a view for Mentions timeline
+ */
+StatusNet.TimelineViewMentions = function(client) {
+    StatusNet.TimelineView.call(this, client);
+}
+
+// Make StatusNet.TimelineViewMentions inherit TimelineView's prototype
+StatusNet.TimelineViewMentions.prototype = heir(StatusNet.TimelineView.prototype);
+
+/**
+ * Constructor for public timeline model
+ */
+StatusNet.TimelinePublic = function(client) {
+    StatusNet.Timeline.call(this, client);
+
+    this.url = 'statuses/public_timeline.atom';
+
+}
+
+// Make StatusNet.TimelinePublic inherit Timeline's prototype
+StatusNet.TimelinePublic.prototype = heir(StatusNet.Timeline.prototype);
+
+/**
+ * Constructor for a view for public timeline
+ */
+StatusNet.TimelineViewPublic = function(client) {
+    StatusNet.TimelineView.call(this, client);
+}
+
+// Make StatusNet.TimelineViewPublic inherit TimelineView's prototype
+StatusNet.TimelineViewPublic.prototype = heir(StatusNet.TimelineView.prototype);
+
+/**
+ * Constructor for use timeline model
+ */
+StatusNet.TimelineUser = function(client) {
+    StatusNet.Timeline.call(this, client);
+
+    this.url = 'statuses/user_timeline.atom';
+
+}
+
+// Make StatusNet.TimelineUser inherit Timeline's prototype
+StatusNet.TimelineUser.prototype = heir(StatusNet.Timeline.prototype);
+
+/**
+ * Constructor for a view for Mentions timeline
+ */
+StatusNet.TimelineViewUser = function(client) {
+    StatusNet.TimelineView.call(this, client);
+}
+
+// Make StatusNet.TimelineViewPublic inherit TimelineView's prototype
+StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
 
