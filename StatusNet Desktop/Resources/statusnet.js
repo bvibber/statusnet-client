@@ -219,7 +219,7 @@ StatusNet.LoginDialog = function(_onSuccess) {
  */
 StatusNet.Client = function(_account) {
 
-    this.account  = _account;
+    this.account = _account;
 
     this.init();
 
@@ -232,6 +232,11 @@ StatusNet.Client = function(_account) {
 
 }
 
+/**
+ * Switch the view to a specified timeline
+ *
+ * @param String timeline   the timeline to show
+ */
 StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
     Titanium.API.debug("StatusNet.Client.prototype.switchTimeline()");
@@ -267,21 +272,16 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             throw new Exception("Gah wrong timeline");
     }
 
+    StatusNet.Sidebar.setSelectedTimeline(timeline);
     this.timeline.update();
 
 }
 
 /**
- * Clear the current notice list, then start reloading it.
+ * Reload timeline notices
  */
 StatusNet.Client.prototype.refresh = function() {
-    switch (this._timeline) {
-        case "friends_timeline":
-            this.timeline.update();
-            break;
-        default:
-            throw new Exception("Gah wrong timeline");
-    }
+    this.timeline.update();
 }
 
 /**
@@ -367,6 +367,51 @@ StatusNet.Client.prototype.postNotice = function()
             alert('Couldn\'t post notice - ' + XMLHttpRequest.status);
         }
     );
+
+}
+
+/**
+ * View class for managing the sidebar
+ *
+ */
+StatusNet.Sidebar = function(client) {
+    Titanium.API.debug("StatusNet.sidebar()");
+    this.client = client;
+}
+
+/**
+ * Class method to higlight the icon associated with the selected timeline
+ *
+ * @param String timeline   the timeline to highlight
+ */
+StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
+
+    switch(timeline) {
+        case 'friends':
+            $('#friends_img').attr('src', '/images/blue/Chat.png');
+            $('#mentions_img').attr('src', '/images/At.png');
+            $('#favorites_img').attr('src', '/images/star.png');
+            break;
+        case 'mentions':
+            $('#friends_img').attr('src', '/images/Chat.png');
+            $('#mentions_img').attr('src', '/images/blue/At.png');
+            $('#favorites_img').attr('src', '/images/star.png');
+            break;
+        case 'favorites':
+            $('#friends_img').attr('src', '/images/Chat.png');
+            $('#mentions_img').attr('src', '/images/At.png');
+            $('#favorites_img').attr('src', '/images/blue/star.png');
+            break;
+        default:
+            $('#friends_img').attr('src', '/images/Chat.png');
+            $('#mentions_img').attr('src', '/images/At.png');
+            $('#favorites_img').attr('src', '/images/star.png');
+
+            // @todo Do something for public and user...
+
+            Titanium.API.debug("I don\'t know how to highlight this timeline.");
+            break;
+    }
 
 }
 
