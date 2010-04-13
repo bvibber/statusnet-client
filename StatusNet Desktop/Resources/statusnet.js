@@ -388,23 +388,23 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
 
     switch(timeline) {
         case 'friends':
-            $('#friends_img').attr('src', '/images/blue/Chat.png');
-            $('#mentions_img').attr('src', '/images/At.png');
+            $('#friends_img').attr('src', '/images/blue/chat.png');
+            $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             break;
         case 'mentions':
-            $('#friends_img').attr('src', '/images/Chat.png');
-            $('#mentions_img').attr('src', '/images/blue/At.png');
+            $('#friends_img').attr('src', '/images/chat.png');
+            $('#mentions_img').attr('src', '/images/blue/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             break;
         case 'favorites':
-            $('#friends_img').attr('src', '/images/Chat.png');
-            $('#mentions_img').attr('src', '/images/At.png');
+            $('#friends_img').attr('src', '/images/chat.png');
+            $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/blue/star.png');
             break;
         default:
-            $('#friends_img').attr('src', '/images/Chat.png');
-            $('#mentions_img').attr('src', '/images/At.png');
+            $('#friends_img').attr('src', '/images/chat.png');
+            $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
 
             // @todo Do something for public and user...
