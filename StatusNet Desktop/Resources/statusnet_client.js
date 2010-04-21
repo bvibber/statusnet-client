@@ -26,7 +26,7 @@ StatusNet.Client = function(_account) {
  */
 StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
-    Titanium.API.debug("StatusNet.Client.prototype.switchTimeline()");
+    StatusNet.debug("StatusNet.Client.prototype.switchTimeline()");
 
     switch (timeline) {
 
@@ -127,8 +127,8 @@ StatusNet.Client.prototype.postNotice = function()
 
     this.account.postUrl(url, params,
         function(status, data) {
-            Titanium.API.debug(data);
-            Titanium.API.debug(data.user);
+            StatusNet.debug(data);
+            StatusNet.debug(data.user);
 
             var status = {};
 
@@ -145,7 +145,7 @@ StatusNet.Client.prototype.postNotice = function()
             //$('#statuses > div.notice:first').before(data.text);
         },
         function(xhr, status, thrown) {
-            Titanium.API.debug(
+            StatusNet.debug(
                 XMLHttpRequest.status +
                 ' - ' +
                 XMLHttpRequest.responseText

@@ -53,7 +53,7 @@ StatusNet.LoginDialog = function(_onSuccess) {
         account.fetchUrl('account/verify_credentials.xml',
             function(status, data) {
                 $("#loginform").hide();
-                Titanium.API.debug("Successful login");
+                StatusNet.debug("Successful login");
 
                 // Update the avatar in the sidebar
                 account.avatar = $(data).find('profile_image_url').text();

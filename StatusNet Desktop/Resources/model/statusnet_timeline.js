@@ -12,7 +12,7 @@ StatusNet.Timeline = function(client, view) {
 
     this._statuses = new Array();
 
-    Titanium.API.debug("StatusNet.Timeline constructor");
+    StatusNet.debug("StatusNet.Timeline constructor");
 }
 
 /**
@@ -23,7 +23,7 @@ StatusNet.Timeline.prototype.addStatus = function(status, prepend) {
     // dedupe here?
     for (i = 0; i < this._statuses.length; i++) {
         if (this._statuses[i].noticeId === status.noticeId) {
-            Titanium.API.debug("skipping duplicate notice: " + status.noticeId);
+            StatusNet.debug("skipping duplicate notice: " + status.noticeId);
             return;
         }
     }
@@ -47,7 +47,7 @@ StatusNet.Timeline.prototype.update = function() {
 
         function(status, data) {
 
-            Titanium.API.debug('Fetching ' + that.url);
+            StatusNet.debug('Fetching ' + that.url);
 
             $(data).find('feed > entry').each(function() {
 
@@ -83,7 +83,7 @@ StatusNet.Timeline.prototype.update = function() {
             that.view.show();
         },
         function(status, thrown) {
-            Titanium.API.debug("Someting went wrong retreiving timeline.");
+            StatusNet.debug("Someting went wrong retreiving timeline.");
             alert("Couldn't get timeline.");
         }
     );

@@ -8,7 +8,7 @@
  */
 StatusNet.Account = function(username, password, apiroot) {
 
-    Titanium.API.debug('in StatusNet.Account()');
+    StatusNet.debug('in StatusNet.Account()');
 
     this.username = username;
     this.password = password;
@@ -23,19 +23,19 @@ StatusNet.Account = function(username, password, apiroot) {
  */
 StatusNet.Account.getDefault = function(db) {
 
-    Titanium.API.debug('in StatusNet.Account.getDefault()');
+    StatusNet.debug('in StatusNet.Account.getDefault()');
 
     row = db.execute('select * from account where is_default = 1');
 
     if (row.isValidRow()) {
-        Titanium.API.debug('found an account');
+        StatusNet.debug('found an account');
         return new StatusNet.Account(
             row.fieldByName("username"),
             row.fieldByName("password"),
             row.fieldByName("apiroot")
         );
     } else {
-        Titanium.API.debug('did not find an account');
+        StatusNet.debug('did not find an account');
         return null;
     }
 }
@@ -51,7 +51,7 @@ StatusNet.Account.getDefault = function(db) {
  */
 StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
 
-     Titanium.API.debug('in fetchUrl()');
+     StatusNet.debug('in fetchUrl()');
 
      $.ajax({ url: this.apiroot + method,
          username: this.username,
@@ -68,7 +68,7 @@ StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
 
 StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError) {
 
-    Titanium.API.debug('in postUrl()');
+    StatusNet.debug('in postUrl()');
 
      $.ajax({ url: this.apiroot + method,
          username: this.username,
@@ -94,17 +94,17 @@ StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError)
  */
 StatusNet.Account.prototype.ensure = function(db) {
 
-    Titanium.API.debug('in ensure()');
+    StatusNet.debug('in ensure()');
 
     var rs = db.execute("select * from account where username = '" + this.username + "' and apiroot = '" + this.apiroot + "'");
 
     if (rs.rowCount() === 0) {
-        Titanium.API.debug('account table is empty');
+        StatusNet.debug('account table is empty');
 
         rs = db.execute("INSERT INTO account (username, password, apiroot, is_default) " +
             "VALUES ('"+this.username+"', '"+this.password+"', '"+this.apiroot+"', 1)");
 
-        Titanium.API.debug('inserted ' + db.rowsAffected + 'rows');
+        StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 
       }
 

@@ -4,7 +4,7 @@
  * @param StatusNet.Client client  The controller
  */
 StatusNet.TimelineView = function(client) {
-    Titanium.API.debug("in StatusNet.TimelineView");
+    StatusNet.debug("in StatusNet.TimelineView");
     this.client = client;
 }
 

@@ -3,7 +3,7 @@
  *
  */
 StatusNet.Sidebar = function(client) {
-    Titanium.API.debug("StatusNet.sidebar()");
+    StatusNet.debug("StatusNet.sidebar()");
     this.client = client;
 }
 
@@ -37,7 +37,7 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
 
             // @todo Do something for public and user...
 
-            Titanium.API.debug("I don\'t know how to highlight this timeline.");
+            StatusNet.debug("I don\'t know how to highlight this timeline.");
             break;
     }
 
