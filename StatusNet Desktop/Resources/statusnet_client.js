@@ -119,10 +119,8 @@ StatusNet.Client.prototype.postNotice = function()
 
     var noticeText = $('#notice_textarea').val();
 
-    var params = { status: noticeText,
-                   source: 'StatusNet Desktop'
-                 };
-
+    var params = 'status=' + noticeText + '&source=StatusNet Desktop';
+                
     var that = this;
 
     this.account.postUrl(url, params,
@@ -144,14 +142,9 @@ StatusNet.Client.prototype.postNotice = function()
 
             //$('#statuses > div.notice:first').before(data.text);
         },
-        function(xhr, status, thrown) {
-            StatusNet.debug(
-                XMLHttpRequest.status +
-                ' - ' +
-                XMLHttpRequest.responseText
-            );
-
-            alert('Couldn\'t post notice - ' + XMLHttpRequest.status);
+        function(client, msg) {
+            StatusNet.debug('Could not post notice: ' + msg);
+            alert('Couldn not post notice: ' + msg);
         }
     );
 

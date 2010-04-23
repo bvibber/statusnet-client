@@ -51,38 +51,70 @@ StatusNet.Account.getDefault = function(db) {
  */
 StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
 
-     StatusNet.debug('in fetchUrl()');
+	StatusNet.debug('in fetchUrl');
 
-     $.ajax({ url: this.apiroot + method,
-         username: this.username,
-         password: this.password,
-         success: function(data, status, xhr) {
-             onSuccess(status, data);
-         },
-         error: function(xhr, status, thrown) {
-             onError(status, thrown);
-         }
-    });
-
+	var client = Titanium.Network.createHTTPClient();
+	
+	client.onload = function() {
+		if (this.status == 200) { 
+			
+			// @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
+			// to use this work-around.
+			var responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
+			
+			onSuccess(this.status, responseXML); 
+		} else { 
+			onError(client, "HTTP status: " + this.status); 
+		}
+	};
+	
+	client.onerror = function(e) {
+		onError(client, "Error: " + e.error);
+	}
+		
+	client.setBasicCredentials(this.username, this.password);
+	
+	// @fixme Hack to work around bug in the Titanium Desktop 1.2.1
+	// onload will not fire unless there a function assigned to 
+	// onreadystatechange.
+	client.onreadystatechange = function() {
+		// NOP
+	};
+		
+	client.open("GET", this.apiroot + method);
+	client.send();
 }
 
 StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError) {
 
-    StatusNet.debug('in postUrl()');
+	StatusNet.debug('in postUrl');
 
-     $.ajax({ url: this.apiroot + method,
-         username: this.username,
-         password: this.password,
-         type: 'POST',
-         data: data,
-         dataType: 'json',
-         success: function(data, status, xhr) {
-             onSuccess(status, data);
-         },
-         error: function(xhr, status, thrown) {
-             onError(xhr, status, thrown);
-         }
-    });
+	var client = Titanium.Network.createHTTPClient();
+	
+	client.onload = function() {
+		if (this.status == 200) { 
+			var json = JSON.parse(this.responseText)
+			onSuccess(this.status, json); 
+		} else { 
+			onError(client, 'HTTP status: ' + this.status); 
+		}
+	};
+	
+	client.onerror = function(e) {
+		onError(client, "Error: " + e.error);
+	}
+	
+	client.setBasicCredentials(this.username, this.password);
+	
+	// @fixme Hack to work around bug in the Titanium Desktop 1.2.1
+	// onload will not fire unless there a function assigned to 
+	// onreadystatechange.
+	client.onreadystatechange = function() {
+		// NOP
+	};
+		
+	client.open("POST", this.apiroot + method);
+	client.send(data);
 }
 
 /**

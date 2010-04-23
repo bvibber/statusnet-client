@@ -47,10 +47,13 @@ StatusNet.Timeline.prototype.update = function() {
 
         function(status, data) {
 
-            StatusNet.debug('Fetching ' + that.url);
+            StatusNet.debug('Fetched ' + that.url);
+			StatusNet.debug('HTTP client returned: ' + data);
 
             $(data).find('feed > entry').each(function() {
 
+				StatusNet.debug('found an entry');
+				
                 var status = {};
 
                 // note: attribute selectors seem to have problems with [media:width=48]
@@ -82,9 +85,9 @@ StatusNet.Timeline.prototype.update = function() {
             // use events instead? Observer?
             that.view.show();
         },
-        function(status, thrown) {
-            StatusNet.debug("Someting went wrong retreiving timeline.");
-            alert("Couldn't get timeline.");
+        function(client, msg) {
+            StatusNet.debug("Someting went wrong retreiving timeline: " + msg);
+            alert("Couldn't get timeline: " + msg);
         }
     );
 
