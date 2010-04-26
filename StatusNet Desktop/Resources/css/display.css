@@ -56,12 +56,13 @@ a {
 }
 
 #content {
-  height:600px;
-  overflow-y: auto;
-  overflow-x: hidden;
+	height: 100%;
 }
 
 #body {
+  height:540px;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding:5px;
 }
 
