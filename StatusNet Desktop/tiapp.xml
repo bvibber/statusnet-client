@@ -6,7 +6,7 @@
 <version>1.0</version>
 <publisher>StatusNet, Inc.</publisher>
 <url>http://status.net</url>
-<icon>logo.png</icon>
+<icon>logo-256.png</icon>
 <copyright>2010 by StatusNet, Inc.</copyright>
 <!-- Window Definition - these values can be edited -->
 <window>
