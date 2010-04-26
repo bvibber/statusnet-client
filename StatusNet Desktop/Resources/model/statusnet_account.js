@@ -61,8 +61,8 @@ StatusNet.Account.listAll = function(db) {
 
 	var accounts = [];
 
-    row = db.execute('select * from account');
-    while (row.isValidRow()) {
+    result = db.execute('select * from account');
+    while (result.isValidRow()) {
 		accounts[accounts.length] = StatusNet.Account.fromRow(result);
         result.next();
     }
