@@ -35,7 +35,7 @@ StatusNet.TimelineView.prototype.show = function () {
         $('.notice a').attr('rel', 'external');
     }
 
-    this.view.hideSpinner();
+    this.hideSpinner();
 }
 
 StatusNet.TimelineView.prototype.showSpinner = function() {
