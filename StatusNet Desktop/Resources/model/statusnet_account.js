@@ -29,15 +29,45 @@ StatusNet.Account.getDefault = function(db) {
 
     if (row.isValidRow()) {
         StatusNet.debug('found an account');
-        return new StatusNet.Account(
-            row.fieldByName("username"),
-            row.fieldByName("password"),
-            row.fieldByName("apiroot")
-        );
+        var acct = StatusNet.Account.fromRow(row);
+        row.close();
+        return acct;
     } else {
         StatusNet.debug('did not find an account');
         return null;
     }
+}
+
+/**
+ * Load an Account object from a database row w/ info
+ * @param Titanium.Database.ResultSet row
+ * @return StatusNet.Account object
+ */
+StatusNet.Account.fromRow = function(row) {
+
+	return new StatusNet.Account(
+		row.fieldByName("username"),
+		row.fieldByName("password"),
+		row.fieldByName("apiroot")
+	);
+}
+
+/**
+ * Load up all configured accounts from the database, if any.
+ *
+ * @return array of StatusNet.Account objects
+ */
+StatusNet.Account.listAll = function(db) {
+
+	var accounts = [];
+
+    row = db.execute('select * from account');
+    while (row.isValidRow()) {
+		accounts[accounts.length] = StatusNet.Account.fromRow(result);
+        result.next();
+    }
+    result.close();
+    return accounts;
 }
 
 /**
