@@ -35,6 +35,18 @@ StatusNet.TimelineView.prototype.show = function () {
         $('.notice a').attr('rel', 'external');
     }
 
+    this.view.hideSpinner();
+}
+
+StatusNet.TimelineView.prototype.showSpinner = function() {
+    StatusNet.debug("showSpinner");
+    $('#statuses').empty();
+    $('#statuses').append('<img id="spinner" src="/images/icon_processing.gif" />');
+}
+
+StatusNet.TimelineView.prototype.hideSpinner = function() {
+    StatusNet.debug("hideSpinner");
+    $('#spinner').remove();
 }
 
 /**

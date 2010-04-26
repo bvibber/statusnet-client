@@ -15,6 +15,7 @@ StatusNet.Client = function(_account) {
     this.view = new StatusNet.TimelineViewFriends(this);
     this.timeline =  new StatusNet.TimelineFriends(this);
 
+    this.view.showSpinner(); // spinner will get hidden by the view when data finishes loading
     this.timeline.update();
 
 }
@@ -60,6 +61,8 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     }
 
     StatusNet.Sidebar.setSelectedTimeline(timeline);
+
+    this.view.showSpinner();
     this.timeline.update();
 
 }
@@ -120,7 +123,7 @@ StatusNet.Client.prototype.postNotice = function()
     var noticeText = $('#notice_textarea').val();
 
     var params = 'status=' + noticeText + '&source=StatusNet Desktop';
-                
+
     var that = this;
 
     this.account.postUrl(url, params,

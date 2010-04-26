@@ -34,6 +34,10 @@ StatusNet.LoginDialog = function(_onSuccess) {
      * hide the dialog and open up a friends timeline view.
      */
     this.onSubmit = function() {
+
+        $('#statuses').empty();
+        $('#statuses').append('<img id="spinner" src="/images/icon_processing.gif" />');
+
         var rootstr = $("#apiroot").val();
         var apiroot;
 
@@ -54,6 +58,7 @@ StatusNet.LoginDialog = function(_onSuccess) {
             function(status, data) {
                 $("#loginform").hide();
                 StatusNet.debug("Successful login");
+                $('#spinner').remove();
 
                 // Update the avatar in the sidebar
                 account.avatar = $(data).find('profile_image_url').text();
@@ -61,7 +66,10 @@ StatusNet.LoginDialog = function(_onSuccess) {
 
                 succfunc(account);
             },
-            function(status, error) { alert("Got an error!"); });
+            function(status, error) {
+                $('#spinner').remove();
+                alert("Got an error!");
+            });
         return false;
     }
 }
