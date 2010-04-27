@@ -18,6 +18,7 @@ $LAB
           ld = new StatusNet.LoginDialog(function(account) {
                ac = account;
                ac.ensure(db);
+               ac.setDefault(db);
                snc = new StatusNet.Client(ac);
                });
 

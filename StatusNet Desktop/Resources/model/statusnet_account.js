@@ -39,6 +39,15 @@ StatusNet.Account.getDefault = function(db) {
 }
 
 /**
+ * Set this account as the default.
+ */
+StatusNet.Account.prototype.setDefault = function(db) {
+	db.execute("update account set is_default=0 where is_default=1");
+	db.execute("update account set is_default=1 where username=? and apiroot=?",
+	           this.username, this.apiroot);
+}
+
+/**
  * Load an Account object from a database row w/ info
  * @param Titanium.Database.ResultSet row
  * @return StatusNet.Account object
@@ -164,7 +173,7 @@ StatusNet.Account.prototype.ensure = function(db) {
         StatusNet.debug('account table is empty');
 
         rs = db.execute("INSERT INTO account (username, password, apiroot, is_default) " +
-            "VALUES ('"+this.username+"', '"+this.password+"', '"+this.apiroot+"', 1)");
+            "VALUES ('"+this.username+"', '"+this.password+"', '"+this.apiroot+"', 0)");
 
         StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 
