@@ -1,0 +1,4 @@
+JS compilation checker, since Titanium is a bit... vague in how it reports
+such errors.
+
+js.jar is Mozilla Rhino interpreter
