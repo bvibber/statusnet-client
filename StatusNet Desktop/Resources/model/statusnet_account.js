@@ -30,6 +30,7 @@ StatusNet.Account.getDefault = function(db) {
     if (row.isValidRow()) {
         StatusNet.debug('found an account');
         var acct = StatusNet.Account.fromRow(row);
+        $('ul.nav li#nav_timeline_profile > img').attr('src', acct.avatar);
         row.close();
         return acct;
     } else {
@@ -54,11 +55,16 @@ StatusNet.Account.prototype.setDefault = function(db) {
  */
 StatusNet.Account.fromRow = function(row) {
 
-	return new StatusNet.Account(
+	var ac = new StatusNet.Account(
 		row.fieldByName("username"),
 		row.fieldByName("password"),
 		row.fieldByName("apiroot")
 	);
+
+	ac.avatar = row.fieldByName("profile_image_url");
+	StatusNet.debug("Account.fromRow - Avatar now = " + ac.avatar);
+
+	return ac;
 }
 
 /**
@@ -93,33 +99,33 @@ StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
 	StatusNet.debug('in fetchUrl');
 
 	var client = Titanium.Network.createHTTPClient();
-	
+
 	client.onload = function() {
-		if (this.status == 200) { 
-			
+		if (this.status == 200) {
+
 			// @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
 			// to use this work-around.
 			var responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
-			
-			onSuccess(this.status, responseXML); 
-		} else { 
-			onError(client, "HTTP status: " + this.status); 
+
+			onSuccess(this.status, responseXML);
+		} else {
+			onError(client, "HTTP status: " + this.status);
 		}
 	};
-	
+
 	client.onerror = function(e) {
 		onError(client, "Error: " + e.error);
 	}
-		
+
 	client.setBasicCredentials(this.username, this.password);
-	
+
 	// @fixme Hack to work around bug in the Titanium Desktop 1.2.1
-	// onload will not fire unless there a function assigned to 
+	// onload will not fire unless there a function assigned to
 	// onreadystatechange.
 	client.onreadystatechange = function() {
 		// NOP
 	};
-		
+
 	client.open("GET", this.apiroot + method);
 	client.send();
 }
@@ -129,29 +135,29 @@ StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError)
 	StatusNet.debug('in postUrl');
 
 	var client = Titanium.Network.createHTTPClient();
-	
+
 	client.onload = function() {
-		if (this.status == 200) { 
+		if (this.status == 200) {
 			var json = JSON.parse(this.responseText)
-			onSuccess(this.status, json); 
-		} else { 
-			onError(client, 'HTTP status: ' + this.status); 
+			onSuccess(this.status, json);
+		} else {
+			onError(client, 'HTTP status: ' + this.status);
 		}
 	};
-	
+
 	client.onerror = function(e) {
 		onError(client, "Error: " + e.error);
 	}
-	
+
 	client.setBasicCredentials(this.username, this.password);
-	
+
 	// @fixme Hack to work around bug in the Titanium Desktop 1.2.1
-	// onload will not fire unless there a function assigned to 
+	// onload will not fire unless there a function assigned to
 	// onreadystatechange.
 	client.onreadystatechange = function() {
 		// NOP
 	};
-		
+
 	client.open("POST", this.apiroot + method);
 	client.send(data);
 }
@@ -163,17 +169,18 @@ StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError)
  * @return boolean success
  * @fixme escape values going into SQL!
  */
-StatusNet.Account.prototype.ensure = function(db) {
+StatusNet.Account.prototype.ensure = function(db, data) {
 
-    StatusNet.debug('in ensure()');
+    StatusNet.debug('in Account.ensure');
+
+    var avatarUrl = $(data).find('profile_image_url').text();
 
     var rs = db.execute("select * from account where username = '" + this.username + "' and apiroot = '" + this.apiroot + "'");
 
     if (rs.rowCount() === 0) {
-        StatusNet.debug('account table is empty');
 
-        rs = db.execute("INSERT INTO account (username, password, apiroot, is_default) " +
-            "VALUES ('"+this.username+"', '"+this.password+"', '"+this.apiroot+"', 0)");
+        rs = db.execute("INSERT INTO account (username, password, apiroot, is_default, profile_image_url) " +
+            "VALUES ('"+this.username+"', '"+this.password+"', '"+this.apiroot+"', 0, '" + avatarUrl + "')");
 
         StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 

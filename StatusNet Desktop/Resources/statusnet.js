@@ -34,7 +34,7 @@ StatusNet.getDB = function() {
         StatusNet.debug("app dir = " + Titanium.Filesystem.getApplicationDataDirectory());
 
         this.db = Titanium.Database.openFile(dbFile);
-        this.db.execute("CREATE TABLE IF NOT EXISTS account (username varchar(255), password varchar(255), apiroot varchar(255), is_default integer default 0, last_timeline_id integer, PRIMARY KEY (username, apiroot))");
+        this.db.execute("CREATE TABLE IF NOT EXISTS account (username varchar(255), password varchar(255), apiroot varchar(255), is_default integer default 0, last_timeline_id integer, profile_image_url varchar(255), PRIMARY KEY (username, apiroot))");
      }
      return this.db;
 }

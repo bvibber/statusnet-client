@@ -16,9 +16,9 @@ $LAB
      var snc = null;
 
      if (ac === null) {
-          ld = new StatusNet.LoginDialog(function(account) {
+          ld = new StatusNet.LoginDialog(function(account, data) {
                ac = account;
-               ac.ensure(db);
+               ac.ensure(db, data);
                ac.setDefault(db);
                snc = new StatusNet.Client(ac);
                });

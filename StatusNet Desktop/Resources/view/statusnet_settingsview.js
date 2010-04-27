@@ -43,7 +43,7 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
 /**
  * Add an account row to the accounts list.
  * Avatar will start loading asynchronously, whee!
- * 
+ *
  * @param StatusNet.Account acct
  */
 StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
@@ -62,17 +62,17 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
 	var td_site = document.createElement('td');
 	$(td_site).addClass('site').text(acct.apiroot);
 	tr.appendChild(td_site);
-	
+
 	var list = $('#accountlist tbody')[0];
 	list.appendChild(tr);
-	
+
 	$(tr).click(function() {
 		acct.setDefault(StatusNet.getDB());
 		var me = Titanium.UI.getCurrentWindow();
 		me.getParent().setURL("app:///index.html");
 		me.close();
 	});
-	
+
 	acct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
 		var avatar = $("user profile_image_url", xml).text();
 		StatusNet.debug(avatar);
@@ -94,7 +94,10 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
 		$("#new-save").attr("disabled", "disabled");
 		$("#new-avatar").attr("src", "images/icon_processing.gif");
 
+        that = this;
+
 		this.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
+			that.xml = xml;
 			var avatar = $("user profile_image_url", xml).text();
 			StatusNet.debug(avatar);
 			$("#new-avatar").attr("src", avatar);
@@ -109,7 +112,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
 /**
  * Build an account object from the info in our form, if possible.
  * We won't yet know for sure whether it's valid, however...
- * 
+ *
  * @return StatusNet.Account or null
  */
 StatusNet.SettingsView.prototype.newAccount = function() {
@@ -133,7 +136,7 @@ StatusNet.SettingsView.prototype.newAccount = function() {
 }
 
 StatusNet.SettingsView.prototype.saveNewAccount = function() {
-	this.workAcct.ensure(StatusNet.getDB());
+	this.workAcct.ensure(StatusNet.getDB(), this.xml);
 	this.showAccountRow(this.workAcct);
 
 	$("#new-account").hide();

@@ -59,12 +59,7 @@ StatusNet.LoginDialog = function(_onSuccess) {
                 $("#loginform").hide();
                 StatusNet.debug("Successful login");
                 $('#spinner').remove();
-
-                // Update the avatar in the sidebar
-                account.avatar = $(data).find('profile_image_url').text();
-                $('#nav_timeline_profile a > img').attr("src", account.avatar);
-
-                succfunc(account);
+                succfunc(account, data);
             },
             function(status, error) {
                 $('#spinner').remove();
