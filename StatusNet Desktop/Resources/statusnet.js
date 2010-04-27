@@ -39,6 +39,18 @@ StatusNet.getDB = function() {
      return this.db;
 }
 
+
+/**
+ * Show settings dialog
+ * @fixme make sure it's a singleton!
+ */
+StatusNet.showSettings = function() {
+    var win = Titanium.UI.getCurrentWindow().createWindow({
+        url: 'app:///settings.html',
+        title: 'Settings'});
+    win.open();
+}
+
 /**
  * Utility function to create a prototype for the subclass
  * that inherits from the prototype of the superclass.

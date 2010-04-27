@@ -10,8 +10,7 @@ StatusNet.SettingsView.prototype.init = function() {
 
     var that = this;
     $("#add-account").click(function() {
-        that.resetNewAccount();
-        $("#new-account").show();
+        that.showAddAccount();
     });
     $("#new-username").change(function() {
         that.updateNewAccount();
@@ -26,17 +25,32 @@ StatusNet.SettingsView.prototype.init = function() {
         that.saveNewAccount();
     });
     $("#new-cancel").click(function() {
-        $("#new-account").hide();
-        that.resetNewAccount();
+        that.hideAddAccount();
     });
+}
+
+StatusNet.SettingsView.prototype.showAddAccount = function() {
+    this.resetNewAccount();
+    $("#new-account").show();
+    $("#new-username").focus();
+}
+
+StatusNet.SettingsView.prototype.hideAddAccount = function() {
+    $("#new-account").hide();
+    this.resetNewAccount();
 }
 
 /**
  * @fixme really should separate this a bit more to model/view?
  */
 StatusNet.SettingsView.prototype.showAccounts = function() {
-    for (var i = 0; i < this.accounts.length; i++) {
-        this.showAccountRow(this.accounts[i]);
+    if (this.accounts.length == 0) {
+        $("#status").text("No accounts set up -- time to add one!");
+        this.showAddAccount();
+    } else {
+        for (var i = 0; i < this.accounts.length; i++) {
+            this.showAccountRow(this.accounts[i]);
+        }
     }
 }
 
@@ -139,8 +153,7 @@ StatusNet.SettingsView.prototype.saveNewAccount = function() {
     this.workAcct.ensure(StatusNet.getDB(), this.xml);
     this.showAccountRow(this.workAcct);
 
-    $("#new-account").hide();
-    this.resetNewAccount();
+    this.hideAddAccount();
 }
 
 StatusNet.SettingsView.prototype.resetNewAccount = function() {

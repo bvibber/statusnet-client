@@ -5,6 +5,8 @@ $LAB
     .script("statusnet_client.js")
     .wait(function(){
     
-    var sv = new StatusNet.SettingsView();
-    sv.init();
+    $(function() {
+        var sv = new StatusNet.SettingsView();
+        sv.init();
+    });
 });

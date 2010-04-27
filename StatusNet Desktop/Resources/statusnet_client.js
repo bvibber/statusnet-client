@@ -75,17 +75,6 @@ StatusNet.Client.prototype.refresh = function() {
 }
 
 /**
- * Show settings dialog
- * @fixme make sure it's a singleton!
- */
-StatusNet.Client.prototype.showSettings = function() {
-    var win = Titanium.UI.getCurrentWindow().createWindow({
-        url: 'app:///settings.html',
-        title: 'Settings'});
-    win.open();
-}
-
-/**
  * General initialization stuff
  */
 StatusNet.Client.prototype.init = function() {
@@ -101,7 +90,7 @@ StatusNet.Client.prototype.init = function() {
     $('#user_img').bind('click', function() { that.switchTimeline('user') });
     $('#mentions_img').bind('click', function() { that.switchTimeline('mentions') });
     $('#favorites_img').bind('click', function() { that.switchTimeline('favorites') });
-    $('#settings_img').bind('click', function() { that.showSettings() });
+    $('#settings_img').bind('click', function() { StatusNet.showSettings() });
 
     // until we have private message timelines working
     var inbox = this.server + this.account.username + '/inbox';

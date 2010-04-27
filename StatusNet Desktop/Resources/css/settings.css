@@ -1,38 +1,38 @@
 body {
-	padding: 16px;
+    padding: 16px;
 }
 
 #accountlist {
-	background: Window;
-	border: solid 1px #888;
-	-webkit-border-radius: 4px;
-	padding: 8px;
-	border-collapse: collapse;
+    background: Window;
+    border: solid 1px #888;
+    -webkit-border-radius: 4px;
+    padding: 8px;
+    border-collapse: collapse;
 }
 #accountlist tr {
-	border-top: solid 1px #eee;
-	background-color: Window;
-	color: WindowText;
+    border-top: solid 1px #eee;
+    background-color: Window;
+    color: WindowText;
 }
 #accountlist tr:hover {
-	background-color: Highlight;
-	color: HighlightText;
+    background-color: Highlight;
+    color: HighlightText;
 }
 #accountlist td {
-	padding: 4px;
+    padding: 4px;
 }
 
-#accountlist img {
-	width: 48px;
-	height: 48px;
+#accountlist img, #new-account img {
+    width: 48px;
+    height: 48px;
 }
 
 #accountlist .name {
-	font-size: 150%;
-	font-weight: bold;
-	padding-right: 16px;
+    font-size: 150%;
+    font-weight: bold;
+    padding-right: 16px;
 }
 #accountlist .site {
-	color: #444;
-	padding-left: 16px;
+    color: #444;
+    padding-left: 16px;
 }

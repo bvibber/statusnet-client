@@ -9,23 +9,16 @@ $LAB
     .script("model/statusnet_timeline_friends.js")
     .wait(function(){
 
-     var db = StatusNet.getDB();
+    var db = StatusNet.getDB();
 
-     var ac = StatusNet.Account.getDefault(db);
+    var ac = StatusNet.Account.getDefault(db);
 
-     var snc = null;
+    var snc = null;
 
-     if (ac === null) {
-          ld = new StatusNet.LoginDialog(function(account, data) {
-               ac = account;
-               ac.ensure(db, data);
-               ac.setDefault(db);
-               snc = new StatusNet.Client(ac);
-               });
-
-          ld.show();
-     } else {
-          snc = new StatusNet.Client(ac);
-     }
+    if (ac === null) {
+        StatusNet.showSettings();
+    } else {
+        snc = new StatusNet.Client(ac);
+    }
 
 });
