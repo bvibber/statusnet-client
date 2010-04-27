@@ -29,15 +29,54 @@ StatusNet.Account.getDefault = function(db) {
 
     if (row.isValidRow()) {
         StatusNet.debug('found an account');
-        return new StatusNet.Account(
-            row.fieldByName("username"),
-            row.fieldByName("password"),
-            row.fieldByName("apiroot")
-        );
+        var acct = StatusNet.Account.fromRow(row);
+        row.close();
+        return acct;
     } else {
         StatusNet.debug('did not find an account');
         return null;
     }
+}
+
+/**
+ * Set this account as the default.
+ */
+StatusNet.Account.prototype.setDefault = function(db) {
+	db.execute("update account set is_default=0 where is_default=1");
+	db.execute("update account set is_default=1 where username=? and apiroot=?",
+	           this.username, this.apiroot);
+}
+
+/**
+ * Load an Account object from a database row w/ info
+ * @param Titanium.Database.ResultSet row
+ * @return StatusNet.Account object
+ */
+StatusNet.Account.fromRow = function(row) {
+
+	return new StatusNet.Account(
+		row.fieldByName("username"),
+		row.fieldByName("password"),
+		row.fieldByName("apiroot")
+	);
+}
+
+/**
+ * Load up all configured accounts from the database, if any.
+ *
+ * @return array of StatusNet.Account objects
+ */
+StatusNet.Account.listAll = function(db) {
+
+	var accounts = [];
+
+    result = db.execute('select * from account');
+    while (result.isValidRow()) {
+		accounts[accounts.length] = StatusNet.Account.fromRow(result);
+        result.next();
+    }
+    result.close();
+    return accounts;
 }
 
 /**
@@ -134,7 +173,7 @@ StatusNet.Account.prototype.ensure = function(db) {
         StatusNet.debug('account table is empty');
 
         rs = db.execute("INSERT INTO account (username, password, apiroot, is_default) " +
-            "VALUES ('"+this.username+"', '"+this.password+"', '"+this.apiroot+"', 1)");
+            "VALUES ('"+this.username+"', '"+this.password+"', '"+this.apiroot+"', 0)");
 
         StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 
