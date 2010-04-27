@@ -2,6 +2,7 @@ StatusNet.SettingsView = function() {
     var db = StatusNet.getDB();
     this.accounts = StatusNet.Account.listAll(db);
     this.workAcct = null;
+    this.updateTimeout = null;
 }
 StatusNet.SettingsView.prototype.init = function() {
     $("#new-account").hide();
@@ -14,12 +15,18 @@ StatusNet.SettingsView.prototype.init = function() {
     });
     $("#new-username").change(function() {
         that.updateNewAccount();
+    }).keydown(function() {
+        that.startUpdateTimeout();
     });
     $("#new-password").change(function() {
         that.updateNewAccount();
+    }).keydown(function() {
+        that.startUpdateTimeout();
     });
     $("#new-site").change(function() {
         that.updateNewAccount();
+    }).keydown(function() {
+        that.startUpdateTimeout();
     });
     $("#new-save").click(function() {
         that.saveNewAccount();
@@ -96,15 +103,46 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     });
 }
 
+
+/**
+ * Start a timeout to try updating the account if the user stops
+ * typing after a couple seconds.
+ */
+StatusNet.SettingsView.prototype.startUpdateTimeout = function() {
+    // Push back the timeout if we're still typing...
+    this.cancelUpdateTimeout();
+
+    var that = this;
+    this.updateTimeout = window.setTimeout(function() { that.updateNewAccount() }, 2000);
+}
+
+/**
+ * Cancel the account update timeout if it's been started.
+ */
+StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
+    if (this.updateTimeout != null) {
+        window.clearTimeout(this.updateTimeout);
+        this.updateTimeout = null;
+    }
+}
+
 /**
  * Validate input and see if we can make it work yet
  */
 StatusNet.SettingsView.prototype.updateNewAccount = function() {
-    this.workAcct = this.newAccount();
-    if (this.workAcct == null) {
+    this.cancelUpdateTimeout();
+    var acct = this.newAccount();
+    if (acct == null) {
+        StatusNet.debug("Bogus acct");
+        this.workAcct = null;
         $("#new-save").attr("disabled", "disabled");
         $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+    } else if (acct.equals(this.workAcct)) {
+        // No change.
+        StatusNet.debug("No change!");
     } else {
+        StatusNet.debug("New acct");
+        this.workAcct = acct;
         $("#new-save").attr("disabled", "disabled");
         $("#new-avatar").attr("src", "images/icon_processing.gif");
 

@@ -188,3 +188,19 @@ StatusNet.Account.prototype.ensure = function(db, data) {
 
     return true;
 }
+
+/**
+ * Is this the same?
+ *
+ * @param mixed other a StatusNet.Account or null
+ * @return boolean
+ */
+StatusNet.Account.prototype.equals = function(other) {
+    if (other == null || typeof other != "object") {
+        return false;
+    }
+    return (typeof other == "object" &&
+            this.username == other.username &&
+            this.password == other.password &&
+            this.apiroot == other.apiroot);
+}
