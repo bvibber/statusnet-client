@@ -53,7 +53,7 @@ StatusNet.Timeline.prototype.update = function() {
             $(data).find('feed > entry').each(function() {
 
 				StatusNet.debug('found an entry');
-				
+
                 var status = {};
 
                 // note: attribute selectors seem to have problems with [media:width=48]
@@ -63,6 +63,14 @@ StatusNet.Timeline.prototype.update = function() {
                         status.avatar = $(el).attr('href');
                     }
                 });
+
+                // XXX: Quick hack to get rid of broken imgs in profile timeline
+                // We need to specialize StatusNet.TimelineUser to grab the avatar
+                // URL from the activity:subject or author. And probably move Atom
+                // parsing to its own class
+                if (!status.avatar) {
+                    status.avatar = that.account.avatar;
+                }
 
                 // Pull notice ID from permalink
                 var idRegexp = /(\d)+$/;
