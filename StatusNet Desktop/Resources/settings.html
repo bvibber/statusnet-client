@@ -19,10 +19,47 @@
 				</tr>
 			</tfoot>
 		</table>
-		<p><i>Sorry, the account dialog doesn't quite work yet.</i></p>
-		<div id="controls">
-			<a href="#" id="button_addaccount">+</a>
-			<a href="#" id="button_delaccount">-</a>
+
+		<div id="new-account">
+			<fieldset>
+				<table>
+					<tr>
+						<td rowspan="3" class="avatar">
+							<img id="new-avatar" src="images/default-avatar-stream.png">
+						</td>
+						<td class="label">
+							<label for="new-username">Nickname:</label>
+						</td>
+						<td>
+							<input id="new-username">
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label for="new-password">Password:</label>
+						</td>
+						<td>
+							<input id="new-password" type="password">
+						</td>
+					</tr>
+					<tr>
+						<td class="label">
+							<label for="new-site">Site:</label>
+						</td>
+						<td>
+							<input id="new-site">
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td>
+							<input id="new-save" type="submit" value="Save">
+							<input id="new-cancel" type="button" value="Cancel">
+						</td>
+					</tr>
+				</table>
+			</fieldset>
 		</div>
     </body>
 </html>
