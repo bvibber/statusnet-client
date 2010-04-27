@@ -10,8 +10,9 @@ StatusNet.SettingsView.prototype.init = function() {
     this.showAccounts();
 
     var that = this;
-    $("#add-account").click(function() {
+    $("tr.add").click(function() {
         that.showAddAccount();
+        return false;
     });
     $("#new-username").change(function() {
         that.updateNewAccount();
@@ -84,6 +85,10 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     $(td_site).addClass('site').text(acct.apiroot);
     tr.appendChild(td_site);
 
+    var td_remove = document.createElement('td');
+    $(td_remove).addClass('remove').html("<a href='#' title='Delete account'></a>");
+    tr.appendChild(td_remove);
+
     var list = $('#accountlist tbody')[0];
     list.appendChild(tr);
 
@@ -92,6 +97,17 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
         var me = Titanium.UI.getCurrentWindow();
         me.getParent().setURL("app:///index.html");
         me.close();
+    });
+    $("a", td_remove).click(function() {
+        if (confirm("Are you sure you want to delete the account " +
+                    acct.username +
+                    " on " +
+                   acct.apiroot +
+                   " ?")) {
+            acct.deleteAccount();
+            list.removeChild(tr);
+        }
+        return false;
     });
 
     acct.fetchUrl('account/verify_credentials.xml', function(status, xml) {

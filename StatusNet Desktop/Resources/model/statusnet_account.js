@@ -204,3 +204,26 @@ StatusNet.Account.prototype.equals = function(other) {
             this.password == other.password &&
             this.apiroot == other.apiroot);
 }
+
+/**
+ * Remove this account from the database, should it exist!
+ * If we removed the default account, we'll set the first next available
+ * account as the new default.
+ */
+StatusNet.Account.prototype.deleteAccount = function() {
+    var db = StatusNet.getDB();
+
+    StatusNet.debug("deleting...");
+    db.execute("delete from account where username=? and apiroot=?",
+               this.username, this.apiroot);
+    StatusNet.debug("deleted.");
+
+    StatusNet.debug("checking default...");
+    if (StatusNet.Account.getDefault(db) == null) {
+        StatusNet.debug("setting new default...");
+        // Set the first one we find as default if we removed the default...
+        db.execute("update account set is_default=1 limit 1");
+        StatusNet.debug("new default set!");
+    }
+    StatusNet.debug("done deleting!");
+}

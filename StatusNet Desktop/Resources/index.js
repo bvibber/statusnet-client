@@ -1,6 +1,5 @@
 $LAB
     .script("statusnet.js").wait()
-    .script("view/statusnet_login_dialog.js")
     .script("model/statusnet_account.js")
     .script("view/statusnet_sidebar.js")
     .script("statusnet_client.js")

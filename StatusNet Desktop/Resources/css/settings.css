@@ -21,6 +21,12 @@ body {
 #accountlist td {
     padding: 4px;
 }
+#accountlist td.add a {
+    content: url(../images/list-add.png);
+}
+#accountlist td.remove a {
+    content: url(../images/list-remove.png);
+}
 
 #accountlist img, #new-account img {
     width: 48px;
