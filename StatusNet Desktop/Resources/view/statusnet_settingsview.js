@@ -23,32 +23,29 @@ StatusNet.SettingsView.prototype.init = function() {
 	});
 }
 
+/**
+ * @fixme really should separate this a bit more to model/view?
+ */
 StatusNet.SettingsView.prototype.showAccounts = function() {
 	var list = $('#accountlist tbody')[0];
 	for (var i = 0; i < this.accounts.length; i++) {
-		StatusNet.debug('hi');
-
 		var acct = this.accounts[i];
 		var tr = document.createElement('tr');
 
-		StatusNet.debug('x1');
 		var td_icon = document.createElement('td');
 		var img_icon = document.createElement('img');
 		img_icon.src = "images/icon_processing.gif";
 		td_icon.appendChild(img_icon);
 		tr.appendChild(td_icon);
 
-		StatusNet.debug('x2');
 		var td_name = document.createElement('td');
 		$(td_name).addClass('name').text(acct.username);
 		tr.appendChild(td_name);
 
-		StatusNet.debug('x3');
 		var td_site = document.createElement('td');
 		$(td_site).addClass('site').text(acct.apiroot);
 		tr.appendChild(td_site);
 		
-		StatusNet.debug('x4');
 		list.appendChild(tr);
 		
 		acct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
@@ -58,7 +55,5 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
 		}, function(status) {
 			StatusNet.debug("We failed to load account info");
 		});
-		
-		StatusNet.debug('bye');
 	}
 }
