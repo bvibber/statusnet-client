@@ -6,6 +6,7 @@ $LAB
  	.script("statusnet_client.js")
 	.script("view/statusnet_timelineview.js")
 	.script("model/statusnet_timeline.js")
+	.script("model/statusnet_timeline_friends.js")
    	.wait(function(){
 	
      var db = StatusNet.getDB();

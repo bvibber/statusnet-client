@@ -16,7 +16,9 @@ StatusNet.TimelineView.prototype.show = function () {
 
     var statuses = this.client.timeline.getStatuses();
 
-    if (statuses) {
+    $('#statuses').empty();
+
+    if (statuses.length > 0) {
 
         var html = new Array();
 
@@ -30,9 +32,10 @@ StatusNet.TimelineView.prototype.show = function () {
             html.push('<div class="clear"></div>');
         }
 
-        $('#statuses').empty();
         $('#statuses').append(html.join(''));
         $('.notice a').attr('rel', 'external');
+    } else {
+        $('#statuses').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
     }
 
     this.hideSpinner();
