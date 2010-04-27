@@ -159,7 +159,7 @@ StatusNet.Client.prototype.postNotice = function()
         },
         function(client, msg) {
             StatusNet.debug('Could not post notice: ' + msg);
-            alert('Couldn not post notice: ' + msg);
+            alert('Could not post notice: ' + msg);
         }
     );
 
