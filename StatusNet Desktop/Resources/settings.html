@@ -2,13 +2,24 @@
 <html>
     <head>
         <link rel="stylesheet" href="css/display.css" type="text/css" charset="utf-8">
+        <link rel="stylesheet" href="css/settings.css" type="text/css" charset="utf-8">
         <script type="text/javascript" src="lib/jquery-1.4.2.min.js" />
 		<script type="text/javascript" src="lib/LAB.min.js" />
         <script type="text/javascript" src="settings.js" />
         <title></title>
     </head>
     <body>
-		<table id="accountlist"></table>
+		<table id="accountlist">
+			<tbody></tbody>
+			<tfoot>
+				<tr>
+					<td colspan="3">
+						<a href="#" id="add-account">Add account...</a>
+					</td>
+				</tr>
+			</tfoot>
+		</table>
+		<p><i>Sorry, the account dialog doesn't quite work yet.</i></p>
 		<div id="controls">
 			<a href="#" id="button_addaccount">+</a>
 			<a href="#" id="button_delaccount">-</a>
