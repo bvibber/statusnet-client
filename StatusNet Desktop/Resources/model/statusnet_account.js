@@ -43,9 +43,9 @@ StatusNet.Account.getDefault = function(db) {
  * Set this account as the default.
  */
 StatusNet.Account.prototype.setDefault = function(db) {
-	db.execute("update account set is_default=0 where is_default=1");
-	db.execute("update account set is_default=1 where username=? and apiroot=?",
-	           this.username, this.apiroot);
+    db.execute("update account set is_default=0 where is_default=1");
+    db.execute("update account set is_default=1 where username=? and apiroot=?",
+               this.username, this.apiroot);
 }
 
 /**
@@ -55,16 +55,16 @@ StatusNet.Account.prototype.setDefault = function(db) {
  */
 StatusNet.Account.fromRow = function(row) {
 
-	var ac = new StatusNet.Account(
-		row.fieldByName("username"),
-		row.fieldByName("password"),
-		row.fieldByName("apiroot")
-	);
+    var ac = new StatusNet.Account(
+        row.fieldByName("username"),
+        row.fieldByName("password"),
+        row.fieldByName("apiroot")
+    );
 
-	ac.avatar = row.fieldByName("profile_image_url");
-	StatusNet.debug("Account.fromRow - Avatar now = " + ac.avatar);
+    ac.avatar = row.fieldByName("profile_image_url");
+    StatusNet.debug("Account.fromRow - Avatar now = " + ac.avatar);
 
-	return ac;
+    return ac;
 }
 
 /**
@@ -74,11 +74,11 @@ StatusNet.Account.fromRow = function(row) {
  */
 StatusNet.Account.listAll = function(db) {
 
-	var accounts = [];
+    var accounts = [];
 
     result = db.execute('select * from account');
     while (result.isValidRow()) {
-		accounts[accounts.length] = StatusNet.Account.fromRow(result);
+        accounts[accounts.length] = StatusNet.Account.fromRow(result);
         result.next();
     }
     result.close();
@@ -96,70 +96,70 @@ StatusNet.Account.listAll = function(db) {
  */
 StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
 
-	StatusNet.debug('in fetchUrl');
+    StatusNet.debug('in fetchUrl');
 
-	var client = Titanium.Network.createHTTPClient();
+    var client = Titanium.Network.createHTTPClient();
 
-	client.onload = function() {
-		if (this.status == 200) {
+    client.onload = function() {
+        if (this.status == 200) {
 
-			// @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
-			// to use this work-around.
-			var responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
+            // @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
+            // to use this work-around.
+            var responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
 
-			onSuccess(this.status, responseXML);
-		} else {
-			onError(client, "HTTP status: " + this.status);
-		}
-	};
+            onSuccess(this.status, responseXML);
+        } else {
+            onError(client, "HTTP status: " + this.status);
+        }
+    };
 
-	client.onerror = function(e) {
-		onError(client, "Error: " + e.error);
-	}
+    client.onerror = function(e) {
+        onError(client, "Error: " + e.error);
+    }
 
-	client.setBasicCredentials(this.username, this.password);
+    client.setBasicCredentials(this.username, this.password);
 
-	// @fixme Hack to work around bug in the Titanium Desktop 1.2.1
-	// onload will not fire unless there a function assigned to
-	// onreadystatechange.
-	client.onreadystatechange = function() {
-		// NOP
-	};
+    // @fixme Hack to work around bug in the Titanium Desktop 1.2.1
+    // onload will not fire unless there a function assigned to
+    // onreadystatechange.
+    client.onreadystatechange = function() {
+        // NOP
+    };
 
-	client.open("GET", this.apiroot + method);
-	client.send();
+    client.open("GET", this.apiroot + method);
+    client.send();
 }
 
 StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError) {
 
-	StatusNet.debug('in postUrl');
+    StatusNet.debug('in postUrl');
 
-	var client = Titanium.Network.createHTTPClient();
+    var client = Titanium.Network.createHTTPClient();
 
-	client.onload = function() {
-		if (this.status == 200) {
-			var json = JSON.parse(this.responseText)
-			onSuccess(this.status, json);
-		} else {
-			onError(client, 'HTTP status: ' + this.status);
-		}
-	};
+    client.onload = function() {
+        if (this.status == 200) {
+            var json = JSON.parse(this.responseText)
+            onSuccess(this.status, json);
+        } else {
+            onError(client, 'HTTP status: ' + this.status);
+        }
+    };
 
-	client.onerror = function(e) {
-		onError(client, "Error: " + e.error);
-	}
+    client.onerror = function(e) {
+        onError(client, "Error: " + e.error);
+    }
 
-	client.setBasicCredentials(this.username, this.password);
+    client.setBasicCredentials(this.username, this.password);
 
-	// @fixme Hack to work around bug in the Titanium Desktop 1.2.1
-	// onload will not fire unless there a function assigned to
-	// onreadystatechange.
-	client.onreadystatechange = function() {
-		// NOP
-	};
+    // @fixme Hack to work around bug in the Titanium Desktop 1.2.1
+    // onload will not fire unless there a function assigned to
+    // onreadystatechange.
+    client.onreadystatechange = function() {
+        // NOP
+    };
 
-	client.open("POST", this.apiroot + method);
-	client.send(data);
+    client.open("POST", this.apiroot + method);
+    client.send(data);
 }
 
 /**
@@ -184,7 +184,7 @@ StatusNet.Account.prototype.ensure = function(db, data) {
 
         StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 
-      }
+    }
 
-      return true;
- }
+    return true;
+}

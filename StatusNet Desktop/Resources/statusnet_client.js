@@ -79,10 +79,10 @@ StatusNet.Client.prototype.refresh = function() {
  * @fixme make sure it's a singleton!
  */
 StatusNet.Client.prototype.showSettings = function() {
-	var win = Titanium.UI.getCurrentWindow().createWindow({
-		url: 'app:///settings.html',
-		title: 'Settings'});
-	win.open();
+    var win = Titanium.UI.getCurrentWindow().createWindow({
+        url: 'app:///settings.html',
+        title: 'Settings'});
+    win.open();
 }
 
 /**

@@ -48,11 +48,11 @@ StatusNet.Timeline.prototype.update = function() {
         function(status, data) {
 
             StatusNet.debug('Fetched ' + that.url);
-			StatusNet.debug('HTTP client returned: ' + data);
+            StatusNet.debug('HTTP client returned: ' + data);
 
             $(data).find('feed > entry').each(function() {
 
-				StatusNet.debug('found an entry');
+                StatusNet.debug('found an entry');
 
                 var status = {};
 
