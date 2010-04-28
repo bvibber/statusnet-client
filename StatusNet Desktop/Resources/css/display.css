@@ -86,6 +86,8 @@ a {
 	margin:5px 0 10px 0;
 	padding:5px;
 	-webkit-border-radius:5px;
+	-webkit-box-shadow: 1px 1px 3px gray;
+	border: solid 1px #f8f8f8;
 	background-color:#f2f2f2;
 }
 .notice .avatar {
