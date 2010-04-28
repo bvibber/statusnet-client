@@ -90,6 +90,11 @@ a {
 	border: solid 1px #f8f8f8;
 	background-color:#f2f2f2;
 }
+.notice:hover {
+	background-color:#f8f8f8;
+	-webkit-box-shadow: 1px 1px 5px #444;
+	border: solid 1px #ffffff;
+}
 .notice .avatar {
 	float:right;
 	margin:5px 0 5px 10px;
@@ -97,6 +102,9 @@ a {
 .notice .avatar img {
 	width: 48px;
 	height: 48px;
+	-webkit-border-radius: 3px;
+	-webkit-box-shadow: 0px 0px 3px gray;
+	background-color:#f8f8f8;
 }
 .notice .author {
 	font-size:14px;
