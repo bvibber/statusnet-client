@@ -3,6 +3,9 @@ StatusNet.SettingsView = function() {
     this.accounts = StatusNet.Account.listAll(db);
     this.workAcct = null;
     this.updateTimeout = null;
+    this.lastUsername = '';
+    this.lastPassword = '';
+    this.lastSite = '';
 }
 StatusNet.SettingsView.prototype.init = function() {
     $("#new-account").hide();
@@ -164,50 +167,63 @@ StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
  * Validate input and see if we can make it work yet
  */
 StatusNet.SettingsView.prototype.updateNewAccount = function() {
+    var that = this;
     this.cancelUpdateTimeout();
-    var acct = this.newAccount();
-    if (acct == null) {
+    this.discoverNewAccount(function(acct) {
+        if (acct.equals(that.workAcct)) {
+            // No change.
+            StatusNet.debug("No change!");
+        } else {
+            StatusNet.debug("New acct");
+            that.workAcct = acct;
+            $("#new-save").attr("disabled", "disabled");
+            $("#new-avatar").attr("src", "images/icon_processing.gif");
+    
+            that.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
+                that.xml = xml;
+                var avatar = $("user profile_image_url", xml).text();
+                StatusNet.debug(avatar);
+                $("#new-avatar").attr("src", avatar);
+                $("#new-save").removeAttr("disabled");
+            }, function(status) {
+                StatusNet.debug("We failed to load account info");
+                $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+            });
+        }
+    }, function() {
         StatusNet.debug("Bogus acct");
-        this.workAcct = null;
+        that.workAcct = null;
         $("#new-save").attr("disabled", "disabled");
         $("#new-avatar").attr("src", "images/default-avatar-stream.png");
-    } else if (acct.equals(this.workAcct)) {
-        // No change.
-        StatusNet.debug("No change!");
-    } else {
-        StatusNet.debug("New acct");
-        this.workAcct = acct;
-        $("#new-save").attr("disabled", "disabled");
-        $("#new-avatar").attr("src", "images/icon_processing.gif");
-
-        that = this;
-
-        this.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
-            that.xml = xml;
-            var avatar = $("user profile_image_url", xml).text();
-            StatusNet.debug(avatar);
-            $("#new-avatar").attr("src", avatar);
-            $("#new-save").removeAttr("disabled");
-        }, function(status) {
-            StatusNet.debug("We failed to load account info");
-            $("#new-avatar").attr("src", "images/default-avatar-stream.png");
-        });
-    }
+    });
 }
 
 /**
  * Build an account object from the info in our form, if possible.
  * We won't yet know for sure whether it's valid, however...
  *
- * @return StatusNet.Account or null
+ * @param onSuccess function(StatusNet.Account acct)
+ * @param onError function()
  */
-StatusNet.SettingsView.prototype.newAccount = function() {
+StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onError) {
     var username = $("#new-username").val();
     var password = $("#new-password").val();
     var site = $("#new-site").val();
 
+    if (this.workAcct != null &&
+        username == this.lastUsername &&
+        password == this.lastPassword &&
+        site == this.lastSite) {
+
+        onSuccess(this.workAcct);
+        return;
+    }
+    this.lastUsername = username;
+    this.lastPassword = password;
+    this.lastSite = site;
     if (username == '' || password == '' || site == '') {
-        return null;
+        onError();
+        return;
     }
 
     if (site.substr(0, 7) == 'http://' || site.substr(0, 8) == 'https://') {
@@ -215,10 +231,24 @@ StatusNet.SettingsView.prototype.newAccount = function() {
         if (url.substr(url.length - 1, 1) != '/') {
             url += '/';
         }
+        callback(new StatusNet.Account(username, password, url));
+    } else if (site == 'twitter.com') {
+        // Special case Twitter...
+        // but it probably ain't super great as we do SN-specific stuff!
+        var url = 'https://twitter.com/';
     } else {
-        var url = 'http://' + site + '/api/';
+        // Try RSD discovery!
+        StatusNet.RSD.discoverTwitterApi('https://' + site + '/rsd.xml', function(apiroot) {
+            onSuccess(new StatusNet.Account(username, password, apiroot));
+        }, function() {
+            StatusNet.RSD.discoverTwitterApi('http://' + site + '/rsd.xml', function(apiroot) {
+                onSuccess(new StatusNet.Account(username, password, apiroot));
+            }, function() {
+                // nothin' :(
+                onError();
+            });
+        });
     }
-    return new StatusNet.Account(username, password, url);
 }
 
 StatusNet.SettingsView.prototype.saveNewAccount = function() {
