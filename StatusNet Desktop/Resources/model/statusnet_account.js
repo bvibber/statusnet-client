@@ -168,7 +168,6 @@ StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError)
  * If not already done, saves them.
  *
  * @return boolean success
- * @fixme escape values going into SQL!
  */
 StatusNet.Account.prototype.ensure = function(db, data) {
 
@@ -176,12 +175,19 @@ StatusNet.Account.prototype.ensure = function(db, data) {
 
     var avatarUrl = $(data).find('profile_image_url').text();
 
-    var rs = db.execute("select * from account where username = '" + this.username + "' and apiroot = '" + this.apiroot + "'");
+    var rs = db.execute("select * from account where username=? " +
+                        "and apiroot=?",
+						this.username, this.apiroot);
 
     if (rs.rowCount() === 0) {
 
-        rs = db.execute("INSERT INTO account (username, password, apiroot, is_default, profile_image_url) " +
-            "VALUES ('"+this.username+"', '"+this.password+"', '"+this.apiroot+"', 0, '" + avatarUrl + "')");
+        rs = db.execute("INSERT INTO account " +
+						"(username, password, apiroot, is_default, profile_image_url) " +
+						"VALUES (?, ?, ?, 0, ?)",
+						this.username,
+						this.password,
+						this.apiroot,
+						avatarUrl);
 
         StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 
