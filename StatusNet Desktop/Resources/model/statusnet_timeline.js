@@ -190,3 +190,83 @@ StatusNet.TimelineFavorites = function(client) {
 
 // Make StatusNet.TimelineFavorites inherit Timeline's prototype
 StatusNet.TimelineFavorites.prototype = heir(StatusNet.Timeline.prototype);
+
+
+/**
+ * Constructor for search timeline model
+ */
+StatusNet.TimelineSearch = function(client) {
+    StatusNet.Timeline.call(this, client);
+
+	this.timeline_name = 'search';
+
+    this._url = 'search.atom';
+
+	this._searchTerm = this.lastQuery();
+}
+
+// Make StatusNet.TimelineSearch inherit Timeline's prototype
+StatusNet.TimelineSearch.prototype = heir(StatusNet.Timeline.prototype);
+
+/**
+ * Override the fetch URL to include search params
+ */
+StatusNet.TimelineSearch.prototype.getUrl = function() {
+	var base = StatusNet.Timeline.prototype.getUrl.call(this);
+    return base + '?q=' + encodeURIComponent(this.searchTerm());
+}
+
+StatusNet.TimelineSearch.prototype.searchTerm = function() {
+	return this._searchTerm;
+}
+
+/**
+ * Get the last-used search term, if any.
+ * @return string
+ */
+StatusNet.TimelineSearch.prototype.lastQuery = function() {
+	var db = StatusNet.getDB();
+	var row = db.execute("select searchterm from search_history limit 1");
+	if (row.isValidRow()) {
+		return row.fieldByName('searchterm');
+	} else {
+		return "";
+	}
+}
+
+/**
+ * Store the search term in our history.
+ * @param q query
+ */
+StatusNet.TimelineSearch.prototype.storeQuery = function(q) {
+	this._searchTerm = q;
+	var db = StatusNet.getDB();
+	db.execute('delete from search_history');
+	db.execute('insert into search_history (searchterm) values (?)',
+	           q);
+}
+
+/**
+ * Store the search term in our history and update the timeline
+ * @param q query
+ */
+StatusNet.TimelineSearch.prototype.updateSearch = function(q) {
+	this.storeQuery(q);
+    this.client.view.showSpinner();
+	this.update();
+}
+
+/**
+ * Override updates for search: don't search if we have nothing,
+ * and clear out the previous results rather than trying to
+ * combine them.
+ */
+StatusNet.TimelineSearch.prototype.update = function() {
+    this._statuses = [];
+    if (this.searchTerm() == '') {
+		// nothing to search for!
+		this.finishedFetch()
+	} else {
+		StatusNet.Timeline.prototype.update.call(this);
+	}
+}

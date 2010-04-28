@@ -15,6 +15,7 @@ StatusNet.Client = function(_account) {
     this.view = new StatusNet.TimelineViewFriends(this);
     this.timeline =  new StatusNet.TimelineFriends(this);
 
+	this.view.showHeader();
     this.view.showSpinner(); // spinner will get hidden by the view when data finishes loading
     this.timeline.update();
 
@@ -32,36 +33,37 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     switch (timeline) {
 
         case 'public':
-            this._timeline = 'public';
             this.view = new StatusNet.TimelineViewPublic(this);
             this.timeline = new StatusNet.TimelinePublic(this);
             break;
         case 'user':
-            this._timeline = 'user';
             this.view = new StatusNet.TimelineViewUser(this);
             this.timeline = new StatusNet.TimelineUser(this);
             break;
         case "friends":
-            this._timeline = 'friends';
             this.view = new StatusNet.TimelineViewFriends(this);
             this.timeline = new StatusNet.TimelineFriends(this);
             break;
         case 'mentions':
-            this._timeline = 'mentions';
             this.view = new StatusNet.TimelineViewMentions(this);
             this.timeline = new StatusNet.TimelineMentions(this);
             break;
         case 'favorites':
-            this._timeline = 'favorites';
             this.view = new StatusNet.TimelineViewFavorites(this);
             this.timeline = new StatusNet.TimelineFavorites(this);
+            break;
+        case 'search':
+            this.view = new StatusNet.TimelineViewSearch(this);
+            this.timeline = new StatusNet.TimelineSearch(this);
             break;
         default:
             throw new Exception("Gah wrong timeline");
     }
+    this._timeline = timeline;
 
     StatusNet.Sidebar.setSelectedTimeline(timeline);
 
+	this.view.showHeader();
     this.view.showSpinner();
     this.timeline.update();
 
@@ -90,6 +92,7 @@ StatusNet.Client.prototype.init = function() {
     $('#user_img').bind('click', function() { that.switchTimeline('user') });
     $('#mentions_img').bind('click', function() { that.switchTimeline('mentions') });
     $('#favorites_img').bind('click', function() { that.switchTimeline('favorites') });
+    $('#search_img').bind('click', function() { that.switchTimeline('search') });
     $('#settings_img').bind('click', function() { StatusNet.showSettings() });
 
     // until we have private message timelines working

@@ -41,6 +41,13 @@ StatusNet.TimelineView.prototype.show = function () {
     this.hideSpinner();
 }
 
+/**
+ * Set up anything that should go in the header section...
+ */
+StatusNet.TimelineView.prototype.showHeader = function () {
+    $("#header").html("");
+}
+
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
     $('#statuses').empty();
@@ -104,3 +111,26 @@ StatusNet.TimelineViewFavorites = function(client) {
 StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototype);
 
 
+/**
+ * Constructor for a view for search timeline
+ * @fixme this guy'll need an input box!
+ */
+StatusNet.TimelineViewSearch = function(client) {
+    StatusNet.TimelineView.call(this, client);
+}
+
+// Make StatusNet.TimelineViewSearch inherit TimelineView's prototype
+StatusNet.TimelineViewSearch.prototype = heir(StatusNet.TimelineView.prototype);
+
+/**
+ * Set up the search box.
+ */
+StatusNet.TimelineViewSearch.prototype.showHeader = function () {
+    $("#header").html('<div id="search-box"><input id="search"></div>');
+    var timeline = this.client.timeline;
+    var q = timeline.searchTerm();
+    $("#search").val(q)
+			    .change(function() {
+		timeline.updateSearch($(this).val());
+	});
+}

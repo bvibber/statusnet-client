@@ -62,6 +62,12 @@ StatusNet.getDB = function() {
             + ')';
 
         this.db.execute(sql);
+
+        sql = 'CREATE TABLE IF NOT EXISTS search_history ('
+            + 'searchterm TEXT NOT NULL'
+            + ')';
+
+        this.db.execute(sql);
     }
 
     return this.db;
