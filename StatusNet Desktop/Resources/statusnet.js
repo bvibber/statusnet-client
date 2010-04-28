@@ -74,7 +74,9 @@ StatusNet.getDB = function() {
 StatusNet.showSettings = function() {
     var win = Titanium.UI.getCurrentWindow().createWindow({
         url: 'app:///settings.html',
-        title: 'Settings'});
+        title: 'Settings',
+        width: 400,
+        height: 500});
     win.open();
 }
 

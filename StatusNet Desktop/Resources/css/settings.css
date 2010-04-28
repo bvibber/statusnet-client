@@ -2,17 +2,31 @@ body {
     padding: 16px;
 }
 
+h1 {
+	font-size: 160%;
+	margin-left: 8px;
+	margin-bottom: 8px;
+}
+
+#accountlist-holder {
+    background: #ffffff;
+    border: solid 1px #f2f2f2;
+    -webkit-border-radius: 8px;
+    -webkit-box-shadow: 1px 1px 5px #444;
+    padding: 8px 0px;
+}
+
 #accountlist {
-    background: Window;
-    border: solid 1px #888;
-    -webkit-border-radius: 4px;
-    padding: 8px;
+	width: 100%;
     border-collapse: collapse;
 }
 #accountlist tr {
-    border-top: solid 1px #eee;
-    background-color: Window;
+    border-bottom: solid 1px #eee;
     color: WindowText;
+    cursor: pointer;
+}
+#accountlist tr.add {
+	border-bottom: none;
 }
 #accountlist tr:hover {
     background-color: Highlight;
@@ -21,6 +35,7 @@ body {
 #accountlist td {
     padding: 4px;
 }
+
 #accountlist td.add a {
     content: url(../images/list-add.png);
 }
@@ -37,6 +52,7 @@ body {
 #accountlist img, #new-account img {
     width: 48px;
     height: 48px;
+    -webkit-border-radius: 2px;
 }
 
 #accountlist .name {
