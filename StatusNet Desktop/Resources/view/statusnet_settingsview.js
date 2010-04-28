@@ -231,7 +231,7 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
         if (url.substr(url.length - 1, 1) != '/') {
             url += '/';
         }
-        callback(new StatusNet.Account(username, password, url));
+        onSuccess(new StatusNet.Account(username, password, url));
     } else if (site == 'twitter.com') {
         // Special case Twitter...
         // but it probably ain't super great as we do SN-specific stuff!
