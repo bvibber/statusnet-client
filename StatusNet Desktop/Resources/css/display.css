@@ -34,6 +34,7 @@ a {
   width:70px;
   height:610px;
   background-color:#1c1c1c;
+  background: url(/images/sidebar-bg.png);
   float:left;
   text-align:center;
 }
@@ -45,6 +46,11 @@ a {
 #sidebar img {
   cursor:pointer;
   margin-bottom:10px;
+}
+
+#sidebar img:hover {
+	background-image: url(/images/sidebar-button-glow.png);
+	background-repeat: no-repeat;
 }
 
 #profile {
