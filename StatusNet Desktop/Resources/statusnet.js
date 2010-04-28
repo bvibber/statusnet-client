@@ -39,7 +39,7 @@ StatusNet.getDB = function() {
 
         this.db = Titanium.Database.openFile(dbFile);
 
-        sql = 'CREATE TABLE IF NOT EXISTS account ('
+        var sql = 'CREATE TABLE IF NOT EXISTS account ('
             + 'id INTEGER PRIMARY KEY AUTOINCREMENT, '
             + 'username TEXT NOT NULL, '
             + 'password TEXT NOT NULL, '
@@ -53,8 +53,8 @@ StatusNet.getDB = function() {
         this.db.execute(sql);
 
         sql = 'CREATE TABLE IF NOT EXISTS notice_cache ('
-            + 'notice_id INTEGER NOT NULL, '
-            + 'account_id INTEGER NOT NULL, '
+            + 'notice_id INTEGER, '
+            + 'account_id INTEGER, '
             + 'atom_entry TEXT NOT NULL, '
             + 'PRIMARY KEY (notice_id, account_id)'
             + ')';
