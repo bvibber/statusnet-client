@@ -17,6 +17,7 @@ StatusNet.debug = function(msg) {
     Titanium.API.debug(msg);
 }
 
+
 /**
  * Lazy-open our local storage database.
  * @return database object
@@ -55,6 +56,7 @@ StatusNet.getDB = function() {
         sql = 'CREATE TABLE IF NOT EXISTS notice_cache ('
             + 'notice_id INTEGER, '
             + 'account_id INTEGER, '
+            + 'timeline TEXT NOT NULL, '
             + 'atom_entry TEXT NOT NULL, '
             + 'PRIMARY KEY (notice_id, account_id)'
             + ')';

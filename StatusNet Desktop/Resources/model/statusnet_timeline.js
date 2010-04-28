@@ -9,16 +9,27 @@ StatusNet.Timeline = function(client, view) {
     this.client = client;
     this.view = this.client.view;
     this.account = this.client.account;
+    this.db = StatusNet.getDB();
 
     this._statuses = new Array();
 
     StatusNet.debug("StatusNet.Timeline constructor");
 }
 
+StatusNet.Timeline.prototype.encacheNotice = function(timeline_name, noticeId, entry) {
+
+	rc = this.db.execute(
+	        "INSERT OR IGNORE INTO notice_cache (account_id, notice_id, timeline, atom_entry) VALUES (?, ?, ?, ?)",
+	        	this.client.account.id,
+				noticeId,
+				this.timeline_name,
+				(new XMLSerializer()).serializeToString(entry));
+}
+
 /**
  * Add a notice to the Timeline if it's not already in it.
  */
-StatusNet.Timeline.prototype.addStatus = function(status, prepend) {
+StatusNet.Timeline.prototype.addStatus = function(status, entry, prepend) {
 
     // dedupe here?
     for (i = 0; i < this._statuses.length; i++) {
@@ -27,6 +38,8 @@ StatusNet.Timeline.prototype.addStatus = function(status, prepend) {
             return;
         }
     }
+
+	this.encacheNotice(this.timeline_name, status.noticeId, entry);
 
     if (prepend) {
         this._statuses.unshift(status);
@@ -86,7 +99,7 @@ StatusNet.Timeline.prototype.update = function() {
                 status.author = $(this).find('author name').text();
                 status.link = $(this).find('author uri').text();
 
-                that.addStatus(status, false);
+                that.addStatus(status, this, false);
 
             });
 
@@ -124,6 +137,8 @@ StatusNet.Timeline.prototype.getStatuses = function() {
 StatusNet.TimelineMentions = function(client) {
     StatusNet.Timeline.call(this, client);
 
+	this.timeline_name = 'mentions';
+
     this._url = 'statuses/mentions.atom';
 
 }
@@ -136,6 +151,8 @@ StatusNet.TimelineMentions.prototype = heir(StatusNet.Timeline.prototype);
  */
 StatusNet.TimelinePublic = function(client) {
     StatusNet.Timeline.call(this, client);
+
+	this.timeline_name = 'public';
 
     this._url = 'statuses/public_timeline.atom';
 
@@ -150,6 +167,8 @@ StatusNet.TimelinePublic.prototype = heir(StatusNet.Timeline.prototype);
 StatusNet.TimelineUser = function(client) {
     StatusNet.Timeline.call(this, client);
 
+	this.timeline_name = 'user';
+
     this._url = 'statuses/user_timeline.atom';
 
 }
@@ -162,6 +181,8 @@ StatusNet.TimelineUser.prototype = heir(StatusNet.Timeline.prototype);
  */
 StatusNet.TimelineFavorites = function(client) {
     StatusNet.Timeline.call(this, client);
+
+	this.timeline_name = 'favorites';
 
     this._url = 'favorites.atom';
 

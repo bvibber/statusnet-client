@@ -61,6 +61,7 @@ StatusNet.Account.fromRow = function(row) {
         row.fieldByName("apiroot")
     );
 
+	ac.id = row.fieldByName("id");
     ac.avatar = row.fieldByName("profile_image_url");
     StatusNet.debug("Account.fromRow - Avatar now = " + ac.avatar);
 
