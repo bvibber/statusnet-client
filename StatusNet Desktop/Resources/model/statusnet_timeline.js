@@ -18,12 +18,12 @@ StatusNet.Timeline = function(client, view) {
 
 StatusNet.Timeline.prototype.encacheNotice = function(timeline_name, noticeId, entry) {
 
-	rc = this.db.execute(
-	        "INSERT OR IGNORE INTO notice_cache (account_id, notice_id, timeline, atom_entry) VALUES (?, ?, ?, ?)",
-	        	this.client.account.id,
-				noticeId,
-				this.timeline_name,
-				(new XMLSerializer()).serializeToString(entry));
+    rc = this.db.execute(
+            "INSERT OR IGNORE INTO notice_cache (account_id, notice_id, timeline, atom_entry) VALUES (?, ?, ?, ?)",
+                this.client.account.id,
+                noticeId,
+                this.timeline_name,
+                (new XMLSerializer()).serializeToString(entry));
 }
 
 /**
@@ -39,7 +39,7 @@ StatusNet.Timeline.prototype.addStatus = function(status, entry, prepend) {
         }
     }
 
-	this.encacheNotice(this.timeline_name, status.noticeId, entry);
+    this.encacheNotice(this.timeline_name, status.noticeId, entry);
 
     if (prepend) {
         this._statuses.unshift(status);
@@ -54,7 +54,7 @@ StatusNet.Timeline.prototype.addStatus = function(status, entry, prepend) {
  */
 StatusNet.Timeline.prototype.update = function() {
 
-    var that = this;  // Provide inner helper with outer function's context
+    var that = this;
 
     this.account.fetchUrl(this.getUrl(),
 
@@ -64,18 +64,8 @@ StatusNet.Timeline.prototype.update = function() {
             StatusNet.debug('HTTP client returned: ' + data);
 
             $(data).find('feed > entry').each(function() {
-
-                StatusNet.debug('found an entry');
-
-                var status = {};
-
-                // note: attribute selectors seem to have problems with [media:width=48]
-                var avatar = 'about:blank';
-                $(this).find('link[rel=avatar]').each(function(i, el) {
-                    if ($(el).attr('media:width') == '48') {
-                        status.avatar = $(el).attr('href');
-                    }
-                });
+                StatusNet.debug('Timeline.update: found an entry.');
+                var status = StatusNet.AtomParser.statusFromEntry(this);
 
                 // XXX: Quick hack to get rid of broken imgs in profile timeline
                 // We need to specialize StatusNet.TimelineUser to grab the avatar
@@ -85,29 +75,14 @@ StatusNet.Timeline.prototype.update = function() {
                     status.avatar = that.account.avatar;
                 }
 
-                // Pull notice ID from permalink
-                var idRegexp = /(\d)+$/;
-                var permalink = $(this).find('id').text();
-                result = permalink.match(idRegexp);
-
-                if (result) {
-                    status.noticeId = result[0];
-                }
-
-                status.date = $(this).find('published').text();
-                status.desc = $(this).find('content').text();
-                status.author = $(this).find('author name').text();
-                status.link = $(this).find('author uri').text();
-
                 that.addStatus(status, this, false);
-
             });
 
             // use events instead? Observer?
             that.finishedFetch()
         },
         function(client, msg) {
-            StatusNet.debug("Someting went wrong retreiving timeline: " + msg);
+            StatusNet.debug("Something went wrong retrieving timeline: " + msg);
             alert("Couldn't get timeline: " + msg);
         }
     );
@@ -128,6 +103,22 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
  * @return Array an array of statuses
  */
 StatusNet.Timeline.prototype.getStatuses = function() {
+
+    var rs = this.db.execute(
+        "SELECT * from notice_cache WHERE account_id = ? AND timeline = ? ORDER BY notice_id",
+        this.account.id,
+        this.timeline_name
+    );
+
+    while (rs.isValidRow()) {
+        xmlEntry = rs.fieldByName('atom_entry');
+        entry = (new DOMParser()).parseFromString(xmlEntry, "text/xml");
+        var status = StatusNet.AtomParser.statusFromEntry(entry);
+        this._statuses.unshift(status);
+        rs.next();
+    }
+    rs.close();
+
     return this._statuses;
 }
 
@@ -137,7 +128,7 @@ StatusNet.Timeline.prototype.getStatuses = function() {
 StatusNet.TimelineMentions = function(client) {
     StatusNet.Timeline.call(this, client);
 
-	this.timeline_name = 'mentions';
+    this.timeline_name = 'mentions';
 
     this._url = 'statuses/mentions.atom';
 
@@ -152,7 +143,7 @@ StatusNet.TimelineMentions.prototype = heir(StatusNet.Timeline.prototype);
 StatusNet.TimelinePublic = function(client) {
     StatusNet.Timeline.call(this, client);
 
-	this.timeline_name = 'public';
+    this.timeline_name = 'public';
 
     this._url = 'statuses/public_timeline.atom';
 
@@ -167,7 +158,7 @@ StatusNet.TimelinePublic.prototype = heir(StatusNet.Timeline.prototype);
 StatusNet.TimelineUser = function(client) {
     StatusNet.Timeline.call(this, client);
 
-	this.timeline_name = 'user';
+    this.timeline_name = 'user';
 
     this._url = 'statuses/user_timeline.atom';
 
@@ -182,7 +173,7 @@ StatusNet.TimelineUser.prototype = heir(StatusNet.Timeline.prototype);
 StatusNet.TimelineFavorites = function(client) {
     StatusNet.Timeline.call(this, client);
 
-	this.timeline_name = 'favorites';
+    this.timeline_name = 'favorites';
 
     this._url = 'favorites.atom';
 
