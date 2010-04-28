@@ -105,7 +105,7 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
 StatusNet.Timeline.prototype.getStatuses = function() {
 
     var rs = this.db.execute(
-        "SELECT * from notice_cache WHERE account_id = ? AND timeline = ? ORDER BY notice_id",
+        "SELECT * from notice_cache WHERE account_id = ? AND timeline = ?",
         this.account.id,
         this.timeline_name
     );
