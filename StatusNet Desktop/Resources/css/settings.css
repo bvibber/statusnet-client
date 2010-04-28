@@ -27,6 +27,12 @@ body {
 #accountlist td.remove a {
     content: url(../images/list-remove.png);
 }
+#accountlist .http:before {
+    content: url(../images/padlock-insecure.png);
+}
+#accountlist .https:before {
+    content: url(../images/padlock-secure.png);
+}
 
 #accountlist img, #new-account img {
     width: 48px;

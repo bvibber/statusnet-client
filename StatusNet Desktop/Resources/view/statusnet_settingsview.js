@@ -82,7 +82,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     tr.appendChild(td_name);
 
     var td_site = document.createElement('td');
-    $(td_site).addClass('site').text(acct.apiroot);
+    $(td_site).addClass('site').html(this.prettySiteName(acct.apiroot));
     tr.appendChild(td_site);
 
     var td_remove = document.createElement('td');
@@ -119,6 +119,24 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     });
 }
 
+/**
+ * @param string apiroot
+ * @return string HTML fragment with prettified name
+ */
+StatusNet.SettingsView.prototype.prettySiteName = function(apiroot) {
+    var matches = apiroot.match(/^(http|https):\/\/([^\/]+)/);
+    if (matches) {
+        var protocol = matches[1];
+        var host = matches[2];
+        var html = $("<span></span>").text(host)
+                                     .attr("title", apiroot)
+                                     .addClass(protocol);
+        return $("<div></div>").append(html).html(); // @fixme ok this is lame
+    } else {
+        // hmmm
+        return apiroot;
+    }
+}
 
 /**
  * Start a timeout to try updating the account if the user stops
