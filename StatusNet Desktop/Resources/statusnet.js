@@ -22,6 +22,7 @@ StatusNet.debug = function(msg) {
  * @return database object
  */
 StatusNet.getDB = function() {
+
     if (this.db === null) {
 
         var separator = Titanium.Filesystem.getSeparator();
@@ -31,14 +32,38 @@ StatusNet.getDB = function() {
             "statusnet.db"
         );
 
-        StatusNet.debug("app dir = " + Titanium.Filesystem.getApplicationDataDirectory());
+        StatusNet.debug(
+            "Application data directory = "
+            + Titanium.Filesystem.getApplicationDataDirectory()
+        );
 
         this.db = Titanium.Database.openFile(dbFile);
-        this.db.execute("CREATE TABLE IF NOT EXISTS account (username varchar(255), password varchar(255), apiroot varchar(255), is_default integer default 0, last_timeline_id integer, profile_image_url varchar(255), PRIMARY KEY (username, apiroot))");
-     }
-     return this.db;
-}
 
+        var sql = 'CREATE TABLE IF NOT EXISTS account ('
+            + 'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+            + 'username TEXT NOT NULL, '
+            + 'password TEXT NOT NULL, '
+            + 'apiroot TEXT NOT NULL, '
+            + 'is_default INTEGER DEFAULT 0, '
+            + 'last_timeline_id INTEGER, '
+            + 'profile_image_url TEXT, '
+            + 'UNIQUE (username, apiroot)'
+            + ')';
+
+        this.db.execute(sql);
+
+        sql = 'CREATE TABLE IF NOT EXISTS notice_cache ('
+            + 'notice_id INTEGER, '
+            + 'account_id INTEGER, '
+            + 'atom_entry TEXT NOT NULL, '
+            + 'PRIMARY KEY (notice_id, account_id)'
+            + ')';
+
+        this.db.execute(sql);
+    }
+
+    return this.db;
+}
 
 /**
  * Show settings dialog
