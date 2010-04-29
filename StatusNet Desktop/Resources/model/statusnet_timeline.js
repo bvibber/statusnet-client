@@ -184,6 +184,22 @@ StatusNet.TimelineFavorites.prototype = heir(StatusNet.Timeline.prototype);
 
 
 /**
+ * Constructor for inbox timeline model
+ */
+StatusNet.TimelineInbox = function(client) {
+    StatusNet.Timeline.call(this, client);
+
+    this.timeline_name = 'inbox';
+
+    this._url = 'direct_messages.atom';
+
+}
+
+// Make StatusNet.TimelineInbox inherit Timeline's prototype
+StatusNet.TimelineInbox.prototype = heir(StatusNet.Timeline.prototype);
+
+
+/**
  * Constructor for search timeline model
  */
 StatusNet.TimelineSearch = function(client) {

@@ -52,6 +52,10 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             this.view = new StatusNet.TimelineViewFavorites(this);
             this.timeline = new StatusNet.TimelineFavorites(this);
             break;
+        case 'inbox':
+            this.view = new StatusNet.TimelineViewInbox(this);
+            this.timeline = new StatusNet.TimelineInbox(this);
+            break;
         case 'search':
             this.view = new StatusNet.TimelineViewSearch(this);
             this.timeline = new StatusNet.TimelineSearch(this);
@@ -92,6 +96,7 @@ StatusNet.Client.prototype.init = function() {
     $('#user_img').bind('click', function() { that.switchTimeline('user') });
     $('#mentions_img').bind('click', function() { that.switchTimeline('mentions') });
     $('#favorites_img').bind('click', function() { that.switchTimeline('favorites') });
+    $('#inbox_img').bind('click', function() { that.switchTimeline('inbox') });
     $('#search_img').bind('click', function() { that.switchTimeline('search') });
     $('#settings_img').bind('click', function() { StatusNet.showSettings() });
 

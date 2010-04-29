@@ -112,6 +112,17 @@ StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototyp
 
 
 /**
+ * Constructor for a view for inbox timeline
+ */
+StatusNet.TimelineViewInbox = function(client) {
+    StatusNet.TimelineView.call(this, client);
+}
+
+// Make StatusNet.TimelineViewInbox inherit TimelineView's prototype
+StatusNet.TimelineViewInbox.prototype = heir(StatusNet.TimelineView.prototype);
+
+
+/**
  * Constructor for a view for search timeline
  * @fixme this guy'll need an input box!
  */
@@ -126,7 +137,10 @@ StatusNet.TimelineViewSearch.prototype = heir(StatusNet.TimelineView.prototype);
  * Set up the search box.
  */
 StatusNet.TimelineViewSearch.prototype.showHeader = function () {
-    $("#header").html('<div id="search-box"><input id="search"></div>');
+    $("#header").html('<div id="search-box">' +
+                      '<label for="search">Search:</label> ' +
+                      '<input id="search">' +
+                      '</div>');
     var timeline = this.client.timeline;
     var q = timeline.searchTerm();
     $("#search").val(q)
