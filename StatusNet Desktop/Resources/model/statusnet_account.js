@@ -234,3 +234,25 @@ StatusNet.Account.prototype.deleteAccount = function() {
     }
     StatusNet.debug("done deleting!");
 }
+
+/**
+ * Get an attractive description of the hostname
+ * @return string
+ */
+StatusNet.Account.prototype.getHost = function() {
+    var matches = this.apiroot.match(/^(http|https):\/\/([^\/]+)/);
+    if (matches) {
+		return matches[2];
+    } else {
+        // hmmm
+        return this.apiroot;
+    }
+}
+
+/**
+ * Is this account set up with a secure connection?
+ * @return boolean
+ */
+StatusNet.Account.prototype.isSecure = function() {
+	return (this.apiroot.match(/^https:/));
+}
