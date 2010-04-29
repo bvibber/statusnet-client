@@ -44,9 +44,9 @@ StatusNet.TimelineFriends.prototype.getUrl = function() {
 StatusNet.TimelineFriends.prototype.finishedFetch = function() {
     StatusNet.Timeline.prototype.finishedFetch.call(this);
 
-    if (this._statuses.length > 0) {
+    if (this._notices.length > 0) {
 
-        lastId = this._statuses[0].noticeId;
+        lastId = this._notices[0].noticeId;
 
         StatusNet.debug("Updating last_timeline_id to " + lastId);
 

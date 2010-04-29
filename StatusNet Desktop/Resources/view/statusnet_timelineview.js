@@ -15,28 +15,28 @@ StatusNet.TimelineView = function(client) {
  */
 StatusNet.TimelineView.prototype.show = function () {
 
-    var statuses = this.client.timeline.getStatuses();
+    var notices = this.client.timeline.getNotices();
 
-    $('#statuses').empty();
+    $('#notices').empty();
 
-    if (statuses.length > 0) {
+    if (notices.length > 0) {
 
         var html = new Array();
 
-        for (i = 0; i < statuses.length; i++) {
+        for (i = 0; i < notices.length; i++) {
             html.push('<div class="notice">');
-            html.push('   <div class="avatar"><a href="' + statuses[i].link + '"><img src="' + statuses[i].avatar + '"/></a></div>');
-            html.push('   <div><a class="author" href="' + statuses[i].link + '">' + statuses[i].author + '</a><br/>');
-            html.push('   <small class="date">' + statuses[i].date + '</small></div>');
-            html.push('   <div class="content">'+ statuses[i].desc +'<br/></div>');
+            html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + notices[i].avatar + '"/></a></div>');
+            html.push('   <div><a class="author" href="' + notices[i].link + '">' + notices[i].author + '</a><br/>');
+            html.push('   <small class="date">' + notices[i].date + '</small></div>');
+            html.push('   <div class="content">'+ notices[i].desc +'<br/></div>');
             html.push('</div>');
             html.push('<div class="clear"></div>');
         }
 
-        $('#statuses').append(html.join(''));
+        $('#notices').append(html.join(''));
         $('.notice a').attr('rel', 'external');
     } else {
-        $('#statuses').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
+        $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
     }
 
     this.hideSpinner();
@@ -54,8 +54,8 @@ StatusNet.TimelineView.prototype.showHeader = function () {
 
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-    $('#statuses').empty();
-    $('#statuses').append('<img id="spinner" src="/images/icon_processing.gif" />');
+    $('#notices').empty();
+    $('#notices').append('<img id="spinner" src="/images/icon_processing.gif" />');
 }
 
 StatusNet.TimelineView.prototype.hideSpinner = function() {

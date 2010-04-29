@@ -140,19 +140,19 @@ StatusNet.Client.prototype.postNotice = function()
             StatusNet.debug(data);
             StatusNet.debug(data.user);
 
-            var status = {};
+            var notice = {};
 
-            status.noticeId = data.id;
-            status.avatar = data.user.profile_image_url;
-            status.date = data.created_at;
-            status.desc = data.text;
-            status.author = data.user.screen_name;
-            status.link = that.account.server + '/' + data.user.screen_name;
+            notice.noticeId = data.id;
+            notice.avatar = data.user.profile_image_url;
+            notice.date = data.created_at;
+            notice.desc = data.text;
+            notice.author = data.user.screen_name;
+            notice.link = that.account.server + '/' + data.user.screen_name;
 
             that.timeline.addStatus(status, true);
             that.view.show();
 
-            //$('#statuses > div.notice:first').before(data.text);
+            //$('#notices > div.notice:first').before(data.text);
         },
         function(client, msg) {
             StatusNet.debug('Could not post notice: ' + msg);

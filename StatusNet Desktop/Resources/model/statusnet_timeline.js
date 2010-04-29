@@ -11,7 +11,7 @@ StatusNet.Timeline = function(client, view) {
     this.account = this.client.account;
     this.db = StatusNet.getDB();
 
-    this._statuses = new Array();
+    this._notices = new Array();
 
     StatusNet.debug("StatusNet.Timeline constructor");
 }
@@ -29,22 +29,22 @@ StatusNet.Timeline.prototype.encacheNotice = function(timeline_name, noticeId, e
 /**
  * Add a notice to the Timeline if it's not already in it.
  */
-StatusNet.Timeline.prototype.addStatus = function(status, entry, prepend) {
+StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
 
     // dedupe here?
-    for (i = 0; i < this._statuses.length; i++) {
-        if (this._statuses[i].noticeId === status.noticeId) {
-            StatusNet.debug("skipping duplicate notice: " + status.noticeId);
+    for (i = 0; i < this._notices.length; i++) {
+        if (this._notices[i].noticeId === notices.noticeId) {
+            StatusNet.debug("skipping duplicate notice: " + notice.noticeId);
             return;
         }
     }
 
-    this.encacheNotice(this.timeline_name, status.noticeId, entry);
+    this.encacheNotice(this.timeline_name, notice.noticeId, entry);
 
     if (prepend) {
-        this._statuses.unshift(status);
+        this._notices.unshift(notice);
     } else {
-        this._statuses.push(status);
+        this._notices.push(notice);
     }
 }
 
@@ -65,17 +65,10 @@ StatusNet.Timeline.prototype.update = function() {
 
             $(data).find('feed > entry').each(function() {
                 StatusNet.debug('Timeline.update: found an entry.');
-                var status = StatusNet.AtomParser.statusFromEntry(this);
 
-                // XXX: Quick hack to get rid of broken imgs in profile timeline
-                // We need to specialize StatusNet.TimelineUser to grab the avatar
-                // URL from the activity:subject or author. And probably move Atom
-                // parsing to its own class
-                if (!status.avatar) {
-                    status.avatar = that.account.avatar;
-                }
+                var notice = StatusNet.AtomParser.noticeFromEntry(this);
 
-                that.addStatus(status, this, false);
+                that.addNotice(notice, this, false);
             });
 
             // use events instead? Observer?
@@ -98,11 +91,11 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
 }
 
 /**
- * Accessor for statuses
+ * Accessor for notices
  *
- * @return Array an array of statuses
+ * @return Array an array of notices
  */
-StatusNet.Timeline.prototype.getStatuses = function() {
+StatusNet.Timeline.prototype.getNotices = function() {
 
     var rs = this.db.execute(
         "SELECT * from notice_cache WHERE account_id = ? AND timeline = ?",
@@ -113,13 +106,13 @@ StatusNet.Timeline.prototype.getStatuses = function() {
     while (rs.isValidRow()) {
         xmlEntry = rs.fieldByName('atom_entry');
         entry = (new DOMParser()).parseFromString(xmlEntry, "text/xml");
-        var status = StatusNet.AtomParser.statusFromEntry(entry);
-        this._statuses.unshift(status);
+        var notice = StatusNet.AtomParser.noticeFromEntry(entry);
+        this._notices.unshift(notice);
         rs.next();
     }
     rs.close();
 
-    return this._statuses;
+    return this._notices;
 }
 
 /**
@@ -269,7 +262,7 @@ StatusNet.TimelineSearch.prototype.updateSearch = function(q) {
  * combine them.
  */
 StatusNet.TimelineSearch.prototype.update = function() {
-    this._statuses = [];
+    this._notices = [];
     if (this.searchTerm() == '') {
 		// nothing to search for!
 		this.finishedFetch()

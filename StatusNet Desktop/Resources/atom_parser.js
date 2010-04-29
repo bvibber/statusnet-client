@@ -1,31 +1,30 @@
 StatusNet.AtomParser = function() {
 }
 
-StatusNet.AtomParser.statusFromEntry = function(entry) {
-    
-    var status = {};
+StatusNet.AtomParser.noticeFromEntry = function(entry) {
+
+    var notice = {};
 
     // note: attribute selectors seem to have problems with [media:width=48]
-    var avatar = 'about:blank';
     $(entry).find('link[rel=avatar]').each(function(i, el) {
         if ($(el).attr('media:width') == '48') {
-            status.avatar = $(el).attr('href');
+            notice.avatar = $(el).attr('href');
         }
     });
 
-    // Pull status ID from permalink
+    // Pull notice ID from permalink
     var idRegexp = /(\d)+$/;
     var permalink = $(entry).find('id').text();
     result = permalink.match(idRegexp);
 
     if (result) {
-        status.noticeId = result[0];
+        notice.noticeId = result[0];
     }
 
-    status.date = $(entry).find('published').text();
-    status.desc = $(entry).find('content').text();
-    status.author = $(entry).find('author name').text();
-    status.link = $(entry).find('author uri').text();
-    
-    return status;
+    notice.date = $(entry).find('published').text();
+    notice.desc = $(entry).find('content').text();
+    notice.author = $(entry).find('author name').text();
+    notice.link = $(entry).find('author uri').text();
+
+    return notice;
 }
