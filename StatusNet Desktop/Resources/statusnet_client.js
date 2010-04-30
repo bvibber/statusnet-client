@@ -142,7 +142,7 @@ StatusNet.Client.prototype.postNotice = function()
 
             var notice = {};
 
-            notice.noticeId = data.id;
+            notice.id = data.id;
             notice.avatar = data.user.profile_image_url;
             notice.date = data.created_at;
             notice.desc = data.text;

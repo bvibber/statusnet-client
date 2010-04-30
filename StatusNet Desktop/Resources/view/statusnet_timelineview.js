@@ -27,8 +27,8 @@ StatusNet.TimelineView.prototype.show = function () {
             html.push('<div class="notice">');
             html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + notices[i].avatar + '"/></a></div>');
             html.push('   <div><a class="author" href="' + notices[i].link + '">' + notices[i].author + '</a><br/>');
-            html.push('   <small class="date">' + notices[i].date + '</small></div>');
-            html.push('   <div class="content">'+ notices[i].desc +'<br/></div>');
+            html.push('   <small class="date">' + notices[i].updated + '</small></div>');
+            html.push('   <div class="content">'+ notices[i].content +'<br/></div>');
             html.push('</div>');
             html.push('<div class="clear"></div>');
         }

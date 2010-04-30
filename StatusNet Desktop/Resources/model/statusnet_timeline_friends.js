@@ -46,7 +46,7 @@ StatusNet.TimelineFriends.prototype.finishedFetch = function() {
 
     if (this._notices.length > 0) {
 
-        lastId = this._notices[0].noticeId;
+        lastId = this._notices[0].id;
 
         StatusNet.debug("Updating last_timeline_id to " + lastId);
 

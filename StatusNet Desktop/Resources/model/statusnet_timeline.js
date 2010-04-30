@@ -33,13 +33,13 @@ StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
 
     // dedupe here?
     for (i = 0; i < this._notices.length; i++) {
-        if (this._notices[i].noticeId === notices.noticeId) {
-            StatusNet.debug("skipping duplicate notice: " + notice.noticeId);
+        if (this._notices[i].id === notices.id) {
+            StatusNet.debug("skipping duplicate notice: " + notice.id);
             return;
         }
     }
 
-    this.encacheNotice(this.timeline_name, notice.noticeId, entry);
+    this.encacheNotice(this.timeline_name, notice.id, entry);
 
     if (prepend) {
         this._notices.unshift(notice);
