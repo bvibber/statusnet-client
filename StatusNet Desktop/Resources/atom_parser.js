@@ -42,7 +42,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
  *
  * @param DOM subject the Atom feed's activity subject element
  */
-StatusNet.AtomParser.authorFromSubject = function(subject) {
+StatusNet.AtomParser.userFromSubject = function(subject) {
 
     var author = {};
 

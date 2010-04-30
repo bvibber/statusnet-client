@@ -255,3 +255,4 @@ StatusNet.TimelineSearch.prototype.update = function() {
         StatusNet.Timeline.prototype.update.call(this);
     }
 }
+

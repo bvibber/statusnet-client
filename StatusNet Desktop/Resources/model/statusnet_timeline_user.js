@@ -8,6 +8,8 @@ StatusNet.TimelineUser = function(client) {
 
     this._url = 'statuses/user_timeline.atom';
 
+    this.user = null;
+
 }
 
 // Make StatusNet.TimelineUser inherit Timeline's prototype
@@ -31,7 +33,7 @@ StatusNet.TimelineUser.prototype.update = function() {
             // @todo How we get author info will need to change when we
             // update output to match the latest Activity Streams spec
             var subject = $(data).find("feed > [nodeName=activity:subject]:first");
-            this.author = StatusNet.AtomParser.authorFromSubject(subject);
+            that.user = StatusNet.AtomParser.userFromSubject(subject);
 
             $(data).find('feed > entry').each(function() {
                 StatusNet.debug('Timeline.update: found an entry.');
@@ -49,3 +51,4 @@ StatusNet.TimelineUser.prototype.update = function() {
     );
 
 }
+

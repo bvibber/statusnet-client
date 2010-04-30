@@ -4,6 +4,7 @@ $LAB
     .script("view/statusnet_sidebar.js")
     .script("statusnet_client.js")
     .script("view/statusnet_timelineview.js")
+    .script("view/statusnet_timelineview_user.js")
     .script("model/statusnet_timeline.js")
     .script("model/statusnet_timeline_friends.js")
     .script("model/statusnet_timeline_user.js")

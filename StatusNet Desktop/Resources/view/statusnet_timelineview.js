@@ -98,17 +98,6 @@ StatusNet.TimelineViewPublic = function(client) {
 StatusNet.TimelineViewPublic.prototype = heir(StatusNet.TimelineView.prototype);
 
 /**
- * Constructor for user's timeline
- */
-StatusNet.TimelineViewUser = function(client) {
-    StatusNet.TimelineView.call(this, client);
-    this.title = "{name}'s profile on {site}";
-}
-
-// Make StatusNet.TimelineViewUser inherit TimelineView's prototype
-StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
-
-/**
  * Constructor for a view for favorites timeline
  */
 StatusNet.TimelineViewFavorites = function(client) {
