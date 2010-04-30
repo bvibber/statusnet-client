@@ -146,21 +146,6 @@ StatusNet.TimelinePublic = function(client) {
 StatusNet.TimelinePublic.prototype = heir(StatusNet.Timeline.prototype);
 
 /**
- * Constructor for user timeline model
- */
-StatusNet.TimelineUser = function(client) {
-    StatusNet.Timeline.call(this, client);
-
-    this.timeline_name = 'user';
-
-    this._url = 'statuses/user_timeline.atom';
-
-}
-
-// Make StatusNet.TimelineUser inherit Timeline's prototype
-StatusNet.TimelineUser.prototype = heir(StatusNet.Timeline.prototype);
-
-/**
  * Constructor for favorites timeline model
  */
 StatusNet.TimelineFavorites = function(client) {
@@ -198,11 +183,11 @@ StatusNet.TimelineInbox.prototype = heir(StatusNet.Timeline.prototype);
 StatusNet.TimelineSearch = function(client) {
     StatusNet.Timeline.call(this, client);
 
-	this.timeline_name = 'search';
+    this.timeline_name = 'search';
 
     this._url = 'search.atom';
 
-	this._searchTerm = this.lastQuery();
+    this._searchTerm = this.lastQuery();
 }
 
 // Make StatusNet.TimelineSearch inherit Timeline's prototype
@@ -212,12 +197,12 @@ StatusNet.TimelineSearch.prototype = heir(StatusNet.Timeline.prototype);
  * Override the fetch URL to include search params
  */
 StatusNet.TimelineSearch.prototype.getUrl = function() {
-	var base = StatusNet.Timeline.prototype.getUrl.call(this);
+    var base = StatusNet.Timeline.prototype.getUrl.call(this);
     return base + '?q=' + encodeURIComponent(this.searchTerm());
 }
 
 StatusNet.TimelineSearch.prototype.searchTerm = function() {
-	return this._searchTerm;
+    return this._searchTerm;
 }
 
 /**
@@ -225,13 +210,13 @@ StatusNet.TimelineSearch.prototype.searchTerm = function() {
  * @return string
  */
 StatusNet.TimelineSearch.prototype.lastQuery = function() {
-	var db = StatusNet.getDB();
-	var row = db.execute("select searchterm from search_history limit 1");
-	if (row.isValidRow()) {
-		return row.fieldByName('searchterm');
-	} else {
-		return "";
-	}
+    var db = StatusNet.getDB();
+    var row = db.execute("select searchterm from search_history limit 1");
+    if (row.isValidRow()) {
+        return row.fieldByName('searchterm');
+    } else {
+        return "";
+    }
 }
 
 /**
@@ -239,11 +224,11 @@ StatusNet.TimelineSearch.prototype.lastQuery = function() {
  * @param q query
  */
 StatusNet.TimelineSearch.prototype.storeQuery = function(q) {
-	this._searchTerm = q;
-	var db = StatusNet.getDB();
-	db.execute('delete from search_history');
-	db.execute('insert into search_history (searchterm) values (?)',
-	           q);
+    this._searchTerm = q;
+    var db = StatusNet.getDB();
+    db.execute('delete from search_history');
+    db.execute('insert into search_history (searchterm) values (?)',
+               q);
 }
 
 /**
@@ -251,9 +236,9 @@ StatusNet.TimelineSearch.prototype.storeQuery = function(q) {
  * @param q query
  */
 StatusNet.TimelineSearch.prototype.updateSearch = function(q) {
-	this.storeQuery(q);
+    this.storeQuery(q);
     this.client.view.showSpinner();
-	this.update();
+    this.update();
 }
 
 /**
@@ -264,9 +249,9 @@ StatusNet.TimelineSearch.prototype.updateSearch = function(q) {
 StatusNet.TimelineSearch.prototype.update = function() {
     this._notices = [];
     if (this.searchTerm() == '') {
-		// nothing to search for!
-		this.finishedFetch()
-	} else {
-		StatusNet.Timeline.prototype.update.call(this);
-	}
+        // nothing to search for!
+        this.finishedFetch()
+    } else {
+        StatusNet.Timeline.prototype.update.call(this);
+    }
 }
