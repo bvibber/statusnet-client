@@ -29,15 +29,25 @@ StatusNet.TimelineView.prototype.show = function () {
             html.push('   <div><a class="author" href="' + notices[i].link + '">' + notices[i].author + '</a><br/>');
             html.push('   <small class="date">' + notices[i].updated + '</small></div>');
             html.push('   <div class="content">'+ notices[i].content +'<br/></div>');
+            if (notices[i].contextLink && notices[i].inReplyToLink) {
+                html.push(
+                    '   <div class="context"><a class="context" href="'
+                    + notices[i].contextLink +'">in context</a><br/></div>'
+                );
+            }
             html.push('</div>');
             html.push('<div class="clear"></div>');
         }
 
         $('#notices').append(html.join(''));
-        $('.notice a').attr('rel', 'external');
+
+
+
     } else {
         $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
     }
+
+    $('.notice a').attr('rel', 'external');
 
     this.hideSpinner();
 }
