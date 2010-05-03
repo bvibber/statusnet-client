@@ -32,6 +32,9 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.updated = $(entry).find('updated').text();
     notice.content = $(entry).find('content').text();
     notice.author = $(entry).find('author name').text();
+
+    notice.authorId = $(entry).find('[nodeName=activity:actor] > id').text();
+
     notice.link = $(entry).find('author uri').text();
 
     var geoPoint = $(entry).find("[nodeName=georss:point]:first").text();
