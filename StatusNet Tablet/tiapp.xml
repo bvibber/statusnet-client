@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
 <id>new.status.client.tablet</id>
-<name>StatusNet Mobile</name>
+<name>StatusNet Tablet</name>
 <version>1.0</version>
 <publisher>StatusNet, Inc.</publisher>
 <url>StatusNet, Inc.</url>
