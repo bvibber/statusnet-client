@@ -31,6 +31,9 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.date = $(entry).find('published').text();
     notice.desc = $(entry).find('content').text();
     notice.author = $(entry).find('author name').text();
+
+    notice.authorId = $(entry).find('[nodeName=activity:actor] > id').text();
+
     notice.link = $(entry).find('author uri').text();
 
     return notice;

@@ -15,6 +15,8 @@ StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
  */
 StatusNet.TimelineViewUser.prototype.show = function () {
 
+    this.showProfileInfo();
+
     var notices = this.client.timeline.getNotices();
 
     $('#notices').empty();
@@ -43,5 +45,28 @@ StatusNet.TimelineViewUser.prototype.show = function () {
     }
 
     this.hideSpinner();
-}
+};
+
+StatusNet.TimelineViewUser.prototype.showProfileInfo = function () {
+    StatusNet.debug("showProfileInfo()");
+
+    var user = this.client.timeline.user;
+
+    // @todo HTTP fetch here to get follower count, etc.
+
+    $('#profile_info').remove();
+
+    var html = new Array();
+
+    html.push('<div id="profile_info">');
+    html.push('<img src="' + user.avatarMedium + '"/>');
+    html.push(user.fullName);
+    html.push(' (@' + user.username + ')');
+    html.push('</div>');
+
+    $('#header').append(html.join(''));
+
+};
+
+
 
