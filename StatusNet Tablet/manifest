@@ -1,8 +1,8 @@
 #appname: StatusNet Tablet
-#publisher: zcopley
-#url: StatusNet, Inc.
+#publisher: brion
+#url: http://status.net/
 #image: appicon.png
-#appid: new.status.client.mobile
+#appid: net.status.tablet
 #desc: undefined
-#type: mobile
-#guid: cca143fb-473f-4e8c-9bcb-91b02a08e548
+#type: ipad
+#guid: 927aa034-2a65-496c-b54a-5a83b988198a
