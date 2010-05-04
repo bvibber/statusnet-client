@@ -61,6 +61,11 @@ a {
   -webkit-border-bottom-left-radius:10px;
 }
 
+#profile_info img {
+	float:left
+	margin-bottom:10px;
+}
+
 #content {
 	height: 100%;
 }
