@@ -15,6 +15,8 @@ StatusNet.TimelineView = function(client) {
  */
 StatusNet.TimelineView.prototype.show = function () {
 
+    StatusNet.debug("TimelineView.show");
+
     var notices = this.client.timeline.getNotices();
 
     $('#notices').empty();

@@ -39,7 +39,10 @@ StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
         }
     }
 
-    this.encacheNotice(this.timeline_name, notice.id, entry);
+    if (notice.id !== undefined) {
+        StatusNet.debug("encached notice: " + notice.id);
+        this.encacheNotice(this.timeline_name, notice.id, entry);
+    }
 
     if (prepend) {
         this._notices.unshift(notice);
@@ -107,7 +110,7 @@ StatusNet.Timeline.prototype.getNotices = function() {
         xmlEntry = rs.fieldByName('atom_entry');
         entry = (new DOMParser()).parseFromString(xmlEntry, "text/xml");
         var notice = StatusNet.AtomParser.noticeFromEntry(entry);
-        this._notices.unshift(notice);
+        this._notices.push(notice);
         rs.next();
     }
     rs.close();

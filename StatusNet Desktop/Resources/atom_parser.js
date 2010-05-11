@@ -19,14 +19,10 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
         }
     });
 
-    // Pull notice ID from permalink
-    var idRegexp = /(\d)+$/;
-    notice.permalink = $(entry).find('id').text();
+    notice.id = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('local_id');
+    notice.source = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('source');
 
-    result = notice.permalink.match(idRegexp);
-    if (result) {
-        notice.id = result[0]; // XXX: not sure we need this anymore
-    }
+    StatusNet.debug("notice id =" + notice.id + " notice.source = " + notice.source);
 
     notice.published = $(entry).find('published').text();
     notice.updated = $(entry).find('updated').text();
@@ -56,6 +52,8 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     StatusNet.debug("contextLink: " + notice.contextLink);
 
     notice.inReplyToLink = $(entry).find("[nodeName=thr:in-reply-to]:first").attr('ref');
+
+    var idRegexp = /(\d)+$/;
 
     if (notice.inReplyToLink) {
         result = notice.inReplyToLink.match(idRegexp);

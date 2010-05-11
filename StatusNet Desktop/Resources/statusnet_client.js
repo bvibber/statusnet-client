@@ -16,6 +16,7 @@ StatusNet.Client = function(_account) {
     this.timeline =  new StatusNet.TimelineFriends(this);
 
 	this.view.showHeader();
+    this.view.show();
     this.view.showSpinner(); // spinner will get hidden by the view when data finishes loading
     this.timeline.update();
 
