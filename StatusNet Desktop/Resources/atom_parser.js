@@ -25,7 +25,11 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     StatusNet.debug("notice id =" + notice.id + " notice.source = " + notice.source);
 
     notice.published = $(entry).find('published').text();
-    notice.updated = $(entry).find('updated').text();
+    var updated = $(entry).find('updated').text();
+
+    // knock off the millisecs to make the date string work with humane.js
+    notice.updated = updated.substring(0, 19);
+
     notice.content = $(entry).find('content').text();
     notice.author = $(entry).find('author name').text();
 
