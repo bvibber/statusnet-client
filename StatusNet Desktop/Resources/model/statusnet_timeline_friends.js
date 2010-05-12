@@ -15,6 +15,10 @@ StatusNet.TimelineFriends = function(client) {
 // Make StatusNet.TimelineFriends inherit Timeline's prototype
 StatusNet.TimelineFriends.prototype = heir(StatusNet.Timeline.prototype);
 
+/**
+ * Override to add a since_id parameter to the friends timeline API
+ * call. ID of the last seen notice is stored in the DB.
+ */
 StatusNet.TimelineFriends.prototype.getUrl = function() {
 
     // @fixme use the current account instead of the default
@@ -41,6 +45,10 @@ StatusNet.TimelineFriends.prototype.getUrl = function() {
     }
 }
 
+/**
+ * After the timeline is fetched store the ID of the latest notice
+ * in the timeline
+ */
 StatusNet.TimelineFriends.prototype.finishedFetch = function() {
     StatusNet.Timeline.prototype.finishedFetch.call(this);
 

@@ -22,7 +22,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.id = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('local_id');
     notice.source = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('source');
 
-    StatusNet.debug("notice id =" + notice.id + " notice.source = " + notice.source);
+    StatusNet.debug("notice.id = " + notice.id + " notice.source = " + notice.source);
 
     notice.published = $(entry).find('published').text();
     var updated = $(entry).find('updated').text();
@@ -32,8 +32,15 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
 
     notice.content = $(entry).find('content').text();
     notice.author = $(entry).find('author name').text();
+    notice.authorUri = $(entry).find('author uri').text();
 
-    notice.authorId = $(entry).find('[nodeName=activity:actor] > id').text();
+    var idRegexp = /(\d)+$/;
+
+    result = notice.authorUri.match(idRegexp);
+    if (result) {
+        notice.authorId = result[0];
+        StatusNet.debug("author id = " + notice.authorId);
+    }
 
     notice.link = $(entry).find('author uri').text();
 
@@ -57,7 +64,6 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
 
     notice.inReplyToLink = $(entry).find("[nodeName=thr:in-reply-to]:first").attr('ref');
 
-    var idRegexp = /(\d)+$/;
 
     if (notice.inReplyToLink) {
         result = notice.inReplyToLink.match(idRegexp);

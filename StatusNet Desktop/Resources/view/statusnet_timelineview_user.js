@@ -51,8 +51,12 @@ StatusNet.TimelineViewUser.prototype.show = function () {
     }
 
     this.hideSpinner();
+    this.showHeader();
 };
 
+/**
+ * Show profile information header for this user
+ */
 StatusNet.TimelineViewUser.prototype.showProfileInfo = function () {
     StatusNet.debug("showProfileInfo()");
 
@@ -74,5 +78,23 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function () {
 
 };
 
+/**
+ * Override the header to show name of the user associated with
+ * this timeline
+ */
+StatusNet.TimelineViewUser.prototype.showHeader = function () {
 
+    var username = null;
+
+    if (this.client.timeline.user) {
+        username = this.client.timeline.user.username;
+    } else {
+        username = this.client.timeline.account.username;
+    }
+
+	var title = this.title.replace("{name}", username)
+						  .replace("{site}", this.client.account.getHost());
+    $("#header").html("<h1></h1>");
+    $("#header h1").text(title);
+};
 

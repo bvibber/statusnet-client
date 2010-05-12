@@ -39,7 +39,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             break;
         case 'user':
             this.view = new StatusNet.TimelineViewUser(this);
-            this.timeline = new StatusNet.TimelineUser(this);
+            this.timeline = new StatusNet.TimelineUser(this, null);
             break;
         case "friends":
             this.view = new StatusNet.TimelineViewFriends(this);
@@ -75,6 +75,37 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 }
 
 /**
+ * Switch the user timeline based on the ID of the user. This only
+ * works for local users.  Remote user timeline open in a browser.
+ *
+ * @param int authorId ID of the (local site) user to display
+ */
+StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
+
+    StatusNet.debug("in switchUserTimeline()");
+
+    this.view = new StatusNet.TimelineViewUser(this);
+
+    var timeline = 'user';
+
+    if (authorId === null) {
+        StatusNet.debug("authorId is null");
+        this.timeline = new StatusNet.TimelineUser(this, null);
+    } else {
+        StatusNet.debug("authorID is " + authorId);
+        timeline = 'user' + '-' + authorId;
+        this.timeline = new StatusNet.TimelineUser(this, authorId);
+    }
+
+    this._timeline = timeline;
+    StatusNet.Sidebar.setSelectedTimeline(timeline);
+
+    this.view.showSpinner();
+    this.timeline.update();
+    this.view.showHeader();
+}
+
+/**
  * Reload timeline notices
  */
 StatusNet.Client.prototype.refresh = function() {
@@ -86,7 +117,7 @@ StatusNet.Client.prototype.refresh = function() {
  */
 StatusNet.Client.prototype.init = function() {
 
-    that = this;
+    var that = this;
 
     this.server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
 
@@ -113,7 +144,7 @@ StatusNet.Client.prototype.init = function() {
     $('#update_button').bind('click', function() { that.postNotice(); });
 
     // refresh timeline when window is clicked
-    $("#content").bind('click', function() { that.refresh(); });
+    //$("#content").bind('click', function() { that.refresh(); });
 
     // make links open in an external browser window
     $('a[rel=external]').live('click', function() {

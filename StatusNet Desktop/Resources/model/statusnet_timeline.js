@@ -85,10 +85,17 @@ StatusNet.Timeline.prototype.update = function() {
 
 }
 
+/**
+ * Get the URL for the Atom feed of this timeline
+ */
 StatusNet.Timeline.prototype.getUrl = function() {
     return this._url;
 }
 
+/**
+ * Do anything that needs doing after retrieving timeline data.
+ * Typically displaying the timeline.
+ */
 StatusNet.Timeline.prototype.finishedFetch = function() {
     this.view.show();
 }

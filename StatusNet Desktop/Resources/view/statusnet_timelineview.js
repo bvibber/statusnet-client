@@ -26,11 +26,12 @@ StatusNet.TimelineView.prototype.show = function () {
         var html = new Array();
 
         for (i = 0; i < notices.length; i++) {
-            html.push('<div class="notice">');
+
+            html.push('<div class="notice" name="notice-' + notices[i].id +'">');
             html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + notices[i].avatar + '"/></a></div>');
-            html.push('   <div><a class="author" href="' + notices[i].link + '">' + notices[i].author + '</a><br/>');
-            html.push('   <small class="date">' + humane_date(notices[i].updated) + '</small></div>');
+            html.push('   <div><a class="author" name="author-' + notices[i].authorId + '" href="' + notices[i].link + '">' + notices[i].author + '</a><br/>');
             html.push('   <div class="content">'+ notices[i].content +'<br/></div>');
+            html.push('   <small class="date">' + humane_date(notices[i].updated) + '</small></div>');
             if (notices[i].contextLink && notices[i].inReplyToLink) {
                 html.push(
                     '   <div class="context"><a class="context" href="'
@@ -39,11 +40,16 @@ StatusNet.TimelineView.prototype.show = function () {
             }
             html.push('</div>');
             html.push('<div class="clear"></div>');
+
         }
 
         $('#notices').append(html.join(''));
 
+        var that = this;
 
+        $('#notices div.notice').each(function() {
+            that.enableNoticeControls(this);
+        });
 
     } else {
         $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
@@ -54,22 +60,65 @@ StatusNet.TimelineView.prototype.show = function () {
     this.hideSpinner();
 }
 
+StatusNet.TimelineView.prototype.localAuthor = function(uri) {
+
+    if (uri.substring(0, this.client.server.length) === this.client.server) {
+        return true;
+    }
+    return false;
+}
+
+StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
+    var name = $(noticeDom).attr('name');
+    var noticeId = name.substring(7); // notice-
+
+    name = $(noticeDom).find('a.author').attr('name');
+    var authorId = name.substring(7); // author-
+
+    StatusNet.debug("authorId = " + authorId + " noticeId = " + noticeId);
+
+    var uri = $(noticeDom).find('div a.author').attr('href');
+
+    if (this.localAuthor(uri)) {
+
+        var that = this;
+
+        $(noticeDom).find('div a.author').attr('href', "#");
+        $(noticeDom).find('div a.author').bind('click', function(event) {
+            StatusNet.debug("Switching timeline to user " + authorId);
+            that.client.switchUserTimeline(authorId);
+        });
+
+        $(noticeDom).find('div.avatar a').attr('href', "#");
+        $(noticeDom).find('div.avatar').bind('click', function(event) {
+            StatusNet.debug("Switching timeline to user " + authorId);
+            that.client.switchUserTimeline(authorId);
+        });
+    }
+}
+
 /**
  * Set up anything that should go in the header section...
  */
 StatusNet.TimelineView.prototype.showHeader = function () {
-	var title = this.title.replace("{name}", this.client.account.username)
-						   .replace("{site}", this.client.account.getHost());
+    var title = this.title.replace("{name}", this.client.account.username)
+                           .replace("{site}", this.client.account.getHost());
     $("#header").html("<h1></h1>");
     $("#header h1").text(title);
 }
 
+/**
+ * Show wait cursor
+ */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
     $('#notices').empty();
     $('#notices').append('<img id="spinner" src="/images/icon_processing.gif" />');
 }
 
+/**
+ * Hide wait cursor
+ */
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
     $('#spinner').remove();
@@ -157,7 +206,7 @@ StatusNet.TimelineViewSearch.prototype.showHeader = function () {
     var timeline = this.client.timeline;
     var q = timeline.searchTerm();
     $("#search").val(q)
-			    .change(function() {
-		timeline.updateSearch($(this).val());
-	});
+                .change(function() {
+        timeline.updateSearch($(this).val());
+    });
 }

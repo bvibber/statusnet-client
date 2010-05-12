@@ -1,10 +1,16 @@
 /**
  * Constructor for user timeline model
  */
-StatusNet.TimelineUser = function(client) {
+StatusNet.TimelineUser = function(client, authorId) {
     StatusNet.Timeline.call(this, client);
 
-    this.timeline_name = 'user';
+    this.authorId = authorId;
+
+    if (this.authorId === null) {
+        this.timeline_name = 'user';
+    } else {
+        this.timeline_name = 'user-' + authorId;
+    }
 
     this._url = 'statuses/user_timeline.atom';
 
@@ -14,6 +20,17 @@ StatusNet.TimelineUser = function(client) {
 
 // Make StatusNet.TimelineUser inherit Timeline's prototype
 StatusNet.TimelineUser.prototype = heir(StatusNet.Timeline.prototype);
+
+StatusNet.TimelineUser.prototype.getUrl = function() {
+
+    StatusNet.debug("TimelineUser.getUrl() this.authorId = " + this.authorId);
+
+    if (this.authorId === null) {
+        return this._url;
+    } else {
+        return this._url + "?user_id=" + this.authorId;
+    }
+}
 
 /**
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
