@@ -15,8 +15,6 @@ StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
  */
 StatusNet.TimelineViewUser.prototype.show = function () {
 
-    this.showProfileInfo();
-
     var notices = this.client.timeline.getNotices();
 
     $('#notices').empty();
@@ -52,6 +50,8 @@ StatusNet.TimelineViewUser.prototype.show = function () {
 
     this.hideSpinner();
     this.showHeader();
+    this.showProfileInfo();
+
 };
 
 /**
@@ -96,5 +96,6 @@ StatusNet.TimelineViewUser.prototype.showHeader = function () {
 						  .replace("{site}", this.client.account.getHost());
     $("#header").html("<h1></h1>");
     $("#header h1").text(title);
+
 };
 
