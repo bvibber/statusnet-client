@@ -118,7 +118,6 @@ StatusNet.Timeline.prototype.getNotices = function() {
         entry = (new DOMParser()).parseFromString(xmlEntry, "text/xml");
         var notice = StatusNet.AtomParser.noticeFromEntry(entry);
         this._notices.unshift(notice);
-        StatusNet.debug('XXXXXX added notice from cache: ' + notice.id);
         rs.next();
     }
     rs.close();

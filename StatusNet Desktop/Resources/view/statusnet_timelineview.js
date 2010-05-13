@@ -60,6 +60,13 @@ StatusNet.TimelineView.prototype.show = function () {
     this.hideSpinner();
 }
 
+/**
+ * Determines whether the notice is local (by permalink)
+ *
+ * @param String uri the uri of the notice
+ *
+ * @return boolean value
+ */
 StatusNet.TimelineView.prototype.localAuthor = function(uri) {
 
     if (uri.substring(0, this.client.server.length) === this.client.server) {
@@ -79,6 +86,8 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
 
     var uri = $(noticeDom).find('div a.author').attr('href');
 
+    // Override links to external web view of the notice timelines
+    // with click event handlers to display timelines within the client
     if (this.localAuthor(uri)) {
 
         var that = this;
@@ -95,7 +104,22 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
             that.client.switchUserTimeline(authorId);
         });
     }
-}
+
+    // Override external web links to local users in-content
+    $(noticeDom).find('div.content span.vcard a').each(function() {
+        var href = $(this).attr('href');
+        if (that.localAuthor(href)) {
+            $(this).attr('href', '#');
+            $(this).click(function() {
+                var idRegexp = /(\d)+$/;
+                result = href.match(idRegexp);
+                if (result) {
+                    that.client.switchUserTimeline(result[0]);
+                }
+            });
+        }
+    });
+};
 
 /**
  * Set up anything that should go in the header section...

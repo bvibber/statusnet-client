@@ -31,6 +31,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.updated = updated.substring(0, 19);
 
     notice.content = $(entry).find('content').text();
+
     notice.author = $(entry).find('author name').text();
     notice.authorUri = $(entry).find('author uri').text();
 
