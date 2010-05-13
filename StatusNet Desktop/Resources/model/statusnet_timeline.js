@@ -108,7 +108,7 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
 StatusNet.Timeline.prototype.getNotices = function() {
 
     var rs = this.db.execute(
-        "SELECT * from notice_cache WHERE account_id = ? AND timeline = ?",
+        "SELECT * from notice_cache WHERE account_id = ? AND timeline = ? ORDER BY notice_id",
         this.account.id,
         this.timeline_name
     );
@@ -117,7 +117,8 @@ StatusNet.Timeline.prototype.getNotices = function() {
         xmlEntry = rs.fieldByName('atom_entry');
         entry = (new DOMParser()).parseFromString(xmlEntry, "text/xml");
         var notice = StatusNet.AtomParser.noticeFromEntry(entry);
-        this._notices.push(notice);
+        this._notices.unshift(notice);
+        StatusNet.debug('XXXXXX added notice from cache: ' + notice.id);
         rs.next();
     }
     rs.close();
