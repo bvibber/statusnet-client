@@ -32,7 +32,7 @@ a {
 
 #sidebar {
   width:70px;
-  height:610px;
+  height:1000px;
   background-color:#1c1c1c;
   background: url(/images/sidebar-bg.png);
   float:left;
@@ -71,7 +71,7 @@ a {
 }
 
 #body {
-  height:540px;
+  height:580px;
   overflow-y: auto;
   overflow-x: hidden;
   padding:5px;

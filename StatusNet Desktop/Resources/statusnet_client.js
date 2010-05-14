@@ -140,9 +140,6 @@ StatusNet.Client.prototype.init = function() {
     var search = this.server + 'search/notice';
     $('ul.nav li#nav_timeline_search > a').attr('href', search);
 
-    // post a new notice
-    $('#update_button').bind('click', function() { that.postNotice(); });
-
     // refresh timeline when window is clicked
     //$("#content").bind('click', function() { that.refresh(); });
 
@@ -152,44 +149,31 @@ StatusNet.Client.prototype.init = function() {
         return false;
     });
 
+    $('#new_notice').click(function() { that.newNoticeDialog(); });
 }
 
 /**
- * Post a notice
+ * Show notice input dialog
  */
-StatusNet.Client.prototype.postNotice = function()
-{
-    var url = 'statuses/update.json';
+StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername) {
+    var win = Titanium.UI.getCurrentWindow().createWindow({
+        url: 'app:///new_notice.html',
+        title: 'New notice',
+        width: 400,
+        height: 100});
 
-    var noticeText = $('#notice_textarea').val();
-
-    var params = 'status=' + noticeText + '&source=StatusNet Desktop';
+    // Pass the reply-to info in via the window itself.
+    // XXX: Is there a better way?
+    win.replyToId = replyToId;
+    win.replyToUsername = replyToUsername;
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(data);
-            StatusNet.debug(data.user);
+    win.addEventListener(Titanium.CLOSE, function(event) {
+        that.view.showHeader();
+        that.view.showSpinner();
+        that.timeline.update();
+    });
 
-            var notice = {};
-
-            notice.id = data.id;
-            notice.avatar = data.user.profile_image_url;
-            notice.date = data.created_at;
-            notice.desc = data.text;
-            notice.author = data.user.screen_name;
-            notice.link = that.account.server + '/' + data.user.screen_name;
-
-            that.timeline.addStatus(status, true);
-            that.view.show();
-
-            //$('#notices > div.notice:first').before(data.text);
-        },
-        function(client, msg) {
-            StatusNet.debug('Could not post notice: ' + msg);
-            alert('Could not post notice: ' + msg);
-        }
-    );
-
+    win.open();
 }

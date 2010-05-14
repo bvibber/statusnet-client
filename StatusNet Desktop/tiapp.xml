@@ -13,15 +13,15 @@
 <id>initial</id>
 <title>StatusNet Desktop</title>
 <url>app://index.html</url>
-<width>420</width>
-<max-width>420</max-width>
+<width>600</width>
+<max-width>600</max-width>
 <min-width>420</min-width>
-<height>610</height>
-<max-height>610</max-height>
+<height>600</height>
+<max-height>1000</max-height>
 <min-height>610</min-height>
 <fullscreen>false</fullscreen>
-<resizable>false</resizable>
-<chrome scrollbars="true">true</chrome>
+<resizable>true</resizable>
+<chrome scrollbars="false">true</chrome>
 <maximizable>false</maximizable>
 <minimizable>true</minimizable>
 <closeable>true</closeable>

@@ -17,7 +17,6 @@ StatusNet.debug = function(msg) {
     Titanium.API.debug(msg);
 }
 
-
 /**
  * Lazy-open our local storage database.
  * @return database object
