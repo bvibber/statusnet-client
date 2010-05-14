@@ -159,8 +159,8 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
     var win = Titanium.UI.getCurrentWindow().createWindow({
         url: 'app:///new_notice.html',
         title: 'New notice',
-        width: 400,
-        height: 100});
+        width: 420,
+        height: 120});
 
     // Pass the reply-to info in via the window itself.
     // XXX: Is there a better way?
