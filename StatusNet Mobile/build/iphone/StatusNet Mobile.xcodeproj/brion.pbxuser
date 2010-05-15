@@ -6,6 +6,12 @@
 			D41FA1D2118F9AD200AC4AF5 /* StatusNet Mobile */,
 		);
 	};
+	24D8E3B5119B9D8A00F8CAA6 /* StatusNet Mobile-iPad */ = {
+		activeExec = 0;
+		executables = (
+			D4101D27119F4B14008B547A /* StatusNet Mobile-iPad */,
+		);
+	};
 	29B97313FDCFA39411CA2CEA /* Project object */ = {
 		activeBuildConfigurationName = Debug;
 		activeExecutable = D41FA1D2118F9AD200AC4AF5 /* StatusNet Mobile */;
@@ -13,6 +19,7 @@
 		codeSenseManager = D41FA213118F9ADD00AC4AF5 /* Code sense */;
 		executables = (
 			D41FA1D2118F9AD200AC4AF5 /* StatusNet Mobile */,
+			D4101D27119F4B14008B547A /* StatusNet Mobile-iPad */,
 		);
 		perUserDictionary = {
 			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
@@ -22,7 +29,7 @@
 					20,
 					341,
 					20,
-					48.16259765625,
+					48,
 					43,
 					43,
 					20,
@@ -37,12 +44,39 @@
 					PBXFileDataSource_Target_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 294623954;
-			PBXWorkspaceStateSaveDate = 294623954;
+			PBXPerProjectTemplateStateSaveDate = 295652116;
+			PBXWorkspaceStateSaveDate = 295652116;
 		};
 		sourceControlManager = D41FA212118F9ADD00AC4AF5 /* Source Control */;
 		userBuildSettings = {
 		};
+	};
+	D4101D27119F4B14008B547A /* StatusNet Mobile-iPad */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = "StatusNet Mobile-iPad";
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
 	};
 	D41FA1D2118F9AD200AC4AF5 /* StatusNet Mobile */ = {
 		isa = PBXExecutable;
