@@ -38,6 +38,8 @@ StatusNet.TimelineView.prototype.show = function () {
                     + notices[i].contextLink +'">in context</a><br/></div>'
                 );
             }
+            html.push('<a href="#" class="notice_reply">Reply</a>');
+
             html.push('</div>');
             html.push('<div class="clear"></div>');
 
@@ -82,15 +84,17 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     name = $(noticeDom).find('a.author').attr('name');
     var authorId = name.substring(7); // author-
 
-    StatusNet.debug("authorId = " + authorId + " noticeId = " + noticeId);
+    var noticeAuthor = $(noticeDom).find('a.author').text();
+
+    StatusNet.debug("authorId = " + authorId + " author name = " + noticeAuthor + " noticeId = " + noticeId);
 
     var uri = $(noticeDom).find('div a.author').attr('href');
+
+    var that = this;
 
     // Override links to external web view of the notice timelines
     // with click event handlers to display timelines within the client
     if (this.localAuthor(uri)) {
-
-        var that = this;
 
         $(noticeDom).find('div a.author').attr('href', "#");
         $(noticeDom).find('div a.author').bind('click', function(event) {
@@ -104,6 +108,10 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
             that.client.switchUserTimeline(authorId);
         });
     }
+
+    $(noticeDom).find('a.notice_reply').bind('click', function(event) {
+        that.client.newNoticeDialog(noticeId, noticeAuthor);
+    });
 
     // Override external web links to local users in-content
     $(noticeDom).find('div.content span.vcard a').each(function() {
@@ -119,6 +127,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
             });
         }
     });
+
 };
 
 /**

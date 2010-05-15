@@ -164,8 +164,12 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
 
     // Pass the reply-to info in via the window itself.
     // XXX: Is there a better way?
-    win.replyToId = replyToId;
-    win.replyToUsername = replyToUsername;
+
+    if (replyToId) {
+        win.setTitle('Replying to ' + replyToUsername);
+        win.replyToId = replyToId;
+        win.replyToUsername = replyToUsername;
+    }
 
     var that = this;
 

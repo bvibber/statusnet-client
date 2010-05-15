@@ -95,3 +95,21 @@ function heir(p) {
     return new f();
 }
 
+/**
+ * Utility JQuery function to control the selection in an input.
+ * Useful for positioning the carat.
+ */
+$.fn.selectRange = function(start, end) {
+    return this.each(function() {
+        if (this.setSelectionRange) {
+            this.focus();
+            this.setSelectionRange(start, end);
+        } else if (this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    });
+}
