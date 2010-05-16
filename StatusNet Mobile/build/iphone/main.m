@@ -10,7 +10,7 @@
 NSString * const TI_APPLICATION_DEPLOYTYPE = @"development";
 NSString * const TI_APPLICATION_ID = @"net.status.client.mobile";
 NSString * const TI_APPLICATION_PUBLISHER = @"StatusNet, Inc.";
-NSString * const TI_APPLICATION_URL = @"StatusNet, Inc.";
+NSString * const TI_APPLICATION_URL = @"http://status.net/";
 NSString * const TI_APPLICATION_NAME = @"StatusNet Mobile";
 NSString * const TI_APPLICATION_VERSION = @"1.0";
 NSString * const TI_APPLICATION_DESCRIPTION = @"StatusNet Mobile Client";
