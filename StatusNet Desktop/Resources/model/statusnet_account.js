@@ -61,10 +61,9 @@ StatusNet.Account.fromRow = function(row) {
         row.fieldByName("apiroot")
     );
 
-	ac.id = row.fieldByName("id");
+    ac.id = row.fieldByName("id");
     ac.avatar = row.fieldByName("profile_image_url");
-    StatusNet.debug("Account.fromRow - Avatar now = " + ac.avatar);
-
+    ac.textLimit = row.fieldByName('text_limit');
     return ac;
 }
 
@@ -169,25 +168,27 @@ StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError)
  *
  * @return boolean success
  */
-StatusNet.Account.prototype.ensure = function(db, data) {
+StatusNet.Account.prototype.ensure = function(db) {
 
     StatusNet.debug('in Account.ensure');
 
-    var avatarUrl = $(data).find('profile_image_url').text();
+    StatusNet.debug("Avatar = " + this.avatar);
+    StatusNet.debug("textLimit = " + this.textLimit);
 
     var rs = db.execute("select * from account where username=? " +
                         "and apiroot=?",
-						this.username, this.apiroot);
+                        this.username, this.apiroot);
 
     if (rs.rowCount() === 0) {
 
         rs = db.execute("INSERT INTO account " +
-						"(username, password, apiroot, is_default, profile_image_url) " +
-						"VALUES (?, ?, ?, 0, ?)",
-						this.username,
-						this.password,
-						this.apiroot,
-						avatarUrl);
+                        "(username, password, apiroot, is_default, profile_image_url, text_limit) " +
+                        "VALUES (?, ?, ?, 0, ?, ?)",
+                        this.username,
+                        this.password,
+                        this.apiroot,
+                        this.avatar,
+                        this.textLimit);
 
         StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 
@@ -242,7 +243,7 @@ StatusNet.Account.prototype.deleteAccount = function() {
 StatusNet.Account.prototype.getHost = function() {
     var matches = this.apiroot.match(/^(http|https):\/\/([^\/]+)/);
     if (matches) {
-		return matches[2];
+        return matches[2];
     } else {
         // hmmm
         return this.apiroot;
@@ -254,5 +255,5 @@ StatusNet.Account.prototype.getHost = function() {
  * @return boolean
  */
 StatusNet.Account.prototype.isSecure = function() {
-	return (this.apiroot.match(/^https:/));
+    return (this.apiroot.match(/^https:/));
 }

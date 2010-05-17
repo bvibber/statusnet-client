@@ -27,8 +27,26 @@ StatusNet.NewNoticeView.prototype.init = function() {
         );
     }
 
-    $('#update_button').bind('click', function() {
+    $('#update_button').bind('click', function(event) {
         that.postNotice();
+    });
+
+    StatusNet.debug("textlimit = " + that.account.textLimit);
+
+    $('#counter').html(that.account.textLimit);
+    $('#notice_textarea').bind('keypress', function(event) {
+        var len = $('#notice_textarea').val().length;
+
+        // turn char counter red when it goes negative
+        if (that.account.textLimit - len < 0 && that.account.textLimit - len + 1 == 0) {
+            $('#counter').addClass('negative');
+        }
+
+        if (that.account.textLimit - len > 0 && that.account.textLimit - len - 1 == 0) {
+            $('#counter').removeClass('negative');
+        }
+
+        $('#counter').html(that.account.textLimit - len);
     });
 }
 
