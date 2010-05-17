@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
-    <id>net.status.tablet</id>
-    <name>StatusNet Tablet</name>
-    <version>1.0</version>
-    <publisher>not specified</publisher>
-    <url>not specified</url>
-    <description>not specified</description>
-    <copyright>not specified</copyright>
-    <icon>appicon.png</icon>
+<id>net.status.tablet</id>
+<name>StatusNet Tablet</name>
+<version>1.0</version>
+<publisher>brion</publisher>
+<url>http://status.net/</url>
+<description>No description provided</description>
+<copyright>2010 by brion</copyright>
+<icon>default_app_logo.png</icon>
     <persistent-wifi>false</persistent-wifi>
     <prerendered-icon>false</prerendered-icon>
     <statusbar-style>default</statusbar-style>

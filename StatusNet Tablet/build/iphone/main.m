@@ -7,19 +7,19 @@
 #define _QUOTEME(x) #x
 #define STRING(x) _QUOTEME(x)
 
-NSString * const TI_APPLICATION_DEPLOYTYPE = @"development";
+NSString * const TI_APPLICATION_DEPLOYTYPE = @"production";
 NSString * const TI_APPLICATION_ID = @"net.status.tablet";
-NSString * const TI_APPLICATION_PUBLISHER = @"not specified";
-NSString * const TI_APPLICATION_URL = @"not specified";
+NSString * const TI_APPLICATION_PUBLISHER = @"brion";
+NSString * const TI_APPLICATION_URL = @"http://status.net/";
 NSString * const TI_APPLICATION_NAME = @"StatusNet Tablet";
 NSString * const TI_APPLICATION_VERSION = @"1.0";
-NSString * const TI_APPLICATION_DESCRIPTION = @"not specified";
-NSString * const TI_APPLICATION_COPYRIGHT = @"not specified";
+NSString * const TI_APPLICATION_DESCRIPTION = @"No description provided";
+NSString * const TI_APPLICATION_COPYRIGHT = @"2010 by brion";
 NSString * const TI_APPLICATION_GUID = @"927aa034-2a65-496c-b54a-5a83b988198a";
 BOOL const TI_APPLICATION_ANALYTICS = true;
 
-#ifdef DEBUG
-NSString * const TI_APPLICATION_RESOURCE_DIR = @"/Users/brion/src/StatusNet/client/statusnet-client/StatusNet Tablet/build/iphone/build/Debug-iphonesimulator/StatusNet Tablet.app";
+#ifdef TARGET_IPHONE_SIMULATOR
+NSString * const TI_APPLICATION_RESOURCE_DIR = @"";
 #endif
 
 int main(int argc, char *argv[]) {
