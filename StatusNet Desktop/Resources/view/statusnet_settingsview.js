@@ -177,10 +177,22 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             that.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
                 $("#new-status").text("Login confirmed.");
                 that.xml = xml;
-                var avatar = $("user profile_image_url", xml).text();
-                StatusNet.debug(avatar);
-                $("#new-avatar").attr("src", avatar);
+                that.workAcct.avatar = $("user profile_image_url", xml).text();
+                StatusNet.debug(that.workAcct.avatar);
+                $("#new-avatar").attr("src", that.workAcct.avatar);
                 $("#new-save").removeAttr("disabled");
+                
+                // get site specific configuration info
+                that.workAcct.fetchUrl('statusnet/config.xml', function(status, xml) {
+                    StatusNet.debug("Loaded statusnet/config.xml");
+
+                    that.workAcct.textLimit = $(xml).find('textlimit:first').text();
+
+
+                }, function(status) {
+                    StatusNet.debug("Couldn't load statusnet/config.xml for site."); 
+                });
+
             }, function(status) {
                 $("#new-status").text("Bad nickname or password.");
                 StatusNet.debug("We failed to load account info");
@@ -253,7 +265,7 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
 }
 
 StatusNet.SettingsView.prototype.saveNewAccount = function() {
-    this.workAcct.ensure(StatusNet.getDB(), this.xml);
+    this.workAcct.ensure(StatusNet.getDB());
     this.showAccountRow(this.workAcct);
 
     this.hideAddAccount();
