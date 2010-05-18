@@ -64,6 +64,8 @@ StatusNet.Account.fromRow = function(row) {
     ac.id = row.fieldByName("id");
     ac.avatar = row.fieldByName("profile_image_url");
     ac.textLimit = row.fieldByName('text_limit');
+    ac.siteLogo = row.fieldByName('site_logo');
+
     return ac;
 }
 
@@ -174,6 +176,7 @@ StatusNet.Account.prototype.ensure = function(db) {
 
     StatusNet.debug("Avatar = " + this.avatar);
     StatusNet.debug("textLimit = " + this.textLimit);
+    StatusNet.debug("siteLogo = " + this.siteLogo);
 
     var rs = db.execute("select * from account where username=? " +
                         "and apiroot=?",
@@ -182,13 +185,14 @@ StatusNet.Account.prototype.ensure = function(db) {
     if (rs.rowCount() === 0) {
 
         rs = db.execute("INSERT INTO account " +
-                        "(username, password, apiroot, is_default, profile_image_url, text_limit) " +
-                        "VALUES (?, ?, ?, 0, ?, ?)",
+                        "(username, password, apiroot, is_default, profile_image_url, text_limit, site_logo) " +
+                        "VALUES (?, ?, ?, 0, ?, ?, ?)",
                         this.username,
                         this.password,
                         this.apiroot,
                         this.avatar,
-                        this.textLimit);
+                        this.textLimit,
+                        this.siteLogo);
 
         StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 

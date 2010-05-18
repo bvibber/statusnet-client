@@ -48,6 +48,7 @@ StatusNet.getDB = function() {
             + 'last_timeline_id INTEGER, '
             + 'profile_image_url TEXT, '
             + 'text_limit INTEGER DEFAULT 0, '
+            + 'site_logo TEXT, '
             + 'UNIQUE (username, apiroot)'
             + ')';
 

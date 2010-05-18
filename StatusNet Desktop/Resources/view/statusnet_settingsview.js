@@ -185,10 +185,8 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                 // get site specific configuration info
                 that.workAcct.fetchUrl('statusnet/config.xml', function(status, xml) {
                     StatusNet.debug("Loaded statusnet/config.xml");
-
-                    that.workAcct.textLimit = $(xml).find('textlimit:first').text();
-
-
+                    that.workAcct.textLimit = $(xml).find('site > textlimit:first').text();
+                    that.workAcct.siteLogo = $(xml).find('site > logo:first').text();
                 }, function(status) {
                     StatusNet.debug("Couldn't load statusnet/config.xml for site."); 
                 });
