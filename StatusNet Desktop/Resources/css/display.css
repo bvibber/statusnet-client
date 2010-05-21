@@ -1,3 +1,7 @@
+html, body {
+	height: 100%;
+}
+
 body, * {
   font-family:"Lucida Grande",Tahoma, Helvetica, sans-serif;
   font-size:12px;
@@ -32,11 +36,11 @@ a {
 
 #sidebar {
   width:70px;
-  height:1000px;
   background-color:#1c1c1c;
   background: url(/images/sidebar-bg.png);
   float:left;
   text-align:center;
+	height: 100%;
 }
 
 #main_logo {
@@ -71,10 +75,10 @@ a {
 }
 
 #body {
-  height:580px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding:5px;
+	height: 94%;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: 5px;
 }
 
 #body h4 {
@@ -131,4 +135,12 @@ a {
 }
 .notice .clear {
 	clear:both;
+}
+
+#footer {
+	position: absolute;
+	bottom: 0px;
+	left: 70px;
+	height: 20px;
+	padding-left: 5px;
 }

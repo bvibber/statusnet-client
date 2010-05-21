@@ -1,4 +1,31 @@
+#counter {
+	position: absolute;
+	top: 68px;
+	left: 360px;
+	width: 50px;
+	text-align: right;
+	color: #444;
+}
+
 div#counter.negative {
     color:red;
 }
 
+#update_button {
+	position: absolute;
+	top: 92px;
+	left: 358px;
+}
+
+#notice_textarea {
+	margin: 5px;
+	padding: 4px;
+	height: 70px;
+	width: 400px;
+	outline: none;
+	-webkit-border-radius:5px;
+	-webkit-box-shadow: 1px 1px 3px gray;
+	border: solid 1px #f8f8f8;
+	background-color:#f2f2f2;
+
+}
