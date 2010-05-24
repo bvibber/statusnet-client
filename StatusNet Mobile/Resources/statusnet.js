@@ -26,19 +26,7 @@ StatusNet.getDB = function() {
 
     if (this.db === null) {
 
-        var separator = Titanium.Filesystem.getSeparator();
-        var dbFile = Titanium.Filesystem.getFile(
-            Titanium.Filesystem.getApplicationDataDirectory() +
-            separator +
-            "statusnet.db"
-        );
-
-        StatusNet.debug(
-            "Application data directory = "
-            + Titanium.Filesystem.getApplicationDataDirectory()
-        );
-
-        this.db = Titanium.Database.openFile(dbFile);
+        this.db = Titanium.Database.open('statusnet');
 
         var sql = 'CREATE TABLE IF NOT EXISTS account ('
             + 'id INTEGER PRIMARY KEY AUTOINCREMENT, '
@@ -73,20 +61,64 @@ StatusNet.getDB = function() {
     }
 
     return this.db;
-}
+};
+
+StatusNet.initTabs = function() {
+    // For now let's stick with the same tabs we have on the desktop sidebar
+    var tabNames = ['public',
+                    'personal',
+                    'profile',
+                    'replies',
+                    'favorites',
+                    'inbox',
+                    'search',
+                    'settings'];
+
+    // @todo localization
+    var titles = {public: 'Public',
+                  personal: 'Personal',
+                  profile: 'Profile',
+                  replies: 'Replies',
+                  favorites: 'Favorites',
+                  inbox: 'Inbox',
+                  search: 'Search',
+                  settings: 'Settings'};
+
+    this.tabs = {};
+    this.windows = {};
+    this.tabGroup = Titanium.UI.createTabGroup();
+    this.tabsByName = {};
+
+    for (var i = 0; i < tabNames.length; i++) {
+        var tab = tabNames[i];
+        this.tabsByName[tab] = i;
+        this.windows[tab] = Titanium.UI.createWindow({
+            url: tab + '.js',
+            title: titles[tab]
+        });
+        this.tabs[tab] = Titanium.UI.createTab({
+            icon: 'images/tabs/' + tab + '.png',
+            title: titles[tab],
+            window: this.windows[tab]
+        });
+        this.tabGroup.addTab(this.tabs[tab]);
+    }
+
+    this.tabGroup.setActiveTab(1);
+    this.tabGroup.open();
+};
+
+StatusNet.setActiveTab = function(tabName) {
+    this.tabGroup.setActiveTab(this.tabsByName[tabName]);
+};
 
 /**
  * Show settings dialog
  * @fixme make sure it's a singleton!
  */
 StatusNet.showSettings = function() {
-    var win = Titanium.UI.getCurrentWindow().createWindow({
-        url: 'app:///settings.html',
-        title: 'Settings',
-        width: 400,
-        height: 500});
-    win.open();
-}
+    this.setActiveTab('settings');
+};
 
 /**
  * Utility function to create a prototype for the subclass
@@ -96,23 +128,4 @@ function heir(p) {
     function f(){}
     f.prototype = p;
     return new f();
-}
-
-/**
- * Utility JQuery function to control the selection in an input.
- * Useful for positioning the carat.
- */
-$.fn.selectRange = function(start, end) {
-    return this.each(function() {
-        if (this.setSelectionRange) {
-            this.focus();
-            this.setSelectionRange(start, end);
-        } else if (this.createTextRange) {
-            var range = this.createTextRange();
-            range.collapse(true);
-            range.moveEnd('character', end);
-            range.moveStart('character', start);
-            range.select();
-        }
-    });
-}
+};
