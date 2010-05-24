@@ -12,6 +12,17 @@ var tabNames = ['public',
                 'inbox',
                 'search',
                 'settings'];
+
+// @todo localization
+var titles = {public: 'Public Timeline',
+              personal: 'Personal Timeline',
+              profile: 'Profile',
+              replies: 'Replies',
+              favorites: 'Favorites',
+              inbox: 'Inbox',
+              search: 'Search',
+              settings: 'Settings'};
+
 var tabs = {};
 var windows = {};
 var tabGroup = Titanium.UI.createTabGroup();
@@ -19,7 +30,8 @@ var tabGroup = Titanium.UI.createTabGroup();
 for (var i = 0; i < tabNames.length; i++) {
     var tab = tabNames[i];
     windows[tab] = Titanium.UI.createWindow({
-        url: tab + '.js'
+        url: tab + '.js',
+        title: titles[tab]
     });
     tabs[tab] = Titanium.UI.createTab({
         icon: 'images/tabs/' + tab + '.png',
