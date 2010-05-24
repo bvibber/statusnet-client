@@ -66,9 +66,9 @@ StatusNet.getDB = function() {
 StatusNet.initTabs = function() {
     // For now let's stick with the same tabs we have on the desktop sidebar
     var tabNames = ['public',
-                    'personal',
+                    'friends',
                     'profile',
-                    'replies',
+                    'mentions',
                     'favorites',
                     'inbox',
                     'search',
@@ -76,9 +76,9 @@ StatusNet.initTabs = function() {
 
     // @todo localization
     var titles = {public: 'Public',
-                  personal: 'Personal',
+                  friends: 'Personal',
                   profile: 'Profile',
-                  replies: 'Replies',
+                  mentions: 'Replies',
                   favorites: 'Favorites',
                   inbox: 'Inbox',
                   search: 'Search',

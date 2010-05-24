@@ -20,6 +20,7 @@ StatusNet.TimelineView.prototype.show = function () {
     var notices = this.client.timeline.getNotices();
 
     $('#notices').empty();
+    var window = StatusNet.windows[this.tabName()];
 
     if (notices.length > 0) {
 
