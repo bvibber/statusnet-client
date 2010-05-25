@@ -76,6 +76,18 @@ StatusNet.getDB = function() {
 }
 
 /**
+ * Abstract away completely gratuitous differences between database result
+ * classes in Titanium Desktop and Mobile. Sigh.
+ *
+ * @param Titaniu.Database.ResultSet rs
+ * @return int
+ */
+StatusNet.rowCount = function(rs) {
+    return rs.rowCount();
+}
+
+
+/**
  * Show settings dialog
  * @fixme make sure it's a singleton!
  */

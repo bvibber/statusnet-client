@@ -98,7 +98,7 @@ StatusNet.Account.listAll = function(db) {
  */
 StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
 
-    StatusNet.debug('in fetchUrl');
+    StatusNet.debug('in fetchUrl: ' + this.apiroot + method);
 
     var client = Titanium.Network.createHTTPClient();
 
@@ -119,7 +119,24 @@ StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
         onError(client, "Error: " + e.error);
     }
 
-    client.setBasicCredentials(this.username, this.password);
+    // @fixme Desktop vs Mobile auth differences HTTPClient hack
+    //
+    // Titanium Mobile 1.3.0 seems to lack the ability to do HTTP basic auth
+    // on its HTTPClient implementation. The setBasicCredentials method
+    // claims to exist (typeof client.setBasicCredentials == 'function') however
+    // calling it triggers an "invalid method 'setBasicCredentials:'" error.
+    // The method is also not listed in the documentation for Mobile, nor do I see
+    // it in the source code for the proxy object.
+    //
+    // Moreover, the Titanium.Utils namespace, which contains the base 64 utility
+    // functions, isn't present on Desktop. So for now, we'll check for that and
+    // use the manual way assuming it's mobile. Seriously, can't the core libs be
+    // synchronized better?
+    StatusNet.debug("fetchUrl: Titanium.Utils is: " + typeof Titanium.Utils);
+    StatusNet.debug("fetchUrl: client.setBasicCredentials is: " + typeof client.setBasicCredentials);
+    if (typeof Titanium.Utils == "undefined") {
+        client.setBasicCredentials(this.username, this.password);
+    }
 
     // @fixme Hack to work around bug in the Titanium Desktop 1.2.1
     // onload will not fire unless there a function assigned to
@@ -129,6 +146,13 @@ StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
     };
 
     client.open("GET", this.apiroot + method);
+    // @fixme Desktop vs Mobile auth differences HTTPClient hack
+    // setRequestHeader must be called between open() and send()
+    if (typeof Titanium.Utils != "undefined") {
+        var auth = 'Basic ' + Titanium.Utils.base64encode(this.username + ':' + this.password);
+        StatusNet.debug("fetchUrl: Authorization: " + auth);
+        client.setRequestHeader('Authorization', auth);
+    }
     client.send();
 }
 
@@ -182,7 +206,7 @@ StatusNet.Account.prototype.ensure = function(db) {
                         "and apiroot=?",
                         this.username, this.apiroot);
 
-    if (rs.rowCount() === 0) {
+    if (StatusNet.rowCount(rs) === 0) {
 
         rs = db.execute("INSERT INTO account " +
                         "(username, password, apiroot, is_default, profile_image_url, text_limit, site_logo) " +

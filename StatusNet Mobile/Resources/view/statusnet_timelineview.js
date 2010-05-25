@@ -17,17 +17,23 @@ StatusNet.TimelineView.prototype.show = function () {
 
     StatusNet.debug("TimelineView.show");
 
+    // @fixme don't recreate the table, or else kill it on close?
+    this.window = StatusNet.windows[this.tabName()];
+    this.table = Titanium.UI.createTableView();
+    this.window.add(this.table);
+
     var notices = this.client.timeline.getNotices();
 
-    $('#notices').empty();
-    var window = StatusNet.windows[this.tabName()];
+    // clear old notices
+    // @todo be a little nicer; no need to clear if we just changed one thing
+    this.table.setData([]);
 
     if (notices.length > 0) {
 
-        var html = new Array();
-
         for (i = 0; i < notices.length; i++) {
-
+            
+            this.table.appendRow({title: notices[i].content});
+            /*
             html.push('<div class="notice" name="notice-' + notices[i].id +'">');
             html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + notices[i].avatar + '"/></a></div>');
             html.push('   <div><a class="author" name="author-' + notices[i].authorId + '" href="' + notices[i].link + '">' + notices[i].author + '</a><br/>');
@@ -43,22 +49,20 @@ StatusNet.TimelineView.prototype.show = function () {
 
             html.push('</div>');
             html.push('<div class="clear"></div>');
-
+            */
         }
 
-        $('#notices').append(html.join(''));
-
+        /*
         var that = this;
 
         $('#notices div.notice').each(function() {
             that.enableNoticeControls(this);
         });
+        */
 
     } else {
-        $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
+        table.appendRow({title: 'No notices in this timeline yet.'});
     }
-
-    $('.notice a').attr('rel', 'external');
 
     this.hideSpinner();
 }
@@ -137,8 +141,8 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
 StatusNet.TimelineView.prototype.showHeader = function () {
     var title = this.title.replace("{name}", this.client.account.username)
                            .replace("{site}", this.client.account.getHost());
-    $("#header").html("<h1></h1>");
-    $("#header h1").text(title);
+    //$("#header").html("<h1></h1>");
+    //$("#header h1").text(title);
 }
 
 /**
@@ -146,8 +150,8 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-    $('#notices').empty();
-    $('#notices').append('<img id="spinner" src="/images/icon_processing.gif" />');
+//    $('#notices').empty();
+//    $('#notices').append('<img id="spinner" src="/images/icon_processing.gif" />');
 }
 
 /**
@@ -155,7 +159,7 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
  */
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
-    $('#spinner').remove();
+//    $('#spinner').remove();
 }
 
 /**
@@ -164,6 +168,7 @@ StatusNet.TimelineView.prototype.hideSpinner = function() {
 StatusNet.TimelineViewFriends = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name} and friends on {site}";
+    this.tab = 'friends';
 }
 
 // Make StatusNet.TimelineViewFriends inherit TimelineView's prototype
@@ -176,6 +181,7 @@ StatusNet.TimelineViewFriends.prototype = heir(StatusNet.TimelineView.prototype)
 StatusNet.TimelineViewMentions = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name} and friends on {site}";
+    this.tab = 'mentions';
 }
 
 // Make StatusNet.TimelineViewMentions inherit TimelineView's prototype
@@ -187,6 +193,7 @@ StatusNet.TimelineViewMentions.prototype = heir(StatusNet.TimelineView.prototype
 StatusNet.TimelineViewPublic = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Public timeline on {site}";
+    this.tab = 'public';
 }
 
 // Make StatusNet.TimelineViewPublic inherit TimelineView's prototype
@@ -198,6 +205,7 @@ StatusNet.TimelineViewPublic.prototype = heir(StatusNet.TimelineView.prototype);
 StatusNet.TimelineViewFavorites = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s favorite notices on {site}";
+    this.tab = 'favorites';
 }
 
 // Make StatusNet.TimelineViewFavorites inherit TimelineView's prototype
@@ -210,6 +218,7 @@ StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototyp
 StatusNet.TimelineViewInbox = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Inbox for {name} on {site}";
+    this.tab = 'inbox';
 }
 
 // Make StatusNet.TimelineViewInbox inherit TimelineView's prototype
@@ -223,6 +232,7 @@ StatusNet.TimelineViewInbox.prototype = heir(StatusNet.TimelineView.prototype);
 StatusNet.TimelineViewSearch = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Text search on {site}";
+    this.tab = 'search';
 }
 
 // Make StatusNet.TimelineViewSearch inherit TimelineView's prototype
@@ -233,6 +243,7 @@ StatusNet.TimelineViewSearch.prototype = heir(StatusNet.TimelineView.prototype);
  */
 StatusNet.TimelineViewSearch.prototype.showHeader = function () {
     StatusNet.TimelineView.prototype.showHeader.call(this);
+    /*
     $("#header").append('<div id="search-box">' +
                         '<label for="search">Search:</label> ' +
                         '<input id="search">' +
@@ -243,4 +254,5 @@ StatusNet.TimelineViewSearch.prototype.showHeader = function () {
                 .change(function() {
         timeline.updateSearch($(this).val());
     });
+    */
 }

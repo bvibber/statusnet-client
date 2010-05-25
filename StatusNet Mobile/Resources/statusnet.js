@@ -63,61 +63,23 @@ StatusNet.getDB = function() {
     return this.db;
 };
 
-StatusNet.initTabs = function() {
-    // For now let's stick with the same tabs we have on the desktop sidebar
-    var tabNames = ['public',
-                    'friends',
-                    'profile',
-                    'mentions',
-                    'favorites',
-                    'inbox',
-                    'search',
-                    'settings'];
-
-    // @todo localization
-    var titles = {public: 'Public',
-                  friends: 'Personal',
-                  profile: 'Profile',
-                  mentions: 'Replies',
-                  favorites: 'Favorites',
-                  inbox: 'Inbox',
-                  search: 'Search',
-                  settings: 'Settings'};
-
-    this.tabs = {};
-    this.windows = {};
-    this.tabGroup = Titanium.UI.createTabGroup();
-    this.tabsByName = {};
-
-    for (var i = 0; i < tabNames.length; i++) {
-        var tab = tabNames[i];
-        this.tabsByName[tab] = i;
-        this.windows[tab] = Titanium.UI.createWindow({
-            url: tab + '.js',
-            title: titles[tab]
-        });
-        this.tabs[tab] = Titanium.UI.createTab({
-            icon: 'images/tabs/' + tab + '.png',
-            title: titles[tab],
-            window: this.windows[tab]
-        });
-        this.tabGroup.addTab(this.tabs[tab]);
-    }
-
-    this.tabGroup.setActiveTab(1);
-    this.tabGroup.open();
-};
-
-StatusNet.setActiveTab = function(tabName) {
-    this.tabGroup.setActiveTab(this.tabsByName[tabName]);
-};
+/**
+ * Abstract away completely gratuitous differences between database result
+ * classes in Titanium Desktop and Mobile. Sigh.
+ *
+ * @param Titaniu.Database.ResultSet rs
+ * @return int
+ */
+StatusNet.rowCount = function(rs) {
+    return rs.rowCount;
+}
 
 /**
  * Show settings dialog
  * @fixme make sure it's a singleton!
  */
 StatusNet.showSettings = function() {
-    this.setActiveTab('settings');
+    client.setActiveTab('settings');
 };
 
 /**

@@ -1,5 +1,8 @@
 // StatusNet
 
+Titanium.include('jquery-shim.js');
+
+
 var sources = ['statusnet.js',
 
                'model/statusnet_account.js',
@@ -12,16 +15,29 @@ var sources = ['statusnet.js',
                'view/statusnet_sidebar.js',
                'view/statusnet_timelineview.js',
                'view/statusnet_timelineview_user.js',
-               'view/statusnet_settingsview.js'];
+               'view/statusnet_settingsview.js',
+
+               'statusnet_client.js',];
 
 for (var i = 0; i < sources.length; i++) {
     Titanium.include(sources[i]);
 }
 
-// Initialize database
-StatusNet.getDB();
-
 // this sets the background color of the master UIView (when there are no windows/tab groups on it)
 Titanium.UI.setBackgroundColor('#000');
 
-StatusNet.initTabs();
+
+// Initialize database
+var db = StatusNet.getDB();
+var acct = StatusNet.Account.getDefault(db);
+StatusNet.debug(acct);
+if (!acct) {
+    // @fixme add the settings dialog!
+    /*
+    acct = new StatusNet.Account('username', 'pass', 'baseUrl');
+    acct.ensure(db);
+    acct.setDefault(db);
+    */
+}
+
+var client = new StatusNet.Client(acct);
