@@ -183,3 +183,47 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
 
     win.open();
 }
+
+StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
+{
+    var url = 'favorites/create/' + noticeId + '.json';
+
+    StatusNet.debug("StatusNet.Client.faveNotice()");
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).text('Unfave');
+        },
+        function(client, msg) {
+            StatusNet.debug('Could not favorite notice: ' + msg);
+            alert('Could not favorite notice: ' + msg);
+        }
+    );
+}
+
+StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
+{
+    var url = 'favorites/destroy/' + noticeId + '.json';
+
+    StatusNet.debug("StatusNet.Client.unFaveNotice()");
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).text('Fave');
+        },
+        function(client, msg) {
+            StatusNet.debug('Could not unfavorite notice: ' + msg);
+            alert('Could not unfavorite notice: ' + msg);
+        }
+    );
+}
+
+
