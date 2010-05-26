@@ -197,10 +197,13 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
     window.addEventListener('open', function() {
         StatusNet.debug("Open tab: " + tab);
         client.view = new info.view(client);
+        client.view.window = window;
         if (info.timeline) {
+            StatusNet.debug('timeline tab? updating timeline...');
             client.timeline = new info.timeline(client);
             client.timeline.update();
         } else {
+            StatusNet.debug('settings tab? showing view...');
             // Settings dialog
             client.timeline = null;
             client.view.init();

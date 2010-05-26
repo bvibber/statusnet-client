@@ -7,11 +7,15 @@ StatusNet.SettingsView = function() {
     this.lastPassword = '';
     this.lastSite = '';
 }
+
 StatusNet.SettingsView.prototype.init = function() {
-    $("#new-account").hide();
+    StatusNet.debug('SettingsView.init');
+    this.table = Titanium.UI.createTableView();
+    this.window.add(this.table);
 
     this.showAccounts();
 
+    /*
     var that = this;
     $("tr.add").click(function() {
         that.showAddAccount();
@@ -38,16 +42,21 @@ StatusNet.SettingsView.prototype.init = function() {
     $("#new-cancel").click(function() {
         that.hideAddAccount();
     });
+    */
 }
 
 StatusNet.SettingsView.prototype.showAddAccount = function() {
     this.resetNewAccount();
+    /*
     $("#new-account").show();
     $("#new-username").focus();
+    */
 }
 
 StatusNet.SettingsView.prototype.hideAddAccount = function() {
+    /*
     $("#new-account").hide();
+    */
     this.resetNewAccount();
 }
 
@@ -55,8 +64,9 @@ StatusNet.SettingsView.prototype.hideAddAccount = function() {
  * @fixme really should separate this a bit more to model/view?
  */
 StatusNet.SettingsView.prototype.showAccounts = function() {
+    StatusNet.debug('SettingsView.showAccounts');
     if (this.accounts.length == 0) {
-        $("#status").text("No accounts set up -- time to add one!");
+        //$("#status").text("No accounts set up -- time to add one!");
         this.showAddAccount();
     } else {
         for (var i = 0; i < this.accounts.length; i++) {
@@ -72,35 +82,16 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
  * @param StatusNet.Account acct
  */
 StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
-    var tr = document.createElement('tr');
+    // todo: avatar
+    // todo: better formatting
+    // todo: secure state
+    var title = acct.username + ' ' + acct.getHost();
+    StatusNet.debug('adding row: ' + title);
+    var row = {title: title};
+    this.table.appendRow(row);
 
-    var td_icon = document.createElement('td');
-    var img_icon = document.createElement('img');
-    img_icon.src = "images/icon_processing.gif";
-    td_icon.appendChild(img_icon);
-    tr.appendChild(td_icon);
-
-    var td_name = document.createElement('td');
-    $(td_name).addClass('name').text(acct.username);
-    tr.appendChild(td_name);
-
-    var td_site = document.createElement('td');
-    $(td_site).addClass('site').html(this.prettySiteName(acct));
-    tr.appendChild(td_site);
-
-    var td_remove = document.createElement('td');
-    $(td_remove).addClass('remove').html("<a href='#' title='Delete account'></a>");
-    tr.appendChild(td_remove);
-
-    var list = $('#accountlist tbody')[0];
-    list.appendChild(tr);
-
-    $(tr).click(function() {
-        acct.setDefault(StatusNet.getDB());
-        var me = Titanium.UI.getCurrentWindow();
-        me.getParent().setURL("app:///index.html");
-        me.close();
-    });
+    // todo: if necessary, set up delete and add event handlers
+    /*
     $("a", td_remove).click(function() {
         if (confirm("Are you sure you want to delete the account " +
                     acct.username +
@@ -112,25 +103,18 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
         }
         return false;
     });
+    */
 
     acct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
+        /*
         var avatar = $("user profile_image_url", xml).text();
         StatusNet.debug(avatar);
         img_icon.src = avatar;
+        */
+        StatusNet.debug("Verified account info for " + acct.username);
     }, function(status) {
         StatusNet.debug("We failed to load account info");
     });
-}
-
-/**
- * @param StatusNet.Account acct
- * @return string HTML fragment with prettified name
- */
-StatusNet.SettingsView.prototype.prettySiteName = function(acct) {
-	var html = $("<span></span>").text(acct.getHost())
-								 .attr("title", acct.apiroot)
-								 .addClass(acct.isSecure() ? 'https' : 'http');
-	return $("<div></div>").append(html).html(); // @fixme ok this is lame
 }
 
 /**
