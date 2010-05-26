@@ -40,6 +40,16 @@ StatusNet.TimelineView.prototype.show = function () {
             }
             html.push('<a href="#" class="notice_reply">Reply</a>');
 
+            if (notices[i].favorite === "true") {
+                html.push(' <a href="#" class="notice_unfave">Unfave</a>');
+            } else {
+                html.push(' <a href="#" class="notice_fave">Fave</a>')
+            }
+
+            if (notices[i].author === this.client.account.username) {
+                html.push(' <a href="#" class="notice_delete">Delete</a>')
+            }
+
             html.push('</div>');
             html.push('<div class="clear"></div>');
 
@@ -112,6 +122,15 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     $(noticeDom).find('a.notice_reply').bind('click', function(event) {
         that.client.newNoticeDialog(noticeId, noticeAuthor);
     });
+
+    $(noticeDom).find('a.notice_fave').toggle(
+        function(event) {
+            that.client.faveNotice(noticeId, this);
+        },
+        function(event) {
+            that.client.unFaveNotice(noticeId, this);
+        }
+    );
 
     // Override external web links to local users in-content
     $(noticeDom).find('div.content span.vcard a').each(function() {
