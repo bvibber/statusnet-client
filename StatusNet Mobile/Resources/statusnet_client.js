@@ -30,15 +30,16 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
     StatusNet.debug("StatusNet.Client.prototype.switchTimeline()");
 
-    this.view = this.views[timeline];
-    this.timeline = this.timelines[timeline];
     this._timeline = timeline;
 
     this.setActiveTab(timeline);
 
+    /*
+    // should happen in response to open event?
     this.view.showHeader();
     this.view.showSpinner();
     this.timeline.update();
+    */
 
 }
 
@@ -150,45 +151,61 @@ StatusNet.Client.prototype.init = function() {
 
     this.tabs = {};
     this.windows = {};
-    this.views = {};
-    this.timelines = {};
     this.tabGroup = Titanium.UI.createTabGroup();
 
     StatusNet.debug('Starting building tabs, timelines, views...');
     for (var tab in tabInfo) {
-        var info = tabInfo[tab];
-        StatusNet.debug('tab: ' + tab);
-        StatusNet.debug('info: ' + info);
-
-        var window = Titanium.UI.createWindow({
-            url: 'tab.js',
-            title: info.title
-        });
-        this.windows[tab] = window;
-
-        this.tabs[tab] = Titanium.UI.createTab({
-            icon: 'images/tabs/' + tab + '.png',
-            title: info.title,
-            window: window
-        });
-        this.tabGroup.addTab(this.tabs[tab]);
-
-        //window.StatusNet = StatusNet;
-        //window.client = this;
-        //window.timeline = tab;
-        if (info.timeline) {
-            this.timelines[tab] = new info.timeline(this);
-        } else {
-            this.timelines[tab] = null;
-        }
-        this.views[tab] = new info.view(this);
+        this.createTab(tab, tabInfo[tab]);
     }
     StatusNet.debug('Done building tabs, timelines, views.');
 
     // @todo remember last-used tab
     this.tabGroup.setActiveTab(this.tabs['friends']);
     this.tabGroup.open();
-    //this.windows['friends'].view.show();
+}
+
+/**
+ * Build an individual tab for the user interface and set up its
+ * associated view and timeline, if applicable.
+ *
+ * @param string tab identifier
+ * @param object info associative array with name and related classes
+ *
+ * @access private
+ */
+StatusNet.Client.prototype.createTab = function(tab, info) {
+    StatusNet.debug('tab: ' + tab);
+    StatusNet.debug('info: ' + info);
+
+    var window = Titanium.UI.createWindow({
+        url: 'tab.js',
+        title: info.title
+    });
+    this.windows[tab] = window;
+
+    this.tabs[tab] = Titanium.UI.createTab({
+        icon: 'images/tabs/' + tab + '.png',
+        title: info.title,
+        window: window
+    });
+    this.tabGroup.addTab(this.tabs[tab]);
+
+    //window.StatusNet = StatusNet;
+    //window.client = this;
+    //window.timeline = tab;
+    var client = this;
+    window.addEventListener('open', function() {
+        StatusNet.debug("Open tab: " + tab);
+        client.view = new info.view(client);
+        if (info.timeline) {
+            client.timeline = new info.timeline(client);
+            client.timeline.update();
+        } else {
+            // Settings dialog
+            client.timeline = null;
+            client.view.init();
+        }
+    });
 }
 
 /**

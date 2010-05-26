@@ -103,16 +103,27 @@ StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
     var client = Titanium.Network.createHTTPClient();
 
     client.onload = function() {
+        StatusNet.debug("fetchUrl: in onload - " + this.status);
         if (this.status == 200) {
 
-            // @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
-            // to use this work-around.
-            var responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
+            StatusNet.debug("fetchUrl: before parse " + this.status);
+            StatusNet.debug(Titanium.version);
+            if (Titanium.version < '1.3.0') {
+                // @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
+                // to use this work-around.
+                var responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
+            } else {
+                // Is implemented in Titanium Mobile 1.3, whereas the above doesn't work there.
+                var responseXML = this.responseXML;
+            }
 
+            StatusNet.debug("fetchUrl: after parse, before onSuccess");
             onSuccess(this.status, responseXML);
+            StatusNet.debug("fetchUrl: after onSuccess");
         } else {
             onError(client, "HTTP status: " + this.status);
         }
+        StatusNet.debug("fetchUrl: done with onload.");
     };
 
     client.onerror = function(e) {
