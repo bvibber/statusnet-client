@@ -10,9 +10,43 @@ StatusNet.SettingsView = function() {
 
 StatusNet.SettingsView.prototype.init = function() {
     StatusNet.debug('SettingsView.init');
-    this.table = Titanium.UI.createTableView();
+    var view = this;
+
+    // Set up our table view...
+    this.table = Titanium.UI.createTableView({
+        editable: true
+    });
+    this.table.addEventListener('click', function(event) {
+        // Selected an account
+        var acct = event.rowData.acct;
+        StatusNet.debug('Attempting to select account: ' + acct.username + '@' + acct.getHost());
+    });
+    this.table.addEventListener('delete', function(event) {
+        // deleted a row
+        var acct = event.rowData.acct;
+        StatusNet.debug('Attempting to delete account: ' + acct.username + '@' + acct.getHost());
+    });
     this.window.add(this.table);
 
+    // Edit/cancel buttons for the table view...
+    var edit = Titanium.UI.createButton({
+        title: 'Edit'
+    });
+    var cancel = Titanium.UI.createButton({
+        title: 'Cancel',
+        style: Titanium.UI.iPhone.SystemButtonStyle.DONE
+    });
+    edit.addEventListener('click', function() {
+        view.window.setRightNavButton(cancel);
+        view.table.editing = true;
+    });
+    cancel.addEventListener('click', function() {
+        view.window.setRightNavButton(edit);
+        view.table.editing = false;
+    });
+    this.window.setRightNavButton(edit);
+
+    // Now let's fill out the table!
     this.showAccounts();
 
     /*
@@ -87,7 +121,8 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     // todo: secure state
     var title = acct.username + ' ' + acct.getHost();
     StatusNet.debug('adding row: ' + title);
-    var row = {title: title};
+    var row = {title: title,
+               acct: acct};
     this.table.appendRow(row);
 
     // todo: if necessary, set up delete and add event handlers
