@@ -1,4 +1,6 @@
-StatusNet.SettingsView = function() {
+StatusNet.SettingsView = function(client) {
+    this.client = client;
+
     var db = StatusNet.getDB();
     this.accounts = StatusNet.Account.listAll(db);
     this.workAcct = null;
@@ -8,8 +10,9 @@ StatusNet.SettingsView = function() {
     this.lastSite = '';
 }
 
-StatusNet.SettingsView.prototype.init = function() {
+StatusNet.SettingsView.prototype.init = function(client) {
     StatusNet.debug('SettingsView.init');
+    this.client = client;
     var view = this;
 
     // Set up our table view...
@@ -28,6 +31,15 @@ StatusNet.SettingsView.prototype.init = function() {
     });
     this.window.add(this.table);
 
+    // Create-account button
+    var create = Titanium.UI.createButton({
+        title: '+'
+    });
+    create.addEventListener('click', function() {
+        StatusNet.debug('create new account!');
+    });
+    this.window.setRightNavButton(create);
+
     // Edit/cancel buttons for the table view...
     var edit = Titanium.UI.createButton({
         title: 'Edit'
@@ -37,46 +49,17 @@ StatusNet.SettingsView.prototype.init = function() {
         style: Titanium.UI.iPhone.SystemButtonStyle.DONE
     });
     edit.addEventListener('click', function() {
-        view.window.setRightNavButton(cancel);
+        view.window.setLeftNavButton(cancel);
         view.table.editing = true;
     });
     cancel.addEventListener('click', function() {
-        view.window.setRightNavButton(edit);
+        view.window.setLeftNavButton(edit);
         view.table.editing = false;
     });
-    this.window.setRightNavButton(edit);
+    this.window.setLeftNavButton(edit);
 
     // Now let's fill out the table!
     this.showAccounts();
-
-    /*
-    var that = this;
-    $("tr.add").click(function() {
-        that.showAddAccount();
-        return false;
-    });
-    $("#new-username").change(function() {
-        that.updateNewAccount();
-    }).keydown(function() {
-        that.startUpdateTimeout();
-    });
-    $("#new-password").change(function() {
-        that.updateNewAccount();
-    }).keydown(function() {
-        that.startUpdateTimeout();
-    });
-    $("#new-site").change(function() {
-        that.updateNewAccount();
-    }).keydown(function() {
-        that.startUpdateTimeout();
-    });
-    $("#new-save").click(function() {
-        that.saveNewAccount();
-    });
-    $("#new-cancel").click(function() {
-        that.hideAddAccount();
-    });
-    */
 }
 
 StatusNet.SettingsView.prototype.showAddAccount = function() {
@@ -119,7 +102,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     // todo: avatar
     // todo: better formatting
     // todo: secure state
-    var title = acct.username + ' ' + acct.getHost();
+    var title = acct.username + '@' + acct.getHost();
     StatusNet.debug('adding row: ' + title);
     var row = {title: title,
                acct: acct};
@@ -139,17 +122,6 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
         return false;
     });
     */
-
-    acct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
-        /*
-        var avatar = $("user profile_image_url", xml).text();
-        StatusNet.debug(avatar);
-        img_icon.src = avatar;
-        */
-        StatusNet.debug("Verified account info for " + acct.username);
-    }, function(status) {
-        StatusNet.debug("We failed to load account info");
-    });
 }
 
 /**

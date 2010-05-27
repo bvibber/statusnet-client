@@ -10,10 +10,11 @@ StatusNet.Client = function(_account) {
 
     this.init();
 
+    /*
     this._timeline = "friends_timeline"; // which timeline are we currently showing?
 
     this.switchTimeline('friends');
-
+    */
 }
 
 StatusNet.Client.prototype.setActiveTab = function(tabName) {
@@ -85,43 +86,33 @@ StatusNet.Client.prototype.refresh = function() {
  * General initialization stuff
  */
 StatusNet.Client.prototype.init = function() {
-/*
-    var that = this;
+    var tabGroup = Titanium.UI.createTabGroup();
 
-    this.server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
-
-    var gar = $('#public_img').attr('src', this.account.siteLogo);
-
-    // Add event handlers for buttons
-
-    $('#public_img').bind('click', function() { that.switchTimeline('public') });
-    $('#friends_img').bind('click', function() { that.switchTimeline('friends') });
-    $('#user_img').bind('click', function() { that.switchTimeline('user') });
-    $('#mentions_img').bind('click', function() { that.switchTimeline('mentions') });
-    $('#favorites_img').bind('click', function() { that.switchTimeline('favorites') });
-    $('#inbox_img').bind('click', function() { that.switchTimeline('inbox') });
-    $('#search_img').bind('click', function() { that.switchTimeline('search') });
-    $('#settings_img').bind('click', function() { StatusNet.showSettings() });
-
-    // until we have private message timelines working
-    var inbox = this.server + this.account.username + '/inbox';
-    $('ul.nav li#nav_timeline_inbox > a').attr('href', inbox);
-
-    // until we have built-in search working
-    var search = this.server + 'search/notice';
-    $('ul.nav li#nav_timeline_search > a').attr('href', search);
-
-    // refresh timeline when window is clicked
-    //$("#content").bind('click', function() { that.refresh(); });
-
-    // make links open in an external browser window
-    $('a[rel=external]').live('click', function() {
-        Titanium.Desktop.openURL($(this).attr('href'));
-        return false;
+    var window = Titanium.UI.createWindow({
+        title: 'Accounts',
+        tabBarHidden: true
+    });
+    var tab = Titanium.UI.createTab({
+        icon: 'images/tabs/settings.png',
+        title: 'Accounts',
+        window: window
     });
 
-    $('#new_notice').click(function() { that.newNoticeDialog(); });
-*/
+    tabGroup.addTab(tab);
+    tabGroup.open();
+
+    var client = this;
+    window.addEventListener('open', function() {
+        StatusNet.debug("Open main tab");
+        client.view = new StatusNet.SettingsView(client);
+        client.view.window = window;
+        client.view.init();
+    });
+}
+
+StatusNet.Client.prototype.initAccountView = function(acct) {
+    this.account = acct;
+
     // For now let's stick with the same tabs we have on the desktop sidebar
     // @todo localization
     var tabInfo = {'public':    {title: 'Public',
@@ -144,10 +135,7 @@ StatusNet.Client.prototype.init = function() {
                                   view: StatusNet.TimelineViewInbox},
                      search:    {title: 'Search',
                               timeline: StatusNet.TimelineSearch,
-                                  view: StatusNet.TimelineViewSearch},
-                   settings:    {title: 'Settings',
-                              timeline: null,
-                                  view: StatusNet.SettingsView}};
+                                  view: StatusNet.TimelineViewSearch}};
 
     this.tabs = {};
     this.windows = {};
@@ -178,8 +166,8 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
     StatusNet.debug('info: ' + info);
 
     var window = Titanium.UI.createWindow({
-        url: 'tab.js',
-        title: info.title
+        title: info.title,
+        tabBarHidden: true
     });
     this.windows[tab] = window;
 
