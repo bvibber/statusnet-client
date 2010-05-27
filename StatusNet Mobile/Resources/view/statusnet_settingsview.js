@@ -87,9 +87,13 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     });
     save.addEventListener('click', function() {
         view.updateNewAccount();
+        StatusNet.debug('save click: updated');
         view.saveNewAccount();
+        StatusNet.debug('save click: saved');
         window.close();
-        this.fields = null;
+        StatusNet.debug('hide: closed');
+        view.fields = null;
+        StatusNet.debug('hide: killed fields');
     });
     window.setRightNavButton(save);
 
@@ -179,11 +183,13 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     // todo: avatar
     // todo: better formatting
     // todo: secure state
+    StatusNet.debug('show account row: ' + acct);
     var title = acct.username + '@' + acct.getHost();
     StatusNet.debug('adding row: ' + title);
     var row = {title: title,
                acct: acct};
     this.table.appendRow(row);
+    StatusNet.debug('show account row done.');
 }
 
 /**
@@ -219,20 +225,22 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
     var that = this;
     this.cancelUpdateTimeout();
     this.discoverNewAccount(function(acct) {
+        StatusNet.debug("Discovered... found: " + acct);
+        StatusNet.debug("Previous was: " + that.workAcct);
         if (acct.equals(that.workAcct)) {
             // No change.
             StatusNet.debug("No change!");
-            this.fields.status.text = "No change.";
+            that.fields.status.text = "No change.";
         } else {
-            this.fields.status.text = "Testing login...";
-
             StatusNet.debug("New acct");
+            that.fields.status.text = "Testing login...";
+
             that.workAcct = acct;
             //$("#new-save").attr("disabled", "disabled");
             //$("#new-avatar").attr("src", "images/icon_processing.gif");
     
             that.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
-                this.fields.status.text = "Login confirmed.";
+                that.fields.status.text = "Login confirmed.";
                 that.xml = xml;
                 that.workAcct.avatar = $("user profile_image_url", xml).text();
                 StatusNet.debug(that.workAcct.avatar);
@@ -242,20 +250,20 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                 // get site specific configuration info
                 that.workAcct.fetchUrl('statusnet/config.xml', function(status, xml) {
                     StatusNet.debug("Loaded statusnet/config.xml");
-                    that.workAcct.textLimit = $(xml).find('site > textlimit:first').text();
-                    that.workAcct.siteLogo = $(xml).find('site > logo:first').text();
+                    //that.workAcct.textLimit = $(xml).find('site > textlimit:first').text();
+                    //that.workAcct.siteLogo = $(xml).find('site > logo:first').text();
                 }, function(status) {
                     StatusNet.debug("Couldn't load statusnet/config.xml for site."); 
                 });
 
             }, function(status) {
-                this.fields.status.text = "Bad nickname or password.";
+                that.fields.status.text = "Bad nickname or password.";
                 StatusNet.debug("We failed to load account info");
                 //$("#new-avatar").attr("src", "images/default-avatar-stream.png");
             });
         }
     }, function() {
-        this.fields.status.text = "Could not verify site.";
+        that.fields.status.text = "Could not verify site.";
         StatusNet.debug("Bogus acct");
         that.workAcct = null;
         //$("#new-save").attr("disabled", "disabled");
@@ -322,6 +330,4 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
 StatusNet.SettingsView.prototype.saveNewAccount = function() {
     this.workAcct.ensure(StatusNet.getDB());
     this.showAccountRow(this.workAcct);
-
-    this.hideAddAccount();
 }
