@@ -1,6 +1,5 @@
 // StatusNet
 
-Titanium.include('jquery-shim.js');
 
 
 var sources = ['statusnet.js',
@@ -22,6 +21,8 @@ var sources = ['statusnet.js',
 for (var i = 0; i < sources.length; i++) {
     Titanium.include(sources[i]);
 }
+
+Titanium.include('jquery-shim.js');
 
 // this sets the background color of the master UIView (when there are no windows/tab groups on it)
 Titanium.UI.setBackgroundColor('#000');
