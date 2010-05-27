@@ -94,9 +94,22 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     window.setRightNavButton(save);
 
     this.fields = {};
-    var fields = {site: {label: "Site", props: {hintText: "identi.ca"}},
-                  username: {label: "Nickname", props: {hintText: "mycoolname"}},
-                  password: {label: "Password", props: {hintText: "Required", passwordMask:true}}};
+    var fields = {site: {label: "Site", props: {
+                    hintText: "identi.ca",
+                    returnKeyType:Titanium.UI.RETURNKEY_NEXT,
+                    keyboardType: Titanium.UI.KEYBOARD_URL,
+                    autocorrect: false
+                  }},
+                  username: {label: "Nickname", props: {
+                    hintText: "mycoolname",
+                    returnKeyType:Titanium.UI.RETURNKEY_NEXT,
+                    autocorrect: false
+                  }},
+                  password: {label: "Password", props: {
+                    hintText: "Required",
+                    passwordMask:true,
+                    returnKeyType:Titanium.UI.RETURNKEY_DONE
+                  }}};
     for (var i in fields) {
         var label = Titanium.UI.createLabel({
             text: fields[i].label,
@@ -119,6 +132,15 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
 
         this.fields[i] = text;
     }
+    this.fields.site.addEventListener('return', function() {
+        view.fields.username.focus();
+    });
+    this.fields.username.addEventListener('return', function() {
+        view.fields.password.focus();
+    });
+    this.fields.password.addEventListener('return', function() {
+        // @fixme trigger save if we're ready
+    });
 
     window.open({
         modal: true
