@@ -142,6 +142,14 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         // @fixme trigger save if we're ready
     });
 
+    this.fields.status = Titanium.UI.createLabel({
+        text: "",
+        left: 8,
+        right: 8,
+        height: 30
+    });
+    window.add(this.fields.status);
+
     window.open({
         modal: true
     });
@@ -214,9 +222,9 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
         if (acct.equals(that.workAcct)) {
             // No change.
             StatusNet.debug("No change!");
-            //$("#new-status").text("No change.");
+            this.fields.status.text = "No change.";
         } else {
-            //$("#new-status").text("Testing login...");
+            this.fields.status.text = "Testing login...";
 
             StatusNet.debug("New acct");
             that.workAcct = acct;
@@ -224,7 +232,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             //$("#new-avatar").attr("src", "images/icon_processing.gif");
     
             that.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
-                //$("#new-status").text("Login confirmed.");
+                this.fields.status.text = "Login confirmed.";
                 that.xml = xml;
                 that.workAcct.avatar = $("user profile_image_url", xml).text();
                 StatusNet.debug(that.workAcct.avatar);
@@ -241,13 +249,13 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                 });
 
             }, function(status) {
-                //$("#new-status").text("Bad nickname or password.");
+                this.fields.status.text = "Bad nickname or password.";
                 StatusNet.debug("We failed to load account info");
                 //$("#new-avatar").attr("src", "images/default-avatar-stream.png");
             });
         }
     }, function() {
-        //this.status.text = "Could not verify site.";
+        this.fields.status.text = "Could not verify site.";
         StatusNet.debug("Bogus acct");
         that.workAcct = null;
         //$("#new-save").attr("disabled", "disabled");
@@ -296,11 +304,11 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
         onSuccess(new StatusNet.Account(username, password, url));
     } else {
         // Try RSD discovery!
-        //$("#new-status").text("Finding secure server...");
+        this.fields.status.text = "Finding secure server...";
         StatusNet.RSD.discoverTwitterApi('https://' + site + '/rsd.xml', function(apiroot) {
             onSuccess(new StatusNet.Account(username, password, apiroot));
         }, function() {
-            //$("#new-status").text("Finding non-secured server...");
+            this.fields.status.text = "Finding non-secured server...";
             StatusNet.RSD.discoverTwitterApi('http://' + site + '/rsd.xml', function(apiroot) {
                 onSuccess(new StatusNet.Account(username, password, apiroot));
             }, function() {
@@ -316,13 +324,4 @@ StatusNet.SettingsView.prototype.saveNewAccount = function() {
     this.showAccountRow(this.workAcct);
 
     this.hideAddAccount();
-}
-
-StatusNet.SettingsView.prototype.resetNewAccount = function() {
-    this.workAcct = null;
-    $("#new-username").val("");
-    $("#new-password").val("");
-    $("#new-site").val("");
-    $("#new-avatar").attr("src", "images/default-avatar-stream.png");
-    $("#new-save").attr("disabled", "disabled");
 }
