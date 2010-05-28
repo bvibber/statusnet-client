@@ -12,7 +12,8 @@ var window = {
                 getElementsByTagName: function() {
                     return {};
                 },
-                appendChild: function() {}
+                appendChild: function() {},
+                innerHTML: ""
             };
         },
         documentElement: {
