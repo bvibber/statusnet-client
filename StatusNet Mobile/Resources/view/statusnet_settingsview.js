@@ -29,6 +29,7 @@ StatusNet.SettingsView.prototype.init = function(client) {
         var acct = event.rowData.acct;
         StatusNet.debug('Attempting to delete account: ' + acct.username + '@' + acct.getHost());
         acct.deleteAccount();
+        cancel.title = 'Done';
     });
     this.window.add(this.table);
 
@@ -37,6 +38,10 @@ StatusNet.SettingsView.prototype.init = function(client) {
         title: '+'
     });
     create.addEventListener('click', function() {
+        if (view.table.editing) {
+            view.table.editing = false;
+            view.window.setLeftNavButton(edit);
+        }
         view.showAddAccount();
     });
     this.window.setRightNavButton(create);
