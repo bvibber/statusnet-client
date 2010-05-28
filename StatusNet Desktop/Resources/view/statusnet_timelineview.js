@@ -191,8 +191,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-    $('#notices').empty();
-    $('#notices').append('<img id="spinner" src="/images/icon_processing.gif" />');
+    $('#notices').prepend('<img id="spinner" src="/images/icon_processing.gif" />');
 }
 
 /**
