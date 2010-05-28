@@ -108,6 +108,7 @@ StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
 
     if (prepend) {
         this._notices.unshift(notice);
+        this.client.view.showNewNotice(notice);
     } else {
         this._notices.push(notice);
     }
@@ -117,13 +118,17 @@ StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
-StatusNet.Timeline.prototype.update = function() {
+StatusNet.Timeline.prototype.update = function(onFinish) {
+
+    this.client.view.showSpinner();
 
     var that = this;
 
     this.account.fetchUrl(this.getUrl(),
 
         function(status, data) {
+
+            that.client.view.hideSpinner();
 
             StatusNet.debug('Fetched ' + that.url);
             StatusNet.debug('HTTP client returned: ' + data);
@@ -133,10 +138,13 @@ StatusNet.Timeline.prototype.update = function() {
 
                 var notice = StatusNet.AtomParser.noticeFromEntry(this);
 
-                that.addNotice(notice, this, false);
+                that.addNotice(notice, this, true);
             });
 
             // use events instead? Observer?
+            if (onFinish) {
+                onFinish();
+            }
             that.finishedFetch()
         },
         function(client, msg) {
@@ -159,7 +167,13 @@ StatusNet.Timeline.prototype.getUrl = function() {
  * Typically displaying the timeline.
  */
 StatusNet.Timeline.prototype.finishedFetch = function() {
-    this.view.show();
+
+    if (this._notices.length === 0) {
+        $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
+    }
+
+    this.client.view.hideSpinner();
+
 }
 
 /**

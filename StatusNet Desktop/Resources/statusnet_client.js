@@ -17,7 +17,6 @@ StatusNet.Client = function(_account) {
 
 	this.view.showHeader();
     this.view.show();
-    this.view.showSpinner(); // spinner will get hidden by the view when data finishes loading
     this.timeline.update();
 
 }
@@ -68,10 +67,14 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
     StatusNet.Sidebar.setSelectedTimeline(timeline);
 
-	this.view.showHeader();
-    this.view.showSpinner();
-    this.timeline.update();
+    var that = this;
 
+    this.timeline.update(
+        function() {
+            that.view.showHeader();
+            that.view.show();
+        }
+    );
 }
 
 /**
@@ -100,9 +103,15 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
     this._timeline = timeline;
     StatusNet.Sidebar.setSelectedTimeline(timeline);
 
-    this.view.showSpinner();
-    this.timeline.update();
-    this.view.showHeader();
+    var that = this;
+
+    this.timeline.update(
+        function() {
+            that.view.showHeader();
+            that.view.showProfileInfo();
+            that.view.show();
+        }
+    );
 }
 
 /**
@@ -177,7 +186,6 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
 
     win.addEventListener(Titanium.CLOSE, function(event) {
         that.view.showHeader();
-        that.view.showSpinner();
         that.timeline.update();
     });
 
