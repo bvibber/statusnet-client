@@ -21,22 +21,8 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
 
     notice.id = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('local_id');
     notice.source = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('source');
-
-    // XXX: wtf! I can't pull either of these values
     notice.favorite = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('favorite');
     notice.repeat_of = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('repeat_of');
-
-    StatusNet.debug(
-        "notice.id= "
-        + notice.id
-        + ", notice.source= "
-        + notice.source
-        + ", favorite= "
-        + notice.favorite
-        + ", repeat_of= "
-        + notice.repeat_of
-    );
-
     notice.published = $(entry).find('published').text();
     var updated = $(entry).find('updated').text();
 
@@ -53,7 +39,6 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     result = notice.authorUri.match(idRegexp);
     if (result) {
         notice.authorId = result[0];
-        StatusNet.debug("author id = " + notice.authorId);
     }
 
     notice.link = $(entry).find('author uri').text();
@@ -64,28 +49,16 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
         var gArray = geoPoint.split(' ');
         notice.lat = gArray[0];
         notice.lon = gArray[1];
-
-        StatusNet.debug(
-            "Notice geo-location: lat = "
-            + notice.lat
-            + " lon = "
-            + notice.lon
-        );
     }
 
     notice.contextLink = $(entry).find('link[rel=ostatus:conversation]:first').attr('href');
-    StatusNet.debug("contextLink: " + notice.contextLink);
-
     notice.inReplyToLink = $(entry).find("[nodeName=thr:in-reply-to]:first").attr('ref');
-
 
     if (notice.inReplyToLink) {
         result = notice.inReplyToLink.match(idRegexp);
         if (result) {
             notice.inReplyToId = result[0]; // Could be useful
         }
-        StatusNet.debug("inReplyToLink: " + notice.inReplyToLink);
-        StatusNet.debug("inReplyToid  : " + notice.inReplyToId)
     }
 
     // @todo ostatus:attention ?
@@ -107,12 +80,15 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
 
     author.username = $(subject).find('[nodeName=poco:preferredUsername]').text();
     author.fullName = $(subject).find('title').text();
-
-    StatusNet.debug(author.username + " full name: " + author.fullName)
-
     author.link = $(subject).find('id').text();
 
-    StatusNet.debug(author.username + " profile link: " + author.link);
+    var idRegexp = /(\d)+$/;
+    result = author.link.match(idRegexp);
+    if (result) {
+        author.id = result[0];
+    }
+
+    StatusNet.debug("AtomParser.userFromSubject() - name: " + author.username + ", id: " + author.id);
 
     var geoPoint = $(subject).find("[nodeName=georss:point]:first").text();
 
@@ -120,27 +96,13 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
         var gArray = geoPoint.split(' ');
         author.lat = gArray[0];
         author.lon = gArray[1];
-
-        StatusNet.debug(author.username
-            + " geo-location: lat = "
-            + author.lat
-            + " lon = "
-            + author.lon
-        );
     }
 
     author.location = $(subject).find("[nodeName=poco:address] > [nodeName=poco:formatted]:first").text();
 
-    StatusNet.debug(author.username + " location: " + author.location);
-
     // @todo: this homepage parse is sketchy. If we add other URLs we will need to update
     author.homepage = $(subject).find("[nodeName=poco:urls] > [nodeName=poco:value]:first").text();
-
-    StatusNet.debug(author.username + " homepage: " + author.homepage);
-
     author.bio = $(subject).find('[nodeName=poco:note]').text();
-
-    StatusNet.debug(author.username + " bio: " + author.bio);
 
     // note: attribute selectors seem to have problems with [media:width=48]
     $(subject).find('link[rel=avatar]').each(function(i, el) {

@@ -10,12 +10,65 @@ StatusNet.TimelineView = function(client) {
 }
 
 /**
+ * Put together the HTML for a single notice
+ *
+ * @param object notice the notice
+ */
+StatusNet.TimelineView.prototype.renderNotice = function(notice) {
+
+    var html = [];
+
+    var avatar = null;
+    var author = null;
+
+    // Special case for user timelines, which don't have an avatar
+    // and author on each notice Atom entry
+    if (this.client.timeline.user) {
+        avatar = this.client.timeline.user.avatarMedium;
+        author = this.client.timeline.user.username;
+        authorId = this.client.timeline.user.id;
+    } else {
+        avatar = notice.avatar;
+        author = notice.author;
+        authorId = notice.authorId
+    }
+
+    html.push('<div class="notice" name="notice-' + notice.id +'">');
+    html.push('   <div class="avatar"><a href="' + notice.link + '"><img src="' + avatar + '"/></a></div>');
+    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.link + '">' + author + '</a><br/>');
+    html.push('   <div class="content">'+ notice.content +'<br/></div>');
+    html.push('   <small class="date">' + humane_date(notice.updated) + '</small></div>');
+    if (notice.contextLink && notice.inReplyToLink) {
+        html.push(
+            '   <div class="context"><a class="context" href="'
+            + notice.contextLink +'">in context</a><br/></div>'
+        );
+    }
+    html.push('<a href="#" class="notice_reply">Reply</a>');
+
+    if (notice.favorite === "true") {
+        html.push(' <a href="#" class="notice_unfave">Unfave</a>');
+    } else {
+        html.push(' <a href="#" class="notice_fave">Fave</a>')
+    }
+
+    if (author === this.client.account.username) {
+        html.push(' <a href="#" class="notice_delete">Delete</a>')
+    }
+
+    html.push('</div>');
+    html.push('<div class="clear"></div>');
+
+    return html.join('');
+}
+
+/**
  * Render the HTML display of a given timeline
  *
  */
 StatusNet.TimelineView.prototype.show = function () {
 
-    StatusNet.debug("TimelineView.show");
+    StatusNet.debug("TimelineView.show - timeline = " + this.client.timeline.timeline_name);
 
     var notices = this.client.timeline.getNotices();
 
@@ -23,36 +76,10 @@ StatusNet.TimelineView.prototype.show = function () {
 
     if (notices.length > 0) {
 
-        var html = new Array();
+        var html = [];
 
         for (i = 0; i < notices.length; i++) {
-
-            html.push('<div class="notice" name="notice-' + notices[i].id +'">');
-            html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + notices[i].avatar + '"/></a></div>');
-            html.push('   <div><a class="author" name="author-' + notices[i].authorId + '" href="' + notices[i].link + '">' + notices[i].author + '</a><br/>');
-            html.push('   <div class="content">'+ notices[i].content +'<br/></div>');
-            html.push('   <small class="date">' + humane_date(notices[i].updated) + '</small></div>');
-            if (notices[i].contextLink && notices[i].inReplyToLink) {
-                html.push(
-                    '   <div class="context"><a class="context" href="'
-                    + notices[i].contextLink +'">in context</a><br/></div>'
-                );
-            }
-            html.push('<a href="#" class="notice_reply">Reply</a>');
-
-            if (notices[i].favorite === "true") {
-                html.push(' <a href="#" class="notice_unfave">Unfave</a>');
-            } else {
-                html.push(' <a href="#" class="notice_fave">Fave</a>')
-            }
-
-            if (notices[i].author === this.client.account.username) {
-                html.push(' <a href="#" class="notice_delete">Delete</a>')
-            }
-
-            html.push('</div>');
-            html.push('<div class="clear"></div>');
-
+            html.push(this.renderNotice(notices[i]));
         }
 
         $('#notices').append(html.join(''));
@@ -63,13 +90,16 @@ StatusNet.TimelineView.prototype.show = function () {
             that.enableNoticeControls(this);
         });
 
-    } else {
-        $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
     }
 
     $('.notice a').attr('rel', 'external');
+}
 
-    this.hideSpinner();
+StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
+    StatusNet.debug("prepending notice " + notice.id);
+    $('#notices').prepend(this.renderNotice(notice));
+    $('#notices > div.notice:first').hide();
+    $('#notices > div.notice:first').fadeIn("slow");
 }
 
 /**
@@ -95,9 +125,6 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     var authorId = name.substring(7); // author-
 
     var noticeAuthor = $(noticeDom).find('a.author').text();
-
-    StatusNet.debug("authorId = " + authorId + " author name = " + noticeAuthor + " noticeId = " + noticeId);
-
     var uri = $(noticeDom).find('div a.author').attr('href');
     var that = this;
 
