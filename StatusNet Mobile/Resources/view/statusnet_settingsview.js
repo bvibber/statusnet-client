@@ -28,6 +28,7 @@ StatusNet.SettingsView.prototype.init = function(client) {
         // deleted a row
         var acct = event.rowData.acct;
         StatusNet.debug('Attempting to delete account: ' + acct.username + '@' + acct.getHost());
+        acct.deleteAccount();
     });
     this.window.add(this.table);
 

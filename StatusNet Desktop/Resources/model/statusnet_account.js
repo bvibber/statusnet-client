@@ -25,7 +25,7 @@ StatusNet.Account.getDefault = function(db) {
 
     StatusNet.debug('in StatusNet.Account.getDefault()');
 
-    row = db.execute('select * from account where is_default = 1');
+    var row = db.execute('select * from account where is_default = 1');
 
     if (row.isValidRow()) {
         StatusNet.debug('found an account');
@@ -270,7 +270,11 @@ StatusNet.Account.prototype.deleteAccount = function() {
     if (StatusNet.Account.getDefault(db) == null) {
         StatusNet.debug("setting new default...");
         // Set the first one we find as default if we removed the default...
-        db.execute("update account set is_default=1 limit 1");
+        var row = db.execute("select * from account limit 1");
+        if (row.isValidRow()) {
+            var acct = StatusNet.Account.fromRow(row);
+            acct.setDefault();
+        }
         StatusNet.debug("new default set!");
     }
     StatusNet.debug("done deleting!");
