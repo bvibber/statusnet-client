@@ -192,11 +192,16 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
 
     var params = "gar=gar"; // XXX: we have to pass something to get web client to work
 
+    var that = this;
+
     this.account.postUrl(url, params,
         function(status, data) {
             StatusNet.debug(status);
             StatusNet.debug(data);
             $(linkDom).text('Unfave');
+            $(linkDom).removeClass('notice_fave');
+            $(linkDom).addClass('notice_unfave');
+            that.timeline.refreshNotice(noticeId);
         },
         function(client, msg) {
             StatusNet.debug('Could not favorite notice: ' + msg);
@@ -213,11 +218,16 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
 
     var params = "gar=gar"; // XXX: we have to pass something to get web client to work
 
+    var that = this;
+
     this.account.postUrl(url, params,
         function(status, data) {
             StatusNet.debug(status);
             StatusNet.debug(data);
             $(linkDom).text('Fave');
+            $(linkDom).removeClass('notice_unfave');
+            $(linkDom).addClass('notice_fave');
+            that.timeline.refreshNotice(noticeId);
         },
         function(client, msg) {
             StatusNet.debug('Could not unfavorite notice: ' + msg);

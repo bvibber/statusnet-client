@@ -16,7 +16,16 @@ StatusNet.Timeline = function(client, view) {
     StatusNet.debug("StatusNet.Timeline constructor");
 }
 
-StatusNet.Timeline.prototype.encacheNotice = function(timeline_name, noticeId, entry) {
+/**
+ * Add a notice (Atom entry) to the cache
+ *
+ * @param string timeline_name  name of the timeline
+ * @param int    noticeId       ID of the notice
+ * @param DOM    entry          XML Atom entry for the notice
+ */
+StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
+
+    StatusNet.debug("Timeline.encacheNotice() - encaching notice " + noticeId);
 
     rc = this.db.execute(
             "INSERT OR IGNORE INTO notice_cache (account_id, notice_id, timeline, atom_entry) VALUES (?, ?, ?, ?)",
@@ -24,6 +33,59 @@ StatusNet.Timeline.prototype.encacheNotice = function(timeline_name, noticeId, e
                 noticeId,
                 this.timeline_name,
                 (new XMLSerializer()).serializeToString(entry));
+
+    // @todo Check for an error condition -- how?
+}
+
+/**
+ * Remove a notice (Atom entry) from the cache (all timelines)
+ *
+ * @param int noticeId  the ID of the notice to decache
+ */
+StatusNet.Timeline.prototype.decacheNotice = function(noticeId) {
+
+    StatusNet.debug("Timeline.decacheNotice() - decaching notice " + noticeId);
+
+    rc = this.db.execute(
+        "DELETE FROM notice_cache WHERE account_id = ? AND timeline = ? AND notice_id = ?",
+            this.client.account.id,
+            this.timeline_name,
+            noticeId);
+
+    // @todo Check for an error condition -- how?
+}
+
+/**
+ * Refresh the cache for a single notice (Atom entry)
+ *
+ * @param int noticeId  the Id of the notice to refresh
+ */
+StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
+
+    StatusNet.debug('Timeline.refreshNotice() - refreshing notice ' + noticeId);
+
+    var noticeUrl = this._url + '?max_id=' + noticeId + '&count=1';
+
+    var that = this;
+
+    this.account.fetchUrl(noticeUrl,
+        function(status, data) {
+            StatusNet.debug('Fetched ' + that.noticeUrl);
+
+            var entry = $(data).find('feed > entry:first').get(0);
+
+            if (entry) {
+                that.decacheNotice(noticeId);
+                that.encacheNotice(noticeId, entry);
+                StatusNet.debug('Timeline.refreshNotice(): found an entry.');
+            }
+
+        },
+        function(client, msg) {
+            StatusNet.debug("Something went wrong refreshing notice " + noticeId + ": " + msg);
+            alert("Could not refresh notice " + noticeId +": " + msg);
+        }
+    );
 }
 
 /**
@@ -41,7 +103,7 @@ StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
 
     if (notice.id !== undefined) {
         StatusNet.debug("encached notice: " + notice.id);
-        this.encacheNotice(this.timeline_name, notice.id, entry);
+        this.encacheNotice(notice.id, entry);
     }
 
     if (prepend) {

@@ -132,6 +132,15 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
         }
     );
 
+    $(noticeDom).find('a.notice_unfave').toggle(
+        function(event) {
+            that.client.unFaveNotice(noticeId, this);
+        },
+        function(event) {
+            that.client.faveNotice(noticeId, this);
+        }
+    );
+
     // Override external web links to local users in-content
     $(noticeDom).find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');

@@ -26,17 +26,6 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.favorite = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('favorite');
     notice.repeat_of = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('repeat_of');
 
-    // cycle through the vals printing debug
-    var elements = $(entry).find('[nodeName=statusnet:notice_info]:first').toArray();
-
-    for(var i = 0; i < elements.length; i++) {
-        var element = elements[i];
-        var attrs = element.attributes;
-        for (var i = 0; i < attrs.length; i++) {
-            StatusNet.debug("Attribute name: " + attrs[i].name + ", value: " + attrs[i].value);
-        }
-    }
-
     StatusNet.debug(
         "notice.id= "
         + notice.id
