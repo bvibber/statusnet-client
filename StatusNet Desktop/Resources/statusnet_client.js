@@ -184,6 +184,46 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
     win.open();
 }
 
+/**
+ * Delete a notice from the timeline
+ *
+ * @param int noticeId  the ID of the notice to delete
+ */
+StatusNet.Client.prototype.deleteNotice = function(noticeId) {
+
+    var url = 'statuses/destroy/' + noticeId + '.json';
+
+    StatusNet.debug("StatusNet.Client.deleteNotice()");
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            that.timeline.decacheNotice(noticeId);
+            that.view.removeNotice(noticeId);
+         },
+         function(client, msg) {
+             StatusNet.debug('Could not delete notice: ' + msg);
+             alert('Could not delete notice: ' + msg);
+         }
+    );
+}
+
+/**
+ * Favorite a notice
+ *
+ * Change the class on the notice's fave link from notice_fave to
+ * notice_unfave and refresh the notice entry in the cache so it has
+ * the right state
+ *
+ * @param int noticeId  the ID of the notice to delete
+ * @param DOM linkDom   the link element
+ *
+ */
 StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
 {
     var url = 'favorites/create/' + noticeId + '.json';
@@ -210,6 +250,17 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
     );
 }
 
+/**
+ * Unfavorite a notice
+ *
+ * Change the class on the notice's unfave link from notice_unfave
+ * to notice_fave and refresh the notice entry in the cache so it has
+ * the right state.
+ *
+ * @param int noticeId  the ID of the notice to delete
+ * @param DOM linkDom   the link element
+ *
+ */
 StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
 {
     var url = 'favorites/destroy/' + noticeId + '.json';

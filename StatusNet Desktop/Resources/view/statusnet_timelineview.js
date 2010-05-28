@@ -99,7 +99,6 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     StatusNet.debug("authorId = " + authorId + " author name = " + noticeAuthor + " noticeId = " + noticeId);
 
     var uri = $(noticeDom).find('div a.author').attr('href');
-
     var that = this;
 
     // Override links to external web view of the notice timelines
@@ -119,10 +118,20 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
         });
     }
 
+    // New notice
     $(noticeDom).find('a.notice_reply').bind('click', function(event) {
         that.client.newNoticeDialog(noticeId, noticeAuthor);
     });
 
+    // Delete notice
+    $(noticeDom).find('a.notice_delete').bind('click', function(event) {
+        var r = confirm("Delete notice?");
+        if (r) {
+            that.client.deleteNotice(noticeId);
+        }
+    });
+
+    // Fave notice
     $(noticeDom).find('a.notice_fave').toggle(
         function(event) {
             that.client.faveNotice(noticeId, this);
@@ -155,8 +164,17 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
             });
         }
     });
+}
 
-};
+/**
+ * Remove notice from the visible timeline
+ *
+ * @param int noticeId  the ID of the notice to make go away
+ */
+StatusNet.TimelineView.prototype.removeNotice = function(noticeId) {
+    StatusNet.debug("TimelineView.removeNotice() - removing notice " + noticeId);
+    $('#notices div.notice[name=notice-' + noticeId + ']').fadeOut("slow");
+}
 
 /**
  * Set up anything that should go in the header section...

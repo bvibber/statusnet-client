@@ -175,7 +175,8 @@ StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError)
 
     client.onload = function() {
         if (this.status == 200) {
-            var json = JSON.parse(this.responseText)
+            StatusNet.debug(this.responseText);
+            var json = JSON.parse(this.responseText);
             onSuccess(this.status, json);
         } else {
             onError(client, 'HTTP status: ' + this.status);
