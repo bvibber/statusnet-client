@@ -28,12 +28,22 @@ StatusNet.TimelineUser.prototype = heir(StatusNet.Timeline.prototype);
 
 StatusNet.TimelineUser.prototype.getUrl = function() {
 
+    var base = StatusNet.Timeline.prototype.getUrl.call(this);
+
+    StatusNet.debug("BASE = " + base);
+
     StatusNet.debug("TimelineUser.getUrl() this.authorId = " + this.authorId);
 
     if (this.authorId === null) {
-        return this._url;
+        return base;
     } else {
-        return this._url + "?user_id=" + this.authorId;
+        var qRegexp = /atom\?/;
+        result = base.match(qRegexp);
+        if (result) {
+            return base + "&user_id=" + this.authorId; 
+        } else {
+            return base + "?user_id=" + this.authorId;
+        }
     }
 }
 
