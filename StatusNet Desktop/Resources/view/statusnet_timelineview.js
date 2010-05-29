@@ -98,6 +98,8 @@ StatusNet.TimelineView.prototype.show = function () {
 StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     StatusNet.debug("prepending notice " + notice.id);
     $('#notices').prepend(this.renderNotice(notice));
+    var notice = $('#notices > div.notice:first').get(0);
+    this.enableNoticeControls(notice);
     $('#notices > div.notice:first').hide();
     $('#notices > div.notice:first').fadeIn("slow");
 }
