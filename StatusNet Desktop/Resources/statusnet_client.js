@@ -19,6 +19,18 @@ StatusNet.Client = function(_account) {
     this.view.show();
     this.timeline.update();
 
+    var that = this;
+
+    // @todo: refresh multiple timelines in the background
+
+    this.refresh = setInterval(
+        function() {
+            StatusNet.debug("Refreshing visible timeline.");
+            that.timeline.update();
+        },
+        60000
+    );
+
 }
 
 /**
@@ -74,6 +86,16 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             that.view.showHeader();
             that.view.show();
         }
+    );
+
+    clearInterval(this.refresh);
+
+    this.refresh = setInterval(
+        function() {
+            StatusNet.debug("Refreshing visible timeline.");
+            that.timeline.update();
+        },
+        60000
     );
 }
 

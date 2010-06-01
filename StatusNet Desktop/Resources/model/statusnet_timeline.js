@@ -130,7 +130,7 @@ StatusNet.Timeline.prototype.update = function(onFinish) {
 
             that.client.view.hideSpinner();
 
-            StatusNet.debug('Fetched ' + that.url);
+            StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
 
             $(data).find('feed > entry').each(function() {

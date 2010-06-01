@@ -63,7 +63,7 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
 
             that.client.view.hideSpinner();
 
-            StatusNet.debug('Fetched ' + that._url);
+            StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
 
             // @todo How we get author info will need to change when we
