@@ -25,7 +25,7 @@ StatusNet.Timeline = function(client, view) {
  */
 StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
 
-    StatusNet.debug("Timeline.encacheNotice() - encaching notice " + noticeId);
+    StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
     rc = this.db.execute(
             "INSERT OR IGNORE INTO notice_cache (account_id, notice_id, timeline, atom_entry) VALUES (?, ?, ?, ?)",
@@ -44,7 +44,7 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
  */
 StatusNet.Timeline.prototype.decacheNotice = function(noticeId) {
 
-    StatusNet.debug("Timeline.decacheNotice() - decaching notice " + noticeId);
+    StatusNet.debug("Timeline.decacheNotice() - decaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
     rc = this.db.execute(
         "DELETE FROM notice_cache WHERE account_id = ? AND timeline = ? AND notice_id = ?",
@@ -159,7 +159,28 @@ StatusNet.Timeline.prototype.update = function(onFinish) {
  * Get the URL for the Atom feed of this timeline
  */
 StatusNet.Timeline.prototype.getUrl = function() {
-    return this._url;
+
+    // @fixme use the current account instead of the default
+    var ac = StatusNet.Account.getDefault(this.db);
+
+    var sql = 'SELECT MAX(notice_id) AS last_id FROM notice_cache WHERE account_id = ? AND timeline = ?';
+    rs = this.db.execute(sql, ac.id, this.timeline_name);
+
+    StatusNet.debug("account = " + ac.id + ", timeline_name = " + this.timeline_name);
+
+    var lastId = 0;
+
+    if (rs.isValidRow()) {
+        lastId = rs.fieldByName('last_id');
+    }
+
+    StatusNet.debug("lastId = " + lastId);
+
+    if (lastId > 0) {
+        return this._url + '?since_id=' + lastId;
+    } else {
+        return this._url;
+    }
 }
 
 /**
@@ -173,7 +194,6 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
     }
 
     this.client.view.hideSpinner();
-
 }
 
 /**

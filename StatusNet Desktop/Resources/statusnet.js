@@ -46,7 +46,6 @@ StatusNet.getDB = function() {
             + 'password TEXT NOT NULL, '
             + 'apiroot TEXT NOT NULL, '
             + 'is_default INTEGER DEFAULT 0, '
-            + 'last_timeline_id INTEGER, '
             + 'profile_image_url TEXT, '
             + 'text_limit INTEGER DEFAULT 0, '
             + 'site_logo TEXT, '
@@ -60,7 +59,7 @@ StatusNet.getDB = function() {
             + 'account_id INTEGER, '
             + 'timeline TEXT NOT NULL, '
             + 'atom_entry TEXT NOT NULL, '
-            + 'PRIMARY KEY (notice_id, account_id)'
+            + 'PRIMARY KEY (notice_id, timeline, account_id)'
             + ')';
 
         this.db.execute(sql);
