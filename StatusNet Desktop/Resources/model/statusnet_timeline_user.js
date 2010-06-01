@@ -40,7 +40,7 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
         var qRegexp = /atom\?/;
         result = base.match(qRegexp);
         if (result) {
-            return base + "&user_id=" + this.authorId; 
+            return base + "&user_id=" + this.authorId;
         } else {
             return base + "?user_id=" + this.authorId;
         }
@@ -71,11 +71,18 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
             var subject = $(data).find("feed > [nodeName=activity:subject]:first");
             that.user = StatusNet.AtomParser.userFromSubject(subject);
 
+            var noticeCnt = 0;
+
             $(data).find('feed > entry').each(function() {
                 StatusNet.debug('TimelineUser.update: found an entry.');
                 var notice = StatusNet.AtomParser.noticeFromEntry(this);
                 that.addNotice(notice, this, true);
+                noticeCnt++;
             });
+
+            if (noticeCnt > 0) {
+                that.client.newNoticesSound.play();
+            }
 
             // use events instead? Observer?
             if (onFinish) {

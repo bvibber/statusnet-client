@@ -133,13 +133,18 @@ StatusNet.Timeline.prototype.update = function(onFinish) {
             StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
 
+            var noticeCnt = 0;
+
             $(data).find('feed > entry').each(function() {
                 StatusNet.debug('Timeline.update: found an entry.');
-
                 var notice = StatusNet.AtomParser.noticeFromEntry(this);
-
                 that.addNotice(notice, this, true);
+                noticeCnt++;
             });
+
+            if (noticeCnt > 0) {
+                that.client.newNoticesSound.play();
+            }
 
             // use events instead? Observer?
             if (onFinish) {

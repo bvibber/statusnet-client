@@ -183,6 +183,9 @@ StatusNet.Client.prototype.init = function() {
     });
 
     $('#new_notice').click(function() { that.newNoticeDialog(); });
+
+    // setup sounds
+    this.newNoticesSound = Titanium.Media.createSound('app://sounds/kalimba.wav');
 }
 
 /**
