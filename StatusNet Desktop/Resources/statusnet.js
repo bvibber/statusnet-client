@@ -54,11 +54,18 @@ StatusNet.getDB = function() {
 
         this.db.execute(sql);
 
-        sql = 'CREATE TABLE IF NOT EXISTS notice_cache ('
-            + 'notice_id INTEGER, '
-            + 'account_id INTEGER, '
-            + 'timeline TEXT NOT NULL, '
+        sql = 'CREATE TABLE IF NOT EXISTS entry ('
+            + 'notice_id INTEGER NOT NULL, '
             + 'atom_entry TEXT NOT NULL, '
+            + 'PRIMARY KEY (notice_id)'
+            + ')';
+
+        this.db.execute(sql);
+
+        sql = 'CREATE TABLE IF NOT EXISTS notice_entry ('
+            + 'notice_id INTEGER NOT NULL REFERENCES entry (notice_id), '
+            + 'account_id INTEGER NOT NULL, '
+            + 'timeline TEXT NOT NULL, '
             + 'PRIMARY KEY (notice_id, timeline, account_id)'
             + ')';
 

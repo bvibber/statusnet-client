@@ -28,11 +28,17 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
     StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
     rc = this.db.execute(
-            "INSERT OR IGNORE INTO notice_cache (account_id, notice_id, timeline, atom_entry) VALUES (?, ?, ?, ?)",
-                this.client.account.id,
-                noticeId,
-                this.timeline_name,
-                (new XMLSerializer()).serializeToString(entry));
+        "INSERT OR REPLACE INTO entry (notice_id, atom_entry) VALUES (?, ?)",
+        noticeId,
+        (new XMLSerializer()).serializeToString(entry)
+    );
+
+    rc = this.db.execute(
+        "INSERT INTO notice_entry (account_id, notice_id, timeline) VALUES (?, ?, ?)",
+        this.client.account.id,
+        noticeId,
+        this.timeline_name
+    );
 
     // @todo Check for an error condition -- how?
 }
@@ -47,10 +53,14 @@ StatusNet.Timeline.prototype.decacheNotice = function(noticeId) {
     StatusNet.debug("Timeline.decacheNotice() - decaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
     rc = this.db.execute(
-        "DELETE FROM notice_cache WHERE account_id = ? AND timeline = ? AND notice_id = ?",
+        "DELETE FROM notice_entry WHERE account_id = ? AND notice_id = ?",
             this.client.account.id,
-            this.timeline_name,
             noticeId);
+
+    rc = this.db.execute(
+        "DELETE FROM entry WHERE notice_id = ?",
+        noticeId
+    );
 
     // @todo Check for an error condition -- how?
 }
@@ -75,7 +85,6 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
             var entry = $(data).find('feed > entry:first').get(0);
 
             if (entry) {
-                that.decacheNotice(noticeId);
                 that.encacheNotice(noticeId, entry);
                 StatusNet.debug('Timeline.refreshNotice(): found an entry.');
             }
@@ -169,7 +178,7 @@ StatusNet.Timeline.prototype.getUrl = function() {
     // @fixme use the current account instead of the default
     var ac = StatusNet.Account.getDefault(this.db);
 
-    var sql = 'SELECT MAX(notice_id) AS last_id FROM notice_cache WHERE account_id = ? AND timeline = ?';
+    var sql = 'SELECT MAX (notice_id) AS last_id FROM notice_entry WHERE account_id = ? AND timeline = ?';
     rs = this.db.execute(sql, ac.id, this.timeline_name);
 
     StatusNet.debug("account = " + ac.id + ", timeline_name = " + this.timeline_name);
@@ -210,7 +219,8 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
 StatusNet.Timeline.prototype.getNotices = function() {
 
     var rs = this.db.execute(
-        "SELECT * from notice_cache WHERE account_id = ? AND timeline = ? ORDER BY notice_id",
+        "SELECT * from notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id " 
+        + "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? ORDER BY notice_entry.notice_id",
         this.account.id,
         this.timeline_name
     );
