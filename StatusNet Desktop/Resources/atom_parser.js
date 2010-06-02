@@ -20,7 +20,10 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     });
 
     notice.id = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('local_id');
+
+    // source client
     notice.source = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('source');
+
     notice.favorite = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('favorite');
     notice.repeat_of = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('repeat_of');
     notice.published = $(entry).find('published').text();
@@ -28,6 +31,19 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
 
     // knock off the millisecs to make the date string work with humane.js
     notice.updated = updated.substring(0, 19);
+
+    // In most timelines, the plain text version of the notice content
+    // is in the second title element in the entry, but in user feeds,
+    // it's in the first.
+    notice.title = $(entry).find('title:eq(1)');
+    if (notice.title.size() < 1) {
+        notice.title = $(entry).find('title').text();
+    } else {
+        notice.title = $(entry).find('title:eq(1)').text();
+    }
+
+    // atom:source (not the source client, eh) - this might not be in the feed
+    notice.atomSource = $(entry).find('source > title').text();
 
     notice.content = $(entry).find('content').text();
 

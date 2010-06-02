@@ -108,6 +108,7 @@ StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
 
     if (prepend) {
         this._notices.unshift(notice);
+        this.client.view.showNotification(notice);
         this.client.view.showNewNotice(notice);
     } else {
         this._notices.push(notice);

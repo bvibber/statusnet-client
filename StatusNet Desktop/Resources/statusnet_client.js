@@ -30,7 +30,6 @@ StatusNet.Client = function(_account) {
         },
         60000
     );
-
 }
 
 /**

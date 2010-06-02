@@ -104,6 +104,39 @@ StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     $('#notices > div.notice:first').fadeIn("slow");
 }
 
+StatusNet.TimelineView.prototype.showNotification = function(notice) {
+
+    var author = null;
+
+    // Special case for user timelines, which don't have an avatar
+    // and author on each notice Atom entry
+    if (this.client.timeline.user) {
+        author = this.client.timeline.user.username;
+    } else {
+        author = notice.author;
+    }
+
+    var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
+    var nTitle = "New notice from " + notice.author;
+
+    if (notice.atomSource) {
+        nTitle = "New notice from " + notice.atomSource;
+    }
+
+    notification.setTitle(nTitle);
+    notification.setMessage(notice.title); // plain text version of the content
+
+    notification.setIcon("app://logo.png");
+    notification.setDelay(5000);
+    notification.setCallback(function () {
+
+        // @todo Bring the app window back to focus / on top
+
+        alert("i've been clicked");
+    });
+    notification.show();
+}
+
 /**
  * Determines whether the notice is local (by permalink)
  *
