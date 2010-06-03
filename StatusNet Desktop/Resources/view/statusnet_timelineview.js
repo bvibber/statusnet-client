@@ -140,13 +140,19 @@ StatusNet.TimelineView.prototype.showNotification = function(notice) {
 /**
  * Determines whether the notice is local (by permalink)
  *
+ * @todo This could be better...
+ *
  * @param String uri the uri of the notice
  *
  * @return boolean value
  */
 StatusNet.TimelineView.prototype.localAuthor = function(uri) {
 
-    if (uri.substring(0, this.client.server.length) === this.client.server) {
+    // Isolate domain name from URI paths and compare
+    var path = uri.split('/');
+    var serverPath = this.client.server.split('/');
+
+    if (path[2] === serverPath[2]) {
         return true;
     }
     return false;
@@ -158,9 +164,9 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
 
     name = $(noticeDom).find('a.author').attr('name');
     var authorId = name.substring(7); // author-
-
     var noticeAuthor = $(noticeDom).find('a.author').text();
     var uri = $(noticeDom).find('div a.author').attr('href');
+
     var that = this;
 
     // Override links to external web view of the notice timelines
