@@ -59,9 +59,10 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
  * @param DOM     entry    the Atom entry form of the notice
  * @param boolean prepend  whether to add it to the beginning of end of
  *                         the timeline's notices array
+ * @param boolean notify   whether to show a system notification
  *
  */
-StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
+StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, notify) {
 
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 
@@ -75,10 +76,13 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
 
     if (prepend) {
         this._notices.unshift(notice);
-        this.client.view.showNotification(notice);
         this.client.view.showNewNotice(notice);
     } else {
         this._notices.push(notice);
+    }
+
+    if (notify) {
+        this.client.view.showNotification(notice);
     }
 }
 
@@ -86,7 +90,7 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
-StatusNet.TimelineUser.prototype.update = function(onFinish) {
+StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
 
     StatusNet.debug("TimelineUser.update()");
 
@@ -116,10 +120,10 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
             entries.reverse(); // keep correct notice order
 
             for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i], true);
+                that.addNotice(entries[i], true, notifications);
             }
 
-            if (entries.length > 0) {
+            if (entries.length > 0 && notifications) {
                 that.client.newNoticesSound.play();
             }
 

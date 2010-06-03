@@ -26,7 +26,7 @@ StatusNet.Client = function(_account) {
     this.refresh = setInterval(
         function() {
             StatusNet.debug("Refreshing visible timeline.");
-            that.timeline.update();
+            that.timeline.update(null, true);
         },
         60000
     );
@@ -92,7 +92,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     this.refresh = setInterval(
         function() {
             StatusNet.debug("Refreshing visible timeline.");
-            that.timeline.update();
+            that.timeline.update(null, true);
         },
         60000
     );
@@ -131,7 +131,8 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
             that.view.showHeader();
             that.view.showProfileInfo();
             that.view.show();
-        }
+        },
+        false
     );
 }
 
@@ -139,7 +140,7 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
  * Reload timeline notices
  */
 StatusNet.Client.prototype.refresh = function() {
-    this.timeline.update();
+    this.timeline.update(function() {}, "gar");
 }
 
 /**
