@@ -117,6 +117,20 @@ function heir(p) {
 }
 
 /**
+ * Utility function to valid a URL
+ *
+ * @todo This isn't all that great - only looks for http(s)
+ *
+ * @param String url the URL to validate
+ *
+ * @return boolean return value
+ */
+StatusNet.validUrl = function(url) {
+    var regexp = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
+    return regexp.test(s);
+}
+
+/**
  * Utility JQuery function to control the selection in an input.
  * Useful for positioning the carat.
  */

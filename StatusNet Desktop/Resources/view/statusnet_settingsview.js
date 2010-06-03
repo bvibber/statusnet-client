@@ -173,7 +173,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             that.workAcct = acct;
             $("#new-save").attr("disabled", "disabled");
             $("#new-avatar").attr("src", "images/icon_processing.gif");
-    
+
             that.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
                 $("#new-status").text("Login confirmed.");
                 that.xml = xml;
@@ -181,14 +181,19 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                 StatusNet.debug(that.workAcct.avatar);
                 $("#new-avatar").attr("src", that.workAcct.avatar);
                 $("#new-save").removeAttr("disabled");
-                
+
                 // get site specific configuration info
                 that.workAcct.fetchUrl('statusnet/config.xml', function(status, xml) {
                     StatusNet.debug("Loaded statusnet/config.xml");
-                    that.workAcct.textLimit = $(xml).find('site > textlimit:first').text();
-                    that.workAcct.siteLogo = $(xml).find('site > logo:first').text();
+                    that.workAcct.textLimit = $(xml).find('config > site > textlimit:first').text();
+                    that.workAcct.siteLogo = $(xml).find('config > site > logo:first').text();
+
+                    if (!StatusNet.validUrl(that.workAcct.siteLogo)) {
+                        that.workAcct.siteLogo = '';
+                    }
+
                 }, function(status) {
-                    StatusNet.debug("Couldn't load statusnet/config.xml for site."); 
+                    StatusNet.debug("Couldn't load statusnet/config.xml for site.");
                 });
 
             }, function(status) {

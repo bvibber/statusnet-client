@@ -151,7 +151,11 @@ StatusNet.Client.prototype.init = function() {
 
     this.server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
 
-    var gar = $('#public_img').attr('src', this.account.siteLogo);
+    if (this.account.siteLogo) {
+        $('#public_img').attr('src', this.account.siteLogo);
+    } else {
+        $('#public_img').attr('src', '/images/logo.png');
+    }
 
     // Add event handlers for buttons
 
