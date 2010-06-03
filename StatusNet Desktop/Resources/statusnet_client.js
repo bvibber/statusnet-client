@@ -265,7 +265,7 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
 {
     var url = 'favorites/create/' + noticeId + '.json';
 
-    StatusNet.debug("StatusNet.Client.faveNotice()");
+    StatusNet.debug("StatusNet.Client.faveNotice() - faving notice " + noticeId);
 
     var params = "gar=gar"; // XXX: we have to pass something to get web client to work
 
@@ -302,7 +302,7 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
 {
     var url = 'favorites/destroy/' + noticeId + '.json';
 
-    StatusNet.debug("StatusNet.Client.unFaveNotice()");
+    StatusNet.debug("StatusNet.Client.unFaveNotice() - unfaving notice " + noticeId);
 
     var params = "gar=gar"; // XXX: we have to pass something to get web client to work
 
@@ -324,4 +324,36 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
     );
 }
 
+/**
+ * Repeat a notice
+ *
+ * @param int noticeId  the ID of the notice to delete
+ * @param DOM linkDom   the link element
+ *
+ * On success, removes the repeat link and refreshes the notice entry
+ * in the cache so it has the right state.
+ */
+StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
+{
+    var url = 'statuses/retweet/' + noticeId + '.json';
+
+    StatusNet.debug("StatusNet.Client.repeatNotice() - repeating notice " + noticeId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).remove();
+            that.timeline.refreshNotice(noticeId);
+        },
+        function(client, msg) {
+            StatusNet.debug('Could not repeat notice: ' + msg);
+            alert('Could not repeat notice: ' + msg);
+        }
+    );
+}
 

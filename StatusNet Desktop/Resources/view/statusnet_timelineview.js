@@ -54,6 +54,10 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     if (author === this.client.account.username) {
         html.push(' <a href="#" class="notice_delete">Delete</a>')
+    } else {
+        if (notice.repeated === "false") {
+            html.push(' <a href="#" class="notice_repeat">Repeat</a>');
+        }
     }
 
     html.push('</div>');
@@ -217,6 +221,11 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
             that.client.faveNotice(noticeId, this);
         }
     );
+
+    // Repeat
+    $(noticeDom).find('a.notice_repeat').bind('click', function(event) {
+        that.client.repeatNotice(noticeId, this);
+    });
 
     // Override external web links to local users in-content
     $(noticeDom).find('div.content span.vcard a').each(function() {

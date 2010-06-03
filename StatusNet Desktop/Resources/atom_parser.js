@@ -25,6 +25,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.source = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('source');
 
     notice.favorite = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('favorite');
+    notice.repeated = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('repeated');
     notice.repeat_of = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('repeat_of');
     notice.published = $(entry).find('published').text();
     var updated = $(entry).find('updated').text();

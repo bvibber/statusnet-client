@@ -34,7 +34,7 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
     );
 
     rc = this.db.execute(
-        "INSERT INTO notice_entry (account_id, notice_id, timeline) VALUES (?, ?, ?)",
+        "INSERT OR REPLACE INTO notice_entry (account_id, notice_id, timeline) VALUES (?, ?, ?)",
         this.client.account.id,
         noticeId,
         this.timeline_name
