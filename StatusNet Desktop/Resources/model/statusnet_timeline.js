@@ -98,7 +98,14 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
 }
 
 /**
- * Add a notice to the Timeline if it's not already in it.
+ * Add a notice to the Timeline if it's not already in it. Also 
+ * adds it to the notice cache.
+ * 
+ * @param Object  notice   an object with properties we can use for 
+ *                         rendering HTML
+ * @param DOM     entry    the Atom entry form of the notice
+ * @param boolean prepend  whether to add it to the beginning of end of
+ *
  */
 StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
 

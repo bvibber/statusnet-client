@@ -117,7 +117,7 @@ function heir(p) {
 }
 
 /**
- * Utility function to valid a URL
+ * Utility function to validate a URL
  *
  * @todo This isn't all that great - only looks for http(s)
  *

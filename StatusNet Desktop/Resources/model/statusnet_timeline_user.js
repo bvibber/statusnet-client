@@ -48,6 +48,41 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
 }
 
 /**
+ * Add a notice to the Timeline if it's not already in it.
+ *
+ * XXX: Override so user timelines do not get cached. Not
+ * sure how else to handle at the moment since atom entries in
+ * user timelines are different than they are in other timelines.
+ * We may need a special cache facility just for user atom
+ * entries. --Z
+ *
+ * @param Object  notice   an object with properties we can use for
+ *                         rendering HTML
+ * @param DOM     entry    the Atom entry form of the notice
+ * @param boolean prepend  whether to add it to the beginning of end of
+ *                         the timeline's notices array
+ *
+ */
+StatusNet.TimelineUser.prototype.addNotice = function(notice, entry, prepend) {
+
+    // dedupe here?
+    for (i = 0; i < this._notices.length; i++) {
+        if (this._notices[i].id === notices.id) {
+            StatusNet.debug("skipping duplicate notice: " + notice.id);
+            return;
+        }
+    }
+
+    if (prepend) {
+        this._notices.unshift(notice);
+        this.client.view.showNotification(notice);
+        this.client.view.showNewNotice(notice);
+    } else {
+        this._notices.push(notice);
+    }
+}
+
+/**
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
