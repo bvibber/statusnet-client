@@ -98,18 +98,18 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
 }
 
 /**
- * Add a notice to the Timeline if it's not already in it. Also 
+ * Add a notice to the Timeline if it's not already in it. Also
  * adds it to the notice cache.
- * 
- * @param Object  notice   an object with properties we can use for 
- *                         rendering HTML
+ *
  * @param DOM     entry    the Atom entry form of the notice
  * @param boolean prepend  whether to add it to the beginning of end of
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(notice, entry, prepend) {
+StatusNet.Timeline.prototype.addNotice = function(entry, prepend) {
 
-    // dedupe here?
+    var notice = StatusNet.AtomParser.noticeFromEntry(entry);
+
+    // Dedupe here?
     for (i = 0; i < this._notices.length; i++) {
         if (this._notices[i].id === notices.id) {
             StatusNet.debug("skipping duplicate notice: " + notice.id);
@@ -150,16 +150,20 @@ StatusNet.Timeline.prototype.update = function(onFinish) {
             StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
 
-            var noticeCnt = 0;
+            var entries = [];
 
             $(data).find('feed > entry').each(function() {
                 StatusNet.debug('Timeline.update: found an entry.');
-                var notice = StatusNet.AtomParser.noticeFromEntry(this);
-                that.addNotice(notice, this, true);
-                noticeCnt++;
+                entries.push(this);
             });
 
-            if (noticeCnt > 0) {
+            entries.reverse(); // keep correct notice order
+
+            for (var i = 0; i < entries.length; i++) {
+                that.addNotice(entries[i], true);
+            }
+
+            if (entries.length > 0) {
                 that.client.newNoticesSound.play();
             }
 
@@ -226,7 +230,7 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
 StatusNet.Timeline.prototype.getNotices = function() {
 
     var rs = this.db.execute(
-        "SELECT * from notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id " 
+        "SELECT * from notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id "
         + "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? ORDER BY notice_entry.notice_id",
         this.account.id,
         this.timeline_name

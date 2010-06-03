@@ -56,14 +56,14 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
  * We may need a special cache facility just for user atom
  * entries. --Z
  *
- * @param Object  notice   an object with properties we can use for
- *                         rendering HTML
  * @param DOM     entry    the Atom entry form of the notice
  * @param boolean prepend  whether to add it to the beginning of end of
  *                         the timeline's notices array
  *
  */
-StatusNet.TimelineUser.prototype.addNotice = function(notice, entry, prepend) {
+StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
+
+    var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 
     // dedupe here?
     for (i = 0; i < this._notices.length; i++) {
@@ -106,16 +106,20 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
             var subject = $(data).find("feed > [nodeName=activity:subject]:first");
             that.user = StatusNet.AtomParser.userFromSubject(subject);
 
-            var noticeCnt = 0;
+            var entries = [];
 
             $(data).find('feed > entry').each(function() {
                 StatusNet.debug('TimelineUser.update: found an entry.');
-                var notice = StatusNet.AtomParser.noticeFromEntry(this);
-                that.addNotice(notice, this, true);
-                noticeCnt++;
+                entries.push(this);
             });
 
-            if (noticeCnt > 0) {
+            entries.reverse(); // keep correct notice order
+
+            for (var i = 0; i < entries.length; i++) {
+                that.addNotice(entries[i], true);
+            }
+
+            if (entries.length > 0) {
                 that.client.newNoticesSound.play();
             }
 
