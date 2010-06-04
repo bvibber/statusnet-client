@@ -53,8 +53,8 @@ a {
 }
 
 #sidebar img:hover {
-	background-image: url(/images/sidebar-button-glow.png);
-	background-repeat: no-repeat;
+    background-image: url(/images/sidebar-button-glow.png);
+    background-repeat: no-repeat;
 }
 
 #profile {
@@ -65,7 +65,7 @@ a {
   -webkit-border-bottom-left-radius:10px;
 }
 
-#profile_info img {
+#profile_panel img {
 	float:left
 	margin-bottom:10px;
 }

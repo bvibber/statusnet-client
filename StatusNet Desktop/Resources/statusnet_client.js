@@ -128,7 +128,6 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
     this.timeline.update(
         function() {
             that.view.showHeader();
-            that.view.showProfileInfo();
             that.view.show();
         },
         false

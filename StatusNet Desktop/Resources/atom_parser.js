@@ -96,7 +96,8 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
     var author = {};
 
     author.username = $(subject).find('[nodeName=poco:preferredUsername]').text();
-    author.fullName = $(subject).find('title').text();
+    author.fullname = $(subject).find('title').text();
+
     author.link = $(subject).find('id').text();
 
     var idRegexp = /(\d)+$/;
@@ -104,8 +105,6 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
     if (result) {
         author.id = result[0];
     }
-
-    StatusNet.debug("AtomParser.userFromSubject() - name: " + author.username + ", id: " + author.id);
 
     var geoPoint = $(subject).find("[nodeName=georss:point]:first").text();
 

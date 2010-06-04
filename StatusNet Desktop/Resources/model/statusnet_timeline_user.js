@@ -20,7 +20,7 @@ StatusNet.TimelineUser = function(client, authorId) {
     this._url = 'statuses/user_timeline.atom';
 
     this.user = null;
-
+    this.extended = null;
 }
 
 // Make StatusNet.TimelineUser inherit Timeline's prototype
@@ -45,6 +45,38 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
             return base + "?user_id=" + this.authorId;
         }
     }
+}
+
+StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) {
+
+    var url = 'users/show/' + authorId + ".xml";
+
+    StatusNet.debug("StatusNet.TimelineUser.getExtendedInfo for user " + authorId);
+
+    var that = this;
+
+    this.client.account.fetchUrl(url,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug((new XMLSerializer()).serializeToString(data));
+
+            var extended = new Object();
+            extended.followers_cnt = $(data).find('followers_count').text();
+            extended.friends_cnt = $(data).find('friends_count').text();
+            extended.statuses_cnt = $(data).find('statuses_count').text();
+            extended.favorites_cnt = $(data).find('favourites_count').text();
+            extended.following = $(data).find('following').text();
+            extended.notifications = $(data).find('notifications').text();
+            that.extended = extended;
+            if (onFinish) {
+                onFinish(that.user, extended);
+            }
+        },
+        function(client, msg) {
+            StatusNet.debug('Could not get extended user info: ' + msg);
+            alert('Could not get extended user info: ' + msg);
+        }
+    );
 }
 
 /**
