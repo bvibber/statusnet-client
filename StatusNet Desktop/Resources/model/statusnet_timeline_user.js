@@ -92,7 +92,7 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, notify) {
  */
 StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
 
-    StatusNet.debug("TimelineUser.update()");
+    StatusNet.debug("TimelineUser.update() - notifications = " + notifications);
 
     var that = this;
 

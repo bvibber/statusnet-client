@@ -10,8 +10,6 @@ StatusNet.Client = function(_account) {
 
     this.init();
 
-    this._timeline = "friends_timeline"; // which timeline are we currently showing?
-
     this.view = new StatusNet.TimelineViewFriends(this);
     this.timeline =  new StatusNet.TimelineFriends(this);
 
@@ -74,25 +72,25 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
         default:
             throw new Exception("Gah wrong timeline");
     }
-    this._timeline = timeline;
 
     StatusNet.Sidebar.setSelectedTimeline(timeline);
 
     var that = this;
 
+    clearInterval(this.refresh);
+
     this.timeline.update(
         function() {
             that.view.showHeader();
             that.view.show();
-        }
+        },
+        false
     );
-
-    clearInterval(this.refresh);
 
     this.refresh = setInterval(
         function() {
             StatusNet.debug("Refreshing visible timeline.");
-            that.timeline.update(null, true);
+            that.timeline.update(null, (that.timeline.timeline_name !== 'user'));
         },
         60000
     );
@@ -121,7 +119,8 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
         this.timeline = new StatusNet.TimelineUser(this, authorId);
     }
 
-    this._timeline = timeline;
+    clearInterval(this.refresh);
+
     StatusNet.Sidebar.setSelectedTimeline(timeline);
 
     var that = this;
@@ -140,7 +139,7 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
  * Reload timeline notices
  */
 StatusNet.Client.prototype.refresh = function() {
-    this.timeline.update(function() {}, "gar");
+    this.timeline.update();
 }
 
 /**
