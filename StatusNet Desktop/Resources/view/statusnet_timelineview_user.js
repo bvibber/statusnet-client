@@ -4,9 +4,6 @@
 StatusNet.TimelineViewUser = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s profile on {site}";
-
-    this.client = client;
-
 }
 
 // Make StatusNet.TimelineViewUser inherit TimelineView's prototype
@@ -15,7 +12,7 @@ StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
 /**
  * Show profile information header for this user
  */
-StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended, client) {
+StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended, client, authorId) {
     StatusNet.debug("showProfileInfo()");
 
     $('#profile_info').remove();
@@ -64,26 +61,28 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
         html.push('<dd>' + extended.favorites_cnt + '</dd>');
         html.push('</dl>')
 
-        if (extended.following == "false") {
-            html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
-        } else {
-            html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
+        if (authorId !== null) {
+
+            if (extended.following == "false") {
+                html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
+            } else {
+                html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
+            }
+
+            // XXX: sucks that I have to pass client back in so I can use it here -Z
+            // Hmm... use toggle() instead?
+            $('a.profile_subscribe').bind('click', function(event) {
+                client.subscribe(user.id, this);
+            });
+
+            $('a.profile_unsubscribe').bind('click', function(event) {
+                client.unsubscribe(user.id, this);
+            });
         }
     }
 
     html.push('</div>');
-
     $('#header').append(html.join(''));
-
-    // XXX: sucks that I have to pass client back in so I can use it here -Z
-    // Hmm... use toggle() instead?
-    $('a.profile_subscribe').bind('click', function(event) {
-        client.subscribe(user.id, this);
-    });
-
-    $('a.profile_unsubscribe').bind('click', function(event) {
-        client.unsubscribe(user.id, this);
-    });
 }
 
 /**

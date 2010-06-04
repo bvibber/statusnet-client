@@ -49,9 +49,13 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
 
 StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) {
 
-    var url = 'users/show/' + authorId + ".xml";
+    var url = null;
 
-    StatusNet.debug("StatusNet.TimelineUser.getExtendedInfo for user " + authorId);
+    if (authorId === null) {
+        url = 'users/show.xml';
+    } else {
+        url = 'users/show/' + authorId + ".xml";
+    }
 
     var that = this;
 
@@ -69,7 +73,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
             extended.notifications = $(data).find('notifications').text();
             that.extended = extended;
             if (onFinish) {
-                onFinish(that.user, extended, that.client);
+                onFinish(that.user, extended, that.client, authorId);
             }
         },
         function(client, msg) {
