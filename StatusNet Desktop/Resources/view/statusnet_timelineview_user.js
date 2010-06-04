@@ -21,7 +21,7 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended)
 
     html.push('<div id="profile_panel">');
     html.push('<h1>@' + user.username + '</h1>');
-    html.push('<img src="' + user.avatarMedium + '"/>');
+    html.push('<img src="' + user.avatarLarge + '"/>');
     html.push('<dl class="profile_list">');
     html.push('<dt>Name</dt>');
     html.push('<dd>');
@@ -79,7 +79,7 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended)
     $('a.profile_unsubscribe').bind('click', function(event) {
         alert('unsubscribe');
     });
-};
+}
 
 /**
  * Override the header to show name of the user associated with
@@ -116,5 +116,62 @@ StatusNet.TimelineViewUser.prototype.showHeader = function () {
         that.showProfileInfo,
         that.client.timeline.authorId
     );
-};
+}
+
+/**
+ * Put together the HTML for a single notice for a User profile timeline
+ *
+ * @param object notice the notice
+ */
+StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
+
+    var html = [];
+
+    var avatar = null;
+    var author = null;
+
+    // Special case for user timelines, which don't have an avatar
+    // and author on each notice Atom entry
+    if (this.client.timeline.user) {
+        avatar = this.client.timeline.user.avatarMedium;
+        author = this.client.timeline.user.username;
+        authorId = this.client.timeline.user.id;
+    } else {
+        avatar = notice.avatar;
+        author = notice.author;
+        authorId = notice.authorId
+    }
+
+    html.push('<div class="notice" name="notice-' + notice.id +'">');
+    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.link + '">' + author + '</a><br/>');
+    html.push('   <div class="content">'+ notice.content +'<br/></div>');
+    html.push('   <small class="date">' + humane_date(notice.updated) + '</small></div>');
+    if (notice.contextLink && notice.inReplyToLink) {
+        html.push(
+            '   <div class="context"><a class="context" href="'
+            + notice.contextLink +'">in context</a><br/></div>'
+        );
+    }
+    html.push('<a href="#" class="notice_reply">Reply</a>');
+
+    if (notice.favorite === "true") {
+        html.push(' <a href="#" class="notice_unfave">Unfave</a>');
+    } else {
+        html.push(' <a href="#" class="notice_fave">Fave</a>')
+    }
+
+    if (author === this.client.account.username) {
+        html.push(' <a href="#" class="notice_delete">Delete</a>')
+    } else {
+        if (notice.repeated === "false") {
+            html.push(' <a href="#" class="notice_repeat">Repeat</a>');
+        }
+    }
+
+    html.push('</div>');
+    html.push('<div class="clear"></div>');
+
+    return html.join('');
+}
+
 
