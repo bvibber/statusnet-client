@@ -69,7 +69,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
             extended.notifications = $(data).find('notifications').text();
             that.extended = extended;
             if (onFinish) {
-                onFinish(that.user, extended);
+                onFinish(that.user, extended, that.client);
             }
         },
         function(client, msg) {

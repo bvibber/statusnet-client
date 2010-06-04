@@ -355,3 +355,82 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
     );
 }
 
+/**
+ * Subscribe to a profile
+ *
+ * @param int profileId  the ID of the profile to subscribe to
+ * @param DOM linkDom    the link element
+ *
+ * On success changes the link to an unsubscribe link
+ */
+StatusNet.Client.prototype.subscribe = function(profileId, linkDom)
+{
+    var url = 'friendships/create/' + profileId + '.json';
+
+    StatusNet.debug("StatusNet.Client.subscribe() - subscribing to " + profileId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).text('Unsubscribe');
+            $(linkDom).removeClass('profile_subscribe');
+            $(linkDom).addClass('profile_unsubscribe');
+            $(linkDom).unbind('click');
+            $(linkDom).bind('click',
+                function(event) {
+                    that.unsubscribe(profileId, linkDom);
+                }
+            );
+        },
+        function(client, msg) {
+            StatusNet.debug('Could not subscribe to profile: ' + msg);
+            alert('Could not subscribe to profile: ' + msg);
+        }
+    );
+}
+
+/**
+ * Unsubscribe from a profile
+ *
+ * @param int profileId  the ID of the profile to unsubscribe from
+ * @param DOM linkDom    the link element
+ *
+ * On success changes the link to a subscribe link
+ *
+ */
+StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom)
+{
+    var url = 'friendships/destroy/' + profileId + '.json';
+
+    StatusNet.debug("StatusNet.Client.unsubscribe() - unsubscribing from " + profileId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).text('Subscribe');
+            $(linkDom).removeClass('profile_unsubscribe');
+            $(linkDom).addClass('profile_subscribe');
+            $(linkDom).unbind('click');
+            $(linkDom).bind('click',
+                function(event) {
+                    that.subscribe(profileId, linkDom);
+                }
+            );
+        },
+        function(client, msg) {
+            StatusNet.debug('Could not subscribe to profile: ' + msg);
+            alert('Could not subscribe to profile: ' + msg);
+        }
+    );
+}
+

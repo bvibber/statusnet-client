@@ -4,6 +4,9 @@
 StatusNet.TimelineViewUser = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s profile on {site}";
+
+    this.client = client;
+
 }
 
 // Make StatusNet.TimelineViewUser inherit TimelineView's prototype
@@ -12,7 +15,7 @@ StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
 /**
  * Show profile information header for this user
  */
-StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended) {
+StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended, client) {
     StatusNet.debug("showProfileInfo()");
 
     $('#profile_info').remove();
@@ -72,12 +75,14 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended)
 
     $('#header').append(html.join(''));
 
+    // XXX: sucks that I have to pass client back in so I can use it here -Z
+    // Hmm... use toggle() instead?
     $('a.profile_subscribe').bind('click', function(event) {
-        alert('subscribe');
+        client.subscribe(user.id, this);
     });
 
     $('a.profile_unsubscribe').bind('click', function(event) {
-        alert('unsubscribe');
+        client.unsubscribe(user.id, this);
     });
 }
 
