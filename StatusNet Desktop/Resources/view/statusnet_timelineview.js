@@ -190,7 +190,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
         });
     }
 
-    // New notice
+    // Reply
     $(noticeDom).find('a.notice_reply').bind('click', function(event) {
         that.client.newNoticeDialog(noticeId, noticeAuthor);
     });
@@ -323,19 +323,6 @@ StatusNet.TimelineViewFavorites = function(client) {
 
 // Make StatusNet.TimelineViewFavorites inherit TimelineView's prototype
 StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototype);
-
-
-/**
- * Constructor for a view for inbox timeline
- */
-StatusNet.TimelineViewInbox = function(client) {
-    StatusNet.TimelineView.call(this, client);
-    this.title = "Inbox for {name} on {site}";
-}
-
-// Make StatusNet.TimelineViewInbox inherit TimelineView's prototype
-StatusNet.TimelineViewInbox.prototype = heir(StatusNet.TimelineView.prototype);
-
 
 /**
  * Constructor for a view for search timeline

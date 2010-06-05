@@ -4,6 +4,34 @@
 StatusNet.AtomParser = function() {}
 
 /**
+ * Class method for generating a notice obj from an Direct Message Atom entry
+ *
+ * @param DOM entry the atom entry representing the DM
+ *
+ */
+StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
+
+    var notice = {};
+
+    notice.id = $(entry).find('id');
+    notice.title = $(entry).find('title:eq(1)').text();
+    notice.content = $(entry).find('content').text();
+    notice.author = $(entry).find('author name').text();
+    notice.authorUri = $(entry).find('author uri').text();
+
+    notice.published = $(entry).find('published').text();
+    var updated = $(entry).find('updated').text();
+
+    // knock off the millisecs to make the date string work with humane.js
+    notice.updated = updated.substring(0, 19);
+
+    notice.link = $(entry).find('link[rel=alternate]').attr('href');
+    notice.avatar = $(entry).find('link[rel=image]').attr('href');
+
+    return notice;
+}
+
+/**
  * Class method for generating a notice from an Atom entry
  *
  * @param DOM entry the Atom entry representing the notice

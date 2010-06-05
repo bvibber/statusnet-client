@@ -87,13 +87,17 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
         false
     );
 
-    this.refresh = setInterval(
-        function() {
-            StatusNet.debug("Refreshing visible timeline.");
-            that.timeline.update(null, (that.timeline.timeline_name !== 'user'));
-        },
-        60000
-    );
+    // todo multiple timeline auto-refresh
+
+    if (timeline !== 'user' && timeline !== 'inbox') {
+        this.refresh = setInterval(
+            function() {
+                StatusNet.debug("Refreshing visible timeline.");
+                that.timeline.update(null, true);
+            },
+            60000 // @todo Make this configurable
+        );
+    }
 }
 
 /**
