@@ -87,9 +87,9 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
         false
     );
 
-    // todo multiple timeline auto-refresh
+    // @todo multiple timeline auto-refresh
 
-    if (timeline !== 'user' && timeline !== 'inbox') {
+    if (timeline !== 'user' && timeline !== 'inbox' && timeline !== 'search') {
         this.refresh = setInterval(
             function() {
                 StatusNet.debug("Refreshing visible timeline.");

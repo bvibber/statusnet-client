@@ -47,7 +47,24 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
         }
     });
 
+
+    // XXX: Special case for search Atom entries
+    if (!notice.avatar) {
+        notice.avatar = $(entry).find('link[rel=related]').attr('href');
+    }
+
     notice.id = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('local_id');
+
+    var idRegexp = /(\d)+$/;
+
+    // XXX: Special case for search Atom entries
+    if (!notice.id) {
+        var searchId = $(entry).find('id').text();
+        var result = searchId.match(idRegexp);
+        if (result) {
+            notice.id = result[0];
+        }
+    }
 
     // source client
     notice.source = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('source');
@@ -79,9 +96,8 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.author = $(entry).find('author name').text();
     notice.authorUri = $(entry).find('author uri').text();
 
-    var idRegexp = /(\d)+$/;
 
-    result = notice.authorUri.match(idRegexp);
+    var result = notice.authorUri.match(idRegexp);
     if (result) {
         notice.authorId = result[0];
     }
