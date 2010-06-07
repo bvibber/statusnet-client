@@ -86,7 +86,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
         notice.authorId = result[0];
     }
 
-    notice.link = $(entry).find('author uri').text();
+    notice.link = $(entry).find('link[rel=alternate]:eq(1)').attr('href');
 
     var geoPoint = $(entry).find("[nodeName=georss:point]:first").text();
 

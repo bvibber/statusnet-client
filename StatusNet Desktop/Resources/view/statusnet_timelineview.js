@@ -34,10 +34,10 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     }
 
     html.push('<div class="notice" name="notice-' + notice.id +'">');
-    html.push('   <div class="avatar"><a href="' + notice.link + '"><img src="' + avatar + '"/></a></div>');
-    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.link + '">' + author + '</a><br/>');
+    html.push('   <div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a></div>');
+    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a><br/>');
     html.push('   <div class="content">'+ notice.content +'<br/></div>');
-    html.push('   <small class="date">' + humane_date(notice.updated) + '</small></div>');
+    html.push('   <small class="date"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></small></div>');
     if (notice.contextLink && notice.inReplyToLink) {
         html.push(
             '   <div class="context"><a class="context" href="'
