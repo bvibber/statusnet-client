@@ -21,9 +21,12 @@ StatusNet.TimelineViewInbox.prototype.renderNotice = function(notice) {
     var avatar = notice.avatar;
     var author = notice.author;
 
+    // XXX: Argh! There must be a better way
+    var authorUri = this.client.server + notice.nickname;
+
     html.push('<div class="notice" name="notice-' + notice.id +'">');
-    html.push('   <div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a></div>');
-    html.push('   <div><a class="author" name="author" href="' +  notice.authorUri + '">' + notice.nickname + '</a><br/>');
+    html.push('   <div class="avatar"><a href="' + notice.Uri + '" rel="external"><img src="' + avatar + '"/></a></div>');
+    html.push('   <div><a class="author" name="author" href="' +  authorUri + '">' + notice.nickname + '</a><br/>');
     html.push('   <div class="content">'+ notice.content +'<br/></div>');
     html.push('   <small class="date"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></small></div>');
     html.push('<a href="#" class="notice_reply">Reply</a>');

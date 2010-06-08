@@ -171,17 +171,6 @@ StatusNet.Client.prototype.init = function() {
     $('#search_img').bind('click', function() { that.switchTimeline('search') });
     $('#settings_img').bind('click', function() { StatusNet.showSettings() });
 
-    // until we have private message timelines working
-    var inbox = this.server + this.account.username + '/inbox';
-    $('ul.nav li#nav_timeline_inbox > a').attr('href', inbox);
-
-    // until we have built-in search working
-    var search = this.server + 'search/notice';
-    $('ul.nav li#nav_timeline_search > a').attr('href', search);
-
-    // refresh timeline when window is clicked
-    //$("#content").bind('click', function() { that.refresh(); });
-
     // make links open in an external browser window
     $('a[rel=external]').live('click', function() {
         Titanium.Desktop.openURL($(this).attr('href'));
