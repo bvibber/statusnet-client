@@ -104,7 +104,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
 
     notice.author = $(entry).find('author name').text();
     notice.authorUri = $(entry).find('author uri').text();
-
+    notice.fullname = $(entry).find('[nodeName=poco:displayName]').text();
 
     var result = notice.authorUri.match(idRegexp);
     if (result) {
