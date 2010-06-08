@@ -149,7 +149,7 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
     var author = {};
 
     author.username = $(subject).find('[nodeName=poco:preferredUsername]').text();
-    author.fullname = $(subject).find('title').text();
+    author.fullname = $(subject).find('[nodeName=poco:displayName]').text();
 
     author.link = $(subject).find('id').text();
 
