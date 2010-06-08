@@ -223,7 +223,7 @@ StatusNet.Client.prototype.directMessageDialog = function(nickname) {
         height: 120});
 
     if (nickname) {
-        win.setTitle('New Direct Mssage To: ' + nickname);
+        win.setTitle('New Direct Message To: ' + nickname);
         win.nickname = nickname;
     }
 

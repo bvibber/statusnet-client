@@ -7,6 +7,10 @@ h1 {
 	margin: 0 -20px 8px 0;
 }
 
+#status {
+ 	margin: 10px 0px 10px 5px;
+}
+
 #accountlist-holder {
     background: #ffffff;
     border: solid 1px #f2f2f2;

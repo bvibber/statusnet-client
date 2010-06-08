@@ -25,11 +25,11 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     html.push('<dl class="profile_list">');
 
     html.push('<dt>Name</dt>');
-    html.push('<dd>');
+    html.push('<dd class="name">');
     if (user.fullname) {
-        html.push('full:' + user.fullname);
+        html.push(user.fullname);
     } else {
-        html.push('user:' + user.username);
+        html.push(user.username);
     }
     html.push('</dd>');
 
@@ -56,7 +56,7 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
         html.push('<dl class="profile_statistics">');
         html.push('<dt>Subscribers</dt>');
         html.push('<dd>' + extended.followers_cnt + '</dd>');
-        html.push('<dt>Subcriptions</dt>');
+        html.push('<dt>Subscriptions</dt>');
         html.push('<dd>' + extended.friends_cnt + '</dd>');
         html.push('<dt>Notices</dt>');
         html.push('<dd>' + extended.statuses_cnt + '</dd>');
@@ -66,13 +66,16 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
 
         if (authorId !== null && user.username !== client.account.username) {
 
+            html.push('<div id="profile_action_links"');
+
             if (extended.following == "false") {
-                html.push('<div class="subscription_links"><a href="#" class="profile_subscribe">Subscribe</a></div>');
+                html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
             } else {
-                html.push('<div class="subscription_links"><a href="#" class="profile_unsubscribe">Unsubscribe</a></div>');
+                html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
             }
 
-            html.push(' <a href="#" class="profile_direct_message">Direct Message</a>');
+            html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
+            html.push('</div');
         }
 
     }
