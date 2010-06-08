@@ -22,22 +22,26 @@ StatusNet.DirectMessageView.prototype.init = function() {
         that.send();
     });
 
-    StatusNet.debug("textlimit = " + that.account.textLimit);
+    var textLimit = this.account.textLimit;
 
+    StatusNet.debug("textlimit = " + textLimit);
+
+    // Note: backspace and other whitespace keys don't generate
+    // a keypress event on linux, although they do on OS X.
     $('#counter').html(that.account.textLimit);
-    $('#direct_message_textarea').bind('keypress', function(event) {
+    $('#direct_message_textarea').bind('keydown', function(event) {
         var len = $('#direct_message_textarea').val().length;
 
         // turn char counter red when it goes negative
-        if (that.account.textLimit - len < 0 && that.account.textLimit - len + 1 == 0) {
+        if (textLimit - len < 0 && (textLimit - len) + 1 === 0) {
             $('#counter').addClass('negative');
         }
 
-        if (that.account.textLimit - len > 0 && that.account.textLimit - len - 1 == 0) {
+        if (textLimit - len === 0) {
             $('#counter').removeClass('negative');
         }
 
-        $('#counter').html(that.account.textLimit - len);
+        $('#counter').html(textLimit - len);
     });
 }
 

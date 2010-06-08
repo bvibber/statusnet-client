@@ -31,22 +31,27 @@ StatusNet.NewNoticeView.prototype.init = function() {
         that.postNotice();
     });
 
-    StatusNet.debug("textlimit = " + that.account.textLimit);
+    var textLimit = this.account.textLimit;
 
-    $('#counter').html(that.account.textLimit);
-    $('#notice_textarea').bind('keypress', function(event) {
+    StatusNet.debug("textlimit = " + textLimit);
+
+    $('#counter').html(textLimit);
+
+    // Note: pressing a key doesn't generate a keypress event on
+    // Linux version of Titanium.
+    $('#notice_textarea').bind('keydown', function(event) {
         var len = $('#notice_textarea').val().length;
-
-        // turn char counter red when it goes negative
-        if (that.account.textLimit - len < 0 && that.account.textLimit - len + 1 == 0) {
+ 
+       // turn char counter red when it goes negative
+        if (textLimit - len < 0 && (textLimit - len) + 1 === 0) {
             $('#counter').addClass('negative');
         }
 
-        if (that.account.textLimit - len > 0 && that.account.textLimit - len - 1 == 0) {
+        if (textLimit - len === 0) {
             $('#counter').removeClass('negative');
         }
 
-        $('#counter').html(that.account.textLimit - len);
+        $('#counter').html(textLimit - len);
     });
 }
 
