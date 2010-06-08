@@ -252,9 +252,10 @@ StatusNet.Client.prototype.deleteNotice = function(noticeId) {
             that.timeline.decacheNotice(noticeId);
             that.view.removeNotice(noticeId);
          },
-         function(client, msg) {
-             StatusNet.debug('Could not delete notice: ' + msg);
-             alert('Could not delete notice: ' + msg);
+         function(client, responseText) {
+             var msg = Titanium.JSON.parse(responseText);
+             StatusNet.debug('Error deleting notice: ' + msg.error);
+             alert('Error deleting notice: ' + msg.error);
          }
     );
 }
@@ -289,9 +290,10 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
             $(linkDom).addClass('notice_unfave');
             that.timeline.refreshNotice(noticeId);
         },
-        function(client, msg) {
-            StatusNet.debug('Could not favorite notice: ' + msg);
-            alert('Could not favorite notice: ' + msg);
+        function(client, responseText) {
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error favoriting notice: ' + msg.error);
+            alert('Error favoriting notice: ' + msg.error);
         }
     );
 }
@@ -326,9 +328,10 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
             $(linkDom).addClass('notice_fave');
             that.timeline.refreshNotice(noticeId);
         },
-        function(client, msg) {
-            StatusNet.debug('Could not unfavorite notice: ' + msg);
-            alert('Could not unfavorite notice: ' + msg);
+        function(client, responseText) {
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error unfavoring notice: ' + msg.error);
+            alert('Error unfavoring notice: ' + msg.error);
         }
     );
 }
@@ -359,9 +362,10 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
             $(linkDom).remove();
             that.timeline.refreshNotice(noticeId);
         },
-        function(client, msg) {
-            StatusNet.debug('Could not repeat notice: ' + msg);
-            alert('Could not repeat notice: ' + msg);
+        function(client, responseText) {
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error repeating notice: ' + msg.error);
+            alert('Error repeating notice: ' + msg.error);
         }
     );
 }
@@ -398,9 +402,10 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom)
                 }
             );
         },
-        function(client, msg) {
-            StatusNet.debug('Could not subscribe to profile: ' + msg);
-            alert('Could not subscribe to profile: ' + msg);
+        function(client, responseText) {
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error subscribing to profile: ' + msg.error);
+            alert('Error subscribing to profile: ' + msg.error);
         }
     );
 }
@@ -438,9 +443,10 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom)
                 }
             );
         },
-        function(client, msg) {
-            StatusNet.debug('Could not subscribe to profile: ' + msg);
-            alert('Could not subscribe to profile: ' + msg);
+        function(client, responseText) {
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error unsubscribing from profile: ' + msg.error);
+            alert('Error unsubscribing from profile: ' + msg.error);
         }
     );
 }

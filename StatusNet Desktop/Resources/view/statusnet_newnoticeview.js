@@ -94,9 +94,10 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
             
             me.close();
         },
-        function(client, msg) {
-            StatusNet.debug('Could not post notice: ' + msg);
-            alert('Could not post notice: ' + msg);
+        function(client, responseText) {
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error: ' + msg.error);
+            alert('Error: ' + msg.error);
             me.close();
         }
     );

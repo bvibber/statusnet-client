@@ -69,20 +69,26 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
                 html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
             }
 
-            // XXX: sucks that I have to pass client back in so I can use it here -Z
-            // Hmm... use toggle() instead?
-            $('a.profile_subscribe').bind('click', function(event) {
-                client.subscribe(user.id, this);
-            });
-
-            $('a.profile_unsubscribe').bind('click', function(event) {
-                client.unsubscribe(user.id, this);
-            });
+            html.push(' <a href="#" class="profile_direct_message">Direct Message</a>');
         }
     }
 
     html.push('</div>');
     $('#header').append(html.join(''));
+
+    // XXX: sucks that I have to pass client back in so I can use it here -Z
+    // Hmm... use toggle() instead?
+    $('a.profile_subscribe').bind('click', function(event) {
+        client.subscribe(user.id, this);
+    });
+
+    $('a.profile_unsubscribe').bind('click', function(event) {
+        client.unsubscribe(user.id, this);
+    });
+
+    $('a.profile_direct_message').bind('click', function(event) {
+        client.directMessageDialog(user.username);
+    });
 }
 
 /**

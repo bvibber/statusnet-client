@@ -179,7 +179,8 @@ StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError)
             var json = JSON.parse(this.responseText);
             onSuccess(this.status, json);
         } else {
-            onError(client, 'HTTP status: ' + this.status);
+            StatusNet.debug("ERROR - Received HTTP status code: " + this.status + " - reponse text:" + this.responseText);
+            onError(client, this.responseText);
         }
     };
 

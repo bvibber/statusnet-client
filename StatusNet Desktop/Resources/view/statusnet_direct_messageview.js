@@ -73,9 +73,10 @@ StatusNet.DirectMessageView.prototype.send = function()
             notification.show();
             me.close();
         },
-        function(client, msg) {
-            StatusNet.debug('Could not send direct message: ' + msg);
-            alert('Could not send direct message: ' + msg);
+        function(client, responseText) {
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error: ' + msg.error);
+            alert('Error: ' + msg.error);
             me.close();
         }
     );
