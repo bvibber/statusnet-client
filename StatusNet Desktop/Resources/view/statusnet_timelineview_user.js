@@ -61,7 +61,7 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
         html.push('<dd>' + extended.favorites_cnt + '</dd>');
         html.push('</dl>')
 
-        if (authorId !== null) {
+        if (authorId !== null && user.username !== client.account.username) {
 
             if (extended.following == "false") {
                 html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
