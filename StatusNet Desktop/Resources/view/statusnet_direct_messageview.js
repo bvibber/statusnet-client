@@ -59,6 +59,18 @@ StatusNet.DirectMessageView.prototype.send = function()
         function(status, data) {
             StatusNet.debug(data);
             StatusNet.debug(data.user);
+            
+            var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
+            notification.setTitle("Sent");
+            notification.setMessage("Direct message to " + me.nickname + " sent.");
+
+            notification.setIcon("app://logo.png");
+            notification.setDelay(5000);
+            notification.setCallback(function () {
+                // @todo Bring the app window back to focus / on top
+                 alert("i've been clicked");
+             });
+            notification.show();
             me.close();
         },
         function(client, msg) {

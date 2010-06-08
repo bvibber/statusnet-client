@@ -207,18 +207,6 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
     win.addEventListener(Titanium.CLOSE, function(event) {
         that.view.showHeader();
         that.timeline.update();
-
-        var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
-        notification.setTitle("Notice posted");
-        notification.setMessage("Posted new notice to " + that.account.getHost());
-
-        notification.setIcon("app://logo.png");
-        notification.setDelay(5000);
-        notification.setCallback(function () {
-            // @todo Bring the app window back to focus / on top
-             alert("i've been clicked");
-         });
-         notification.show();
     });
 
     win.open();
@@ -238,23 +226,6 @@ StatusNet.Client.prototype.directMessageDialog = function(nickname) {
         win.setTitle('New Direct Mssage To: ' + nickname);
         win.nickname = nickname;
     }
-
-    var that = this;
-
-    win.addEventListener(Titanium.CLOSE, function(event) {
-
-        var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
-        notification.setTitle("Sent");
-        notification.setMessage("Direct message to " + nickname + " sent.");
-
-        notification.setIcon("app://logo.png");
-        notification.setDelay(5000);
-        notification.setCallback(function () {
-            // @todo Bring the app window back to focus / on top
-             alert("i've been clicked");
-         });
-         notification.show();
-    });
 
     win.open();
 }
