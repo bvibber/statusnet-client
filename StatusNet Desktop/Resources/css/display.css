@@ -31,7 +31,8 @@ body {
 }
 
 a {
-  color:#343434;
+	color:#343434;
+	outline: none;
 }
 
 .rounded {
