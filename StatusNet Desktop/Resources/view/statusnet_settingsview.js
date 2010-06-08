@@ -180,22 +180,25 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                 that.workAcct.avatar = $("user profile_image_url", xml).text();
                 StatusNet.debug(that.workAcct.avatar);
                 $("#new-avatar").attr("src", that.workAcct.avatar);
-                $("#new-save").removeAttr("disabled");
 
                 // get site specific configuration info
-                that.workAcct.fetchUrl('statusnet/config.xml', function(status, xml) {
-                    StatusNet.debug("Loaded statusnet/config.xml");
-                    that.workAcct.textLimit = $(xml).find('config > site > textlimit:first').text();
-                    that.workAcct.siteLogo = $(xml).find('config > site > logo:first').text();
+                that.workAcct.fetchUrl('statusnet/config.xml',
+                    function(status, xml) {
+                        StatusNet.debug("Loaded statusnet/config.xml");
+                        that.workAcct.textLimit = $(xml).find('config > site > textlimit').text();
+                        that.workAcct.siteLogo = $(xml).find('config > site > logo').text();
 
-                    if (!StatusNet.validUrl(that.workAcct.siteLogo)) {
-                        that.workAcct.siteLogo = '';
+                        // Okay, now you can save
+                        $("#new-save").removeAttr("disabled");
+
+                        if (!StatusNet.validUrl(that.workAcct.siteLogo)) {
+                            StatusNet.debug("Coudln't get site logo!");
+                            that.workAcct.siteLogo = '';
+                        }
+                    }, function(status) {
+                        StatusNet.debug("Couldn't load statusnet/config.xml for site.");
                     }
-
-                }, function(status) {
-                    StatusNet.debug("Couldn't load statusnet/config.xml for site.");
-                });
-
+                );
             }, function(status) {
                 $("#new-status").text("Bad nickname or password.");
                 StatusNet.debug("We failed to load account info");
