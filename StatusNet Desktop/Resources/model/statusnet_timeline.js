@@ -4,14 +4,14 @@
  * @param StatusNet.Client       client the controller
  * @param StatusNet.TimelineView view   the view
  */
-StatusNet.Timeline = function(client, view) {
+StatusNet.Timeline = function(client) {
 
     this.client = client;
     this.view = this.client.view;
     this.account = this.client.account;
     this.db = StatusNet.getDB();
 
-    this._notices = new Array();
+    this._notices = [];
 
     StatusNet.debug("StatusNet.Timeline constructor");
 }

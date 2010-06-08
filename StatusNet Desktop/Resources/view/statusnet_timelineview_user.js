@@ -17,7 +17,7 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
 
     $('#profile_info').remove();
 
-    var html = new Array();
+    var html = [];
 
     html.push('<div id="profile_panel">');
     html.push('<h1>@' + user.username + '</h1>');

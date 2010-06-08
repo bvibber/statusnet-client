@@ -8,10 +8,10 @@ StatusNet.Client = function(_account) {
 
     this.account = _account;
 
-    this.init();
-
     this.view = new StatusNet.TimelineViewFriends(this);
     this.timeline =  new StatusNet.TimelineFriends(this);
+
+    this.init();
 
 	this.view.showHeader();
     this.view.show();
