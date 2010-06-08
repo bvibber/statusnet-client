@@ -25,12 +25,12 @@ StatusNet.TimelineViewInbox.prototype.renderNotice = function(notice) {
     var authorUri = this.client.server + notice.nickname;
 
     html.push('<div class="notice" name="notice-' + notice.id +'">');
-    html.push('   <div class="avatar"><a href="' + notice.Uri + '" rel="external"><img src="' + avatar + '"/></a></div>');
-    html.push('   <div><a class="author" name="author" href="' +  authorUri + '">' + notice.nickname + '</a><br/>');
-    html.push('   <div class="content">'+ notice.content +'<br/></div>');
-    html.push('   <small class="date"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></small></div>');
-    html.push('<a href="#" class="notice_reply">Reply</a>');
-    html.push('</div>');
+    html.push('   <div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a></div>');
+    html.push('   <div><a class="author" name="author" href="' +  notice.authorUri + '">' + author + '</a>');
+    html.push('   <div class="content">'+ notice.content +'</div>');
+    html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
+    html.push('<div class="notice_links"><a href="#" class="notice_reply">Reply</a>');
+    html.push('</div></div>');
     html.push('<div class="clear"></div>');
 
     return html.join('');

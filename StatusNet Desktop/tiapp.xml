@@ -13,7 +13,7 @@
 <id>initial</id>
 <title>StatusNet Desktop</title>
 <url>app://index.html</url>
-<width>600</width>
+<width>500</width>
 <max-width>600</max-width>
 <min-width>420</min-width>
 <height>600</height>

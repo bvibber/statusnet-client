@@ -35,16 +35,16 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     html.push('<div class="notice" name="notice-' + notice.id +'">');
     html.push('   <div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a></div>');
-    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a><br/>');
-    html.push('   <div class="content">'+ notice.content +'<br/></div>');
-    html.push('   <small class="date"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></small></div>');
+    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
+    html.push('   <div class="content">'+ notice.content +'</div>');
+    html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
     if (notice.contextLink && notice.inReplyToLink) {
         html.push(
-            '   <div class="context"><a class="context" href="'
-            + notice.contextLink +'">in context</a><br/></div>'
+            '   <div class="context_link"><a href="'
+            + notice.contextLink +'">in context</a></div>'
         );
     }
-    html.push('<a href="#" class="notice_reply">Reply</a>');
+    html.push('<div class="notice_links"><a href="#" class="notice_reply">Reply</a>');
 
     if (notice.favorite === "true") {
         html.push(' <a href="#" class="notice_unfave">Unfave</a>');
@@ -60,7 +60,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
         }
     }
 
-    html.push('</div>');
+    html.push('</div></div>');
     html.push('<div class="clear"></div>');
 
     return html.join('');
@@ -268,7 +268,9 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-    $('#notices').prepend('<img id="spinner" src="/images/icon_processing.gif" />');
+    /* $('#notices').prepend('<img id="spinner" src="/images/icon_processing.gif" />'); */
+
+	$('#notices').prepend('<img id="spinner" src="/images/sam/loading.gif" />');
 }
 
 /**

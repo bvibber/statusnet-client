@@ -20,26 +20,23 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     var html = [];
 
     html.push('<div id="profile_panel">');
-    html.push('<h1>@' + user.username + '</h1>');
     html.push('<img src="' + user.avatarLarge + '"/>');
+    html.push('<h2>@' + user.username + '</h2>');
     html.push('<dl class="profile_list">');
+
     html.push('<dt>Name</dt>');
     html.push('<dd>');
     if (user.fullname) {
-        html.push(user.fullname);
+        html.push('full:' + user.fullname);
     } else {
-        html.push(user.username);
+        html.push('user:' + user.username);
     }
     html.push('</dd>');
 
-    if (user.bio) {
-        html.push('<dt>Bio</dt>');
-        html.push('<dd>' + user.bio + '</dd>');
-    }
 
     if (user.location) {
         html.push('<dt>Location</dt>');
-        html.push('<dd>' + user.location + '</dd>');
+        html.push('<dd class="location">' + user.location + '</dd>');
     }
 
     if (user.homepage) {
@@ -47,30 +44,37 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
         html.push('<dd><a rel="external" href="' + user.homepage + '">' + user.homepage + '</a></dd>');
     }
 
+    if (user.bio) {
+        html.push('<dt>Bio</dt>');
+        html.push('<dd class="bio">' + user.bio + '</dd>');
+    }
+
     html.push('</dl>');
 
     if (extended) {
+
         html.push('<dl class="profile_statistics">');
-        html.push('<dt>Subscriber Count</dt>');
+        html.push('<dt>Subscribers</dt>');
         html.push('<dd>' + extended.followers_cnt + '</dd>');
-        html.push('<dt>Subcribed Count</dt>');
+        html.push('<dt>Subcriptions</dt>');
         html.push('<dd>' + extended.friends_cnt + '</dd>');
-        html.push('<dt>Notices Count</dt>');
+        html.push('<dt>Notices</dt>');
         html.push('<dd>' + extended.statuses_cnt + '</dd>');
-        html.push('<dt>Favorites Count</dt>');
+        html.push('<dt>Favorites</dt>');
         html.push('<dd>' + extended.favorites_cnt + '</dd>');
         html.push('</dl>')
 
         if (authorId !== null && user.username !== client.account.username) {
 
             if (extended.following == "false") {
-                html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
+                html.push('<div class="subscription_links"><a href="#" class="profile_subscribe">Subscribe</a></div>');
             } else {
-                html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
+                html.push('<div class="subscription_links"><a href="#" class="profile_unsubscribe">Unsubscribe</a></div>');
             }
 
             html.push(' <a href="#" class="profile_direct_message">Direct Message</a>');
         }
+
     }
 
     html.push('</div>');
@@ -153,16 +157,16 @@ StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
     }
 
     html.push('<div class="notice" name="notice-' + notice.id +'">');
-    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a><br/>');
-    html.push('   <div class="content">'+ notice.content +'<br/></div>');
-    html.push('   <small class="date"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></small></div>');
+    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
+    html.push('   <div class="content">'+ notice.content +'</div>');
+    html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
     if (notice.contextLink && notice.inReplyToLink) {
         html.push(
-            '   <div class="context"><a class="context" href="'
-            + notice.contextLink +'">in context</a><br/></div>'
+            '   <div class="context_link"><a href="'
+            + notice.contextLink +'">in context</a></div>'
         );
     }
-    html.push('<a href="#" class="notice_reply">Reply</a>');
+    html.push('<div class="notice_links"><a href="#" class="notice_reply">Reply</a>');
 
     if (notice.favorite === "true") {
         html.push(' <a href="#" class="notice_unfave">Unfave</a>');
@@ -178,7 +182,7 @@ StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
         }
     }
 
-    html.push('</div>');
+    html.push('</div></div>');
     html.push('<div class="clear"></div>');
 
     return html.join('');
