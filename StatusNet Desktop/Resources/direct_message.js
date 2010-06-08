@@ -1,24 +1,10 @@
 $LAB
     .script("statusnet.js").wait()
     .script("model/statusnet_account.js")
-    .script("view/statusnet_newnoticeview.js")
+    .script("view/statusnet_direct_messageview.js")
     .wait(function() {
     $(function() {
-        var nnv = new StatusNet.NewNoticeView();
-        nnv.init();
+        var dmv = new StatusNet.DirectMessageView();
+        dmv.init();
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-

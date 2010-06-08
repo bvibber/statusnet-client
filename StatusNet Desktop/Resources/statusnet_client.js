@@ -224,6 +224,41 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
 }
 
 /**
+ * Show direct message input dialog
+ */
+StatusNet.Client.prototype.directMessageDialog = function(nickname) {
+    var win = Titanium.UI.getCurrentWindow().createWindow({
+        url: 'app:///direct_message.html',
+        title: 'New Direct Message',
+        width: 420,
+        height: 120});
+
+    if (nickname) {
+        win.setTitle('New Direct Mssage To: ' + nickname);
+        win.nickname = nickname;
+    }
+
+    var that = this;
+
+    win.addEventListener(Titanium.CLOSE, function(event) {
+
+        var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
+        notification.setTitle("Sent");
+        notification.setMessage("Direct message to " + nickname + " sent.");
+
+        notification.setIcon("app://logo.png");
+        notification.setDelay(5000);
+        notification.setCallback(function () {
+            // @todo Bring the app window back to focus / on top
+             alert("i've been clicked");
+         });
+         notification.show();
+    });
+
+    win.open();
+}
+
+/**
  * Delete a notice from the timeline
  *
  * @param int noticeId  the ID of the notice to delete

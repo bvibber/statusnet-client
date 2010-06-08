@@ -22,8 +22,8 @@ StatusNet.TimelineViewInbox.prototype.renderNotice = function(notice) {
     var author = notice.author;
 
     html.push('<div class="notice" name="notice-' + notice.id +'">');
-    html.push('   <div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a></div>');
-    html.push('   <div><a class="author" name="author" href="' +  notice.authorUri + '">' + author + '</a><br/>');
+    html.push('   <div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a></div>');
+    html.push('   <div><a class="author" name="author" href="' +  notice.authorUri + '">' + notice.nickname + '</a><br/>');
     html.push('   <div class="content">'+ notice.content +'<br/></div>');
     html.push('   <small class="date"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></small></div>');
     html.push('<a href="#" class="notice_reply">Reply</a>');
@@ -40,9 +40,9 @@ StatusNet.TimelineViewInbox.prototype.enableNoticeControls = function(noticeDom)
 
     var that = this;
 
-    // Reply
+    // Direct message reply
     $(noticeDom).find('a.notice_reply').bind('click', function(event) {
-        alert("Direct Message");
+        that.client.directMessageDialog(noticeAuthor);
     });
 
 }

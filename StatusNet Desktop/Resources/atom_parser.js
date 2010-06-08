@@ -14,7 +14,16 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
     var notice = {};
 
     notice.id = $(entry).find('id');
-    notice.title = $(entry).find('title:eq(1)').text();
+    notice.title = $(entry).find('title').text();
+
+    // XXX: This is horrible, but until we improve the feed, this is the best
+    // handle to the author's nick we have
+    var result = notice.title.substr(12).match(/\w+\b/);
+
+    if (result) {
+        notice.nickname = result[0];
+    }
+
     notice.content = $(entry).find('content').text();
     notice.author = $(entry).find('author name').text();
     notice.authorUri = $(entry).find('author uri').text();
