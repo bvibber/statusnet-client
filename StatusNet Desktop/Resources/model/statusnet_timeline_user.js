@@ -49,6 +49,8 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
 
 StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) {
 
+    this.client.view.showSpinner();
+
     var url = null;
 
     if (authorId === null) {
@@ -72,9 +74,13 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
             extended.following = $(data).find('following').text();
             extended.notifications = $(data).find('notifications').text();
             that.extended = extended;
+
+            that.client.view.hideSpinner();
+
             if (onFinish) {
                 onFinish(that.user, extended, that.client, authorId);
             }
+
         },
         function(client, msg) {
             StatusNet.debug('Could not get extended user info: ' + msg);
@@ -129,6 +135,8 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, notify) {
 StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
 
     StatusNet.debug("TimelineUser.update() - notifications = " + notifications);
+
+    this.client.view.showSpinner();
 
     var that = this;
 
