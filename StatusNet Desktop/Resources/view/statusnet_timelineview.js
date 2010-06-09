@@ -40,6 +40,10 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     }
 
     if (notice.repeated === "true") {
+        classes.push('notice-repeated');
+    }
+
+    if (notice.repeat_of) {
         classes.push('notice-repeat');
     }
 
