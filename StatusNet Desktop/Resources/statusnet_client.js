@@ -372,6 +372,7 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
             StatusNet.debug(data);
             $(linkDom).remove();
             that.timeline.refreshNotice(noticeId);
+            that.timeline.update();
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
