@@ -159,7 +159,18 @@ StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
         authorId = notice.authorId
     }
 
-    html.push('<div class="notice" name="notice-' + notice.id +'">');
+    var classes = ['notice'];
+
+    if (notice.favorite === "true") {
+        classes.push('notice-favorite');
+    }
+
+    if (notice.repeated === "true") {
+        classes.push('notice-repeat');
+    }
+
+    html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
+
     html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
     html.push('   <div class="content">'+ notice.content +'</div>');
     html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');

@@ -241,6 +241,8 @@ StatusNet.Client.prototype.deleteNotice = function(noticeId) {
 
     StatusNet.debug("StatusNet.Client.deleteNotice()");
 
+    $(linkDom).attr('disabled', 'disabled');
+
     var params = "gar=gar"; // XXX: we have to pass something to get web client to work
 
     var that = this;
@@ -253,6 +255,7 @@ StatusNet.Client.prototype.deleteNotice = function(noticeId) {
             that.view.removeNotice(noticeId);
          },
          function(client, responseText) {
+             $(linkDom).removeAttr('disabled');
              var msg = Titanium.JSON.parse(responseText);
              StatusNet.debug('Error deleting notice: ' + msg.error);
              alert('Error deleting notice: ' + msg.error);
@@ -277,6 +280,8 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
 
     StatusNet.debug("StatusNet.Client.faveNotice() - faving notice " + noticeId);
 
+    $(linkDom).attr('disabled', 'disabled');
+
     var params = "gar=gar"; // XXX: we have to pass something to get web client to work
 
     var that = this;
@@ -291,6 +296,7 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
             that.timeline.refreshNotice(noticeId);
         },
         function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
             var msg = Titanium.JSON.parse(responseText);
             StatusNet.debug('Error favoriting notice: ' + msg.error);
             alert('Error favoriting notice: ' + msg.error);
@@ -315,6 +321,8 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
 
     StatusNet.debug("StatusNet.Client.unFaveNotice() - unfaving notice " + noticeId);
 
+    $(linkDom).attr('disabled', 'disabled');
+
     var params = "gar=gar"; // XXX: we have to pass something to get web client to work
 
     var that = this;
@@ -329,6 +337,7 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
             that.timeline.refreshNotice(noticeId);
         },
         function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
             var msg = Titanium.JSON.parse(responseText);
             StatusNet.debug('Error unfavoring notice: ' + msg.error);
             alert('Error unfavoring notice: ' + msg.error);
@@ -349,6 +358,8 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
 {
     var url = 'statuses/retweet/' + noticeId + '.json';
 
+    $(linkDom).attr('disabled', 'disabled');
+
     StatusNet.debug("StatusNet.Client.repeatNotice() - repeating notice " + noticeId);
 
     var params = "gar=gar"; // XXX: we have to pass something to get web client to work
@@ -363,6 +374,7 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
             that.timeline.refreshNotice(noticeId);
         },
         function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
             var msg = Titanium.JSON.parse(responseText);
             StatusNet.debug('Error repeating notice: ' + msg.error);
             alert('Error repeating notice: ' + msg.error);
@@ -381,6 +393,8 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
 StatusNet.Client.prototype.subscribe = function(profileId, linkDom)
 {
     var url = 'friendships/create/' + profileId + '.json';
+
+    $(linkDom).attr('disabled', 'disabled');
 
     StatusNet.debug("StatusNet.Client.subscribe() - subscribing to " + profileId);
 
@@ -403,6 +417,7 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom)
             );
         },
         function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
             var msg = Titanium.JSON.parse(responseText);
             StatusNet.debug('Error subscribing to profile: ' + msg.error);
             alert('Error subscribing to profile: ' + msg.error);
@@ -422,6 +437,8 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom)
 StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom)
 {
     var url = 'friendships/destroy/' + profileId + '.json';
+
+    $(linkDom).attr('disabled', 'disabled');
 
     StatusNet.debug("StatusNet.Client.unsubscribe() - unsubscribing from " + profileId);
 
@@ -444,6 +461,7 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom)
             );
         },
         function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
             var msg = Titanium.JSON.parse(responseText);
             StatusNet.debug('Error unsubscribing from profile: ' + msg.error);
             alert('Error unsubscribing from profile: ' + msg.error);

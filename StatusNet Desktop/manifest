@@ -1,7 +1,7 @@
 #appname:StatusNet Desktop
 #appid:net.status.desktop.client
 #publisher:StatusNet, Inc.
-#image:logo-256.png
+#image:logo.png
 #url:http://status.net
 #guid:2eab0839-4028-46f9-9058-701930d85558
 #desc:StatusNet Desktop Client
@@ -24,3 +24,7 @@ tinetwork:1.0.0
 timedia:1.0.0
 tidatabase:1.0.0
 timonkey:1.0.0
+tinetwork:1.0.0
+tinotification:1.0.0
+tiprocess:1.0.0
+tiworker:1.0.0
