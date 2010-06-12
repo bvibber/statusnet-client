@@ -55,13 +55,18 @@ StatusNet.SettingsView.prototype.hideAddAccount = function() {
  * @fixme really should separate this a bit more to model/view?
  */
 StatusNet.SettingsView.prototype.showAccounts = function() {
+
+    var me = Titanium.UI.getCurrentWindow();
+
     if (this.accounts.length == 0) {
         $("#status").text("No accounts set up -- time to add one!");
         this.showAddAccount();
+        me.setCloseable(false);
     } else {
         for (var i = 0; i < this.accounts.length; i++) {
             this.showAccountRow(this.accounts[i]);
         }
+        me.setCloseable(true);
     }
 }
 

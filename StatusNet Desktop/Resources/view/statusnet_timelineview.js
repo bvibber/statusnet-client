@@ -4,9 +4,41 @@
  * @param StatusNet.Client client  The controller
  */
 StatusNet.TimelineView = function(client) {
-    StatusNet.debug("in StatusNet.TimelineView");
     this.client = client;
+
+    // XXX: Woah, it doesn't work to pass the timeline into the constructor!
+    this.timeline = client.getActiveTimeline();
+
     this.title = "Timeline on {site}";
+
+    var that = this;
+
+    // Attach event listeners
+
+    this.timeline.updateStart.attach(
+        function() {
+            that.showSpinner();
+        }
+    );
+
+    this.timeline.updateFinished.attach(
+        function() {
+            that.hideSpinner();
+        }
+    );
+
+    this.timeline.noticeAdded.attach(
+        function(args) {
+            if (args) {
+                that.showNewNotice(args.notice);
+                if (args.showNotification) {
+                    that.showNotification(args.notice);
+                }
+            } else {
+                StatusNet.debug("noticeAdded event with no args!");
+            }
+        }
+    );
 }
 
 /**
@@ -17,21 +49,9 @@ StatusNet.TimelineView = function(client) {
 StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     var html = [];
-
-    var avatar = null;
-    var author = null;
-
-    // Special case for user timelines, which don't have an avatar
-    // and author on each notice Atom entry
-    if (this.client.timeline.user) {
-        avatar = this.client.timeline.user.avatarMedium;
-        author = this.client.timeline.user.username;
-        authorId = this.client.timeline.user.id;
-    } else {
-        avatar = notice.avatar;
-        author = notice.author;
-        authorId = notice.authorId
-    }
+    var avatar = notice.avatar;
+    var author = notice.author;
+    var authorId = notice.authorId
 
     var classes = ['notice'];
 
@@ -55,7 +75,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
     if (notice.contextLink && notice.inReplyToLink) {
         html.push(
-            '   <div class="context_link"><a href="'
+            '   <div class="context_link"><a rel="external" href="'
             + notice.contextLink +'">in context</a></div>'
         );
     }
@@ -85,16 +105,19 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
  * Render the HTML display of a given timeline
  *
  */
-StatusNet.TimelineView.prototype.show = function () {
+StatusNet.TimelineView.prototype.show = function (notices) {
 
-    StatusNet.debug("TimelineView.show - timeline = " + this.client.timeline.timeline_name);
+    StatusNet.debug("StatusNet.TimelineView.show() - getting notices");
 
-    var notices = this.client.timeline.getNotices();
+    var notices = this.timeline.getNotices();
+
+    StatusNet.debug("got notices");
 
     $('#notices').empty();
 
     if (notices.length > 0) {
 
+        StatusNet.debug("showing notice");
         var html = [];
 
         for (i = 0; i < notices.length; i++) {
@@ -105,6 +128,8 @@ StatusNet.TimelineView.prototype.show = function () {
 
         var that = this;
 
+        StatusNet.debug("enabling notice controls");
+
         $('#notices div.notice').each(function() {
             that.enableNoticeControls(this);
         });
@@ -112,6 +137,8 @@ StatusNet.TimelineView.prototype.show = function () {
     }
 
     $('.notice a').attr('rel', 'external');
+
+    StatusNet.debug("StatusNet.TimelineView.show() - finished showing notices");
 }
 
 StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
@@ -123,14 +150,14 @@ StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     $('#notices > div.notice:first').fadeIn("slow");
 }
 
-StatusNet.TimelineView.prototype.showNotification = function(notice) {
+StatusNet.TimelineView.prototype.showNotification = function(notice, user) {
 
     var author = null;
 
     // Special case for user timelines, which don't have an avatar
     // and author on each notice Atom entry
-    if (this.client.timeline.user) {
-        author = this.client.timeline.user.username;
+    if (user) {
+        author = user.username;
     } else {
         author = notice.author;
     }
@@ -178,6 +205,7 @@ StatusNet.TimelineView.prototype.localAuthor = function(uri) {
 }
 
 StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
+
     var name = $(noticeDom).attr('name');
     var noticeId = name.substring(7); // notice-
 
@@ -214,7 +242,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     $(noticeDom).find('a.notice_delete').bind('click', function(event) {
         var r = confirm("Delete notice?");
         if (r) {
-            that.client.deleteNotice(noticeId);
+            that.client.deleteNotice(noticeId, this);
         }
     });
 
@@ -274,8 +302,10 @@ StatusNet.TimelineView.prototype.removeNotice = function(noticeId) {
 StatusNet.TimelineView.prototype.showHeader = function () {
     var title = this.title.replace("{name}", this.client.account.username)
                            .replace("{site}", this.client.account.getHost());
+    StatusNet.debug("StatusNet.TimelineView.showHeader() - title = " + title);
     $("#header").html("<h1></h1>");
     $("#header h1").text(title);
+    StatusNet.debug("StatusNet.TimelineView.showHeader() - finished");
 }
 
 /**
@@ -313,7 +343,7 @@ StatusNet.TimelineViewFriends.prototype = heir(StatusNet.TimelineView.prototype)
  */
 StatusNet.TimelineViewMentions = function(client) {
     StatusNet.TimelineView.call(this, client);
-    this.title = "{name} and friends on {site}";
+    this.title = "Replies to {name} on {site}";
 }
 
 // Make StatusNet.TimelineViewMentions inherit TimelineView's prototype

@@ -192,9 +192,5 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
         }
     });
 
-    StatusNet.debug(author.username + " small avatar: " + author.avatarSmall);
-    StatusNet.debug(author.username + " medium avatar: " + author.avatarMedium);
-    StatusNet.debug(author.username + " large avatar: " + author.avatarLarge);
-
     return author;
 }

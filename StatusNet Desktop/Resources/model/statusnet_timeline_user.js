@@ -98,13 +98,13 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
  * We may need a special cache facility just for user atom
  * entries. --Z
  *
- * @param DOM     entry    the Atom entry form of the notice
- * @param boolean prepend  whether to add it to the beginning of end of
- *                         the timeline's notices array
- * @param boolean notify   whether to show a system notification
+ * @param DOM     entry             the Atom entry form of the notice
+ * @param boolean prepend           whether to add it to the beginning of end of
+ *                                  the timeline's notices array
+ * @param boolean showNotification  whether to show a system notification
  *
  */
-StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, notify) {
+StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, showNotification) {
 
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 
@@ -118,14 +118,11 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, notify) {
 
     if (prepend) {
         this._notices.unshift(notice);
-        this.client.view.showNewNotice(notice);
+        this.noticeAdded.notify({notice: notice, showNotification: showNotification});
     } else {
         this._notices.push(notice);
     }
 
-    if (notify) {
-        this.client.view.showNotification(notice);
-    }
 }
 
 /**
@@ -136,7 +133,7 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
 
     StatusNet.debug("TimelineUser.update() - notifications = " + notifications);
 
-    this.client.view.showSpinner();
+    this.updateStart.notify();
 
     var that = this;
 
@@ -170,6 +167,8 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
             if (entries.length > 0 && notifications) {
                 that.client.newNoticesSound.play();
             }
+
+            that.updateFinished.notify();
 
             // use events instead? Observer?
             if (onFinish) {

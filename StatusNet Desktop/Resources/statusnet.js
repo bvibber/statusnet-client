@@ -127,7 +127,7 @@ function heir(p) {
  */
 StatusNet.validUrl = function(url) {
     var regexp = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
-    return regexp.test(s);
+    return regexp.test(url);
 }
 
 /**
@@ -147,4 +147,25 @@ $.fn.selectRange = function(start, end) {
             range.select();
         }
     });
+}
+
+StatusNet.Event = function(sender) {
+    StatusNet.debug("registering new event");
+    this._sender = sender;
+    StatusNet.debug("sender = " + sender);
+    this._listeners = [];
+}
+
+StatusNet.Event.prototype.attach = function(listener) {
+    StatusNet.debug("Attaching event listener");
+    this._listeners.push(listener);
+}
+
+StatusNet.Event.prototype.notify = function(args) {
+    if (args) {
+        StatusNet.debug("Notify called with arg: " + Titanium.JSON.stringify(args));
+    }
+    for (var i = 0; i < this._listeners.length; i++) {
+        this._listeners[i].call(this._sender, args);
+    }
 }

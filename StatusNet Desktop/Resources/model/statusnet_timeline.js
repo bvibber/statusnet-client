@@ -7,13 +7,15 @@
 StatusNet.Timeline = function(client) {
 
     this.client = client;
-    this.view = this.client.view;
     this.account = this.client.account;
     this.db = StatusNet.getDB();
 
     this._notices = [];
 
-    StatusNet.debug("StatusNet.Timeline constructor");
+    this.noticeAdded = new StatusNet.Event(this);
+    this.updateStart = new StatusNet.Event(this);
+    this.updateFinished = new StatusNet.Event(this);
+
 }
 
 /**
@@ -74,7 +76,8 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
 
     StatusNet.debug('Timeline.refreshNotice() - refreshing notice ' + noticeId);
 
-    var noticeUrl = this._url + '?max_id=' + noticeId + '&count=1';
+    // XXX: For now, always take this from the public timeline
+    var noticeUrl = 'statuses/friends_timeline.atom' + '?max_id=' + noticeId + '&count=1';
 
     var that = this;
 
@@ -101,12 +104,12 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  * Add a notice to the Timeline if it's not already in it. Also
  * adds it to the notice cache.
  *
- * @param DOM     entry    the Atom entry form of the notice
- * @param boolean prepend  whether to add it to the beginning of end of
- * @param boolean notify   whether to show a system notification
+ * @param DOM     entry              the Atom entry form of the notice
+ * @param boolean prepend            whether to add it to the beginning of end of
+ * @param boolean showNotification   whether to show a system notification
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notify) {
+StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotification) {
 
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 
@@ -123,16 +126,17 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notify) {
         this.encacheNotice(notice.id, entry);
     }
 
+    StatusNet.debug("addNotice - finished encaching notice")
+
     if (prepend) {
         this._notices.unshift(notice);
-        this.client.view.showNewNotice(notice);
+        this.noticeAdded.notify({notice: notice, showNotification: showNotification});
+        StatusNet.debug("StatusNet.Timeline.addNotice - finished prepending notice");
     } else {
         this._notices.push(notice);
     }
 
-    if (notify) {
-        this.client.view.showNotification(notice);
-    }
+
 }
 
 /**
@@ -141,17 +145,17 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notify) {
  */
 StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
 
-    StatusNet.debug("udpate() onFinish = " + onFinish + " notifications = " + notifications);
+    StatusNet.debug("update() onFinish = " + onFinish + " notifications = " + notifications);
 
-    this.client.view.showSpinner();
+    this.updateStart.notify();
+
+    StatusNet.debug("Notified view that we're doing an update");
 
     var that = this;
 
     this.account.fetchUrl(this.getUrl(),
 
         function(status, data) {
-
-            that.client.view.hideSpinner();
 
             StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
@@ -173,7 +177,8 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
                 that.client.newNoticesSound.play();
             }
 
-            // use events instead? Observer?
+            that.updateFinished.notify();
+
             if (onFinish) {
                 onFinish();
             }
@@ -224,8 +229,6 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
     if (this._notices.length === 0) {
         $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
     }
-
-    this.client.view.hideSpinner();
 }
 
 /**

@@ -61,6 +61,7 @@ StatusNet.TimelineSearch.prototype.storeQuery = function(q) {
 StatusNet.TimelineSearch.prototype.updateSearch = function(q) {
     this.storeQuery(q);
     that = this;
+
     this.update(function() {
         that.client.view.showHeader();
         that.client.view.show();
@@ -74,20 +75,19 @@ StatusNet.TimelineSearch.prototype.updateSearch = function(q) {
  */
 StatusNet.TimelineSearch.prototype.update = function(onFinish) {
     this._notices = [];
-    
+
     StatusNet.debug("TimelineSearch.update()");
-    
+
     if (this.searchTerm() == '') {
-        // nothing to search for!   
+        // nothing to search for!
         this.finishedFetch()
     } else {
         StatusNet.Timeline.prototype.update.call(this);
     }
-    
+
     if (onFinish) {
         onFinish();
     }
-    
 }
 
 /**

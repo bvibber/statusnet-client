@@ -2,9 +2,10 @@
  * Constructor for friends timeline model
  */
 StatusNet.TimelineFriends = function(client) {
+
     StatusNet.Timeline.call(this, client);
 
-	this.timeline_name = 'friends_timeline';
+    this.timeline_name = 'friends_timeline';
 
     // set window title here?
 

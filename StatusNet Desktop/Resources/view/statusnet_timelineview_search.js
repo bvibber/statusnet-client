@@ -25,10 +25,11 @@ StatusNet.TimelineViewSearch.prototype.showHeader = function () {
                         '<label for="search">Search:</label> ' +
                         '<input id="search">' +
                         '</div>');
-    var timeline = this.client.timeline;
+    var timeline = this.client.getActiveTimeline();
     var q = timeline.searchTerm();
-    $("#search").val(q)
-                .change(function() {
-        timeline.updateSearch($(this).val());
-    });
+    $("#search").val(q).change(
+        function() {
+            timeline.updateSearch($(this).val());
+        }
+    );
 }

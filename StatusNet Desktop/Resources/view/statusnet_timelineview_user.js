@@ -144,17 +144,13 @@ StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
 
     var html = [];
 
-    var avatar = null;
     var author = null;
 
-    // Special case for user timelines, which don't have an avatar
-    // and author on each notice Atom entry
-    if (this.client.timeline.user) {
-        avatar = this.client.timeline.user.avatarMedium;
+    // Special case for user timelines, which don't have an author on each notice Atom entry
+    if (!notice.author) {
         author = this.client.timeline.user.username;
-        authorId = this.client.timeline.user.id;
+        authorId =  this.client.timeline.user.id;
     } else {
-        avatar = notice.avatar;
         author = notice.author;
         authorId = notice.authorId
     }
@@ -180,7 +176,7 @@ StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
     html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
     if (notice.contextLink && notice.inReplyToLink) {
         html.push(
-            '   <div class="context_link"><a href="'
+            '   <div class="context_link"><a rel="external" href="'
             + notice.contextLink +'">in context</a></div>'
         );
     }

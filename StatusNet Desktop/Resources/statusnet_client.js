@@ -8,13 +8,17 @@ StatusNet.Client = function(_account) {
 
     this.account = _account;
 
-    this.view = new StatusNet.TimelineViewFriends(this);
     this.timeline =  new StatusNet.TimelineFriends(this);
+    this.view = new StatusNet.TimelineViewFriends(this);
 
     this.init();
 
 	this.view.showHeader();
     this.view.show();
+
+    StatusNet.debug("Finished showing timeline");
+
+
     this.timeline.update();
 
     var that = this;
@@ -28,6 +32,19 @@ StatusNet.Client = function(_account) {
         },
         60000
     );
+
+}
+
+StatusNet.Client.prototype.getActiveTimeline = function() {
+    if (this.timeline) {
+        return this.timeline;
+    } else {
+        StatusNet.debug("Client.getActiveTimeline() - null timeline, help!");
+    }
+}
+
+StatusNet.Client.prototype.getServer = function() {
+    return this.server;
 }
 
 /**
@@ -42,32 +59,32 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     switch (timeline) {
 
         case 'public':
-            this.view = new StatusNet.TimelineViewPublic(this);
             this.timeline = new StatusNet.TimelinePublic(this);
+            this.view = new StatusNet.TimelineViewPublic(this);
             break;
         case 'user':
-            this.view = new StatusNet.TimelineViewUser(this);
             this.timeline = new StatusNet.TimelineUser(this, null);
+            this.view = new StatusNet.TimelineViewUser(this);
             break;
         case "friends":
-            this.view = new StatusNet.TimelineViewFriends(this);
             this.timeline = new StatusNet.TimelineFriends(this);
+            this.view = new StatusNet.TimelineViewFriends(this);
             break;
         case 'mentions':
-            this.view = new StatusNet.TimelineViewMentions(this);
             this.timeline = new StatusNet.TimelineMentions(this);
+            this.view = new StatusNet.TimelineViewMentions(this);
             break;
         case 'favorites':
-            this.view = new StatusNet.TimelineViewFavorites(this);
             this.timeline = new StatusNet.TimelineFavorites(this);
+            this.view = new StatusNet.TimelineViewFavorites(this);
             break;
         case 'inbox':
-            this.view = new StatusNet.TimelineViewInbox(this);
             this.timeline = new StatusNet.TimelineInbox(this);
+            this.view = new StatusNet.TimelineViewInbox(this);
             break;
         case 'search':
-            this.view = new StatusNet.TimelineViewSearch(this);
             this.timeline = new StatusNet.TimelineSearch(this);
+            this.view = new StatusNet.TimelineViewSearch(this);
             break;
         default:
             throw new Exception("Gah wrong timeline");
@@ -139,13 +156,6 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
 }
 
 /**
- * Reload timeline notices
- */
-StatusNet.Client.prototype.refresh = function() {
-    this.timeline.update();
-}
-
-/**
  * General initialization stuff
  */
 StatusNet.Client.prototype.init = function() {
@@ -162,14 +172,14 @@ StatusNet.Client.prototype.init = function() {
 
     // Add event handlers for buttons
 
-    $('#public_img').bind('click', function() { that.switchTimeline('public') });
-    $('#friends_img').bind('click', function() { that.switchTimeline('friends') });
-    $('#user_img').bind('click', function() { that.switchTimeline('user') });
-    $('#mentions_img').bind('click', function() { that.switchTimeline('mentions') });
-    $('#favorites_img').bind('click', function() { that.switchTimeline('favorites') });
-    $('#inbox_img').bind('click', function() { that.switchTimeline('inbox') });
-    $('#search_img').bind('click', function() { that.switchTimeline('search') });
-    $('#settings_img').bind('click', function() { StatusNet.showSettings() });
+    $('#public_img').bind('click', function() { that.switchTimeline('public'); });
+    $('#friends_img').bind('click', function() { that.switchTimeline('friends'); });
+    $('#user_img').bind('click', function() { that.switchTimeline('user'); });
+    $('#mentions_img').bind('click', function() { that.switchTimeline('mentions'); });
+    $('#favorites_img').bind('click', function() { that.switchTimeline('favorites'); });
+    $('#inbox_img').bind('click', function() { that.switchTimeline('inbox'); });
+    $('#search_img').bind('click', function() { that.switchTimeline('search'); });
+    $('#settings_img').bind('click', function() { StatusNet.showSettings(); });
 
     // make links open in an external browser window
     $('a[rel=external]').live('click', function() {
@@ -177,7 +187,9 @@ StatusNet.Client.prototype.init = function() {
         return false;
     });
 
-    $('#new_notice').click(function() { that.newNoticeDialog(); });
+    // XXX: Woah, make sure the href in the HTML link has a # in it, or Titanium goes nutso
+    // and adds additional event handlers! (last one from above?)
+    $('a#new_notice').bind('click', function() { that.newNoticeDialog(); });
 
     // setup sounds
     this.newNoticesSound = Titanium.Media.createSound('app://sounds/kalimba.wav');
@@ -235,11 +247,11 @@ StatusNet.Client.prototype.directMessageDialog = function(nickname) {
  *
  * @param int noticeId  the ID of the notice to delete
  */
-StatusNet.Client.prototype.deleteNotice = function(noticeId) {
+StatusNet.Client.prototype.deleteNotice = function(noticeId, linkDom) {
 
     var url = 'statuses/destroy/' + noticeId + '.json';
 
-    StatusNet.debug("StatusNet.Client.deleteNotice()");
+    StatusNet.debug("StatusNet.Client.deleteNotice() - deleting notice " + noticeId);
 
     $(linkDom).attr('disabled', 'disabled');
 
