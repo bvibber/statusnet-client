@@ -21,7 +21,14 @@ StatusNet.RSD.discover = function(url, onSuccess, onError) {
                 var responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
             } else {
                 // Is implemented in Titanium Mobile 1.3, whereas the above doesn't work there.
-                var responseXML = this.responseXML;
+                if (this.responseXML == null) {
+                    // Titanium Mobile 1.3/Android doesn't implement responseXML,
+                    // and 'new DOMParser()' doesn't work like on Desktop 1.2.
+                    var responseXML = Titanium.XML.parseString(this.responseText);
+                } else {
+                    // Actually works on Titanium Mobile 1.3/iPhone
+                    var responseXML = this.responseXML;
+                }
             }
 
             onSuccess(this.status, responseXML);
@@ -61,6 +68,7 @@ StatusNet.RSD.discoverTwitterApi = function(url, onSuccess, onError) {
         //
         //var apiroot = $("api[name='Twitter']", xml).attr("apiLink");
 
+        StatusNet.debug("... xml: " + xml);
         var apis = xml.getElementsByTagName('api');
         StatusNet.debug('RSD api elements: ' + apis);
         StatusNet.debug('RSD api elements length: ' + apis.length);

@@ -72,10 +72,12 @@ StatusNet.SettingsView.prototype.init = function(client) {
  * Open the add-new-account modal dialog
  */
 StatusNet.SettingsView.prototype.showAddAccount = function() {
+    var android = (Titanium.Platform.osname == "android");
+
     var view = this;
     var window = Titanium.UI.createWindow({
         title: "Add Account",
-        backgroundColor: "#bbbfcc",
+        backgroundColor: android ? "black" : "#bbbfcc",
         layout: 'vertical'
     });
 
@@ -83,61 +85,73 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         title: "Cancel"
     });
     cancel.addEventListener('click', function() {
+        StatusNet.debug('clicked cancel');
         window.close();
         this.fields = null;
     });
-    window.setLeftNavButton(cancel);
 
     var save = Titanium.UI.createButton({
-        title: "Save"
+        title: "Save",
+        width: 'auto',
+        height: 'auto'
     });
     save.addEventListener('click', function() {
+        StatusNet.debug('clicked save');
         view.updateNewAccount();
         StatusNet.debug('save click: updated');
-        view.saveNewAccount();
-        StatusNet.debug('save click: saved');
-        window.close();
-        StatusNet.debug('hide: closed');
-        view.fields = null;
-        StatusNet.debug('hide: killed fields');
+        if (view.workAcct != null) {
+            // @fixme separate the 'update state' and 'save' actions better
+            view.saveNewAccount();
+            StatusNet.debug('save click: saved');
+            window.close();
+            StatusNet.debug('hide: closed');
+            view.fields = null;
+            StatusNet.debug('hide: killed fields');
+        }
     });
-    window.setRightNavButton(save);
+    if (android) {
+        // Android has no navigation area on tab header
+        var label = Titanium.UI.createLabel({
+            text: "Add Account",
+            width: 'auto',
+            height: 'auto',
+            font: {fontSize: '30'}
+        });
+        window.add(label);
+        // Add the buttons at the bottom.
+    } else {
+        window.setLeftNavButton(cancel);
+        window.setRightNavButton(save);
+    }
 
     this.fields = {};
-    var fields = {site: {label: "Site", props: {
-                    hintText: "identi.ca",
+    var fields = {site: {props: {
+                    hintText: "Server",
                     returnKeyType:Titanium.UI.RETURNKEY_NEXT,
                     keyboardType: Titanium.UI.KEYBOARD_URL,
                     autocorrect: false
                   }},
-                  username: {label: "Nickname", props: {
-                    hintText: "mycoolname",
+                  username: {props: {
+                    hintText: "Username",
                     returnKeyType:Titanium.UI.RETURNKEY_NEXT,
                     autocorrect: false
                   }},
-                  password: {label: "Password", props: {
-                    hintText: "Required",
+                  password: {props: {
+                    hintText: "Password",
                     passwordMask:true,
                     returnKeyType:Titanium.UI.RETURNKEY_DONE
                   }}};
     for (var i in fields) {
-        var label = Titanium.UI.createLabel({
-            text: fields[i].label,
-            left: 8,
-            right: 8,
-            height: 30
-        });
         var props = {
             left: 8,
             right: 8,
-            height: 30,
+            height: 'auto',
             borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED
         };
         for (var j in fields[i].props) {
             props[j] = fields[i].props[j];
         }
         var text = Titanium.UI.createTextField(props);
-        window.add(label);
         window.add(text);
 
         this.fields[i] = text;
@@ -153,12 +167,24 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     });
 
     this.fields.status = Titanium.UI.createLabel({
-        text: "",
+        text: ""/*,
         left: 8,
         right: 8,
-        height: 30
+        height: 30*/
     });
     window.add(this.fields.status);
+
+    if (android) {
+        var xview = Titanium.UI.createView();
+        // For some reason, horizontal layout appears to be missing. :P
+        save.left = 10;
+        save.width = 100;
+        cancel.width = 100;
+        cancel.left = 120;
+        xview.add(save);
+        xview.add(cancel);
+        window.add(xview);
+    }
 
     window.open({
         modal: true
@@ -229,15 +255,20 @@ StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
  */
 StatusNet.SettingsView.prototype.updateNewAccount = function() {
     var that = this;
+    StatusNet.debug('yadda 1');
     this.cancelUpdateTimeout();
+    StatusNet.debug('yadda 2');
     this.discoverNewAccount(function(acct) {
+        StatusNet.debug('yadda 3');
         StatusNet.debug("Discovered... found: " + acct);
         StatusNet.debug("Previous was: " + that.workAcct);
         if (acct.equals(that.workAcct)) {
+            StatusNet.debug('yadda 4');
             // No change.
             StatusNet.debug("No change!");
             that.fields.status.text = "No change.";
         } else {
+            StatusNet.debug('yadda 5');
             StatusNet.debug("New acct");
             that.fields.status.text = "Testing login...";
 
@@ -248,8 +279,11 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             that.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
                 that.fields.status.text = "Login confirmed.";
                 that.xml = xml;
+                /*
+                // @fixme replace avatar update code for mobile...
                 that.workAcct.avatar = $("user profile_image_url", xml).text();
                 StatusNet.debug(that.workAcct.avatar);
+                */
                 //$("#new-avatar").attr("src", that.workAcct.avatar);
                 //$("#new-save").removeAttr("disabled");
                 
@@ -269,12 +303,14 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             });
         }
     }, function() {
+        StatusNet.debug('yadda 99');
         that.fields.status.text = "Could not verify site.";
         StatusNet.debug("Bogus acct");
         that.workAcct = null;
         //$("#new-save").attr("disabled", "disabled");
         //$("#new-avatar").attr("src", "images/default-avatar-stream.png");
     });
+    StatusNet.debug("yadda: the end");
 }
 
 /**
@@ -285,52 +321,69 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
  * @param onError function()
  */
 StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onError) {
+    StatusNet.debug('bizbax 1');
     var username = this.fields['username'].value;
     var password = this.fields['password'].value;
     var site = this.fields['site'].value;
+    StatusNet.debug('bizbax 2');
 
     if (this.workAcct != null &&
         username == this.lastUsername &&
         password == this.lastPassword &&
         site == this.lastSite) {
+        StatusNet.debug('bizbax 3');
 
         onSuccess(this.workAcct);
+        StatusNet.debug('bizbax 4');
         return;
     }
+    StatusNet.debug('bizbax 5');
     this.lastUsername = username;
     this.lastPassword = password;
     this.lastSite = site;
     if (username == '' || password == '' || site == '') {
+        StatusNet.debug('bizbax 6');
         onError();
+        StatusNet.debug('bizbax 7');
         return;
     }
 
+    StatusNet.debug('bizbax 8');
     if (site.substr(0, 7) == 'http://' || site.substr(0, 8) == 'https://') {
+        StatusNet.debug('bizbax 9');
         var url = site;
         if (url.substr(url.length - 1, 1) != '/') {
             url += '/';
         }
         onSuccess(new StatusNet.Account(username, password, url));
     } else if (site == 'twitter.com') {
+        StatusNet.debug('bizbax 10');
         // Special case Twitter...
         // but it probably ain't super great as we do SN-specific stuff!
         var url = 'https://twitter.com/';
         onSuccess(new StatusNet.Account(username, password, url));
     } else {
+        StatusNet.debug('bizbax 11');
         // Try RSD discovery!
         this.fields.status.text = "Finding secure server...";
         StatusNet.RSD.discoverTwitterApi('https://' + site + '/rsd.xml', function(apiroot) {
+            StatusNet.debug('bizbax 12');
             onSuccess(new StatusNet.Account(username, password, apiroot));
         }, function() {
+            StatusNet.debug('bizbax 13');
             this.fields.status.text = "Finding non-secured server...";
             StatusNet.RSD.discoverTwitterApi('http://' + site + '/rsd.xml', function(apiroot) {
+                StatusNet.debug('bizbax 14');
                 onSuccess(new StatusNet.Account(username, password, apiroot));
             }, function() {
                 // nothin' :(
+                StatusNet.debug('bizbax 15');
                 onError();
             });
         });
+        StatusNet.debug('bizbax 16');
     }
+    StatusNet.debug('bizbax 99');
 }
 
 StatusNet.SettingsView.prototype.saveNewAccount = function() {
