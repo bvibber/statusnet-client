@@ -127,8 +127,6 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
 
     StatusNet.debug("in switchUserTimeline()");
 
-    this.view = new StatusNet.TimelineViewUser(this);
-
     var timeline = 'user';
 
     if (authorId === null) {
@@ -139,6 +137,8 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
         timeline = 'user' + '-' + authorId;
         this.timeline = new StatusNet.TimelineUser(this, authorId);
     }
+
+    this.view = new StatusNet.TimelineViewUser(this);
 
     clearInterval(this.refresh);
 
