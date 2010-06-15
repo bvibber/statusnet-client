@@ -8,7 +8,7 @@ StatusNet.Client = function(_account) {
 
     this.account = _account;
 
-    this.timeline =  new StatusNet.TimelineFriends(this);
+    this.timeline = new StatusNet.TimelineFriends(this);
     this.view = new StatusNet.TimelineViewFriends(this);
 
     this.init();
@@ -153,6 +153,13 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
         },
         false
     );
+}
+
+StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
+
+    StatusNet.debug("in showGroupTimeline()");
+
+
 }
 
 /**
