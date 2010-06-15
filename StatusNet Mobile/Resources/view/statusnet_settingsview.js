@@ -77,7 +77,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     var view = this;
     var window = Titanium.UI.createWindow({
         title: "Add Account",
-        backgroundColor: android ? "black" : "#bbbfcc",
+        backgroundColor: (android ? "black" : "#bbbfcc"),
         layout: 'vertical'
     });
 
@@ -145,7 +145,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         var props = {
             left: 8,
             right: 8,
-            height: 'auto',
+            height: android ? 'auto' : 32, // argghhhhh auto doesn't work on iphone
             borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED
         };
         for (var j in fields[i].props) {
@@ -167,10 +167,8 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     });
 
     this.fields.status = Titanium.UI.createLabel({
-        text: ""/*,
-        left: 8,
-        right: 8,
-        height: 30*/
+        text: "",
+        height: android ? 'auto' : 32
     });
     window.add(this.fields.status);
 
