@@ -8,7 +8,7 @@ StatusNet.Client = function(_account) {
 
     this.account = _account;
 
-    this.timeline =  new StatusNet.TimelineFriends(this);
+    this.timeline = new StatusNet.TimelineFriends(this);
     this.view = new StatusNet.TimelineViewFriends(this);
 
     this.init();
@@ -127,8 +127,6 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
 
     StatusNet.debug("in switchUserTimeline()");
 
-    this.view = new StatusNet.TimelineViewUser(this);
-
     var timeline = 'user';
 
     if (authorId === null) {
@@ -139,6 +137,8 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
         timeline = 'user' + '-' + authorId;
         this.timeline = new StatusNet.TimelineUser(this, authorId);
     }
+
+    this.view = new StatusNet.TimelineViewUser(this);
 
     clearInterval(this.refresh);
 
@@ -153,6 +153,13 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
         },
         false
     );
+}
+
+StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
+
+    StatusNet.debug("in showGroupTimeline()");
+
+
 }
 
 /**

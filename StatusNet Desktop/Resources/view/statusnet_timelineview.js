@@ -271,17 +271,22 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     });
 
     // Override external web links to local users in-content
+
     $(noticeDom).find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');
-        if (that.localAuthor(href)) {
-            $(this).attr('href', '#');
-            $(this).click(function() {
-                var idRegexp = /(\d)+$/;
-                result = href.match(idRegexp);
-                if (result) {
-                    that.client.switchUserTimeline(result[0]);
-                }
-            });
+        var result = href.match(/group\/(\d+)\/id/);
+        if (result) {
+            var groupId = result[1];
+        } else {
+            if (that.localAuthor(href)) {
+                $(this).attr('href', '#');
+                $(this).click(function() {
+                    result = href.match(/(\d)+$/);
+                    if (result) {
+                        that.client.switchUserTimeline(result[0]);
+                    }
+                });
+            }
         }
     });
 }
