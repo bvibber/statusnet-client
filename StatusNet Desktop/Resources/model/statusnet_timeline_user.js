@@ -170,7 +170,6 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
 
             that.updateFinished.notify();
 
-            // use events instead? Observer?
             if (onFinish) {
                 onFinish();
             }

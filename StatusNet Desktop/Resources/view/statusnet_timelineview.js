@@ -192,7 +192,7 @@ StatusNet.TimelineView.prototype.showNotification = function(notice, user) {
  *
  * @return boolean value
  */
-StatusNet.TimelineView.prototype.localAuthor = function(uri) {
+StatusNet.TimelineView.prototype.isLocal = function(uri) {
 
     // Isolate domain name from URI paths and compare
     var path = uri.split('/');
@@ -218,7 +218,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
 
     // Override links to external web view of the notice timelines
     // with click event handlers to display timelines within the client
-    if (this.localAuthor(uri)) {
+    if (this.isLocal(uri)) {
 
         $(noticeDom).find('div a.author').attr('href', "#");
         $(noticeDom).find('div a.author').bind('click', function(event) {
@@ -270,22 +270,26 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
         that.client.repeatNotice(noticeId, this);
     });
 
-    // Override external web links to local users in-content
+    // Override external web links to local users and groups in-content
 
     $(noticeDom).find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');
-        var result = href.match(/group\/(\d+)\/id/);
-        if (result) {
-            var groupId = result[1];
-        } else {
-            if (that.localAuthor(href)) {
-                $(this).attr('href', '#');
+        if (that.isLocal(href)) {
+            $(this).attr('href', '#');
+            // group
+            var result = href.match(/group\/(\d+)\/id/);
+            if (result) {
                 $(this).click(function() {
-                    result = href.match(/(\d)+$/);
-                    if (result) {
-                        that.client.switchUserTimeline(result[0]);
-                    }
+                    that.client.showGroupTimeline(result[1]); // group id
                 });
+            // user
+            } else {
+                result = href.match(/(\d)+$/);
+                if (result) {
+                    $(this).click(function() {
+                        that.client.switchUserTimeline(result[0]); // user id
+                    });
+                }
             }
         }
     });
