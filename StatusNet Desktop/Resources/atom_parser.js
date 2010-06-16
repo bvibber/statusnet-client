@@ -138,13 +138,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     return notice;
 }
 
-/**
- * Class method for generating an author object from an
- * activity:subject.
- *
- * @param DOM subject the Atom feed's activity subject element
- */
-StatusNet.AtomParser.userFromSubject = function(subject) {
+StatusNet.AtomParser.parseSubject = function(subject) {
 
     var author = {};
 
@@ -193,4 +187,24 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
     });
 
     return author;
+}
+
+/**
+ * Class method for generating a user object from an
+ * activity:subject.
+ *
+ * @param DOM subject the Atom feed's activity subject element
+ */
+StatusNet.AtomParser.userFromSubject = function(subject) {
+    return StatusNet.AtomParser.parseSubject(subject);
+}
+
+/**
+ * Class method for generating an group object from an
+ * activity:subject.
+ *
+ * @param DOM subject the Atom feed's activity subject element
+ */
+StatusNet.AtomParser.groupFromSubject = function(subject) {
+    return StatusNet.AtomParser.parseSubject(subject);
 }

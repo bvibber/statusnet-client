@@ -156,10 +156,26 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
 }
 
 StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
-
     StatusNet.debug("in showGroupTimeline()");
 
+    StatusNet.debug("group ID is " + groupId);
+    timeline = 'user' + '-' + groupId;
+    this.timeline = new StatusNet.TimelineGroup(this, groupId);
+    this.view = new StatusNet.TimelineViewGroup(this);
 
+    clearInterval(this.refresh);
+
+    StatusNet.Sidebar.setSelectedTimeline(timeline);
+
+    var that = this;
+
+    this.timeline.update(
+        function() {
+            that.view.showHeader();
+            that.view.show();
+        },
+        false
+    );
 }
 
 /**
