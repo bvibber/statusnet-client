@@ -68,6 +68,15 @@ StatusNet.TimelineViewGroup.prototype.showGroupInfo = function() {
     $('#header').append(html.join(''));
     StatusNet.debug("finished showing group info...");
 
+    var that = this;
+
+    $('a.group_join').bind('click', function(event) {
+        that.client.joinGroup(group.id, this);
+    });
+
+    $('a.group_leave').bind('click', function(event) {
+        that.client.leaveGroup(group.id, this);
+    });
 }
 
 /**

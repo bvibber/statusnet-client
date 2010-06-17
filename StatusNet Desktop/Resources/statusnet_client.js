@@ -505,3 +505,90 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom)
     );
 }
 
+/**
+ * Join a group
+ *
+ * @param int groupId  the ID of the group to join
+ * @param DOM linkDom  the link element
+ *
+ * On success changes the link to a leave link
+ *
+ */
+StatusNet.Client.prototype.joinGroup = function(groupId, linkDom)
+{
+    var url = 'statusnet/groups/join/' + groupId + '.json';
+
+    $(linkDom).attr('disabled', 'disabled');
+
+    StatusNet.debug("StatusNet.Client.joinGroup() - joining group " + groupId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).text('Leave');
+            $(linkDom).removeClass('group_join');
+            $(linkDom).addClass('group_leave');
+            $(linkDom).unbind('click');
+            $(linkDom).bind('click',
+                function(event) {
+                    that.leaveGroup(groupId, linkDom);
+                }
+            );
+        },
+        function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error joining group: ' + msg.error);
+            alert('Error joining group: ' + msg.error);
+        }
+    );
+}
+
+/**
+ * Leave a group
+ *
+ * @param int groupId  the ID of the group to leave
+ * @param DOM linkDom  the link element
+ *
+ * On success changes the link to a join link
+ *
+ */
+StatusNet.Client.prototype.leaveGroup = function(groupId, linkDom)
+{
+    var url = 'statusnet/groups/leave/' + groupId + '.json';
+
+    $(linkDom).attr('disabled', 'disabled');
+
+    StatusNet.debug("StatusNet.Client.leaveGroup() - leaving group " + groupId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).text('Join');
+            $(linkDom).removeClass('group_leave');
+            $(linkDom).addClass('group_join');
+            $(linkDom).unbind('click');
+            $(linkDom).bind('click',
+                function(event) {
+                    that.joinGroup(groupId, linkDom);
+                }
+            );
+        },
+        function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error leaving group: ' + msg.error);
+            alert('Error leaving group: ' + msg.error);
+        }
+    );
+}

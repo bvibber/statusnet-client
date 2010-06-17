@@ -147,10 +147,15 @@ StatusNet.AtomParser.parseSubject = function(subject) {
 
     author.link = $(subject).find('id').text();
 
-    var idRegexp = /(\d)+$/;
-    result = author.link.match(idRegexp);
+    var result = author.link.match(/(\d)+$/);
     if (result) {
         author.id = result[0];
+    } else {
+        // try for group id
+        result = author.link.match(/group\/(\d)+\/id$/);
+        if (result) {
+            author.id = result[1];
+        }
     }
 
     var geoPoint = $(subject).find("[nodeName=georss:point]:first").text();
