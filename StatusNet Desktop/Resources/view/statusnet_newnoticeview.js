@@ -41,7 +41,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     // Linux version of Titanium.
     $('#notice_textarea').bind('keydown', function(event) {
         var len = $('#notice_textarea').val().length;
- 
+
        // turn char counter red when it goes negative
         if (textLimit - len < 0 && (textLimit - len) + 1 === 0) {
             $('#counter').addClass('negative');
@@ -65,7 +65,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
     var url = 'statuses/update.json';
     var noticeText = $('#notice_textarea').val();
 
-    var base = 'status=' + noticeText;
+    var base = 'status=' + encodeURIComponent(noticeText);
     var params = [];
     params.push('source=StatusNet Desktop');
 
@@ -84,7 +84,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
         function(status, data) {
             StatusNet.debug(data);
             StatusNet.debug(data.user);
-            
+
             var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
             notification.setTitle("Notice posted");
             //notification.setMessage("Posted new notice to " + that.account.getHost());
@@ -96,7 +96,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
                 alert("i've been clicked");
             });
             notification.show();
-            
+
             me.close();
         },
         function(client, responseText) {

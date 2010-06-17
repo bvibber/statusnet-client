@@ -56,14 +56,17 @@ StatusNet.DirectMessageView.prototype.send = function()
     var msgText = $('#direct_message_textarea').val();
 
     var me = Titanium.UI.getCurrentWindow();
-    
-    var params = 'text=' + escape(msgText) + "&" + "screen_name=" + me.nickname;
-            
+
+    var params = 'text='
+        + encodeURIComponent(msgText)
+        + "&screen_name="
+        + encodeURIComponent(me.nickname);
+
     this.account.postUrl(url, params,
         function(status, data) {
             StatusNet.debug(data);
             StatusNet.debug(data.user);
-            
+
             var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
             notification.setTitle("Sent");
             notification.setMessage("Direct message to " + me.nickname + " sent.");
