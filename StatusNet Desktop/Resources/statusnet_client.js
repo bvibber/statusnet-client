@@ -165,10 +165,30 @@ StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
 
     clearInterval(this.refresh);
 
-    StatusNet.Sidebar.setSelectedTimeline(timeline);
+    var that = this;
+
+    this.timeline.update(
+        function() {
+            that.view.showHeader();
+            that.view.show();
+        },
+        false
+    );
+}
+
+StatusNet.Client.prototype.showTagTimeline = function(tag) {
+    StatusNet.debug("in showTagTimeline() for tag: " + tag);
+
+    this.timeline = new StatusNet.TimelineTag(this, tag);
+    this.view = new StatusNet.TimelineViewTag(this);
+
+    StatusNet.debug("finished constructing objs");
+
+    clearInterval(this.refresh);
 
     var that = this;
 
+    StatusNet.debug("Updating");
     this.timeline.update(
         function() {
             that.view.showHeader();
