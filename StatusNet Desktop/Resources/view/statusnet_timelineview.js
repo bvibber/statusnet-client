@@ -105,7 +105,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
  * Render the HTML display of a given timeline
  *
  */
-StatusNet.TimelineView.prototype.show = function (notices) {
+StatusNet.TimelineView.prototype.show = function(notices) {
 
     StatusNet.debug("StatusNet.TimelineView.show() - getting notices");
 
@@ -271,7 +271,6 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     });
 
     // Override external web links to local users and groups in-content
-
     $(noticeDom).find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');
         if (that.isLocal(href)) {
@@ -293,6 +292,15 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
             }
         }
     });
+
+    // Override external web links to tags
+    $(noticeDom).find("div.content span.tag a").each(function() {
+        $(this).attr('href', '#');
+        $(this).click(function() {
+            that.client.showTagTimeline($(this).text());
+        });
+    });
+
 }
 
 /**
@@ -380,3 +388,27 @@ StatusNet.TimelineViewFavorites = function(client) {
 // Make StatusNet.TimelineViewFavorites inherit TimelineView's prototype
 StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototype);
 
+/**
+ * Constructor for a view for tag timeline
+ */
+StatusNet.TimelineViewTag = function(client) {
+    StatusNet.TimelineView.call(this, client);
+    StatusNet.debug("TimelineViewTag constructor");
+    this.title = "Notices tagged #{tag} on {site}";
+}
+
+// Make StatusNet.TimelineViewTag inherit TimelineView's prototype
+StatusNet.TimelineViewTag.prototype = heir(StatusNet.TimelineView.prototype);
+
+/**
+ * Override to show tag name
+ */
+StatusNet.TimelineViewTag.prototype.showHeader = function () {
+    StatusNet.debug("TimelineViewTag.showHeader()");
+    var title = this.title.replace("{tag}", this.timeline.tag)
+                           .replace("{site}", this.client.account.getHost());
+    StatusNet.debug("StatusNet.TimelineViewTag.showHeader() - title = " + title);
+    $("#header").html("<h1></h1>");
+    $("#header h1").text(title);
+    StatusNet.debug("StatusNet.TimelineViewTag.showHeader() - finished");
+}
