@@ -208,3 +208,15 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
 StatusNet.AtomParser.groupFromSubject = function(subject) {
     return StatusNet.AtomParser.parseSubject(subject);
 }
+
+StatusNet.AtomParser.getGroup = function(data) {
+
+    var subject = $(data).find("feed > [nodeName=activity:subject]:first");
+    var group = StatusNet.AtomParser.groupFromSubject(subject);
+
+    group.member = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('member');
+    group.memberCount = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('member_count');
+    group.blocked = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('blocked');
+
+    return group;
+}

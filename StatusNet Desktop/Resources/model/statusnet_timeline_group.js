@@ -40,8 +40,7 @@ StatusNet.TimelineGroup.prototype.update = function(onFinish, notifications) {
             StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
 
-            var subject = $(data).find("feed > [nodeName=activity:subject]:first");
-            that.group = StatusNet.AtomParser.groupFromSubject(subject);
+            that.group = StatusNet.AtomParser.getGroup(data);
 
             var entries = [];
 
