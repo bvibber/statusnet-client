@@ -152,6 +152,11 @@ StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
 
 StatusNet.TimelineView.prototype.showNotification = function(notice, user) {
 
+    // XXX: Notifications are busted and cause crashing on Win32 Titanium
+    if (Titanium.Platform.name === "Windows NT") {
+        return;
+    }
+
     var author = null;
 
     // Special case for user timelines, which don't have an avatar
