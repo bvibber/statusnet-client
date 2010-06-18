@@ -84,20 +84,8 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
         function(status, data) {
             StatusNet.debug(data);
             StatusNet.debug(data.user);
-
-            var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
-            notification.setTitle("Notice posted");
-            //notification.setMessage("Posted new notice to " + that.account.getHost());
-
-            notification.setIcon("app://logo.png");
-            notification.setDelay(5000);
-            notification.setCallback(function () {
-                // @todo Bring the app window back to focus / on top
-                alert("i've been clicked");
-            });
-            notification.show();
-
             me.close();
+
         },
         function(client, responseText) {
             var msg = Titanium.JSON.parse(responseText);
