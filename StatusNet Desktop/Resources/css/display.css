@@ -180,9 +180,13 @@ h1 {
 	float: left;
 }
 
-.notice .context_link {
+.notice .context_link, .notice .notice_source {
 	float: left;
 	margin-left: 2px;
+}
+
+.notice .notice_source .notice_source_inner {
+	font-size: 0.8em;
 }
 
 .notice .date_link a, .notice .context_link a {
@@ -190,16 +194,13 @@ h1 {
 	text-decoration: none;
 }
 
-.notice .date_link a:hover, .notice .context_link a:hover {
-	text-decoration: underline;
+.notice .notice_source a {
+	font-size: 1em;
+	text-decoration: none;
 }
 
-.notice .notice_source {
-    font-size: 0.8em;
-    text-decoration: none;
-    float: left;
-    margin-left: 2px;
-    margin-top: 3px;
+.notice .date_link a:hover, .notice .context_link a:hover, .notice .notice_source a:hover {
+	text-decoration: underline;
 }
 
 .notice .context_link a:before {
