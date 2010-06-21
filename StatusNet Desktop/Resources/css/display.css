@@ -194,6 +194,13 @@ h1 {
 	text-decoration: underline;
 }
 
+.notice .notice_source {
+    font-size: 0.8em;
+    text-decoration: none;
+    float: left;
+    margin-left: 2px;
+    margin-top: 3px;
+}
 
 .notice .context_link a:before {
 	content: "(";

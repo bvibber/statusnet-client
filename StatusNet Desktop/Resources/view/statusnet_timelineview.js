@@ -73,6 +73,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
     html.push('   <div class="content">'+ notice.content +'</div>');
     html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
+    html.push('   <div class="notice_source">from ' + notice.source + '</div>');
     if (notice.contextLink && notice.inReplyToLink) {
         html.push(
             '   <div class="context_link"><a rel="external" href="'
@@ -105,7 +106,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
  * Render the HTML display of a given timeline
  *
  */
-StatusNet.TimelineView.prototype.show = function (notices) {
+StatusNet.TimelineView.prototype.show = function(notices) {
 
     StatusNet.debug("StatusNet.TimelineView.show() - getting notices");
 
@@ -197,7 +198,7 @@ StatusNet.TimelineView.prototype.showNotification = function(notice, user) {
  *
  * @return boolean value
  */
-StatusNet.TimelineView.prototype.localAuthor = function(uri) {
+StatusNet.TimelineView.prototype.isLocal = function(uri) {
 
     // Isolate domain name from URI paths and compare
     var path = uri.split('/');
@@ -223,7 +224,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
 
     // Override links to external web view of the notice timelines
     // with click event handlers to display timelines within the client
-    if (this.localAuthor(uri)) {
+    if (this.isLocal(uri)) {
 
         $(noticeDom).find('div a.author').attr('href', "#");
         $(noticeDom).find('div a.author').bind('click', function(event) {
@@ -275,25 +276,37 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
         that.client.repeatNotice(noticeId, this);
     });
 
-    // Override external web links to local users in-content
-
+    // Override external web links to local users and groups in-content
     $(noticeDom).find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');
-        var result = href.match(/group\/(\d+)\/id/);
-        if (result) {
-            var groupId = result[1];
-        } else {
-            if (that.localAuthor(href)) {
-                $(this).attr('href', '#');
+        if (that.isLocal(href)) {
+            $(this).attr('href', '#');
+            // group
+            var result = href.match(/group\/(\d+)\/id/);
+            if (result) {
                 $(this).click(function() {
-                    result = href.match(/(\d)+$/);
-                    if (result) {
-                        that.client.switchUserTimeline(result[0]);
-                    }
+                    that.client.showGroupTimeline(result[1]); // group id
                 });
+            // user
+            } else {
+                result = href.match(/(\d)+$/);
+                if (result) {
+                    $(this).click(function() {
+                        that.client.switchUserTimeline(result[0]); // user id
+                    });
+                }
             }
         }
     });
+
+    // Override external web links to tags
+    $(noticeDom).find("div.content span.tag a").each(function() {
+        $(this).attr('href', '#');
+        $(this).click(function() {
+            that.client.showTagTimeline($(this).text());
+        });
+    });
+
 }
 
 /**
@@ -381,3 +394,27 @@ StatusNet.TimelineViewFavorites = function(client) {
 // Make StatusNet.TimelineViewFavorites inherit TimelineView's prototype
 StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototype);
 
+/**
+ * Constructor for a view for tag timeline
+ */
+StatusNet.TimelineViewTag = function(client) {
+    StatusNet.TimelineView.call(this, client);
+    StatusNet.debug("TimelineViewTag constructor");
+    this.title = "Notices tagged #{tag} on {site}";
+}
+
+// Make StatusNet.TimelineViewTag inherit TimelineView's prototype
+StatusNet.TimelineViewTag.prototype = heir(StatusNet.TimelineView.prototype);
+
+/**
+ * Override to show tag name
+ */
+StatusNet.TimelineViewTag.prototype.showHeader = function () {
+    StatusNet.debug("TimelineViewTag.showHeader()");
+    var title = this.title.replace("{tag}", this.timeline.tag)
+                           .replace("{site}", this.client.account.getHost());
+    StatusNet.debug("StatusNet.TimelineViewTag.showHeader() - title = " + title);
+    $("#header").html("<h1></h1>");
+    $("#header h1").text(title);
+    StatusNet.debug("StatusNet.TimelineViewTag.showHeader() - finished");
+}

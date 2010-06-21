@@ -138,13 +138,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     return notice;
 }
 
-/**
- * Class method for generating an author object from an
- * activity:subject.
- *
- * @param DOM subject the Atom feed's activity subject element
- */
-StatusNet.AtomParser.userFromSubject = function(subject) {
+StatusNet.AtomParser.parseSubject = function(subject) {
 
     var author = {};
 
@@ -153,10 +147,15 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
 
     author.link = $(subject).find('id').text();
 
-    var idRegexp = /(\d)+$/;
-    result = author.link.match(idRegexp);
+    var result = author.link.match(/(\d)+$/);
     if (result) {
         author.id = result[0];
+    } else {
+        // try for group id
+        result = author.link.match(/group\/(\d)+\/id$/);
+        if (result) {
+            author.id = result[1];
+        }
     }
 
     var geoPoint = $(subject).find("[nodeName=georss:point]:first").text();
@@ -193,4 +192,36 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
     });
 
     return author;
+}
+
+/**
+ * Class method for generating a user object from an
+ * activity:subject.
+ *
+ * @param DOM subject the Atom feed's activity subject element
+ */
+StatusNet.AtomParser.userFromSubject = function(subject) {
+    return StatusNet.AtomParser.parseSubject(subject);
+}
+
+/**
+ * Class method for generating an group object from an
+ * activity:subject.
+ *
+ * @param DOM subject the Atom feed's activity subject element
+ */
+StatusNet.AtomParser.groupFromSubject = function(subject) {
+    return StatusNet.AtomParser.parseSubject(subject);
+}
+
+StatusNet.AtomParser.getGroup = function(data) {
+
+    var subject = $(data).find("feed > [nodeName=activity:subject]:first");
+    var group = StatusNet.AtomParser.groupFromSubject(subject);
+
+    group.member = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('member');
+    group.memberCount = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('member_count');
+    group.blocked = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('blocked');
+
+    return group;
 }

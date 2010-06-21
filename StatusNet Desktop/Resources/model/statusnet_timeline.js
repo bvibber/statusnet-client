@@ -15,7 +15,6 @@ StatusNet.Timeline = function(client) {
     this.noticeAdded = new StatusNet.Event(this);
     this.updateStart = new StatusNet.Event(this);
     this.updateFinished = new StatusNet.Event(this);
-
 }
 
 /**
@@ -301,5 +300,24 @@ StatusNet.TimelineFavorites = function(client) {
 
 // Make StatusNet.TimelineFavorites inherit Timeline's prototype
 StatusNet.TimelineFavorites.prototype = heir(StatusNet.Timeline.prototype);
+
+/**
+ * Constructor for tag timeline model
+ */
+StatusNet.TimelineTag = function(client, tag) {
+    StatusNet.Timeline.call(this, client);
+
+    StatusNet.debug("TimelineTag constructor - tag = " + tag);
+
+    this.tag = tag;
+    this.timeline_name = 'tag-' + tag;
+
+    StatusNet.debug("TimelineTag constructor - timeline name: " + this.timeline_name);
+
+    this._url = 'statusnet/tags/timeline/' + tag + '.atom';
+}
+
+// Make StatusNet.TimelineTag inherit Timeline's prototype
+StatusNet.TimelineTag.prototype = heir(StatusNet.Timeline.prototype);
 
 
