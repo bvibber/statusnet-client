@@ -212,7 +212,7 @@ StatusNet.Timeline.prototype.getUrl = function() {
     StatusNet.debug("lastId = " + lastId);
 
     if (lastId > 0) {
-        return this._url + '?since_id=' + lastId + 1; // add 1 so we don't pull same last notice
+        return this._url + '?since_id=' + lastId;
     } else {
         return this._url;
     }
