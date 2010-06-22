@@ -125,3 +125,10 @@ StatusNet.TimelineSearch.prototype.addNotice = function(entry, prepend, notify) 
     }
 
 }
+
+/**
+ * Don't cache search results yet
+ */
+StatusNet.TimelineSearch.prototype.cacheable = function() {
+    return false;
+}

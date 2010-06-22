@@ -174,6 +174,7 @@ StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
     html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
     html.push('   <div class="content">'+ notice.content +'</div>');
     html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
+    html.push('   <div class="notice_source"><span class="notice_source_inner">from ' + notice.source + '</span></div>');
     if (notice.contextLink && notice.inReplyToLink) {
         html.push(
             '   <div class="context_link"><a rel="external" href="'

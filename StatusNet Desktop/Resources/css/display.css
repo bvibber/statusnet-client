@@ -180,9 +180,13 @@ h1 {
 	float: left;
 }
 
-.notice .context_link {
+.notice .context_link, .notice .notice_source {
 	float: left;
 	margin-left: 2px;
+}
+
+.notice .notice_source .notice_source_inner {
+	font-size: 0.8em;
 }
 
 .notice .date_link a, .notice .context_link a {
@@ -190,10 +194,14 @@ h1 {
 	text-decoration: none;
 }
 
-.notice .date_link a:hover, .notice .context_link a:hover {
-	text-decoration: underline;
+.notice .notice_source a {
+	font-size: 1em;
+	text-decoration: none;
 }
 
+.notice .date_link a:hover, .notice .context_link a:hover, .notice .notice_source a:hover {
+	text-decoration: underline;
+}
 
 .notice .context_link a:before {
 	content: "(";
@@ -372,4 +380,16 @@ a#new_notice:hover {
 	color: #000;
 	text-shadow: 0px 1px 0px #ccc;
 	-webkit-box-shadow: 1px 1px 1px #111;
+}
+
+#search-box {
+	margin: 15px 0px 15px 4px;
+}
+
+#search-box #search {
+	background: #f2f2f2;
+	border: 2px inset #fff;
+	-webkit-border-radius: 4px;
+	margin-left: 6px;
+	padding: 1px;
 }

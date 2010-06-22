@@ -170,7 +170,6 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
 
             that.updateFinished.notify();
 
-            // use events instead? Observer?
             if (onFinish) {
                 onFinish();
             }
@@ -182,5 +181,12 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
         }
     );
 
+}
+
+/**
+ * Don't cache user timelines yet
+ */
+StatusNet.TimelineUser.prototype.cacheable = function() {
+    return false;
 }
 

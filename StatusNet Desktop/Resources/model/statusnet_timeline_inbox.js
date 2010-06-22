@@ -46,6 +46,13 @@ StatusNet.TimelineInbox.prototype.addNotice = function(entry, prepend, notify) {
     }
 }
 
+/**
+ * Don't cache this timeline (yet)
+ */
+StatusNet.TimelineInbox.prototype.cacheable = function() {
+    return false;
+}
+
 
 
 
