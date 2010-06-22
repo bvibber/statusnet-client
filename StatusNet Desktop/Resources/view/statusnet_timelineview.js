@@ -338,8 +338,6 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-    /* $('#notices').prepend('<img id="spinner" src="/images/icon_processing.gif" />'); */
-
 	$('#notices').prepend('<img id="spinner" src="/images/sam/loading.gif" />');
 }
 
@@ -349,6 +347,13 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
     $('#spinner').remove();
+}
+
+/**
+ * Show this if the timeline is empty
+ */
+StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
+    $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
 }
 
 /**

@@ -66,6 +66,7 @@ StatusNet.getDB = function() {
             + 'notice_id INTEGER NOT NULL REFERENCES entry (notice_id), '
             + 'account_id INTEGER NOT NULL, '
             + 'timeline TEXT NOT NULL, '
+            + 'timestamp INTEGER NOT NULL, '
             + 'PRIMARY KEY (notice_id, timeline, account_id)'
             + ')';
 
