@@ -35,10 +35,11 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
     );
 
     rc = this.db.execute(
-        "INSERT OR REPLACE INTO notice_entry (account_id, notice_id, timeline) VALUES (?, ?, ?)",
+        "INSERT OR REPLACE INTO notice_entry (account_id, notice_id, timeline, timestamp) VALUES (?, ?, ?, ?)",
         this.client.account.id,
         noticeId,
-        this.timeline_name
+        this.timeline_name,
+        Date.now()
     );
 
     // @todo Check for an error condition -- how?
@@ -134,8 +135,6 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotificati
     } else {
         this._notices.push(notice);
     }
-
-
 }
 
 /**
@@ -213,20 +212,115 @@ StatusNet.Timeline.prototype.getUrl = function() {
     StatusNet.debug("lastId = " + lastId);
 
     if (lastId > 0) {
-        return this._url + '?since_id=' + lastId;
+        return this._url + '?since_id=' + lastId + 1; // add 1 so we don't pull same last notice
     } else {
         return this._url;
     }
 }
 
 /**
+ * Trim the notice cache for this timeline.  Hard limit of 200 notices per
+ * timeline, and trim anything older than 72 hours.
+ *
+ * @todo Don't trim the cache if we're offline.
+ */
+StatusNet.Timeline.prototype.trimNotices = function() {
+
+    // Remove notices older than 72 hours from cache
+    // @todo Make cache window configurable and tune the defaults
+
+    // NOTE: I'm using integer timestamps because Titanium seems to blow up when
+    // using SQLite's date functions :(
+
+    var now = new Date();
+    var cutoff = new Date();
+    cutoff.setTime(now.getTime() - (86400 * 3 * 1000));
+
+    StatusNet.debug(
+        "Clearing out old cache entries for timeline "
+        + this.timeline_name
+        + " (NOW = "
+        + now.getTime()
+        + ", CUTOFF = "
+        + cutoff.getTime()
+        + ")"
+    );
+
+    var rs = this.db.execute(
+        "DELETE FROM entry WHERE notice_id IN "
+        + "(SELECT notice_id FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?)",
+        cutoff.getTime(),
+        this.timeline_name,
+        this.account.id
+    );
+
+    rs = this.db.execute(
+        'DELETE FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?',
+        cutoff.getTime(),
+        this.timeline_name,
+        this.account.id
+    );
+
+    // Also keep an absolute maximum of 200 notices per timeline
+
+    rs = this.db.execute(
+        "SELECT count(*) FROM notice_entry WHERE timeline = ? AND account_id = ?",
+        this.timeline_name,
+        this.account.id
+    );
+
+    if (rs.isValidRow()) {
+
+        var count = rs.fieldByName("count(*)");
+
+        StatusNet.debug("COUNT = " + count);
+
+        if (count > 200) {
+
+            var diff = (count - 200);
+
+            StatusNet.debug("Row count for " + this.timeline_name + " = " + count + ", overflow = " + diff);
+
+            var sql = "DELETE FROM entry WHERE notice_id IN "
+                + "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)";
+
+            rs = this.db.execute(sql,
+                this.timeline_name,
+                this.account.id,
+                diff
+            );
+
+            rs = this.db.execute(
+                "DELETE FROM notice_entry WHERE notice_id IN "
+                + "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)",
+                this.timeline_name,
+                this.account.id,
+                diff
+            );
+        }
+    }
+}
+
+/**
+ * Whether to cache this timeline - may be overrided by timelines
+ * we can't or don't want to cache ATM
+ */
+StatusNet.Timeline.prototype.cacheable = function() {
+    return true;
+}
+
+/**
  * Do anything that needs doing after retrieving timeline data.
- * Typically displaying the timeline.
  */
 StatusNet.Timeline.prototype.finishedFetch = function() {
 
     if (this._notices.length === 0) {
-        $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
+        StatusNet.debug("Show empty timeline msg");
+        this.client.getActiveView().showEmptyTimeline();
+    }
+
+    if (this.cacheable()) {
+        this.trimNotices();
     }
 }
 
@@ -237,14 +331,19 @@ StatusNet.Timeline.prototype.finishedFetch = function() {
  */
 StatusNet.Timeline.prototype.getNotices = function() {
 
-    var rs = this.db.execute(
-        "SELECT * from notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id "
-        + "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? ORDER BY notice_entry.notice_id",
+    StatusNet.debug("Account ID = " + this.account.id);
+    StatusNet.debug("Timeline name = " + this.timeline_name);
+
+    var sql = "SELECT * FROM notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id "
+        + "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? ORDER BY notice_entry.notice_id";
+
+    var rs = this.db.execute(sql,
         this.account.id,
         this.timeline_name
     );
 
     while (rs.isValidRow()) {
+        StatusNet.debug("Valid row found");
         xmlEntry = rs.fieldByName('atom_entry');
         entry = (new DOMParser()).parseFromString(xmlEntry, "text/xml");
         var notice = StatusNet.AtomParser.noticeFromEntry(entry);

@@ -183,3 +183,10 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
 
 }
 
+/**
+ * Don't cache user timelines yet
+ */
+StatusNet.TimelineUser.prototype.cacheable = function() {
+    return false;
+}
+

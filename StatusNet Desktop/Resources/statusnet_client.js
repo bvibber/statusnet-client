@@ -43,6 +43,14 @@ StatusNet.Client.prototype.getActiveTimeline = function() {
     }
 }
 
+StatusNet.Client.prototype.getActiveView = function() {
+    if (this.view) {
+        return this.view;
+    } else {
+        StatusNet.debug("Client.getActiveView() - null view, help!");
+    }
+}
+
 StatusNet.Client.prototype.getServer = function() {
     return this.server;
 }
