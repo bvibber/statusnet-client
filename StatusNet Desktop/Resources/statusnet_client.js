@@ -105,6 +105,9 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     this.view.showHeader();
     this.view.show();
 
+    // @todo save scroll state
+    $("#body").scrollTop(0);
+
     this.timeline.update(null, false);
 
     var that = this;
