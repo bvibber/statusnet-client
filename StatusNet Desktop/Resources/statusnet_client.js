@@ -100,17 +100,14 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
     StatusNet.Sidebar.setSelectedTimeline(timeline);
 
-    var that = this;
-
     clearInterval(this.refresh);
 
-    this.timeline.update(
-        function() {
-            that.view.showHeader();
-            that.view.show();
-        },
-        false
-    );
+    this.view.showHeader();
+    this.view.show();
+
+    this.timeline.update(null, false);
+
+    var that = this;
 
     // @todo multiple timeline auto-refresh
 
