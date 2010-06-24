@@ -87,7 +87,7 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
 
             var entry = $(data).find('feed > entry:first').get(0);
 
-            if (entry) {
+            if (entry && that.cacheable()) {
                 that.encacheNotice(noticeId, entry);
                 StatusNet.debug('Timeline.refreshNotice(): found an entry.');
             }
@@ -122,8 +122,10 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotificati
     }
 
     if (notice.id !== undefined) {
-        StatusNet.debug("encached notice: " + notice.id);
-        this.encacheNotice(notice.id, entry);
+        if (this.cacheable()) {
+            StatusNet.debug("encached notice: " + notice.id);
+            this.encacheNotice(notice.id, entry);
+        }
     }
 
     StatusNet.debug("addNotice - finished encaching notice")
@@ -408,15 +410,21 @@ StatusNet.TimelineTag = function(client, tag) {
 
     StatusNet.debug("TimelineTag constructor - tag = " + tag);
 
+    this._url = 'statusnet/tags/timeline/' + tag + '.atom';
+
     this.tag = tag;
-    this.timeline_name = 'tag-' + tag;
+    this.timeline_name = 'tag-' + this.tag;
 
     StatusNet.debug("TimelineTag constructor - timeline name: " + this.timeline_name);
 
-    this._url = 'statusnet/tags/timeline/' + tag + '.atom';
+    StatusNet.debug("Tag timeline URL = " + this._url);
 }
 
 // Make StatusNet.TimelineTag inherit Timeline's prototype
 StatusNet.TimelineTag.prototype = heir(StatusNet.Timeline.prototype);
 
-
+// XXX: Turns out StatusNet's TAG timeline doesn't respect the since_id so
+// until we fix it, I'm going to disable caching of tag timelines --Z 
+StatusNet.TimelineTag.prototype.cacheable = function() {
+    return false;
+}

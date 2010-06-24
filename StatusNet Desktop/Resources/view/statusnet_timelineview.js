@@ -310,7 +310,8 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     $(noticeDom).find("div.content span.tag a").each(function() {
         $(this).attr('href', '#');
         $(this).click(function() {
-            that.client.showTagTimeline($(this).text());
+            // strip punctuation from hashtag string
+            that.client.showTagTimeline($(this).text().replace(/\W/, ''));
         });
     });
 
