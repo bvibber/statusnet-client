@@ -163,6 +163,32 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
     );
 }
 
+StatusNet.Client.prototype.showSubscriptions = function(authorId) {
+
+    StatusNet.debug("in showSubscriptions()");
+
+    if (authorId === null) {
+        StatusNet.debug("authorId is null");
+        this.timeline = new StatusNet.TimelineSubscriptions(this)
+    } else {
+        StatusNet.debug("authorID is " + authorId);
+        this.timeline = new StatusNet.TimelineSubscriptions(this, authorId);
+    }
+
+    this.view = new StatusNet.TimelineViewSubscriptions(this);
+
+    clearInterval(this.refresh);
+
+    var that = this;
+
+    this.timeline.update(
+        function() {
+            that.view.showHeader();
+            that.view.show();
+        }
+    );
+}
+
 StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
     StatusNet.debug("in showGroupTimeline()");
 

@@ -6,6 +6,7 @@
 StatusNet.TimelineView = function(client) {
     this.client = client;
 
+    StatusNet.debug("TimelineView constructor");
     // XXX: Woah, it doesn't work to pass the timeline into the constructor!
     this.timeline = client.getActiveTimeline();
 
@@ -15,11 +16,15 @@ StatusNet.TimelineView = function(client) {
 
     // Attach event listeners
 
+    StatusNet.debug("TimelineView constructor - attaching events");
+
     this.timeline.updateStart.attach(
         function() {
             that.showSpinner();
         }
     );
+
+    StatusNet.debug("TimelineView constructor - finished attaching updateStart");
 
     this.timeline.updateFinished.attach(
         function() {

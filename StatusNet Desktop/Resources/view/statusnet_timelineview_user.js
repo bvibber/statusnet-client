@@ -80,6 +80,10 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
 
     }
 
+    if (user.username === client.account.username) {
+        html.push('<a href="#" class="profile_subscriptions">Subscriptions</a>');
+    }
+
     html.push('</div>');
     $('#header').append(html.join(''));
 
@@ -95,6 +99,11 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
 
     $('a.profile_direct_message').bind('click', function(event) {
         client.directMessageDialog(user.username);
+    });
+
+    // Show subscriptions view button
+    $('a.profile_subscriptions').bind('click', function(event) {
+         client.showSubscriptions(user.id);
     });
 }
 
