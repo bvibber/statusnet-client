@@ -20,8 +20,8 @@ StatusNet.TimelineSearch.prototype = heir(StatusNet.Timeline.prototype);
  * Override the fetch URL to include search params
  */
 StatusNet.TimelineSearch.prototype.getUrl = function() {
-    var base = StatusNet.Timeline.prototype.getUrl.call(this);
-    return base + '?q=' + encodeURIComponent(this.searchTerm());
+    //var base = StatusNet.Timeline.prototype.getUrl.call(this);
+    return this._url + '?q=' + encodeURIComponent(this.searchTerm());
 }
 
 StatusNet.TimelineSearch.prototype.searchTerm = function() {

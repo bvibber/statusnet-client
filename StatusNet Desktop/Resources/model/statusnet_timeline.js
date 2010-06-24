@@ -158,7 +158,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
         function(status, data) {
 
             StatusNet.debug('Fetched ' + that.getUrl());
-            StatusNet.debug('HTTP client returned: ' + data);
+            StatusNet.debug('HTTP client returned: ' + (new XMLSerializer()).serializeToString(data));
 
             var entries = [];
 
