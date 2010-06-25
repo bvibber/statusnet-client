@@ -180,6 +180,7 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
  * Show this if the timeline is empty
  */
 StatusNet.TimelineViewSubscriptions.prototype.showEmptyTimeline = function() {
+    $('#notices').empty();
     $('#notices').append('<div id="empty_timeline">No subscriptions yet.</div>');
 }
 

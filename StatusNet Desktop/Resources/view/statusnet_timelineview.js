@@ -364,6 +364,7 @@ StatusNet.TimelineView.prototype.hideSpinner = function() {
  * Show this if the timeline is empty
  */
 StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
+    $('#notices').empty();
     $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
 }
 
