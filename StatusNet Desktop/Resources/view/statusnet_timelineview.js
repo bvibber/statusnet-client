@@ -117,7 +117,7 @@ StatusNet.TimelineView.prototype.show = function(notices) {
 
     StatusNet.debug("StatusNet.TimelineView.show() - getting notices");
 
-    var notices = this.timeline.getNotices();
+    var notices = this.client.getActiveTimeline().getNotices();
 
     StatusNet.debug("got notices");
 

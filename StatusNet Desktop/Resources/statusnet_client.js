@@ -71,8 +71,8 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             this.view = new StatusNet.TimelineViewPublic(this);
             break;
         case 'user':
-            this.timeline = new StatusNet.TimelineUser(this, null);
-            this.view = new StatusNet.TimelineViewUser(this);
+            this.switchUserTimeline();
+            return;
             break;
         case "friends":
             this.timeline = new StatusNet.TimelineFriends(this);
@@ -137,13 +137,13 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
 
     var timeline = 'user';
 
-    if (authorId === null) {
-        StatusNet.debug("authorId is null");
-        this.timeline = new StatusNet.TimelineUser(this, null);
-    } else {
+    if (authorId) {
         StatusNet.debug("authorID is " + authorId);
         timeline = 'user' + '-' + authorId;
         this.timeline = new StatusNet.TimelineUser(this, authorId);
+    } else {
+        StatusNet.debug("authorId is null");
+        this.timeline = new StatusNet.TimelineUser(this, null);
     }
 
     this.view = new StatusNet.TimelineViewUser(this);
