@@ -3,7 +3,7 @@
  *
  * @param StatusNet.Client client  The controller
  */
-StatusNet.TimelineView = function(client) {
+StatusNet.TimelineView = function(client, showNotifications) {
     this.client = client;
 
     StatusNet.debug("TimelineView constructor");
@@ -153,6 +153,33 @@ StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     this.enableNoticeControls(notice);
     $('#notices > div.notice:first').hide();
     $('#notices > div.notice:first').fadeIn("slow");
+}
+
+StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
+
+    if (!StatusNet.nativeNotifications()) {
+        return;
+    }
+
+    var msg;
+
+    if (notice.atomSource) {
+        msg = "New notice from " + notice.atomSource;
+    } else {
+        msg = "New notice from " + notice.author;
+    }
+
+    var notification = Titanium.Notification.createNotification(Titanium.UI.getMainWindow());
+    notification.setTitle("New Notice");
+    notification.setMessage(msg);
+
+    notification.setIcon("app://logo.png");
+    notification.setDelay(5000);
+    notification.setCallback(function () {
+    // @todo Bring the app window back to focus / on top
+        StatusNet.debug("i've been clicked");
+    });
+    notification.show();
 }
 
 /**

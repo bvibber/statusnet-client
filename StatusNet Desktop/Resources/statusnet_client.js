@@ -15,20 +15,41 @@ StatusNet.Client = function(_account) {
 
 	this.view.showHeader();
     this.view.show();
-    this.timeline.update();
 
     var that = this;
+
+    this.timeline.update(function() {
+        that.timeline.noticeAdded.attach(
+            function(args) {
+                if (args) {
+                    that.view.notifyNewNotice(args.notice);
+                } else {
+                    StatusNet.debug("noticeAdded event with no args!");
+                }
+            }
+        );
+    });
 
     // @todo: refresh multiple timelines in the background
 
     this.refresh = setInterval(
         function() {
             StatusNet.debug("Refreshing visible timeline.");
-            that.timeline.update(null, true);
+            that.timeline.update(
+                function(notice_count) {
+                    if (notice_count > 0) {
+                        StatusNet.Infobar.flashMessage(
+                            notice_count
+                            + " new notices in "
+                            + that.timeline.timeline_name
+                        );
+                        that.newNoticesSound.play();
+                    }
+                }
+            );
         },
         60000
     );
-
 }
 
 StatusNet.Client.prototype.getActiveTimeline = function() {
@@ -106,7 +127,17 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     // @todo save scroll state
     $("#body").scrollTop(0);
 
-    this.timeline.update(null);
+    this.timeline.update(function() {
+        that.timeline.noticeAdded.attach(
+            function(args) {
+                if (args) {
+                    that.view.notifyNewNotice(args.notice);
+                } else {
+                    StatusNet.debug("noticeAdded event with no args!");
+                }
+            }
+        );
+    });
 
     // @todo multiple timeline auto-refresh
 

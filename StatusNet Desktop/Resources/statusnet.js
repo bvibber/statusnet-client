@@ -170,3 +170,20 @@ StatusNet.Event.prototype.notify = function(args) {
         this._listeners[i].call(this._sender, args);
     }
 }
+
+StatusNet.nativeNotifications = function() {
+
+    // Snow Lep has notifications
+    if (Titanium.Platform.name === "Darwin") {
+        if (Titanium.Platform.version.substr(0, 4) === "10.6") {
+            return true;
+        }
+    }
+
+    StatusNet.debug("Name = " + Titanium.Platform.name);
+    StatusNet.debug("Architecture = " + Titanium.Platform.architecture);
+    StatusNet.debug("OS type = " + Titanium.Platform.ostype);
+    StatusNet.debug("Version = " + Titanium.Platform.version);
+
+    return false;
+}
