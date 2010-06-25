@@ -189,8 +189,8 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
     }
 
     var notification = Titanium.Notification.createNotification(Titanium.UI.getMainWindow());
-    notification.setTitle("New Notice");
-    notification.setMessage(msg);
+    notification.setTitle(msg);
+    notification.setMessage(notice.title);
 
     notification.setIcon("app://logo.png");
     notification.setDelay(5000);
