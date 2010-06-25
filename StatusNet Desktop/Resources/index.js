@@ -1,3 +1,11 @@
+/**
+ * StatusNet Desktop - a client for the StatusNet microblogging tool
+ * Copyright 2010, StatusNet, Inc.
+ * http://status.net/
+ *
+ * StatusNet Desktop is freely distributable under the terms of the Apache 2.0 license.
+ * See: LICENSE.txt or http://www.apache.org/licenses/LICENSE-2.0
+ */
 $LAB
     .script("statusnet.js").wait()
     .script("model/statusnet_account.js")
