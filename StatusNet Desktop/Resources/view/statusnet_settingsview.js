@@ -1,3 +1,22 @@
+/**
+ * StatusNet Desktop
+ *
+ * Copyright 2010 StatusNet, Inc.
+ * Based in part on Tweetanium
+ * Copyright 2008-2009 Kevin Whinnery and Appcelerator, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 StatusNet.SettingsView = function() {
     var db = StatusNet.getDB();
     this.accounts = StatusNet.Account.listAll(db);
@@ -161,6 +180,33 @@ StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
 }
 
 /**
+ * Determine wether the version of StatusNet will work with this client
+ */
+StatusNet.SettingsView.prototype.validVersion = function(version)
+{
+    var nums = version.split('.');
+    var major = parseInt(nums[0]);
+    var minor = parseInt(nums[1]);
+    var rev = 0;
+
+    if (nums.length > 2) {
+        rev = parseInt(nums[2]);
+    }
+
+    if (major < 1) {
+        if (minor < 9) {
+            return false;
+        } else {
+            if (rev < 2) { // @todo - update this to 3 for release
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+/**
  * Validate input and see if we can make it work yet
  */
 StatusNet.SettingsView.prototype.updateNewAccount = function() {
@@ -186,29 +232,56 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                 StatusNet.debug(that.workAcct.avatar);
                 $("#new-avatar").attr("src", that.workAcct.avatar);
 
-                // get site specific configuration info
-                that.workAcct.fetchUrl('statusnet/config.xml',
+                StatusNet.debug("Loading statusnet/version.xml");
+
+                $("#new-status").text("Checking StatusNet version...");
+
+                that.workAcct.fetchUrl('statusnet/version.xml',
                     function(status, xml) {
-                        StatusNet.debug("Loaded statusnet/config.xml");
-                        that.workAcct.textLimit = $(xml).find('config > site > textlimit').text();
-                        that.workAcct.siteLogo = $(xml).find('config > site > logo').text();
+                        var version = $(xml).find('version').text();
 
-                        // Okay, now you can save
-                        $("#new-save").removeAttr("disabled");
+                        StatusNet.debug("StatusNet version = " + version);
 
-                        if (!StatusNet.validUrl(that.workAcct.siteLogo)) {
-                            StatusNet.debug("Coudln't get site logo!");
-                            that.workAcct.siteLogo = '';
+                        if (that.validVersion(version) === false) {
+                            $("#new-status").text("StatusNet must be version 0.9.3 or later!");
+                            return;
                         }
+
+                        $("#new-status").text("Getting StatusNet configuration...");
+
+                        // get site specific configuration info
+                        that.workAcct.fetchUrl('statusnet/config.xml',
+                            function(status, xml) {
+                                StatusNet.debug("Loaded statusnet/config.xml");
+                                that.workAcct.textLimit = $(xml).find('config > site > textlimit').text();
+                                that.workAcct.siteLogo = $(xml).find('config > site > logo').text();
+
+                                $("#new-status").text("Account verified.");
+
+                                // Okay, now you can save
+                                $("#new-save").removeAttr("disabled");
+
+                                if (!StatusNet.validUrl(that.workAcct.siteLogo)) {
+                                    StatusNet.debug("Couldn't get site logo!");
+                                    that.workAcct.siteLogo = '';
+                                }
+                            }, function(status) {
+                                StatusNet.debug("Couldn't load statusnet/config.xml for site.");
+                            }
+                        );
+
                     }, function(status) {
-                        StatusNet.debug("Couldn't load statusnet/config.xml for site.");
-                    }
-                );
-            }, function(status) {
-                $("#new-status").text("Bad nickname or password.");
-                StatusNet.debug("We failed to load account info");
-                $("#new-avatar").attr("src", "images/default-avatar-stream.png");
-            });
+                        $("#new-status").text("Bad nickname or password.");
+                        StatusNet.debug("We failed to load account info");
+                        $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+                    });
+
+                },
+                function(status) {
+                    StatusNet.debug("Couldn't load statusnet/version.xml for site.");
+                }
+            );
+
         }
     }, function() {
         $("#new-status").text("Could not verify site.");

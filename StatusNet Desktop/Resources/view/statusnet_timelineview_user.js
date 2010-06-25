@@ -1,4 +1,23 @@
 /**
+ * StatusNet Desktop
+ *
+ * Copyright 2010 StatusNet, Inc.
+ * Based in part on Tweetanium
+ * Copyright 2008-2009 Kevin Whinnery and Appcelerator, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * Constructor for user's timeline
  */
 StatusNet.TimelineViewUser = function(client) {
@@ -33,6 +52,8 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     }
     html.push('</dd>');
 
+    html.push('<dt class="id">User ID</dt>');
+    html.push('<dd class="id">' + user.id + '</dd>');
 
     if (user.location) {
         html.push('<dt>Location</dt>');
@@ -56,7 +77,13 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
         html.push('<dl class="profile_statistics">');
         html.push('<dt>Subscribers</dt>');
         html.push('<dd>' + extended.followers_cnt + '</dd>');
-        html.push('<dt>Subscriptions</dt>');
+
+        if (user.username === client.account.username) {
+            html.push('<dt><a href="#" class="profile_subscriptions">Subscriptions</a></dt>');
+        } else {
+            html.push('<dt>Subscriptions</dt>');
+        }
+
         html.push('<dd>' + extended.friends_cnt + '</dd>');
         html.push('<dt>Notices</dt>');
         html.push('<dd>' + extended.statuses_cnt + '</dd>');
@@ -95,6 +122,11 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
 
     $('a.profile_direct_message').bind('click', function(event) {
         client.directMessageDialog(user.username);
+    });
+
+    // Show subscriptions view button
+    $('a.profile_subscriptions').bind('click', function(event) {
+         client.showSubscriptions(user.id);
     });
 }
 

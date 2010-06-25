@@ -1,4 +1,23 @@
 /**
+ * StatusNet Desktop
+ *
+ * Copyright 2010 StatusNet, Inc.
+ * Based in part on Tweetanium
+ * Copyright 2008-2009 Kevin Whinnery and Appcelerator, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * Constructor for UI manager class for the client.
  *
  * @param StatusNet.Account _account
@@ -16,23 +35,40 @@ StatusNet.Client = function(_account) {
 	this.view.showHeader();
     this.view.show();
 
-    StatusNet.debug("Finished showing timeline");
-
-
-    this.timeline.update();
-
     var that = this;
+
+    this.timeline.update(function() {
+        that.timeline.noticeAdded.attach(
+            function(args) {
+                if (args) {
+                    that.view.notifyNewNotice(args.notice);
+                } else {
+                    StatusNet.debug("noticeAdded event with no args!");
+                }
+            }
+        );
+    });
 
     // @todo: refresh multiple timelines in the background
 
     this.refresh = setInterval(
         function() {
             StatusNet.debug("Refreshing visible timeline.");
-            that.timeline.update(null, true);
+            that.timeline.update(
+                function(notice_count) {
+                    if (notice_count > 0) {
+                        StatusNet.Infobar.flashMessage(
+                            notice_count
+                            + " new notices in "
+                            + that.timeline.timeline_name
+                        );
+                        that.newNoticesSound.play();
+                    }
+                }
+            );
         },
         60000
     );
-
 }
 
 StatusNet.Client.prototype.getActiveTimeline = function() {
@@ -64,6 +100,8 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
     StatusNet.debug("StatusNet.Client.prototype.switchTimeline()");
 
+    var that = this;
+
     switch (timeline) {
 
         case 'public':
@@ -71,8 +109,8 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             this.view = new StatusNet.TimelineViewPublic(this);
             break;
         case 'user':
-            this.timeline = new StatusNet.TimelineUser(this, null);
-            this.view = new StatusNet.TimelineViewUser(this);
+            this.switchUserTimeline();
+            return;
             break;
         case "friends":
             this.timeline = new StatusNet.TimelineFriends(this);
@@ -100,17 +138,25 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
     StatusNet.Sidebar.setSelectedTimeline(timeline);
 
-    var that = this;
-
     clearInterval(this.refresh);
 
-    this.timeline.update(
-        function() {
-            that.view.showHeader();
-            that.view.show();
-        },
-        false
-    );
+    this.view.showHeader();
+    this.view.show();
+
+    // @todo save scroll state
+    $("#body").scrollTop(0);
+
+    this.timeline.update(function() {
+        that.timeline.noticeAdded.attach(
+            function(args) {
+                if (args) {
+                    that.view.notifyNewNotice(args.notice);
+                } else {
+                    StatusNet.debug("noticeAdded event with no args!");
+                }
+            }
+        );
+    });
 
     // @todo multiple timeline auto-refresh
 
@@ -118,7 +164,16 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
         this.refresh = setInterval(
             function() {
                 StatusNet.debug("Refreshing visible timeline.");
-                that.timeline.update(null, true);
+                that.timeline.update(function(notice_count) {
+                    if (notice_count > 0) {
+                        StatusNet.Infobar.flashMessage(
+                            notice_count
+                            + " new notices in "
+                            + that.timeline.timeline_name
+                        );
+                        that.newNoticesSound.play();
+                    }
+                });
             },
             60000 // @todo Make this configurable
         );
@@ -137,13 +192,13 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
 
     var timeline = 'user';
 
-    if (authorId === null) {
-        StatusNet.debug("authorId is null");
-        this.timeline = new StatusNet.TimelineUser(this, null);
-    } else {
+    if (authorId) {
         StatusNet.debug("authorID is " + authorId);
         timeline = 'user' + '-' + authorId;
         this.timeline = new StatusNet.TimelineUser(this, authorId);
+    } else {
+        StatusNet.debug("authorId is null");
+        this.timeline = new StatusNet.TimelineUser(this, null);
     }
 
     this.view = new StatusNet.TimelineViewUser(this);
@@ -158,8 +213,36 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
         function() {
             that.view.showHeader();
             that.view.show();
+            $("#body").scrollTop(0);
         },
         false
+    );
+}
+
+StatusNet.Client.prototype.showSubscriptions = function(authorId) {
+
+    StatusNet.debug("in showSubscriptions()");
+
+    if (authorId === null) {
+        StatusNet.debug("authorId is null");
+        this.timeline = new StatusNet.TimelineSubscriptions(this)
+    } else {
+        StatusNet.debug("authorID is " + authorId);
+        this.timeline = new StatusNet.TimelineSubscriptions(this, authorId);
+    }
+
+    this.view = new StatusNet.TimelineViewSubscriptions(this);
+
+    clearInterval(this.refresh);
+
+    var that = this;
+
+    this.timeline.update(
+        function() {
+            that.view.showHeader();
+            that.view.show();
+            $("#body").scrollTop(0);
+        }
     );
 }
 
@@ -179,6 +262,7 @@ StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
         function() {
             that.view.showHeader();
             that.view.show();
+            $("#body").scrollTop(0);
         },
         false
     );
@@ -201,6 +285,7 @@ StatusNet.Client.prototype.showTagTimeline = function(tag) {
         function() {
             that.view.showHeader();
             that.view.show();
+            $("#body").scrollTop(0);
         },
         false
     );

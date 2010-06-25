@@ -1,11 +1,31 @@
 /**
+ * StatusNet Desktop
+ *
+ * Copyright 2010 StatusNet, Inc.
+ * Based in part on Tweetanium
+ * Copyright 2008-2009 Kevin Whinnery and Appcelerator, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * Base class for Timeline view
  *
  * @param StatusNet.Client client  The controller
  */
-StatusNet.TimelineView = function(client) {
+StatusNet.TimelineView = function(client, showNotifications) {
     this.client = client;
 
+    StatusNet.debug("TimelineView constructor");
     // XXX: Woah, it doesn't work to pass the timeline into the constructor!
     this.timeline = client.getActiveTimeline();
 
@@ -15,11 +35,15 @@ StatusNet.TimelineView = function(client) {
 
     // Attach event listeners
 
+    StatusNet.debug("TimelineView constructor - attaching events");
+
     this.timeline.updateStart.attach(
         function() {
             that.showSpinner();
         }
     );
+
+    StatusNet.debug("TimelineView constructor - finished attaching updateStart");
 
     this.timeline.updateFinished.attach(
         function() {
@@ -31,9 +55,6 @@ StatusNet.TimelineView = function(client) {
         function(args) {
             if (args) {
                 that.showNewNotice(args.notice);
-                if (args.showNotification) {
-                    that.showNotification(args.notice);
-                }
             } else {
                 StatusNet.debug("noticeAdded event with no args!");
             }
@@ -112,7 +133,7 @@ StatusNet.TimelineView.prototype.show = function(notices) {
 
     StatusNet.debug("StatusNet.TimelineView.show() - getting notices");
 
-    var notices = this.timeline.getNotices();
+    var notices = this.client.getActiveTimeline().getNotices();
 
     StatusNet.debug("got notices");
 
@@ -153,40 +174,29 @@ StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     $('#notices > div.notice:first').fadeIn("slow");
 }
 
-StatusNet.TimelineView.prototype.showNotification = function(notice, user) {
+StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
 
-    // XXX: Notifications are busted and cause crashing on Win32 Titanium
-    if (Titanium.Platform.name === "Windows NT") {
+    if (!StatusNet.nativeNotifications()) {
         return;
     }
 
-    var author = null;
-
-    // Special case for user timelines, which don't have an avatar
-    // and author on each notice Atom entry
-    if (user) {
-        author = user.username;
-    } else {
-        author = notice.author;
-    }
-
-    var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
-    var nTitle = "New notice from " + notice.author;
+    var msg;
 
     if (notice.atomSource) {
-        nTitle = "New notice from " + notice.atomSource;
+        msg = "New notice from " + notice.atomSource;
+    } else {
+        msg = "New notice from " + notice.author;
     }
 
-    notification.setTitle(nTitle);
-    notification.setMessage(notice.title); // plain text version of the content
+    var notification = Titanium.Notification.createNotification(Titanium.UI.getMainWindow());
+    notification.setTitle(msg);
+    notification.setMessage(notice.title);
 
     notification.setIcon("app://logo.png");
     notification.setDelay(5000);
     notification.setCallback(function () {
-
-        // @todo Bring the app window back to focus / on top
-
-        alert("i've been clicked");
+    // @todo Bring the app window back to focus / on top
+        StatusNet.debug("i've been clicked");
     });
     notification.show();
 }
@@ -305,7 +315,8 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     $(noticeDom).find("div.content span.tag a").each(function() {
         $(this).attr('href', '#');
         $(this).click(function() {
-            that.client.showTagTimeline($(this).text());
+            // strip punctuation from hashtag string
+            that.client.showTagTimeline($(this).text().replace(/\W/, ''));
         });
     });
 
@@ -338,7 +349,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-	$('#notices').prepend('<img id="spinner" src="/images/sam/loading.gif" />');
+	$('#notices').prepend('<img id="spinner" src="/images/loading.gif" />');
 }
 
 /**
@@ -353,6 +364,7 @@ StatusNet.TimelineView.prototype.hideSpinner = function() {
  * Show this if the timeline is empty
  */
 StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
+    $('#notices').empty();
     $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
 }
 

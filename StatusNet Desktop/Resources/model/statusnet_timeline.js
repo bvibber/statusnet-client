@@ -1,4 +1,23 @@
 /**
+ * StatusNet Desktop
+ *
+ * Copyright 2010 StatusNet, Inc.
+ * Based in part on Tweetanium
+ * Copyright 2008-2009 Kevin Whinnery and Appcelerator, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * Constructor for base timeline model class
  *
  * @param StatusNet.Client       client the controller
@@ -87,7 +106,7 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
 
             var entry = $(data).find('feed > entry:first').get(0);
 
-            if (entry) {
+            if (entry && that.cacheable()) {
                 that.encacheNotice(noticeId, entry);
                 StatusNet.debug('Timeline.refreshNotice(): found an entry.');
             }
@@ -95,7 +114,7 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong refreshing notice " + noticeId + ": " + msg);
-            alert("Could not refresh notice " + noticeId +": " + msg);
+            StatusNet.Infobar.flashMessage("Could not refresh notice " + noticeId +": " + msg);
         }
     );
 }
@@ -106,10 +125,9 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  *
  * @param DOM     entry              the Atom entry form of the notice
  * @param boolean prepend            whether to add it to the beginning of end of
- * @param boolean showNotification   whether to show a system notification
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotification) {
+StatusNet.Timeline.prototype.addNotice = function(entry, prepend) {
 
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 
@@ -122,15 +140,17 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotificati
     }
 
     if (notice.id !== undefined) {
-        StatusNet.debug("encached notice: " + notice.id);
-        this.encacheNotice(notice.id, entry);
+        if (this.cacheable()) {
+            StatusNet.debug("encached notice: " + notice.id);
+            this.encacheNotice(notice.id, entry);
+        }
     }
 
     StatusNet.debug("addNotice - finished encaching notice")
 
     if (prepend) {
         this._notices.unshift(notice);
-        this.noticeAdded.notify({notice: notice, showNotification: showNotification});
+        this.noticeAdded.notify({notice: notice});
         StatusNet.debug("StatusNet.Timeline.addNotice - finished prepending notice");
     } else {
         this._notices.push(notice);
@@ -141,9 +161,9 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotificati
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
-StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
+StatusNet.Timeline.prototype.update = function(onFinish) {
 
-    StatusNet.debug("update() onFinish = " + onFinish + " notifications = " + notifications);
+    StatusNet.debug("update() onFinish = " + onFinish);
 
     this.updateStart.notify();
 
@@ -156,7 +176,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
         function(status, data) {
 
             StatusNet.debug('Fetched ' + that.getUrl());
-            StatusNet.debug('HTTP client returned: ' + data);
+            StatusNet.debug('HTTP client returned: ' + (new XMLSerializer()).serializeToString(data));
 
             var entries = [];
 
@@ -168,23 +188,19 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             entries.reverse(); // keep correct notice order
 
             for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i], true, notifications);
+                that.addNotice(entries[i], true);
             }
 
-            if (entries.length > 0 && notifications) {
-                that.client.newNoticesSound.play();
-            }
-
-            that.updateFinished.notify();
+            that.updateFinished.notify({notice_count: entries.length});
 
             if (onFinish) {
-                onFinish();
+                onFinish(entries.length);
             }
-            that.finishedFetch()
+            that.finishedFetch(entries.length)
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
-            alert("Couldn't get timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
         }
     );
 
@@ -312,7 +328,7 @@ StatusNet.Timeline.prototype.cacheable = function() {
 /**
  * Do anything that needs doing after retrieving timeline data.
  */
-StatusNet.Timeline.prototype.finishedFetch = function() {
+StatusNet.Timeline.prototype.finishedFetch = function(notice_count) {
 
     if (this._notices.length === 0) {
         StatusNet.debug("Show empty timeline msg");
@@ -408,15 +424,21 @@ StatusNet.TimelineTag = function(client, tag) {
 
     StatusNet.debug("TimelineTag constructor - tag = " + tag);
 
+    this._url = 'statusnet/tags/timeline/' + tag + '.atom';
+
     this.tag = tag;
-    this.timeline_name = 'tag-' + tag;
+    this.timeline_name = 'tag-' + this.tag;
 
     StatusNet.debug("TimelineTag constructor - timeline name: " + this.timeline_name);
 
-    this._url = 'statusnet/tags/timeline/' + tag + '.atom';
+    StatusNet.debug("Tag timeline URL = " + this._url);
 }
 
 // Make StatusNet.TimelineTag inherit Timeline's prototype
 StatusNet.TimelineTag.prototype = heir(StatusNet.Timeline.prototype);
 
-
+// XXX: Turns out StatusNet's TAG timeline doesn't respect the since_id so
+// until we fix it, I'm going to disable caching of tag timelines --Z 
+StatusNet.TimelineTag.prototype.cacheable = function() {
+    return false;
+}

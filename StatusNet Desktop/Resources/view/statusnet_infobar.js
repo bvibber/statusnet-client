@@ -1,5 +1,5 @@
 /**
- * StatusNet Mobile
+ * StatusNet Desktop
  *
  * Copyright 2010 StatusNet, Inc.
  * Based in part on Tweetanium
@@ -18,19 +18,29 @@
  * limitations under the License.
  */
 /**
- * View class for managing the sidebar
- *
+ * View class for the info bar
  */
-StatusNet.Sidebar = function(client) {
-    StatusNet.debug("StatusNet.sidebar()");
-    this.client = client;
+StatusNet.Infobar = function() {
+    StatusNet.debug("StatusNet.Infobar()");
 }
 
 /**
- * Class method to higlight the icon associated with the selected timeline
- *
- * @param String timeline   the timeline to highlight
+ * Flash an informational message to the user
  */
-StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
-    // no-op: the tab bar manages itself
+StatusNet.Infobar.flashMessage = function(msg) {
+
+    $('#infobar').text(msg);
+    $('#infobar').fadeIn("slow");
+
+    setTimeout(
+        function() {
+            $("#infobar").fadeOut("slow",
+                function () {
+                    $("#infobar").hide();
+                }
+            );
+        },
+        3000
+    );
 }
+

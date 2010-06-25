@@ -1,4 +1,23 @@
 /**
+ * StatusNet Desktop
+ *
+ * Copyright 2010 StatusNet, Inc.
+ * Based in part on Tweetanium
+ * Copyright 2008-2009 Kevin Whinnery and Appcelerator, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * Constructor for direct message view
  */
 StatusNet.DirectMessageView = function() {
@@ -66,20 +85,9 @@ StatusNet.DirectMessageView.prototype.send = function()
         function(status, data) {
             StatusNet.debug(data);
             StatusNet.debug(data.user);
-            // XXX: Notifications are busted and cause crashing on Win32 Titanium
-            if (Titanium.Platform.name !== "Windows NT") {
-                var notification = Titanium.Notification.createNotification(Titanium.UI.getMainWindow());
-                notification.setTitle("Sent");
-                notification.setMessage("Direct message to " + me.nickname + " sent.");
 
-                notification.setIcon("app://logo.png");
-                notification.setDelay(5000);
-                notification.setCallback(function () {
-                    // @todo Bring the app window back to focus / on top
-                     alert("i've been clicked");
-                 });
-                notification.show();
-            }
+            // play new direct message sound
+
             me.close();
         },
         function(client, responseText) {

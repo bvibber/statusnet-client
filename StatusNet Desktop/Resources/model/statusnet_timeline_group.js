@@ -1,4 +1,23 @@
 /**
+ * StatusNet Desktop
+ *
+ * Copyright 2010 StatusNet, Inc.
+ * Based in part on Tweetanium
+ * Copyright 2008-2009 Kevin Whinnery and Appcelerator, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * Constructor for group timeline model
  */
 StatusNet.TimelineGroup = function(client, groupId) {
@@ -23,9 +42,9 @@ StatusNet.TimelineGroup.prototype = heir(StatusNet.Timeline.prototype);
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * group timeline and notifies the view the model has changed.
  */
-StatusNet.TimelineGroup.prototype.update = function(onFinish, notifications) {
+StatusNet.TimelineGroup.prototype.update = function(onFinish) {
 
-    StatusNet.debug("TimelineGroup.update() - notifications = " + notifications);
+    StatusNet.debug("TimelineGroup.update()");
 
     this.updateStart.notify();
 
@@ -34,8 +53,6 @@ StatusNet.TimelineGroup.prototype.update = function(onFinish, notifications) {
     this.account.fetchUrl(this.getUrl(),
 
         function(status, data) {
-
-            that.client.view.hideSpinner();
 
             StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
@@ -52,23 +69,19 @@ StatusNet.TimelineGroup.prototype.update = function(onFinish, notifications) {
             entries.reverse(); // keep correct notice order
 
             for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i], true, notifications);
+                that.addNotice(entries[i]);
             }
 
-            if (entries.length > 0 && notifications) {
-                that.client.newNoticesSound.play();
-            }
-
-            that.updateFinished.notify();
+            that.updateFinished.notify({notice_count: entries.length});
 
             if (onFinish) {
-                onFinish();
+                onFinish(entries.length);
             }
-            that.finishedFetch()
+            that.finishedFetch(entries.length)
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving group timeline: " + msg);
-            alert("Couldn't get group timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't get group timeline: " + msg);
         }
     );
 

@@ -4,30 +4,30 @@ html, body {
 }
 
 body, * {
-  font-family:"Lucida Grande",Tahoma, Helvetica, sans-serif;
-  font-size:12px;
-  margin:0;
-  padding:0;
+	font-family:"Lucida Grande",Tahoma, Helvetica, sans-serif;
+	font-size:12px;
+	margin:0;
+	padding:0;
 }
 
 body {
 	margin: 0px;
 	color: #fff;
-	background: #222 url(../images/sam/page_bg.jpg) no-repeat top left; 
+	background: #222 url(../images/page_bg.jpg) no-repeat top left; 
 }
 
 ::-webkit-scrollbar {
-    width: 13px;
-    height: 13px;
+	width: 13px;
+	height: 13px;
 	background-color: #d2d2d2;
 
 }
 
 ::-webkit-scrollbar-thumb:vertical {
-    -webkit-border-image: url(/images/scroll2.png) 10 0 10 0;
-    border-color: transparent;
-    border-width: 13px 0;
-    min-height: 20px;
+	-webkit-border-image: url(/images/scroll2.png) 10 0 10 0;
+	border-color: transparent;
+	border-width: 13px 0;
+	min-height: 20px;
 }
 
 a {
@@ -36,19 +36,17 @@ a {
 }
 
 .rounded {
-  -webkit-border-radius:10px;
+	-webkit-border-radius:10px;
 }
 
 #sidebar {
-  width:70px;
-  background-color:#1c1c1c;
-  background: url(/images/sidebar-bg.png);
-  float:left;
-  text-align:center;
+	background-color: #1c1c1c;
+	float: left;
+	text-align: center;
 	height: 100%;
-		background: url(/images/sam/sidebar_bg.png);
-		margin-right: 4px;
-		width: 65px;
+	background: url(/images/sidebar_bg.png);
+	margin-right: 4px;
+	width: 65px;
 }
 
 #sidebar ul {
@@ -56,25 +54,25 @@ a {
 }
 
 #main_logo {
-  margin-top:10px;
+	margin-top:10px;
 }
 
 #sidebar img {
-  cursor:pointer;
-  margin-bottom:10px;
+	cursor:pointer;
+	margin-bottom:10px;
 }
 
 #sidebar img:hover {
-    background-image: url(/images/sidebar-button-glow.png);
-    background-repeat: no-repeat;
+	background-image: url(/images/sidebar-button-glow.png);
+	background-repeat: no-repeat;
 }
 
 #profile {
-  padding-top:10px;
-  margin-bottom:10px;
-  background-color:#d2d2d2;
-  -webkit-border-top-left-radius:10px;
-  -webkit-border-bottom-left-radius:10px;
+	padding-top:10px;
+	margin-bottom:10px;
+	background-color:#d2d2d2;
+	-webkit-border-top-left-radius:10px;
+	-webkit-border-bottom-left-radius:10px;
 }
 
 #profile_panel img {
@@ -91,8 +89,8 @@ a {
 	overflow-y: auto;
 	overflow-x: hidden;
 	padding: 5px;
-		padding-left: 0px;
-		padding-bottom: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
 }
 
 h1 {
@@ -112,22 +110,20 @@ h1 {
 	font-weight: normal;
 }
 
-
 #body h4 {
-  margin:0;
-  padding:10px;
+	margin:0;
+	padding:10px;
 }
 
 #body p {
-  line-height:1.5em;
-  margin:3px 10px 3px 10px;
+	line-height:1.5em;
+	margin:3px 10px 3px 10px;
 }
 
 #spinner {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
 	position: absolute;
 	top: 13px;
 	right: 24px;
@@ -142,7 +138,7 @@ h1 {
 	margin: 3px 4px 10px 0px;
 	padding:5px;
 	color: #000;
-	background: url(../images/sam/notice_bg.png);
+	background: url(../images/notice_bg.png);
 	border: 1px solid #000;
 	border-color: transparent;
 	-webkit-border-radius:10px;
@@ -171,11 +167,10 @@ h1 {
 	font-size:14px;
 	color:#000;
 	text-decoration:none;
-	font-weight:bold;
-		font-weight: normal;
-		text-shadow: 0px 1px 1px #fff;
-
+	font-weight: normal;
+	text-shadow: 0px 1px 1px #fff;
 }
+
 .notice .date_link {
 	float: left;
 }
@@ -215,6 +210,7 @@ h1 {
 	margin-top: 3px;
 	margin-bottom: 6px;
 }
+
 .notice .clear {
 	clear:both;
 }
@@ -224,6 +220,11 @@ h1 {
 	bottom: 0px;
 	left: 70px;
 	height: 22px;
+}
+
+#infobar {
+	float: right;
+	margin-left: 5px;
 }
 
 a#new_notice {
@@ -279,17 +280,20 @@ a#new_notice:hover {
 #profile_panel {
 	position: relative;	
 	margin: 0px 4px 6px 0px;
-	padding: 0px 0px 14px;
-		padding: 0px 0px 0px;
+	padding: 0px 0px 0px;
 	height: auto;
 }
 
+#notices #profile_panel {
+	margin-bottom: 10px;
+	border-bottom: 1px dotted #ccc;
+}
 
 #profile_panel img {
 	float: left;
 	border: 1px transparent #fff;
 	-webkit-border-radius: 6px;
-		margin-left: 4px;
+	margin-left: 4px;
 	margin-right: 10px;
 	margin-bottom: 6px;
 }
@@ -315,6 +319,19 @@ a#new_notice:hover {
 
 #profile_panel dl.profile_list dd.name {
 	font-weight: bold;
+}
+
+#profile_panel dl.profile_list dt.id {
+	display: block;
+	float: left;
+}
+
+#profile_panel dl.profile_list dt.id:after {
+	content: ":";
+}
+
+#profile_panel dl.profile_list dd.id {
+	padding-left: 4px;
 }
 
 #profile_panel dl.profile_list dd.location {
@@ -345,6 +362,9 @@ a#new_notice:hover {
 	margin-left: 6px;
 }
 
+#profile_panel dl.profile_statistics dt a {
+	font-size: 1em;
+}
 
 #profile_panel dl.profile_statistics dd {
 	float: left;

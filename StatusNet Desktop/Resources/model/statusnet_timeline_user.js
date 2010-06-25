@@ -1,4 +1,23 @@
 /**
+ * StatusNet Desktop
+ *
+ * Copyright 2010 StatusNet, Inc.
+ * Based in part on Tweetanium
+ * Copyright 2008-2009 Kevin Whinnery and Appcelerator, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * Constructor for user timeline model
  */
 StatusNet.TimelineUser = function(client, authorId) {
@@ -49,7 +68,7 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
 
 StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) {
 
-    this.client.view.showSpinner();
+    this.client.getActiveView().showSpinner();
 
     var url = null;
 
@@ -75,7 +94,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
             extended.notifications = $(data).find('notifications').text();
             that.extended = extended;
 
-            that.client.view.hideSpinner();
+            that.client.getActiveView().hideSpinner();
 
             if (onFinish) {
                 onFinish(that.user, extended, that.client, authorId);
@@ -84,7 +103,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
         },
         function(client, msg) {
             StatusNet.debug('Could not get extended user info: ' + msg);
-            alert('Could not get extended user info: ' + msg);
+            StatusNet.Infobar.flashMessage('Could not get extended user info: ' + msg);
         }
     );
 }
@@ -101,10 +120,8 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
  * @param DOM     entry             the Atom entry form of the notice
  * @param boolean prepend           whether to add it to the beginning of end of
  *                                  the timeline's notices array
- * @param boolean showNotification  whether to show a system notification
- *
  */
-StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, showNotification) {
+StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
 
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 
@@ -118,7 +135,7 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, showNotifi
 
     if (prepend) {
         this._notices.unshift(notice);
-        this.noticeAdded.notify({notice: notice, showNotification: showNotification});
+        this.noticeAdded.notify({notice: notice});
     } else {
         this._notices.push(notice);
     }
@@ -129,9 +146,9 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, showNotifi
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
-StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
+StatusNet.TimelineUser.prototype.update = function(onFinish) {
 
-    StatusNet.debug("TimelineUser.update() - notifications = " + notifications);
+    StatusNet.debug("TimelineUser.update()");
 
     this.updateStart.notify();
 
@@ -140,8 +157,6 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
     this.account.fetchUrl(this.getUrl(),
 
         function(status, data) {
-
-            that.client.view.hideSpinner();
 
             StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
@@ -161,23 +176,19 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
             entries.reverse(); // keep correct notice order
 
             for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i], true, notifications);
+                that.addNotice(entries[i], true);
             }
 
-            if (entries.length > 0 && notifications) {
-                that.client.newNoticesSound.play();
-            }
-
-            that.updateFinished.notify();
+            that.updateFinished.notify({notice_count: entries.length});
 
             if (onFinish) {
-                onFinish();
+                onFinish(entries.length);
             }
-            that.finishedFetch()
+            that.finishedFetch(entries.length)
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving user timeline: " + msg);
-            alert("Couldn't get user timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't get user timeline: " + msg);
         }
     );
 
