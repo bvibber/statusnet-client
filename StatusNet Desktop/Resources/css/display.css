@@ -13,7 +13,7 @@ body, * {
 body {
 	margin: 0px;
 	color: #fff;
-	background: #222 url(../images/sam/page_bg.jpg) no-repeat top left; 
+	background: #222 url(../images/page_bg.jpg) no-repeat top left; 
 }
 
 ::-webkit-scrollbar {
@@ -46,7 +46,7 @@ a {
   float:left;
   text-align:center;
 	height: 100%;
-		background: url(/images/sam/sidebar_bg.png);
+		background: url(/images/sidebar_bg.png);
 		margin-right: 4px;
 		width: 65px;
 }
@@ -142,7 +142,7 @@ h1 {
 	margin: 3px 4px 10px 0px;
 	padding:5px;
 	color: #000;
-	background: url(../images/sam/notice_bg.png);
+	background: url(../images/notice_bg.png);
 	border: 1px solid #000;
 	border-color: transparent;
 	-webkit-border-radius:10px;
@@ -289,6 +289,10 @@ a#new_notice:hover {
 	height: auto;
 }
 
+#notices #profile_panel {
+	margin-bottom: 10px;
+	border-bottom: 1px dotted #ccc;
+}
 
 #profile_panel img {
 	float: left;
