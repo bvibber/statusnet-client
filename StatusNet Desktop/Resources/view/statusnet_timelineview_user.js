@@ -77,7 +77,13 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
         html.push('<dl class="profile_statistics">');
         html.push('<dt>Subscribers</dt>');
         html.push('<dd>' + extended.followers_cnt + '</dd>');
-        html.push('<dt>Subscriptions</dt>');
+
+        if (user.username === client.account.username) {
+            html.push('<dt><a href="#" class="profile_subscriptions">Subscriptions</a></dt>');
+        } else {
+            html.push('<dt>Subscriptions</dt>');
+        }
+
         html.push('<dd>' + extended.friends_cnt + '</dd>');
         html.push('<dt>Notices</dt>');
         html.push('<dd>' + extended.statuses_cnt + '</dd>');
@@ -99,10 +105,6 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
             html.push('</div');
         }
 
-    }
-
-    if (user.username === client.account.username) {
-        html.push('<a href="#" class="profile_subscriptions">Subscriptions</a>');
     }
 
     html.push('</div>');
