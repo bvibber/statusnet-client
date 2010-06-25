@@ -49,7 +49,7 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
 
 StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) {
 
-    this.client.view.showSpinner();
+    this.client.getActiveView().showSpinner();
 
     var url = null;
 
@@ -75,7 +75,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
             extended.notifications = $(data).find('notifications').text();
             that.extended = extended;
 
-            that.client.view.hideSpinner();
+            that.client.getActiveView().hideSpinner();
 
             if (onFinish) {
                 onFinish(that.user, extended, that.client, authorId);

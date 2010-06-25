@@ -158,6 +158,7 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
         function() {
             that.view.showHeader();
             that.view.show();
+            $("#body").scrollTop(0);
         },
         false
     );
@@ -185,6 +186,7 @@ StatusNet.Client.prototype.showSubscriptions = function(authorId) {
         function() {
             that.view.showHeader();
             that.view.show();
+            $("#body").scrollTop(0);
         }
     );
 }
@@ -205,6 +207,7 @@ StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
         function() {
             that.view.showHeader();
             that.view.show();
+            $("#body").scrollTop(0);
         },
         false
     );
@@ -227,6 +230,7 @@ StatusNet.Client.prototype.showTagTimeline = function(tag) {
         function() {
             that.view.showHeader();
             that.view.show();
+            $("#body").scrollTop(0);
         },
         false
     );
