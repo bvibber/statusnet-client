@@ -194,9 +194,13 @@ StatusNet.nativeNotifications = function() {
 
     // Snow Lep has notifications
     if (Titanium.Platform.name === "Darwin") {
+
+        // XXX: @byosko says notifications don't work on 10.6.3
         if (Titanium.Platform.version.substr(0, 4) === "10.6") {
             return true;
         }
+    } else if (Titanium.Platform.name === "Linux") {
+        return true;
     }
 
     StatusNet.debug("Name = " + Titanium.Platform.name);
