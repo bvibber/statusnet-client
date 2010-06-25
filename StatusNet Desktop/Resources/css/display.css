@@ -321,6 +321,19 @@ a#new_notice:hover {
 	font-weight: bold;
 }
 
+#profile_panel dl.profile_list dt.id {
+	display: block;
+	float: left;
+}
+
+#profile_panel dl.profile_list dt.id:after {
+	content: ":";
+}
+
+#profile_panel dl.profile_list dd.id {
+	padding-left: 4px;
+}
+
 #profile_panel dl.profile_list dd.location {
 	font-style: italic;
 }
@@ -347,6 +360,10 @@ a#new_notice:hover {
 
 #profile_panel dl.profile_statistics dt:first-child {
 	margin-left: 6px;
+}
+
+#profile_panel dl.profile_statistics dt a {
+	font-size: 1em;
 }
 
 #profile_panel dl.profile_statistics dd {
