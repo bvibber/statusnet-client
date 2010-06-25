@@ -15,10 +15,6 @@ StatusNet.Client = function(_account) {
 
 	this.view.showHeader();
     this.view.show();
-
-    StatusNet.debug("Finished showing timeline");
-
-
     this.timeline.update();
 
     var that = this;
@@ -64,6 +60,8 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
     StatusNet.debug("StatusNet.Client.prototype.switchTimeline()");
 
+    var that = this;
+
     switch (timeline) {
 
         case 'public':
@@ -108,9 +106,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     // @todo save scroll state
     $("#body").scrollTop(0);
 
-    this.timeline.update(null, false);
-
-    var that = this;
+    this.timeline.update(null);
 
     // @todo multiple timeline auto-refresh
 
@@ -118,7 +114,16 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
         this.refresh = setInterval(
             function() {
                 StatusNet.debug("Refreshing visible timeline.");
-                that.timeline.update(null, true);
+                that.timeline.update(function(notice_count) {
+                    if (notice_count > 0) {
+                        StatusNet.Infobar.flashMessage(
+                            notice_count
+                            + " new notices in "
+                            + that.timeline.timeline_name
+                        );
+                        that.newNoticesSound.play();
+                    }
+                });
             },
             60000 // @todo Make this configurable
         );

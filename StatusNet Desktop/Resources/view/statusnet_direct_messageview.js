@@ -66,20 +66,9 @@ StatusNet.DirectMessageView.prototype.send = function()
         function(status, data) {
             StatusNet.debug(data);
             StatusNet.debug(data.user);
-            // XXX: Notifications are busted and cause crashing on Win32 Titanium
-            if (Titanium.Platform.name !== "Windows NT") {
-                var notification = Titanium.Notification.createNotification(Titanium.UI.getMainWindow());
-                notification.setTitle("Sent");
-                notification.setMessage("Direct message to " + me.nickname + " sent.");
 
-                notification.setIcon("app://logo.png");
-                notification.setDelay(5000);
-                notification.setCallback(function () {
-                    // @todo Bring the app window back to focus / on top
-                     alert("i've been clicked");
-                 });
-                notification.show();
-            }
+            // play new direct message sound
+
             me.close();
         },
         function(client, responseText) {

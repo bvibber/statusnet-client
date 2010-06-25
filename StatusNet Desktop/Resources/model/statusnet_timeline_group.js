@@ -23,9 +23,9 @@ StatusNet.TimelineGroup.prototype = heir(StatusNet.Timeline.prototype);
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * group timeline and notifies the view the model has changed.
  */
-StatusNet.TimelineGroup.prototype.update = function(onFinish, notifications) {
+StatusNet.TimelineGroup.prototype.update = function(onFinish) {
 
-    StatusNet.debug("TimelineGroup.update() - notifications = " + notifications);
+    StatusNet.debug("TimelineGroup.update()");
 
     this.updateStart.notify();
 
@@ -34,8 +34,6 @@ StatusNet.TimelineGroup.prototype.update = function(onFinish, notifications) {
     this.account.fetchUrl(this.getUrl(),
 
         function(status, data) {
-
-            that.client.view.hideSpinner();
 
             StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
@@ -52,19 +50,15 @@ StatusNet.TimelineGroup.prototype.update = function(onFinish, notifications) {
             entries.reverse(); // keep correct notice order
 
             for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i], true, notifications);
+                that.addNotice(entries[i]);
             }
 
-            if (entries.length > 0 && notifications) {
-                that.client.newNoticesSound.play();
-            }
-
-            that.updateFinished.notify();
+            that.updateFinished.notify({notice_count: entries.length});
 
             if (onFinish) {
-                onFinish();
+                onFinish(entries.length);
             }
-            that.finishedFetch()
+            that.finishedFetch(entries.length)
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving group timeline: " + msg);

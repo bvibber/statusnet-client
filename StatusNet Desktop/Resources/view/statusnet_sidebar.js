@@ -1,10 +1,7 @@
 /**
  * View class for managing the sidebar
- *
  */
-StatusNet.Sidebar = function(client) {
-    StatusNet.debug("StatusNet.sidebar()");
-    this.client = client;
+StatusNet.Sidebar = function() {
 }
 
 /**

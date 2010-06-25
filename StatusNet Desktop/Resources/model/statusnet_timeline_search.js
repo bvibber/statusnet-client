@@ -102,10 +102,9 @@ StatusNet.TimelineSearch.prototype.update = function(onFinish) {
  * @param DOM     entry    the Atom entry form of the notice
  * @param boolean prepend  whether to add it to the beginning of end of
  *                         the timeline's notices array
- * @param boolean notify   whether to show a system notification
  *
  */
-StatusNet.TimelineSearch.prototype.addNotice = function(entry, prepend, notify) {
+StatusNet.TimelineSearch.prototype.addNotice = function(entry, prepend) {
 
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 

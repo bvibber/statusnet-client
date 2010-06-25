@@ -36,9 +36,6 @@ StatusNet.TimelineView = function(client) {
         function(args) {
             if (args) {
                 that.showNewNotice(args.notice);
-                if (args.showNotification) {
-                    that.showNotification(args.notice);
-                }
             } else {
                 StatusNet.debug("noticeAdded event with no args!");
             }
@@ -156,44 +153,6 @@ StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     this.enableNoticeControls(notice);
     $('#notices > div.notice:first').hide();
     $('#notices > div.notice:first').fadeIn("slow");
-}
-
-StatusNet.TimelineView.prototype.showNotification = function(notice, user) {
-
-    // XXX: Notifications are busted and cause crashing on Win32 Titanium
-    if (Titanium.Platform.name === "Windows NT") {
-        return;
-    }
-
-    var author = null;
-
-    // Special case for user timelines, which don't have an avatar
-    // and author on each notice Atom entry
-    if (user) {
-        author = user.username;
-    } else {
-        author = notice.author;
-    }
-
-    var notification = Titanium.Notification.createNotification(Titanium.UI.getCurrentWindow());
-    var nTitle = "New notice from " + notice.author;
-
-    if (notice.atomSource) {
-        nTitle = "New notice from " + notice.atomSource;
-    }
-
-    notification.setTitle(nTitle);
-    notification.setMessage(notice.title); // plain text version of the content
-
-    notification.setIcon("app://logo.png");
-    notification.setDelay(5000);
-    notification.setCallback(function () {
-
-        // @todo Bring the app window back to focus / on top
-
-        alert("i've been clicked");
-    });
-    notification.show();
 }
 
 /**

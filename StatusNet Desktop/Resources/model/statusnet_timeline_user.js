@@ -101,10 +101,8 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
  * @param DOM     entry             the Atom entry form of the notice
  * @param boolean prepend           whether to add it to the beginning of end of
  *                                  the timeline's notices array
- * @param boolean showNotification  whether to show a system notification
- *
  */
-StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, showNotification) {
+StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
 
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 
@@ -118,7 +116,7 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, showNotifi
 
     if (prepend) {
         this._notices.unshift(notice);
-        this.noticeAdded.notify({notice: notice, showNotification: showNotification});
+        this.noticeAdded.notify({notice: notice});
     } else {
         this._notices.push(notice);
     }
@@ -129,9 +127,9 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend, showNotifi
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
-StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
+StatusNet.TimelineUser.prototype.update = function(onFinish) {
 
-    StatusNet.debug("TimelineUser.update() - notifications = " + notifications);
+    StatusNet.debug("TimelineUser.update()");
 
     this.updateStart.notify();
 
@@ -140,8 +138,6 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
     this.account.fetchUrl(this.getUrl(),
 
         function(status, data) {
-
-            that.client.view.hideSpinner();
 
             StatusNet.debug('Fetched ' + that.getUrl());
             StatusNet.debug('HTTP client returned: ' + data);
@@ -161,19 +157,15 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
             entries.reverse(); // keep correct notice order
 
             for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i], true, notifications);
+                that.addNotice(entries[i], true);
             }
 
-            if (entries.length > 0 && notifications) {
-                that.client.newNoticesSound.play();
-            }
-
-            that.updateFinished.notify();
+            that.updateFinished.notify({notice_count: entries.length});
 
             if (onFinish) {
-                onFinish();
+                onFinish(entries.length);
             }
-            that.finishedFetch()
+            that.finishedFetch(entries.length)
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving user timeline: " + msg);

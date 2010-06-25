@@ -19,10 +19,9 @@ StatusNet.TimelineInbox.prototype = heir(StatusNet.Timeline.prototype);
  *
  * @param DOM     entry    the Atom entry form of the notice
  * @param boolean prepend  whether to add it to the beginning of end of
- * @param boolean notify   whether to show a system notification
  *
  */
-StatusNet.TimelineInbox.prototype.addNotice = function(entry, prepend, notify) {
+StatusNet.TimelineInbox.prototype.addNotice = function(entry, prepend) {
 
     var notice = StatusNet.AtomParser.noticeFromDMEntry(entry);
 
@@ -41,9 +40,6 @@ StatusNet.TimelineInbox.prototype.addNotice = function(entry, prepend, notify) {
         this._notices.push(notice);
     }
 
-    if (notify) {
-        this.client.view.showNotification(notice);
-    }
 }
 
 /**

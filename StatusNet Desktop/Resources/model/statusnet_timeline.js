@@ -106,10 +106,9 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  *
  * @param DOM     entry              the Atom entry form of the notice
  * @param boolean prepend            whether to add it to the beginning of end of
- * @param boolean showNotification   whether to show a system notification
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotification) {
+StatusNet.Timeline.prototype.addNotice = function(entry, prepend) {
 
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
 
@@ -132,7 +131,7 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotificati
 
     if (prepend) {
         this._notices.unshift(notice);
-        this.noticeAdded.notify({notice: notice, showNotification: showNotification});
+        this.noticeAdded.notify({notice: notice});
         StatusNet.debug("StatusNet.Timeline.addNotice - finished prepending notice");
     } else {
         this._notices.push(notice);
@@ -143,9 +142,9 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, showNotificati
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
-StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
+StatusNet.Timeline.prototype.update = function(onFinish) {
 
-    StatusNet.debug("update() onFinish = " + onFinish + " notifications = " + notifications);
+    StatusNet.debug("update() onFinish = " + onFinish);
 
     this.updateStart.notify();
 
@@ -170,19 +169,15 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             entries.reverse(); // keep correct notice order
 
             for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i], true, notifications);
+                that.addNotice(entries[i], true);
             }
 
-            if (entries.length > 0 && notifications) {
-                that.client.newNoticesSound.play();
-            }
-
-            that.updateFinished.notify();
+            that.updateFinished.notify({notice_count: entries.length});
 
             if (onFinish) {
-                onFinish();
+                onFinish(entries.length);
             }
-            that.finishedFetch()
+            that.finishedFetch(entries.length)
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
@@ -314,7 +309,7 @@ StatusNet.Timeline.prototype.cacheable = function() {
 /**
  * Do anything that needs doing after retrieving timeline data.
  */
-StatusNet.Timeline.prototype.finishedFetch = function() {
+StatusNet.Timeline.prototype.finishedFetch = function(notice_count) {
 
     if (this._notices.length === 0) {
         StatusNet.debug("Show empty timeline msg");

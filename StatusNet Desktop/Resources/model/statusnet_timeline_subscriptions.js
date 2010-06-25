@@ -80,8 +80,6 @@ StatusNet.TimelineSubscriptions.prototype.update = function(onFinish) {
 
         function(status, data) {
 
-            that.client.view.hideSpinner();
-
             var users = [];
 
             $(data).find('users > user').each(function() {
@@ -95,12 +93,12 @@ StatusNet.TimelineSubscriptions.prototype.update = function(onFinish) {
                 that.addUser(users[i]);
             }
 
-            that.updateFinished.notify();
+            that.updateFinished.notify({user_count: users.length});
 
             if (onFinish) {
-                onFinish();
+                onFinish(users.length);
             }
-            that.finishedFetch()
+            that.finishedFetch(users.length)
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving subscriptions: " + msg);
@@ -129,7 +127,7 @@ StatusNet.TimelineSubscriptions.prototype.getUsers = function() {
 /**
  * Do anything that needs doing after retrieving timeline data.
  */
-StatusNet.TimelineSubscriptions.prototype.finishedFetch = function() {
+StatusNet.TimelineSubscriptions.prototype.finishedFetch = function(notice_count) {
     if (this._users.length === 0) {
         this.client.getActiveView().showEmptyTimeline();
     }
