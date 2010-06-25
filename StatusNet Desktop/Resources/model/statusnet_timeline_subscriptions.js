@@ -102,7 +102,7 @@ StatusNet.TimelineSubscriptions.prototype.update = function(onFinish) {
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving subscriptions: " + msg);
-            alert("Couldn't get subscriptions: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't get subscriptions: " + msg);
         }
     );
 

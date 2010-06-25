@@ -62,7 +62,7 @@ StatusNet.TimelineGroup.prototype.update = function(onFinish) {
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving group timeline: " + msg);
-            alert("Couldn't get group timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't get group timeline: " + msg);
         }
     );
 

@@ -95,7 +95,7 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong refreshing notice " + noticeId + ": " + msg);
-            alert("Could not refresh notice " + noticeId +": " + msg);
+            StatusNet.Infobar.flashMessage("Could not refresh notice " + noticeId +": " + msg);
         }
     );
 }
@@ -181,7 +181,7 @@ StatusNet.Timeline.prototype.update = function(onFinish) {
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
-            alert("Couldn't get timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
         }
     );
 

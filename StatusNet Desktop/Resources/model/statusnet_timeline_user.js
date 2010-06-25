@@ -84,7 +84,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
         },
         function(client, msg) {
             StatusNet.debug('Could not get extended user info: ' + msg);
-            alert('Could not get extended user info: ' + msg);
+            StatusNet.Infobar.flashMessage('Could not get extended user info: ' + msg);
         }
     );
 }
@@ -169,7 +169,7 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving user timeline: " + msg);
-            alert("Couldn't get user timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't get user timeline: " + msg);
         }
     );
 
