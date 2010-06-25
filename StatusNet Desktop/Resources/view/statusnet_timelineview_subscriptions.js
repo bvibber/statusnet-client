@@ -131,7 +131,7 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
         html.push(user.username);
     }
     html.push('</dd>');
-    html.push('<dt>User ID</dt>');
+    html.push('<dt class="id">User ID</dt>');
     html.push('<dd class="id">' + user.id + '</dd>');
 
     if (user.location) {

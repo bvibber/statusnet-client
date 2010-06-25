@@ -52,6 +52,8 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     }
     html.push('</dd>');
 
+    html.push('<dt class="id">User ID</dt>');
+    html.push('<dd class="id">' + user.id + '</dd>');
 
     if (user.location) {
         html.push('<dt>Location</dt>');
