@@ -1,64 +1,101 @@
 // this sets the background color of the master UIView (when there are no windows/tab groups on it)
 Titanium.UI.setBackgroundColor('#000');
 
-// create tab group
-var tabGroup = Titanium.UI.createTabGroup();
-
-
-//
-// create base UI tab and root window
-//
 var win1 = Titanium.UI.createWindow({  
-    title:'Tab 1',
+    title:'heyQuery test cases',
     backgroundColor:'#fff'
 });
-var tab1 = Titanium.UI.createTab({  
-    icon:'KS_nav_views.png',
-    title:'Tab 1',
-    window:win1
+
+var tableView = Titanium.UI.createTableView();
+win1.add(tableView);
+
+var tab1 = Titanium.UI.createTab({
+    title:'heyQuery test cases'
 });
 
-var label1 = Titanium.UI.createLabel({
-	color:'#999',
-	text:'I am Window 1',
-	font:{fontSize:20,fontFamily:'Helvetica Neue'},
-	textAlign:'center',
-	width:'auto'
-});
-
-win1.add(label1);
-
-//
-// create controls tab and root window
-//
-var win2 = Titanium.UI.createWindow({  
-    title:'Tab 2',
-    backgroundColor:'#fff'
-});
-var tab2 = Titanium.UI.createTab({  
-    icon:'KS_nav_ui.png',
-    title:'Tab 2',
-    window:win2
-});
-
-var label2 = Titanium.UI.createLabel({
-	color:'#999',
-	text:'I am Window 2',
-	font:{fontSize:20,fontFamily:'Helvetica Neue'},
-	textAlign:'center',
-	width:'auto'
-});
-
-win2.add(label2);
-
-
-
-//
-//  add tabs
-//
-tabGroup.addTab(tab1);  
-tabGroup.addTab(tab2);  
-
+var tabGroup = Titanium.UI.createTabGroup();
+tabGroup.add(tab1);
 
 // open tab group
-tabGroup.open();
+win1.open();
+
+
+
+Titanium.API.debug('this is a debug statement');
+Titanium.API.error('this is an error statement');
+Titanium.API.warn('this is a warn statement');
+Titanium.API.info('this is an info statement');
+
+var window = {};
+var document = Titanium.XML.parseString('<stub/>');
+Titanium.include('sizzle.js');
+var Sizzle = window.Sizzle;
+
+Titanium.API.info('we lived past sizzle.js load');
+
+
+Titanium.include('heyQuery.js');
+var $ = jQuery = heyQuery;
+
+Titanium.API.info('we lived past heyQuery.js load');
+
+
+var StatusNet = {};
+
+StatusNet.parseString = function(str) {
+    if (typeof Titanium.XML != "undefined") {
+        return Titanium.XML.parseString(str);
+    } else {
+        return (new DOMParser()).parseFromString(str, "text/xml");
+    }
+};
+
+Titanium.include('atom_parser.js');
+Titanium.API.info('we lived past atom_parser.js load');
+
+/*
+
+// object identity fail
+var bit = Sizzle.hacks.documentElement(document);
+Titanium.API.info(bit);
+for (var i in bit) {
+    Titanium.API.info(i + ': ' + bit[i]);
+}
+
+var bit2 = Sizzle.hacks.documentElement(document);
+Titanium.API.info(bit2);
+for (var i in bit2) {
+    Titanium.API.info(i + ': ' + bit2[i]);
+}
+
+Titanium.API.info('bit == bit2 ' + (bit == bit2));
+Titanium.API.info('bit === bit2 ' + (bit === bit2));
+Titanium.API.info('bit.toString() == bit2.toString() ' + (bit.toString() == bit2.toString()));
+
+
+// confirmed the cause of getelementbyid bug -- bad xpath expression building in the obj-c code
+
+var document = Titanium.XML.parseString('<stub><a id="a"></a> <b id="b"></b></stub>');
+var a = document.getElementById('a');
+var ax = document.getElementById("'a'");
+var axp = document.evaluate('//*[@id=a]');
+var axpx = document.evaluate("//*[@id='a']");
+Titanium.API.info('a: ' + a);
+Titanium.API.info('ax: ' + ax);
+Titanium.API.info('axp: ' + axp);
+Titanium.API.info('axpx: ' + axpx);
+*/
+
+Titanium.include('tests/test-shim.js');
+Titanium.API.info('we lived past test-shim load');
+
+Titanium.include('tests/data/testinit.js');
+Titanium.API.info('we lived past testinit.js load');
+
+//Titanium.include('tests/selector.js');
+//Titanium.API.info('we lived past selector.js load');
+
+Titanium.include('tests/atom.js');
+Titanium.API.info('we lived past selector.js load');
+
+Titanium.API.info('We are DONE!');

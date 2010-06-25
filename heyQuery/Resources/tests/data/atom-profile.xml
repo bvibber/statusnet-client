@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xml:lang="en-US" xmlns="http://www.w3.org/2005/Atom" xmlns:thr="http://purl.org/syndication/thread/1.0" xmlns:georss="http://www.georss.org/georss" xmlns:activity="http://activitystrea.ms/spec/1.0/" xmlns:media="http://purl.org/syndication/atommedia" xmlns:poco="http://portablecontacts.net/spec/1.0" xmlns:ostatus="http://ostatus.org/schema/1.0" xmlns:statusnet="http://status.net/ont/">
+ <generator uri="http://status.net" version="0.9.2">StatusNet</generator>
+ <id>http://lazarus.local/mublog/api/statuses/user_timeline/129.atom</id>
+ <title>aposter timeline</title>
+ <subtitle>Updates from aposter on Just another StatusNet microblog!</subtitle>
+ <logo>http://lazarus.local/mublog/theme/default/default-avatar-profile.png</logo>
+ <updated>2010-06-23T20:11:48+00:00</updated>
+<author>
+ <name>aposter</name>
+ <uri>http://lazarus.local/mublog/user/129</uri>
+
+</author>
+ <link href="http://lazarus.local/mublog/aposter" rel="alternate" type="text/html"/>
+ <link href="http://lazarus.local/mublog/main/sup#129" rel="http://api.friendfeed.com/2008/03#sup" type="application/json"/>
+ <link href="http://lazarus.local/mublog/main/push/hub" rel="hub"/>
+ <link href="http://lazarus.local/mublog/main/salmon/user/129" rel="http://salmon-protocol.org/ns/salmon-replies"/>
+ <link href="http://lazarus.local/mublog/main/salmon/user/129" rel="http://salmon-protocol.org/ns/salmon-mention"/>
+ <link href="http://lazarus.local/mublog/api/statuses/user_timeline/129.atom" rel="self" type="application/atom+xml"/>
+<activity:subject>
+ <activity:object-type>http://activitystrea.ms/schema/1.0/person</activity:object-type>
+ <id>http://lazarus.local/mublog/user/129</id>
+ <title>aposter</title>
+ <link rel="alternate" type="text/html" href="http://lazarus.local/mublog/aposter"/>
+ <link rel="avatar" type="image/png" media:width="96" media:height="96" href="http://lazarus.local/mublog/theme/default/default-avatar-profile.png"/>
+ <link rel="avatar" type="image/png" media:width="48" media:height="48" href="http://lazarus.local/mublog/theme/default/default-avatar-stream.png"/>
+ <link rel="avatar" type="image/png" media:width="24" media:height="24" href="http://lazarus.local/mublog/theme/default/default-avatar-mini.png"/>
+
+<poco:preferredUsername>aposter</poco:preferredUsername>
+<poco:displayName>aposter</poco:displayName>
+</activity:subject>
+<entry>
+ <title>POSTS ARE FUN</title>
+ <link rel="alternate" type="text/html" href="http://lazarus.local/mublog/notice/794"/>
+ <id>http://lazarus.local/mublog/notice/794</id>
+ <published>2010-06-23T20:09:01+00:00</published>
+ <updated>2010-06-23T20:09:01+00:00</updated>
+ <statusnet:notice_info local_id="794" source="web" favorite="false" repeated="false"></statusnet:notice_info>
+ <link rel="ostatus:conversation" href="http://lazarus.local/mublog/conversation/100793"/>
+ <content type="html">POSTS ARE FUN</content>
+
+</entry>
+<entry>
+ <title>that's right... i like to post!</title>
+ <link rel="alternate" type="text/html" href="http://lazarus.local/mublog/notice/793"/>
+ <id>http://lazarus.local/mublog/notice/793</id>
+ <published>2010-06-23T20:08:52+00:00</published>
+ <updated>2010-06-23T20:08:52+00:00</updated>
+ <statusnet:notice_info local_id="793" source="web" favorite="false" repeated="false"></statusnet:notice_info>
+ <link rel="ostatus:conversation" href="http://lazarus.local/mublog/conversation/100792"/>
+ <content type="html">that's right... i like to post!</content>
+</entry>
+
+<entry>
+ <title>hi i'm a poster</title>
+ <link rel="alternate" type="text/html" href="http://lazarus.local/mublog/notice/792"/>
+ <id>http://lazarus.local/mublog/notice/792</id>
+ <published>2010-06-23T20:08:47+00:00</published>
+ <updated>2010-06-23T20:08:47+00:00</updated>
+ <statusnet:notice_info local_id="792" source="web" favorite="false" repeated="false"></statusnet:notice_info>
+ <link rel="ostatus:conversation" href="http://lazarus.local/mublog/conversation/100791"/>
+ <content type="html">hi i'm a poster</content>
+</entry>
+</feed>
+
