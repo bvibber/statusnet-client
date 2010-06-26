@@ -82,28 +82,13 @@ StatusNet.RSD.discoverTwitterApi = function(url, onSuccess, onError) {
     StatusNet.RSD.discover(url, function(status, xml) {
         StatusNet.debug("Got RSD info for " + url);
 
-        // jQuery selector engine doesn't work with the utter fail that is the
-        // DOM implementation in Titanium Mobile/iPhone. :(
-        //
-        //var apiroot = $("api[name='Twitter']", xml).attr("apiLink");
-
-        StatusNet.debug("... xml: " + xml);
-        var apis = xml.getElementsByTagName('api');
-        StatusNet.debug('RSD api elements: ' + apis);
-        StatusNet.debug('RSD api elements length: ' + apis.length);
-        for (var i = 0; i < apis.length; i++) {
-            StatusNet.debug('RSD iter ' + i);
-            var api = apis.item(i);
-            StatusNet.debug('RSD iter ' + i + ' api: ' + api);
-            var apiroot = api.getAttribute('apiLink');
-            if (apiroot && api.getAttribute('name') == 'Twitter') {
-                StatusNet.debug("Got RSD info with Twitter API for " + url + " : " + apiroot);
-                onSuccess(apiroot);
-                return;
-            }
-            StatusNet.debug('RSD iter ' + i + ' out');
+        var apiroot = $("api[name='Twitter']", xml).attr("apiLink");
+        if (apiroot) {
+            StatusNet.debug("Got RSD info with Twitter API for " + url + " : " + apiroot);
+            onSuccess(apiroot);
+        } else {
+            StatusNet.debug("Got RSD info but no Twitter API for " + url);
+            onError(client, error);
         }
-        StatusNet.debug("Got RSD info but no Twitter API for " + url);
-        onError(client, error);
     }, onError);
 }

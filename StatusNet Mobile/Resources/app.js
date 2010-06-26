@@ -35,7 +35,9 @@ var sources = ['statusnet.js',
                'view/statusnet_timelineview_user.js',
                'view/statusnet_settingsview.js',
 
-               'statusnet_client.js',];
+               'statusnet_client.js',
+
+               'heyQuery.js'];
 
 for (var i = 0; i < sources.length; i++) {
     Titanium.include(sources[i]);

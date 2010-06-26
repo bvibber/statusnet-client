@@ -35,9 +35,8 @@ Titanium.include('sizzle.js');
  * @param Array context list of DOM nodes
  */
 function heyQueryObj(context) {
-    Titanium.API.debug('heyQueryObj(' + debugFormat(context) + ')');
     if (context === null || typeof context != "object" || typeof (context.length) != "number") {
-        var msg = "Given invalid context to heyQueryObj: " + debugFormat(context);
+        var msg = "Given invalid context to heyQueryObj: " + context;
         Titanium.API.error(msg);
         throw msg;
     }
@@ -57,19 +56,14 @@ function heyQueryObj(context) {
  */
 heyQueryObj.prototype.find = function(selector) {
     var set = [];
-    Titanium.API.debug('heyQueryObj.find... this.nodes is: ' + debugFormat(this.nodes));
     for (var i = 0; i < this.nodes.length; i++) {
-        Titanium.API.debug('heyQueryObj.find before Sizzle');
         var chunk = Sizzle(selector, this.nodes[i]);
-        Titanium.API.debug('heyQueryObj.find after Sizzle');
 
         // @fixme we should check for duplicates between runs here, but
         // object identity doesn't seem to be preserved on the dom nodes
         // as proxied to javascript, which complicates things.
         heyQuery.appendArray(chunk, set);
-        Titanium.API.debug('heyQueryObj.find after appendArray');
     }
-    Titanium.API.debug('heyQueryObj.find done, passing the set off: ' + debugFormat(set));
     return new heyQueryObj(set);
 }
 
