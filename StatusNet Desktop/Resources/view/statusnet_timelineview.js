@@ -180,6 +180,10 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
         return;
     }
 
+    if (this.client.account.username === notice.author) {
+        return;
+    }
+
     var msg;
 
     if (notice.atomSource) {
