@@ -6,14 +6,8 @@
  */
 (function(){
 
-function magic(o, msg) {
-	var out = '';
-	if (msg) {
-		out += msg + ": ";
-	}
-	out += debugFormat(o);
-	Titanium.API.debug(out);
-}
+// Stub DOM document for feature detection...
+var document = Titanium.XML.parseString('<stub/>');
 
 var chunker = /((?:\((?:\([^()]+\)|[^()]+)+\)|\[(?:\[[^\[\]]*\]|['"][^'"]*['"]|[^\[\]'"]+)+\]|\\.|[^ >+~,(\[\\]+)+|[>+~])(\s*,\s*)?((?:.|\r|\n)*)/g,
 	done = 0,
@@ -92,16 +86,10 @@ var Sizzle = function(selector, context, results, seed) {
 		}
 
 		if ( context ) {
-		    //magic(seed, 'cyz context... seed');
-		    //magic(parts, 'cyz context... parts');
 			ret = seed ?
 				{ expr: parts.pop(), set: makeArray(seed) } :
 				Sizzle.find( parts.pop(), parts.length === 1 && (parts[0] === "~" || parts[0] === "+") && context.parentNode ? context.parentNode : context, contextXML );
-			//magic(ret, 'xyz ret'); // at this point, ret.set is a node list
-			//magic(ret.set, 'xyz ret.set'); // we're getting null here instead of what we expected on Android.
 			set = ret.expr ? Sizzle.filter( ret.expr, ret.set ) : ret.set;
-			// filter is returning us a list of nulls.
-			//magic(set, 'xyz set');
 
 			if ( parts.length > 0 ) {
 				checkSet = makeArray(set);
@@ -138,47 +126,31 @@ var Sizzle = function(selector, context, results, seed) {
 		Sizzle.error( cur || selector );
 	}
 
-    //magic(results, 'results before final junk'); // XXX
-    //magic(checkSet, 'checkSet before final junk'); // XXX <- ok it's already corrupt in checkSet.
 	if ( toString.call(checkSet) === "[object Array]" ) {
-		//magic(results, 'QQQ BEFORE: results');
-		//magic(results, 'QQQ BEFORE: checkSet');
-		//magic(prune, 'QQQ BEFORE: prune');
 		if ( !prune ) {
 			results.push.apply( results, checkSet );
 		} else if ( context && context.nodeType === 1 ) {
-			//magic(true, 'QQQ BEFORE: context is a node');
-			//magic(set, 'set');
 			for ( i = 0; checkSet[i] != null; i++ ) {
 				if ( checkSet[i] && (checkSet[i] === true || checkSet[i].nodeType === 1 && Sizzle.contains(context, checkSet[i])) ) {
-					//magic(set[i], 'QQQ DURING: set[' + i + ']');
 					results.push( set.item ? set.item(i) : set[i] );
 				}
 			}
 		} else {
-			//magic(true, 'QQQ BEFORE: context is empty or not a node');
 			for ( i = 0; checkSet[i] != null; i++ ) {
 				if ( checkSet[i] && checkSet[i].nodeType === 1 ) {
 					results.push( set.item ? set.item(i) : set[i] );
 				}
 			}
 		}
-		//magic(results, 'QQQ AFTER: results');
-		//magic(results, 'QQQ AFTER: checkSet');
-        //magic(results, 'after manual?? makeArray? prune???'); // XXX
 	} else {
 		makeArray( checkSet, results );
-        //magic(results, 'after makeArray'); // XXX
 	}
 
 	if ( extra ) {
 		Sizzle( extra, origContext, results, seed );
-        //magic(results, 'after extra'); // XXX
 		Sizzle.uniqueSort( results );
-        //magic(results, 'after uniqueSort'); // XXX
 	}
 
-    //magic(results, 'return'); // XXX
 	return results;
 };
 
@@ -239,28 +211,8 @@ Sizzle.find = function(expr, context, isXML){
 // @param DOMNodeList set
 // note that nodelist[i] doesn't work on mobile!
 Sizzle.filter = function(expr, set, inplace, not){
-//Titanium.API.debug('Sizzle.filter() enter');
-//	var old = expr, result = [], curLoop = makeArray(set), match, anyFound,
-//		isXMLFilter = set && (set.item ? set.item(0) : set[0]) && Sizzle.isXML((set.item ? set.item(0) : set[0]));
-//Titanium.API.debug('Sizzle.filter() a');
-	var old = expr;
-//Titanium.API.debug('Sizzle.filter() b');
-	var result = [];
-//Titanium.API.debug('Sizzle.filter() c');
-	var curLoop = makeArray(set); // <- ok this is what appears to be dying. odd since we instrumented that fucker too!
-//Titanium.API.debug('Sizzle.filter() d');
-	var match;
-//Titanium.API.debug('Sizzle.filter() e');
-	var anyFound;
-//Titanium.API.debug('Sizzle.filter() f');
-	var isXMLFilter = set && (set.item ? set.item(0) : set[0]) && Sizzle.isXML((set.item ? set.item(0) : set[0]));
-//Titanium.API.debug('Sizzle.filter() g');
-//Titanium.API.debug('Sizzle.filter() debug time...');
-//magic(expr, 'filter: expr');
-//magic(set, 'filter: set');
-//magic(curLoop, 'filter: curLoop');
-//magic(inplace, 'filter: inplace');
-//magic(not, 'filter: not');
+	var old = expr, result = [], curLoop = makeArray(set), match, anyFound,
+		isXMLFilter = set && (set.item ? set.item(0) : set[0]) && Sizzle.isXML((set.item ? set.item(0) : set[0]));
 	while ( expr && set.length ) {
 		for ( var type in Expr.filter ) {
 			if ( (match = Expr.leftMatch[ type ].exec( expr )) != null && match[2] ) {
@@ -315,7 +267,6 @@ Sizzle.filter = function(expr, set, inplace, not){
 					expr = expr.replace( Expr.match[ type ], "" );
 
 					if ( !anyFound ) {
-//Titanium.API.debug('Sizzle.filter() early return');
 						return [];
 					}
 
@@ -336,7 +287,6 @@ Sizzle.filter = function(expr, set, inplace, not){
 		old = expr;
 	}
 
-//Titanium.API.debug('Sizzle.filter() done');
 	return curLoop;
 };
 
@@ -619,7 +569,6 @@ var Expr = Sizzle.selectors = {
 	},
 	setFilters: {
 		first: function(elem, i){
-			Titanium.API.info('setFilters: first called with i=' + i);
 			return i === 0;
 		},
 		last: function(elem, i, match, array){
@@ -641,7 +590,6 @@ var Expr = Sizzle.selectors = {
 			return match[3] - 0 === i;
 		},
 		eq: function(elem, i, match){
-			Titanium.API.info('setFilters: eq called with i=' + i + ', match=' + match);
 			return match[3] - 0 === i;
 		}
 	},
@@ -758,16 +706,10 @@ var Expr = Sizzle.selectors = {
 				false;
 		},
 		POS: function(elem, match, i, array){
-			Titanium.API.info("POS called with i=" + i);
 			var name = match[2], filter = Expr.setFilters[ name ];
-			Titanium.API.info("POS called with name=" + name);
-			Titanium.API.info("POS called with filter=" + filter);
 
 			if ( filter ) {
-				//return filter( elem, i, match, array );
-				var result = filter( elem, i, match, array );
-				Titanium.API.info("POS filter result: " + result);
-				return result;
+				return filter( elem, i, match, array );
 			}
 		}
 	}
@@ -783,45 +725,11 @@ for ( var type in Expr.match ) {
 	Expr.leftMatch[ type ] = new RegExp( /(^(?:.|\r|\n)*?)/.source + Expr.match[ type ].source.replace(/\\(\d+)/g, fescape) );
 }
 
-/*
+// Hacked for the funky DOM node lists in Titanium Mobile which
+// don't support reading elements via array index operator.
 var makeArray = function(array, results) {
-	Titanium.API.debug('makeArray enter...');
-	Titanium.API.debug('makeArray(' + array + ', ' + results + ')');
-	if (!(array instanceof Array)) {
-		Titanium.API.debug('makeArray has a non-array!');
-		return [];
-	}
-	Titanium.API.debug('makeArray(' + debugFormat(array) + ', ' + debugFormat(results) + ')');
-	array = Array.prototype.slice.call( array, 0 );
-
-	if ( results ) {
-		results.push.apply( results, array );
-		Titanium.API.debug('makeArray out (to results)');
-		return results;
-	}
-	Titanium.API.debug('makeArray out');
-	return array;
-};
-
-// Perform a simple check to determine if the browser is capable of
-// converting a NodeList to an array using builtin methods.
-// Also verifies that the returned array holds DOM nodes
-// (which is not the case in the Blackberry browser)
-try {
-	Array.prototype.slice.call( document.documentElement.childNodes, 0 )[0].nodeType;
-
-// Provide a fallback method if it does not work
-} catch(e){
-*/
-var	makeArray = function(array, results) {
-		if (array === null) {
-			// for some reason this has been happening on Android
-			// a backtrace would be REALLY FUCKING NICE
-			throw "null passed to makeArray!";
-		}
 		var ret = results || [], i = 0;
 
-		//if ( toString.call(array) === "[object Array]" ) {
 		if ( array instanceof Array ) {
 			Array.prototype.push.apply( ret, array );
 		} else {
@@ -842,7 +750,6 @@ var	makeArray = function(array, results) {
 
 		return ret;
 	};
-//}
 
 var sortOrder;
 
@@ -1144,7 +1051,6 @@ Sizzle.isXML = function(elem){
 };
 
 var posProcess = function(selector, context){
-	Titanium.API.warn('posProcess: "' + selector + '" ' + context);
 	var tmpSet = [], later = "", match,
 		root = context.nodeType ? [context] : context;
 
@@ -1157,9 +1063,7 @@ var posProcess = function(selector, context){
 
 	selector = Expr.relative[selector] ? selector + "*" : selector;
 
-	// wtf is all this man...
 	for ( var i = 0, l = root.length; i < l; i++ ) {
-		Titanium.API.warn('posProcess sub-Sizzle: "' + selector + '" i=' + i + ', root[i]=' + debugFormat(root[i]));
 		Sizzle( selector, root[i], tmpSet );
 	}
 
@@ -1168,7 +1072,7 @@ var posProcess = function(selector, context){
 
 // EXPOSE
 
-window.Sizzle = Sizzle;
+this.Sizzle = Sizzle;
 
 // Hacks for Titanium
 Sizzle.hacks = {

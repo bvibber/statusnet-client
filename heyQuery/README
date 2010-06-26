@@ -17,6 +17,21 @@ Sizzle is from: http://sizzlejs.com/ and has all that copyright stuff. Enjoy!
 
 
 
-Other fixes that should be done:
-* loading sizzle.js still requires a funky wrapper check, should be cleaned up.
-* probably have heyQuery.js load sizzle.js, or combine them.
+
+Ti.XML DOM implementation problems...
+* some method entries are present, but don't work as expected -- this can mess up feature detection.
+* getElementById is present, but doesn't work on iPhone
+	a) XPath expression doesn't quote its string, so fails.
+	b) also, it tries to return a node list instead of a single node!
+* getElementsByTagName('*') doesn't work on iPhone
+* getElementsByName is not present (but, technically, possibly shouldn't for xml)
+* documentElement is exposed as a function instead of a property on iPhone
+* object identity is not preserved on DOM node proxy objects -- can't compare variables to see if they hold the same element! this is hugely problematic, and is my main remaining bottleneck
+* node lists can't be accessed directly by index nodes[i] -- have to use nodes.item(i) which isn't source compatible
+* elements have 'text' property where we expected 'textContent'
+* evaluate() returns a DOM node list, where we would have expected an XPathResult (honestly i like the node list better, but it's a compatibility issue as they're totally different interfaces)
+* i think i've seen problems with objects not updating when we make changes via the dom. this is not an issue for our use cases, but it's worrying. need to investigate.
+
+Bad assumptions in sizzle:
+* window and document exist...
+* object.prototype.toString(foo) will give consistent results like "[object Array]" -- they can differ significantly, which affects some type checks

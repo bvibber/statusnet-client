@@ -26,17 +26,8 @@ Titanium.API.error('this is an error statement');
 Titanium.API.warn('this is a warn statement');
 Titanium.API.info('this is an info statement');
 
-var window = {};
-var document = Titanium.XML.parseString('<stub/>');
-Titanium.include('sizzle.js');
-var Sizzle = window.Sizzle;
-
-Titanium.API.info('we lived past sizzle.js load');
-
 
 Titanium.include('heyQuery.js');
-var $ = jQuery = heyQuery;
-
 Titanium.API.info('we lived past heyQuery.js load');
 
 
@@ -72,7 +63,9 @@ Titanium.API.info('bit == bit2 ' + (bit == bit2));
 Titanium.API.info('bit === bit2 ' + (bit === bit2));
 Titanium.API.info('bit.toString() == bit2.toString() ' + (bit.toString() == bit2.toString()));
 
+*/
 
+/*
 // confirmed the cause of getelementbyid bug -- bad xpath expression building in the obj-c code
 
 var document = Titanium.XML.parseString('<stub><a id="a"></a> <b id="b"></b></stub>');
@@ -82,6 +75,7 @@ var axp = document.evaluate('//*[@id=a]');
 var axpx = document.evaluate("//*[@id='a']");
 Titanium.API.info('a: ' + a);
 Titanium.API.info('ax: ' + ax);
+if (ax) { Titanium.API.info('ax.length: ' + ax.length); } // it's also returning a node list instead of a node
 Titanium.API.info('axp: ' + axp);
 Titanium.API.info('axpx: ' + axpx);
 */
@@ -92,8 +86,8 @@ Titanium.API.info('we lived past test-shim load');
 Titanium.include('tests/data/testinit.js');
 Titanium.API.info('we lived past testinit.js load');
 
-//Titanium.include('tests/selector.js');
-//Titanium.API.info('we lived past selector.js load');
+Titanium.include('tests/selector.js');
+Titanium.API.info('we lived past selector.js load');
 
 Titanium.include('tests/atom.js');
 Titanium.API.info('we lived past selector.js load');

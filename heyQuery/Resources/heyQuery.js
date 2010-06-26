@@ -27,6 +27,8 @@
  * @maintainer Brion Vibber <brion@status.net>
  */
 
+// Pull in our patched version of jQuery's Sizzle selector engine...
+Titanium.include('sizzle.js');
 
 /**
  * heyQueryObj constructor - internal
@@ -212,3 +214,5 @@ heyQuery.appendArray = function(a, result) {
 };
 
 heyQuery.makeArray = heyQuery.appendArray;
+
+var $ = jQuery = heyQuery;
