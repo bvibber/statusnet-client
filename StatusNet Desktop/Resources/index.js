@@ -44,7 +44,7 @@ $LAB
     .script("model/statusnet_timeline_inbox.js")
     .script("model/statusnet_timeline_search.js")
     .script("model/statusnet_timeline_subscriptions.js")
-    .script('atom_parser.js')
+    .script('model/statusnet_atom_parser.js')
     .script("humane.js")
     .wait(function(){
 
