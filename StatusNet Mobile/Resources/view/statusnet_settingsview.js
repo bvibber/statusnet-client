@@ -42,6 +42,10 @@ StatusNet.SettingsView.prototype.init = function(client) {
         // Selected an account
         var acct = event.rowData.acct;
         StatusNet.debug('Attempting to select account: ' + acct.username + '@' + acct.getHost());
+        acct.setDefault(StatusNet.getDB());
+        StatusNet.debug('Saved!');
+        this.client.showTimeline('home');
+        StatusNet.debug('Switched to timeline.');
     });
     this.table.addEventListener('delete', function(event) {
         // deleted a row
