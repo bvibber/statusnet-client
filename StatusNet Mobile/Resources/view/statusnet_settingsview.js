@@ -44,7 +44,7 @@ StatusNet.SettingsView.prototype.init = function(client) {
         StatusNet.debug('Attempting to select account: ' + acct.username + '@' + acct.getHost());
         acct.setDefault(StatusNet.getDB());
         StatusNet.debug('Saved!');
-        this.client.showTimeline('home');
+        this.client.initAccountView(acct);
         StatusNet.debug('Switched to timeline.');
     });
     this.table.addEventListener('delete', function(event) {

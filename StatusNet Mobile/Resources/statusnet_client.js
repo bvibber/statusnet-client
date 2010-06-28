@@ -61,6 +61,8 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     this.timeline.update();
     */
 
+    StatusNet.debug("StatusNet.Client.prototype.switchTimeline() DONE");
+
 }
 
 /**
@@ -136,7 +138,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     // @todo localization
     var tabInfo = {'public':    {title: 'Public',
                               timeline: StatusNet.TimelinePublic,
-                                  view: StatusNet.TimelineViewPublic},
+                                  view: StatusNet.TimelineViewPublic}/*,
                     friends:    {title: 'Personal',
                               timeline: StatusNet.TimelineFriends,
                                   view: StatusNet.TimelineViewFriends},
@@ -154,7 +156,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
                                   view: StatusNet.TimelineViewInbox},
                      search:    {title: 'Search',
                               timeline: StatusNet.TimelineSearch,
-                                  view: StatusNet.TimelineViewSearch}};
+                                  view: StatusNet.TimelineViewSearch}*/};
 
     this.tabs = {};
     this.windows = {};
@@ -169,6 +171,8 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     // @todo remember last-used tab
     this.tabGroup.setActiveTab(this.tabs['friends']);
     this.tabGroup.open();
+
+    StatusNet.debug('initAccountView done.');
 }
 
 /**
@@ -207,13 +211,17 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
         client.view.window = window;
         if (info.timeline) {
             StatusNet.debug('timeline tab? updating timeline...');
+            StatusNet.debug(info.timeline);
             client.timeline = new info.timeline(client);
-            client.timeline.update();
+            StatusNet.debug('created, now telling it to update:');
+            //client.timeline.update();
+            StatusNet.debug('timeline updated.');
         } else {
             StatusNet.debug('settings tab? showing view...');
             // Settings dialog
             client.timeline = null;
             client.view.init();
+            StatusNet.debug('settings shown.');
         }
     });
 }
