@@ -62,6 +62,9 @@ StatusNet.DirectMessageView.prototype.init = function() {
 
         $('#counter').html(textLimit - len);
     });
+
+    // set focus to the text entry field
+    $('direct_message_textarea').focus();
 }
 
 /**

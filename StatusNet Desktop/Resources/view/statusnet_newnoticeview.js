@@ -72,6 +72,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
         $('#counter').html(textLimit - len);
     });
+
+    // set focus to the text entry field
+    $('textarea#notice_textarea').focus();
 }
 
 /**
