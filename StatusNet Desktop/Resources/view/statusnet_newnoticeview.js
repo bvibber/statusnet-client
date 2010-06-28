@@ -86,7 +86,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
 
     var base = 'status=' + encodeURIComponent(noticeText);
     var params = [];
-    params.push('source=StatusNetDesktop');
+    params.push('source=' + encodeURIComponent('StatusNet Desktop'));
 
     var me = Titanium.UI.getCurrentWindow();
 
