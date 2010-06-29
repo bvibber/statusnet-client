@@ -181,6 +181,7 @@ StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
 
 /**
  * Determine wether the version of StatusNet will work with this client
+ * Currently hard-coded to check for 0.9.3 or above
  */
 StatusNet.SettingsView.prototype.validVersion = function(version)
 {
@@ -197,7 +198,7 @@ StatusNet.SettingsView.prototype.validVersion = function(version)
         if (minor < 9) {
             return false;
         } else {
-            if (rev < 2) { // @todo - update this to 3 for release
+            if (rev < 3) { 
                 return false;
             }
         }

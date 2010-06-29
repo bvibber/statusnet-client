@@ -150,6 +150,9 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
         }
     }
 
+    notice.following = $(entry).find('[nodeName=statusnet:profile_info]').attr('following');
+    notice.blocking = $(entry).find('[nodeName=statusnet:profile_info]').attr('blocking');
+
     // @todo ostatus:attention ?
 
     // @todo category / tags / groups ?

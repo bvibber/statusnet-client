@@ -17,16 +17,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-StatusNet.TimelineViewSubscriptions = function(client) {    
+StatusNet.TimelineViewSubscriptions = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s subscriptions on {site}";
-    
+
     StatusNet.debug("TimelineViewSubscriptions constructor");
-    
+
     this.timeline = client.getActiveTimeline();
-    
+
     var that = this;
-    
+
     this.timeline.userAdded.attach(
         function(args) {
             if (args) {
@@ -35,7 +35,7 @@ StatusNet.TimelineViewSubscriptions = function(client) {
                 StatusNet.debug("userAdded event with no args!");
             }
         }
-    );    
+    );
 }
 
 // Make StatusNet.TimelineViewSubscriptions inherit TimelineView's prototype
@@ -60,9 +60,9 @@ StatusNet.TimelineViewSubscriptions.prototype.show = function() {
 
         $('#notices').append(html.join(''));
     }
-    
+
     var that = this;
-    
+
     $('#notices > div#profile_panel').each(function() {
         that.enableProfileControls(this);
     });
@@ -169,8 +169,9 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
     }
 
     html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
+    html.push('<a href="#" class="profile_block">Block</a>');
     html.push('</div>');
-    
+
     html.push('</div>')
 
     return html.join('');
@@ -187,22 +188,29 @@ StatusNet.TimelineViewSubscriptions.prototype.showEmptyTimeline = function() {
 StatusNet.TimelineViewSubscriptions.prototype.enableProfileControls = function(profileXml) {
 
     StatusNet.debug("enableProfileControls()");
-        
+
     var nameAttr = $(profileXml).find('dl.profile_list').attr('name');
     var result = nameAttr.split(",");
-    
+
     var id = result[0];
     var username = result[1];
-    
+
     StatusNet.debug("nameAtrr = " + nameAttr + ", id = " + id + ", name = " + username);
-    
+
     var that = this;
-    
+
     $('a.profile_unsubscribe:first', profileXml).bind('click', function(event) {
         that.client.unsubscribe(id, this);
     });
 
     $('a.profile_direct_message', profileXml).bind('click', function(event) {
         that.client.directMessageDialog(username);
+    });
+
+    $('a.profile_block', profileXml).bind('click', function(event) {
+        var r = confirm("Really block this user?");
+        if (r) {
+            that.client.block(id, this);
+        }
     });
 }
