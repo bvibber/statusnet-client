@@ -91,7 +91,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
     html.push('<div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a>');
     if (notice.author !== this.client.account.username) {
-        if (notice.subscribed === 'false' ) {
+        if (notice.following === 'false' ) {
             html.push('<a href="#" class="avatar_subscribe">Subscribe</a> ');
         } else {
             html.push(' <a href="#" class="avatar_unsubscribe">Unsubscribe</a> ');

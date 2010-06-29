@@ -715,7 +715,7 @@ StatusNet.Client.prototype.leaveGroup = function(groupId, linkDom)
  *
  * On success changes the link to an unblock link
  */
-StatusNet.Client.prototype.block = function(profileId, linkDom)
+StatusNet.Client.prototype.block = function(profileId, linkDom, onSuccess)
 {
     var url = 'blocks/create/' + profileId + '.json';
 
@@ -740,6 +740,7 @@ StatusNet.Client.prototype.block = function(profileId, linkDom)
                     that.unblock(profileId, linkDom);
                 }
             );
+            onSuccess();
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
@@ -758,7 +759,7 @@ StatusNet.Client.prototype.block = function(profileId, linkDom)
  *
  * On success changes the link to an unblock link
  */
-StatusNet.Client.prototype.unblock = function(profileId, linkDom)
+StatusNet.Client.prototype.unblock = function(profileId, linkDom, onSuccess)
 {
     var url = 'blocks/destroy/' + profileId + '.json';
 
@@ -783,6 +784,7 @@ StatusNet.Client.prototype.unblock = function(profileId, linkDom)
                     that.block(profileId, linkDom);
                 }
             );
+            onSuccess();
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');

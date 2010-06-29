@@ -117,11 +117,15 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     // XXX: sucks that I have to pass client back in so I can use it here -Z
     // Hmm... use toggle() instead?
     $('a.profile_subscribe').bind('click', function(event) {
-        client.subscribe(user.id, this);
+        client.subscribe(user.id, function() {
+            $('a.profile_direct_message').show();
+        });
     });
 
     $('a.profile_unsubscribe').bind('click', function(event) {
-        client.unsubscribe(user.id, this);
+        client.unsubscribe(user.id, this, function() {
+            $('a.profile_direct_message').hide();
+        });
     });
 
     $('a.profile_direct_message').bind('click', function(event) {
@@ -131,12 +135,16 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     $('a.profile_block').bind('click', function(event) {
         var r = confirm("Really block this user?");
         if (r) {
-            client.block(user.id, this);
+            client.block(user.id, this, function() {
+                $('a.profile_direct_message').hide()
+            });
         }
     });
 
     $('a.profile_unblock').bind('click', function(event) {
-         client.unblock(user.id, this);
+         client.unblock(user.id, this, function() {
+             $('a.profile_direct_message').hide();
+         });
     });
 
     // Show subscriptions view button

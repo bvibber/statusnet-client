@@ -200,7 +200,9 @@ StatusNet.TimelineViewSubscriptions.prototype.enableProfileControls = function(p
     var that = this;
 
     $('a.profile_unsubscribe:first', profileXml).bind('click', function(event) {
-        that.client.unsubscribe(id, this);
+        that.client.unsubscribe(id, this, function() {
+            $('a.profile_direct_message', profileXml).hide();
+        });
     });
 
     $('a.profile_direct_message', profileXml).bind('click', function(event) {
@@ -210,7 +212,9 @@ StatusNet.TimelineViewSubscriptions.prototype.enableProfileControls = function(p
     $('a.profile_block', profileXml).bind('click', function(event) {
         var r = confirm("Really block this user?");
         if (r) {
-            that.client.block(id, this);
+            that.client.block(id, this, function() {
+                $('a.profile_direct_message', profileXml).hide();
+            });
         }
     });
 }
