@@ -563,7 +563,9 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom, onSuccess)
                     that.unsubscribe(profileId, linkDom);
                 }
             );
-            onSuccess();
+            if (onSuccess) {
+                onSuccess();
+            }
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
@@ -608,7 +610,9 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom, onSuccess)
                     that.subscribe(profileId, linkDom);
                 }
             );
-            onSuccess();
+            if (onSuccess) {
+                onSuccess();
+            }
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
@@ -740,7 +744,9 @@ StatusNet.Client.prototype.block = function(profileId, linkDom, onSuccess)
                     that.unblock(profileId, linkDom);
                 }
             );
-            onSuccess();
+            if (onSuccess) {
+                onSuccess();
+            }
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
@@ -784,7 +790,9 @@ StatusNet.Client.prototype.unblock = function(profileId, linkDom, onSuccess)
                     that.block(profileId, linkDom);
                 }
             );
-            onSuccess();
+            if (onSuccess) {
+                onSuccess();
+            }
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
