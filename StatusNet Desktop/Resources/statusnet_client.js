@@ -704,3 +704,89 @@ StatusNet.Client.prototype.leaveGroup = function(groupId, linkDom)
         }
     );
 }
+
+/**
+ * Block to a profile
+ *
+ * @param int profileId  the ID of the profile to block
+ * @param DOM linkDom    the link element
+ *
+ * On success changes the link to an unblock link
+ */
+StatusNet.Client.prototype.block = function(profileId, linkDom)
+{
+    var url = 'blocks/create/' + profileId + '.json';
+
+    $(linkDom).attr('disabled', 'disabled');
+
+    StatusNet.debug("StatusNet.Client.block() - blocking " + profileId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).text('Unblock');
+            $(linkDom).removeClass('profile_block');
+            $(linkDom).addClass('profile_unblock');
+            $(linkDom).unbind('click');
+            $(linkDom).bind('click',
+                function(event) {
+                    that.unblock(profileId, linkDom);
+                }
+            );
+        },
+        function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error blocking profile: ' + msg.error);
+            alert('Error blocking profile: ' + msg.error);
+        }
+    );
+}
+
+/**
+ * Unblock to a profile
+ *
+ * @param int profileId  the ID of the profile to unblock
+ * @param DOM linkDom    the link element
+ *
+ * On success changes the link to an unblock link
+ */
+StatusNet.Client.prototype.unblock = function(profileId, linkDom)
+{
+    var url = 'blocks/destroy/' + profileId + '.json';
+
+    $(linkDom).attr('disabled', 'disabled');
+
+    StatusNet.debug("StatusNet.Client.block() - unblocking " + profileId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.postUrl(url, params,
+        function(status, data) {
+            StatusNet.debug(status);
+            StatusNet.debug(data);
+            $(linkDom).text('Block');
+            $(linkDom).removeClass('profile_unblock');
+            $(linkDom).addClass('profile_block');
+            $(linkDom).unbind('click');
+            $(linkDom).bind('click',
+                function(event) {
+                    that.block(profileId, linkDom);
+                }
+            );
+        },
+        function(client, responseText) {
+            $(linkDom).removeAttr('disabled');
+            var msg = Titanium.JSON.parse(responseText);
+            StatusNet.debug('Error unblocking profile: ' + msg.error);
+            alert('Error unblocking profile: ' + msg.error);
+        }
+    );
+}

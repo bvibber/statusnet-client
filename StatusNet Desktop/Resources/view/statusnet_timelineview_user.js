@@ -95,13 +95,17 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
 
             html.push('<div id="profile_action_links"');
 
-            if (extended.following == "false") {
-                html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
+            if (extended.blocking !== "true") {
+                if (extended.following === "false") {
+                    html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
+                } else {
+                    html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
+                    html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
+                }
+                html.push('<a href="#" class="profile_block">Block</a>');
             } else {
-                html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
+                html.push('<a href="#" class="profile_unblock">Unblock</a>');
             }
-
-            html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
             html.push('</div');
         }
 
@@ -122,6 +126,17 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
 
     $('a.profile_direct_message').bind('click', function(event) {
         client.directMessageDialog(user.username);
+    });
+
+    $('a.profile_block').bind('click', function(event) {
+        var r = confirm("Really block this user?");
+        if (r) {
+            client.block(user.id, this);
+        }
+    });
+
+    $('a.profile_unblock').bind('click', function(event) {
+         client.unblock(user.id, this);
     });
 
     // Show subscriptions view button

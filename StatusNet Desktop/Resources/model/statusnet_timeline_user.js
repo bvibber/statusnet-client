@@ -91,6 +91,8 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
             extended.statuses_cnt = $(data).find('statuses_count').text();
             extended.favorites_cnt = $(data).find('favourites_count').text();
             extended.following = $(data).find('following').text();
+            extended.blocking = $(data).find('[nodeName=statusnet:blocking]').text();
+
             extended.notifications = $(data).find('notifications').text();
             that.extended = extended;
 
