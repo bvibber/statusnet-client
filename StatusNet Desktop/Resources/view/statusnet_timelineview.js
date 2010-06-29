@@ -90,14 +90,6 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
     html.push('<div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a>');
-    if (notice.author !== this.client.account.username) {
-        if (notice.following === 'false' ) {
-            html.push('<a href="#" class="avatar_subscribe">Subscribe</a> ');
-        } else {
-            html.push(' <a href="#" class="avatar_unsubscribe">Unsubscribe</a> ');
-        }
-        html.push('<a href="#" class="avatar_block">Block</a>');
-    }
     html.push('</div>');
     html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
     html.push('<div class="content">'+ notice.content +'</div>');
@@ -298,27 +290,6 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     // Repeat
     $(noticeDom).find('a.notice_repeat').bind('click', function(event) {
         that.client.repeatNotice(noticeId, this);
-    });
-
-    $(noticeDom).find('a.avatar_subscribe').bind('click', function(event) {
-        that.client.subscribe(authorId, this, function() {
-            that.timeline.refreshNotice(noticeId);
-        });
-    });
-
-    $(noticeDom).find('a.avatar_unsubscribe').bind('click', function(event) {
-        that.client.unsubscribe(authorId, this, function() {
-            that.timeline.refreshNotice(noticeId);
-        });
-    });
-
-    $(noticeDom).find('a.avatar_block').bind('click', function(event) {
-        var r = confirm("Really block this user?");
-        if (r) {
-            that.client.block(authorId, this, function() {
-                that.timeline.refreshNotice(noticeId);
-            });
-        }
     });
 
     // Override external web links to local users and groups in-content

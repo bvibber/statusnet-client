@@ -156,7 +156,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
                 }
             }
         );
-    });
+    }, false);
 
     // @todo multiple timeline auto-refresh
 
@@ -173,7 +173,8 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
                         );
                         that.newNoticesSound.play();
                     }
-                });
+                },
+                true)
             },
             60000 // @todo Make this configurable
         );
@@ -353,7 +354,7 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
     var that = this;
 
     win.addEventListener(Titanium.CLOSE, function(event) {
-        that.timeline.update();
+        that.timeline.update(null, false);
     });
 
     win.open();
@@ -802,3 +803,25 @@ StatusNet.Client.prototype.unblock = function(profileId, linkDom, onSuccess)
         }
     );
 }
+
+/**
+ * Dump all cached notices
+ */
+StatusNet.Client.prototype.flushNoticeCache = function(onSuccess) {
+
+    StatusNet.debug("Flushing the cache for account: " + this.account.id);
+
+    var db = StatusNet.getDB();
+
+    var rs = db.execute(
+        "DELETE FROM entry WHERE notice_id IN (SELECT notice_id FROM notice_entry WHERE account_id = ?)",
+        this.account.id
+    );
+
+    var rs = db.execute("DELETE FROM notice_entry WHERE account_id = ?", this.account.id);
+
+    if (onSuccess) {
+        onSuccess();
+    }
+}
+
