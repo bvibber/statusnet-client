@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * View class for managing the sidebar
  */
@@ -35,21 +36,44 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#friends_img').attr('src', '/images/blue/chat.png');
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
+            $('#inbox_img').attr('src', '/images/mail.png');
+            $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'mentions':
             $('#friends_img').attr('src', '/images/chat.png');
             $('#mentions_img').attr('src', '/images/blue/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
+            $('#inbox_img').attr('src', '/images/mail.png');
+            $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'favorites':
             $('#friends_img').attr('src', '/images/chat.png');
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/blue/star.png');
+            $('#inbox_img').attr('src', '/images/mail.png');
+            $('#search_img').attr('src', '/images/magnifier.png');
+            break;
+        case 'inbox':
+            $('#friends_img').attr('src', '/images/chat.png');
+            $('#mentions_img').attr('src', '/images/at.png');
+            $('#favorites_img').attr('src', '/images/star.png');
+            $('#inbox_img').attr('src', '/images/blue/mail.png');
+            $('#search_img').attr('src', '/images/magnifier.png');
+            break;
+        case 'search':
+            $('#friends_img').attr('src', '/images/chat.png');
+            $('#mentions_img').attr('src', '/images/at.png');
+            $('#favorites_img').attr('src', '/images/star.png');
+            $('#inbox_img').attr('src', '/images/mail.png');
+            $('#search_img').attr('src', '/images/blue/magnifier.png');
             break;
         default:
             $('#friends_img').attr('src', '/images/chat.png');
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
+            $('#inbox_img').attr('src', '/images/mail.png');
+            $('#search_img').attr('src', '/images/magnifier.png');
+
 
             // @todo Do something for public and user...
 
