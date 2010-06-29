@@ -89,17 +89,25 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     }
 
     html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
-
-    html.push('   <div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a></div>');
-    html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
-    html.push('   <div class="content">'+ notice.content +'</div>');
-    html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
+    html.push('<div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a>');
+    if (notice.author !== this.client.account.username) {
+        if (notice.subscribed === 'false' ) {
+            html.push('<a href="#" class="avatar_subscribe">Subscribe</a> ');
+        } else {
+            html.push(' <a href="#" class="avatar_unsubscribe">Unsubscribe</a> ');
+        }
+        html.push('<a href="#" class="avatar_block">Block</a>');
+    }
+    html.push('</div>');
+    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
+    html.push('<div class="content">'+ notice.content +'</div>');
+    html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external">' + humane_date(notice.updated) + '</a></div>');
     if (notice.source) {
-        html.push('   <div class="notice_source"><span class="notice_source_inner">from ' + notice.source + '</span></div>');
+        html.push('<div class="notice_source"><span class="notice_source_inner">from ' + notice.source + '</span></div>');
     }
     if (notice.contextLink && notice.inReplyToLink) {
         html.push(
-            '   <div class="context_link"><a rel="external" href="'
+            '<div class="context_link"><a rel="external" href="'
             + notice.contextLink +'">in context</a></div>'
         );
     }
@@ -249,7 +257,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
         });
 
         $(noticeDom).find('div.avatar a').attr('href', "#");
-        $(noticeDom).find('div.avatar').bind('click', function(event) {
+        $(noticeDom).find('div.avatar img').bind('click', function(event) {
             StatusNet.debug("Switching timeline to user " + authorId);
             that.client.switchUserTimeline(authorId);
         });
@@ -290,6 +298,27 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     // Repeat
     $(noticeDom).find('a.notice_repeat').bind('click', function(event) {
         that.client.repeatNotice(noticeId, this);
+    });
+
+    $(noticeDom).find('a.avatar_subscribe').bind('click', function(event) {
+        that.client.subscribe(authorId, this, function() {
+            that.timeline.refreshNotice(noticeId);
+        });
+    });
+
+    $(noticeDom).find('a.avatar_unsubscribe').bind('click', function(event) {
+        that.client.unsubscribe(authorId, this, function() {
+            that.timeline.refreshNotice(noticeId);
+        });
+    });
+
+    $(noticeDom).find('a.avatar_block').bind('click', function(event) {
+        var r = confirm("Really block this user?");
+        if (r) {
+            that.client.block(authorId, this, function() {
+                that.timeline.refreshNotice(noticeId);
+            });
+        }
     });
 
     // Override external web links to local users and groups in-content

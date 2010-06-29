@@ -538,7 +538,7 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
  *
  * On success changes the link to an unsubscribe link
  */
-StatusNet.Client.prototype.subscribe = function(profileId, linkDom)
+StatusNet.Client.prototype.subscribe = function(profileId, linkDom, onSuccess)
 {
     var url = 'friendships/create/' + profileId + '.json';
 
@@ -563,6 +563,7 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom)
                     that.unsubscribe(profileId, linkDom);
                 }
             );
+            onSuccess();
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
@@ -582,7 +583,7 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom)
  * On success changes the link to a subscribe link
  *
  */
-StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom)
+StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom, onSuccess)
 {
     var url = 'friendships/destroy/' + profileId + '.json';
 
@@ -607,6 +608,7 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom)
                     that.subscribe(profileId, linkDom);
                 }
             );
+            onSuccess();
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
