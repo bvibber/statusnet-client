@@ -66,6 +66,15 @@ a {
 	background-repeat: no-repeat;
 }
 
+#sidebar #user_img, #sidebar #public_img {
+	opacity: 0.7;
+}
+
+#sidebar #user_img.opaque, #sidebar #user_img:hover, #sidebar #public_img.opaque, #sidebar #public_img:hover {
+	background-image: none;	
+	opacity: 1;
+}
+
 #profile {
 	padding-top:10px;
 	margin-bottom:10px;

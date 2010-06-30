@@ -33,6 +33,8 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
 
     switch(timeline) {
         case 'friends':
+            $('#public_img').attr('class', '');
+            $('#user_img').attr('class', 'rounded');
             $('#friends_img').attr('src', '/images/blue/chat.png');
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
@@ -40,6 +42,8 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'mentions':
+            $('#public_img').attr('class', '');
+            $('#user_img').attr('class', 'rounded');
             $('#friends_img').attr('src', '/images/chat.png');
             $('#mentions_img').attr('src', '/images/blue/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
@@ -47,6 +51,8 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'favorites':
+            $('#public_img').attr('class', '');
+            $('#user_img').attr('class', 'rounded');
             $('#friends_img').attr('src', '/images/chat.png');
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/blue/star.png');
@@ -54,6 +60,8 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'inbox':
+            $('#public_img').attr('class', '');
+            $('#user_img').attr('class', 'rounded');
             $('#friends_img').attr('src', '/images/chat.png');
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
@@ -61,21 +69,41 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'search':
+            $('#public_img').attr('class', '');
+            $('#user_img').attr('class', 'rounded');
             $('#friends_img').attr('src', '/images/chat.png');
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
             $('#search_img').attr('src', '/images/blue/magnifier.png');
             break;
+        case 'user':
+            $('#public_img').attr('class', '');
+            $('#user_img').attr('class', 'rounded opaque');
+            $('#friends_img').attr('src', '/images/chat.png');
+            $('#mentions_img').attr('src', '/images/at.png');
+            $('#favorites_img').attr('src', '/images/star.png');
+            $('#inbox_img').attr('src', '/images/mail.png');
+            $('#search_img').attr('src', '/images/magnifier.png');
+            break;
+        case 'public':
+            $('#public_img').attr('class', 'opaque');
+            $('#user_img').attr('class', 'rounded');
+            $('#friends_img').attr('src', '/images/chat.png');
+            $('#mentions_img').attr('src', '/images/at.png');
+            $('#favorites_img').attr('src', '/images/star.png');
+            $('#inbox_img').attr('src', '/images/mail.png');
+            $('#search_img').attr('src', '/images/magnifier.png');
+            break;
         default:
+            $('#public_img').attr('class', '');
+            $('#user_img').attr('class', 'rounded');
             $('#friends_img').attr('src', '/images/chat.png');
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
             $('#search_img').attr('src', '/images/magnifier.png');
 
-
-            // @todo Do something for public and user...
 
             StatusNet.debug("I don\'t know how to highlight this timeline.");
             break;
