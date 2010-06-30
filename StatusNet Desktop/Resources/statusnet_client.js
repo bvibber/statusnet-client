@@ -40,12 +40,13 @@ StatusNet.Client = function(_account) {
     this.timeline.update(function() {
         that.timeline.noticeAdded.attach(
             function(args) {
-                if (args) {
+                if (args.notifications) {
                     that.view.notifyNewNotice(args.notice);
                 } else {
                     StatusNet.debug("noticeAdded event with no args!");
                 }
-            }
+            },
+            false
         );
     });
 
@@ -64,7 +65,8 @@ StatusNet.Client = function(_account) {
                         );
                         that.newNoticesSound.play();
                     }
-                }
+                },
+                true
             );
         },
         60000

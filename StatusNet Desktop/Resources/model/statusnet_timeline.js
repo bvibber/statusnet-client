@@ -150,10 +150,7 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications)
 
     if (prepend) {
         this._notices.unshift(notice);
-        if (notifications) {
-            this.noticeAdded.notify({notice: notice});
-        }
-        StatusNet.debug("StatusNet.Timeline.addNotice - finished prepending notice");
+        this.noticeAdded.notify({notice: notice, notifications: notifications});
     } else {
         this._notices.push(notice);
     }
@@ -166,8 +163,6 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications)
 StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
 
     this.updateStart.notify();
-
-    StatusNet.debug("Notified view that we're doing an update");
 
     var that = this;
 
@@ -436,7 +431,7 @@ StatusNet.TimelineTag = function(client, tag) {
 StatusNet.TimelineTag.prototype = heir(StatusNet.Timeline.prototype);
 
 // XXX: Turns out StatusNet's TAG timeline doesn't respect the since_id so
-// until we fix it, I'm going to disable caching of tag timelines --Z 
+// until we fix it, I'm going to disable caching of tag timelines --Z
 StatusNet.TimelineTag.prototype.cacheable = function() {
     return false;
 }
