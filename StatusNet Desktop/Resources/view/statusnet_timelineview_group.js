@@ -44,6 +44,17 @@ StatusNet.TimelineViewGroup.prototype.showGroupInfo = function() {
 
     html.push('<div id="profile_panel">');
     html.push('<img src="' + group.avatarLarge + '"/>');
+
+    html.push('<div id="profile_action_links"');
+
+    if (group.member === "false" && group.blocked !== "true") {
+        html.push('<a href="#" class="group_join">Join</a>');
+    } else {
+        html.push('<a href="#" class="group_leave">Leave</a>');
+    }
+
+    html.push('</div');
+
     html.push('<h2>!' + group.username + '</h2>');
     html.push('<dl class="profile_list">');
 
@@ -77,17 +88,6 @@ StatusNet.TimelineViewGroup.prototype.showGroupInfo = function() {
     html.push('<dt>Members</dt>');
     html.push('<dd>' + group.memberCount + '</dd>');
     html.push('</dl>')
-
-
-    html.push('<div id="profile_action_links"');
-
-    if (group.member === "false" && group.blocked !== "true") {
-        html.push('<a href="#" class="group_join">Join</a>');
-    } else {
-        html.push('<a href="#" class="group_leave">Leave</a>');
-    }
-
-    html.push('</div');
 
     html.push('</div>');
     $('#header').append(html.join(''));

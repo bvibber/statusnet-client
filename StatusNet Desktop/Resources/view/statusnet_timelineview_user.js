@@ -40,6 +40,27 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
 
     html.push('<div id="profile_panel">');
     html.push('<img src="' + user.avatarLarge + '"/>');
+
+    if (extended) {
+        if (authorId !== null && user.username !== client.account.username) {
+
+            html.push('<div id="profile_action_links"');
+
+            if (extended.blocking !== "true") {
+                if (extended.following === "false") {
+                    html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
+                } else {
+                    html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
+                    html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
+                }
+                html.push('<a href="#" class="profile_block">Block</a>');
+            } else {
+                html.push('<a href="#" class="profile_unblock">Unblock</a>');
+            }
+            html.push('</div');
+        }
+    }
+
     html.push('<h2>@' + user.username + '</h2>');
     html.push('<dl class="profile_list">');
 
@@ -90,25 +111,6 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
         html.push('<dt>Favorites</dt>');
         html.push('<dd>' + extended.favorites_cnt + '</dd>');
         html.push('</dl>')
-
-        if (authorId !== null && user.username !== client.account.username) {
-
-            html.push('<div id="profile_action_links"');
-
-            if (extended.blocking !== "true") {
-                if (extended.following === "false") {
-                    html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
-                } else {
-                    html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
-                    html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
-                }
-                html.push('<a href="#" class="profile_block">Block</a>');
-            } else {
-                html.push('<a href="#" class="profile_unblock">Unblock</a>');
-            }
-            html.push('</div');
-        }
-
     }
 
     html.push('</div>');

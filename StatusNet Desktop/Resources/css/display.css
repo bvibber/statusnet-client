@@ -20,14 +20,13 @@ body {
 	width: 13px;
 	height: 13px;
 	background-color: #d2d2d2;
-
 }
 
 ::-webkit-scrollbar-thumb:vertical {
 	-webkit-border-image: url(/images/scroll2.png) 10 0 10 0;
 	border-color: transparent;
 	border-width: 13px 0;
-	min-height: 20px;
+	min-height: 30px;
 }
 
 a {
@@ -73,11 +72,6 @@ a {
 	background-color:#d2d2d2;
 	-webkit-border-top-left-radius:10px;
 	-webkit-border-bottom-left-radius:10px;
-}
-
-#profile_panel img {
-	float:left
-	margin-bottom:10px;
 }
 
 #content {
@@ -156,6 +150,7 @@ h1 {
 	float:right;
 	margin:5px 0 5px 10px;
 }
+
 .notice .avatar img {
 	width: 48px;
 	height: 48px;
@@ -163,6 +158,7 @@ h1 {
 	-webkit-box-shadow: 0px 0px 3px gray;
 	background-color:#f8f8f8;
 }
+
 .notice .author {
 	font-size:14px;
 	color:#000;
@@ -177,7 +173,7 @@ h1 {
 
 .notice .context_link, .notice .notice_source {
 	float: left;
-	margin-left: 2px;
+	margin-left: 4px;
 }
 
 .notice .notice_source .notice_source_inner {
@@ -279,7 +275,7 @@ a#new_notice:hover {
 
 #profile_panel {
 	position: relative;	
-	margin: 0px 4px 6px 0px;
+	margin: 0px 4px 6px 4px;
 	padding: 0px 0px 0px;
 	height: auto;
 }
@@ -293,9 +289,8 @@ a#new_notice:hover {
 	float: left;
 	border: 1px transparent #fff;
 	-webkit-border-radius: 6px;
-	margin-left: 4px;
 	margin-right: 10px;
-	margin-bottom: 6px;
+	margin-bottom: 4px;
 }
 
 #profile_panel a {
@@ -313,17 +308,26 @@ a#new_notice:hover {
 	font-weight: normal;
 }
 
+#notices #profile_panel h2 {
+	font-size: 1.1em;
+	padding-top: 1px;
+	margin-bottom: 2px;
+}
+
 #profile_panel dl.profile_list dt {
 	display: none;
 }
 
 #profile_panel dl.profile_list dd.name {
 	font-weight: bold;
+	padding-bottom: 2px;
 }
 
 #profile_panel dl.profile_list dt.id {
 	display: block;
 	float: left;
+	font-size: 0.8em;
+	padding-right: 4px;
 }
 
 #profile_panel dl.profile_list dt.id:after {
@@ -331,17 +335,22 @@ a#new_notice:hover {
 }
 
 #profile_panel dl.profile_list dd.id {
-	padding-left: 4px;
+	font-size: 0.8em;
 }
 
 #profile_panel dl.profile_list dd.location {
 	font-style: italic;
+	font-size: 0.8em;
 }
 
 #profile_panel dl.profile_list dd.bio {
 	margin-top: 4px;
 	font-size: 0.8em;
 	margin-bottom: 6px;
+}
+
+#notices #profile_panel dl.profile_list {
+	min-height: 58px;
 }
 
 #profile_panel dl.profile_statistics {
@@ -359,7 +368,7 @@ a#new_notice:hover {
 }
 
 #profile_panel dl.profile_statistics dt:first-child {
-	margin-left: 6px;
+	margin-left: 2px;
 }
 
 #profile_panel dl.profile_statistics dt a {
@@ -373,9 +382,7 @@ a#new_notice:hover {
 }
 
 #profile_panel #profile_action_links {
-	position: absolute;
-	top: 4px;
-	right: 0px;
+	float: right;
 }
 
 #profile_panel #profile_action_links a {
@@ -384,7 +391,7 @@ a#new_notice:hover {
 	width: 100px;
 	text-align: center;
 	padding: 2px 0px 2px 0px;
-	margin-bottom: 8px;
+	margin-bottom: 10px;
 	background: #444;
 	color: #fff;
 	font-size: 0.95em;
@@ -394,6 +401,10 @@ a#new_notice:hover {
 	text-shadow: 0px 1px 0px #000;
 	-webkit-box-shadow: 1px 1px 1px #dcdcdc;
 } 
+
+#notices #profile_panel #profile_action_links a {
+	margin-bottom: 8px;
+}
 
 #profile_panel #profile_action_links a:hover {
 	background: #b3b3b3;

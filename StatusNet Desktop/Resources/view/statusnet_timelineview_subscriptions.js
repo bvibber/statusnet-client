@@ -120,6 +120,17 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
 
     html.push('<div id="profile_panel">');
     html.push('<img src="' + user.avatar + '"/>');
+
+    html.push('<div id="profile_action_links"');
+
+    if (user.following === "true") {
+        html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
+    }
+
+    html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
+    html.push('<a href="#" class="profile_block">Block</a>');
+    html.push('</div>');
+
     html.push('<h2>@' + user.username + '</h2>');
     html.push('<dl class="profile_list" name="' + user.id + ',' + user.username + '">');
 
@@ -161,16 +172,6 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
     html.push('<dt>Favorites</dt>');
     html.push('<dd>' + user.favorites_cnt + '</dd>');
     html.push('</dl>')
-
-    html.push('<div id="profile_action_links"');
-
-    if (user.following === "true") {
-        html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
-    }
-
-    html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
-    html.push('<a href="#" class="profile_block">Block</a>');
-    html.push('</div>');
 
     html.push('</div>')
 
