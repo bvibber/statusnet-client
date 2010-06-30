@@ -1,9 +1,16 @@
-body {height: 94%;}
+body {
+	height: 94%;
+}
+
+#notice_input, #form_notice {
+	height: 100%;
+	width: 100%;
+}
 
 #counter {
 	position: absolute;
-	top: 68px;
-	left: 358px;
+	top: 62%;
+	right: 4%;
 	width: 50px;
 	text-align: right;
 	color: #444;
@@ -15,8 +22,8 @@ div#counter.negative {
 
 #update_button {
 	position: absolute;
-	top: 92px;
-	left: 350px;
+	bottom: 6%;
+	right: 2%;
 	font-size: 0.95em;
 	width: 60px;
 	text-align: center;
@@ -39,19 +46,19 @@ div#counter.negative {
 
 #textarea_wrapper {
 	margin: 8px;
-	padding: 4px;
-	height: 66px;
-	width: 394px;
-	-webkit-border-radius:5px;
+	padding: 1%;
+	height: 64%;
+	width: 94%;
+	-webkit-border-radius: 5px;
 	-webkit-box-shadow: 2px 2px 2px #222;
 	border: solid 1px #f8f8f8;
-	background-color:#f2f2f2;	
+	background-color: #f2f2f2;
 }
 
 #notice_textarea {
 	background: #fff;
-	height: 56px;
-	width: 392px;
 	border: none;
 	outline: none;
+	height: 84%;
+	width: 100%;
 }
