@@ -124,6 +124,12 @@ StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
 
     var client = Titanium.Network.createHTTPClient();
 
+    if (Titanium.Network.online == false) {
+       StatusNet.debug("No internet.");
+       onError(client, "No Internet connection!");
+       return;
+    }
+
     client.onload = function() {
         StatusNet.debug("fetchUrl: in onload - " + this.status);
         if (this.status == 200) {
@@ -194,6 +200,12 @@ StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError)
     StatusNet.debug('in postUrl');
 
     var client = Titanium.Network.createHTTPClient();
+
+    if (Titanium.Network.online == false) {
+       StatusNet.debug("No internet.");
+       onError(client, '{"error": "No internet connection!"}');
+       return;
+    }
 
     client.onload = function() {
         if (this.status == 200) {

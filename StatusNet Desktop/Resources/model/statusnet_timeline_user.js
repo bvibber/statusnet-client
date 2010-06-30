@@ -191,6 +191,7 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving user timeline: " + msg);
             StatusNet.Infobar.flashMessage("Couldn't get user timeline: " + msg);
+            that.updateFinished.notify();
         }
     );
 

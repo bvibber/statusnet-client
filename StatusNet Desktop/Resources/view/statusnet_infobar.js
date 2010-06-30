@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * View class for the info bar
  */
@@ -40,7 +41,7 @@ StatusNet.Infobar.flashMessage = function(msg) {
                 }
             );
         },
-        3000
+        10000
     );
 }
 

@@ -165,8 +165,6 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications)
  */
 StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
 
-    StatusNet.debug("update() onFinish = " + onFinish);
-
     this.updateStart.notify();
 
     StatusNet.debug("Notified view that we're doing an update");
@@ -176,9 +174,6 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
     this.account.fetchUrl(this.getUrl(),
 
         function(status, data) {
-
-            StatusNet.debug('Fetched ' + that.getUrl());
-            StatusNet.debug('HTTP client returned: ' + (new XMLSerializer()).serializeToString(data));
 
             var entries = [];
 
@@ -203,6 +198,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
             StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
+            that.updateFinished.notify();
         }
     );
 

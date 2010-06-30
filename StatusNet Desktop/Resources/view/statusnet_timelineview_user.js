@@ -138,7 +138,8 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
         var r = confirm("Really block this user?");
         if (r) {
             client.block(user.id, this, function() {
-                $('a.profile_direct_message').hide()
+                $('a.profile_direct_message').hide();
+                $('a.profile_unsubscribe').hide();
             });
         }
     });
