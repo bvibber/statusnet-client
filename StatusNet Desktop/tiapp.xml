@@ -25,5 +25,6 @@
 <maximizable>false</maximizable>
 <minimizable>true</minimizable>
 <closeable>true</closeable>
+<analytics>false</analytics>
 </window>
 </ti:app>
