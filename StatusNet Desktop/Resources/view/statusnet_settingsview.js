@@ -137,7 +137,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
         return false;
     });
 
-    acct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
+    acct.apiGet('account/verify_credentials.xml', function(status, xml) {
         var avatar = $("user profile_image_url", xml).text();
         StatusNet.debug(avatar);
         img_icon.src = avatar;
@@ -226,7 +226,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             $("#new-save").attr("disabled", "disabled");
             $("#new-avatar").attr("src", "images/icon_processing.gif");
 
-            that.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
+            that.workAcct.apiGet('account/verify_credentials.xml', function(status, xml) {
                 $("#new-status").text("Login confirmed.");
                 that.xml = xml;
                 that.workAcct.avatar = $("user profile_image_url", xml).text();
@@ -237,7 +237,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
 
                 $("#new-status").text("Checking StatusNet version...");
 
-                that.workAcct.fetchUrl('statusnet/version.xml',
+                that.workAcct.apiGet('statusnet/version.xml',
                     function(status, xml) {
                         var version = $(xml).find('version').text();
 
@@ -251,7 +251,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                         $("#new-status").text("Getting StatusNet configuration...");
 
                         // get site specific configuration info
-                        that.workAcct.fetchUrl('statusnet/config.xml',
+                        that.workAcct.apiGet('statusnet/config.xml',
                             function(status, xml) {
                                 StatusNet.debug("Loaded statusnet/config.xml");
                                 that.workAcct.textLimit = $(xml).find('config > site > textlimit').text();

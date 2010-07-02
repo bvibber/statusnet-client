@@ -74,7 +74,7 @@ StatusNet.DirectMessageView.prototype.send = function()
 {
     StatusNet.debug("DirectMessageView.send()");
     var that = this;
-    var url = 'direct_messages/new.json';
+    var method = 'direct_messages/new.json';
     var msgText = $('#direct_message_textarea').val();
 
     var me = Titanium.UI.getCurrentWindow();
@@ -84,19 +84,19 @@ StatusNet.DirectMessageView.prototype.send = function()
         + "&screen_name="
         + encodeURIComponent(me.nickname);
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(data);
-            StatusNet.debug(data.user);
-
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Send direct message to " + me.nickname);
             // play new direct message sound
-
             me.close();
         },
-        function(client, responseText) {
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error: ' + msg.error);
-            alert('Error: ' + msg.error);
+        function(status, response) {
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error posting direct message" + " - " + msg);
+            } else {
+                StatusNet.debug("Error posting direct message - " + status + " - " + response);
+            }
             me.close();
         }
     );

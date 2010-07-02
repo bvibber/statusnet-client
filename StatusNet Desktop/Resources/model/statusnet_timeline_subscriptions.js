@@ -95,7 +95,7 @@ StatusNet.TimelineSubscriptions.prototype.update = function(onFinish) {
 
     var that = this;
 
-    this.account.fetchUrl(this.getUrl(),
+    this.account.apiGet(this.getUrl(),
 
         function(status, data) {
 

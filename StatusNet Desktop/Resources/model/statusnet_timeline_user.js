@@ -80,7 +80,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
 
     var that = this;
 
-    this.client.account.fetchUrl(url,
+    this.client.account.apiGet(url,
         function(status, data) {
             StatusNet.debug(status);
             StatusNet.debug((new XMLSerializer()).serializeToString(data));
@@ -156,7 +156,7 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
 
     var that = this;
 
-    this.account.fetchUrl(this.getUrl(),
+    this.account.apiGet(this.getUrl(),
 
         function(status, data) {
 

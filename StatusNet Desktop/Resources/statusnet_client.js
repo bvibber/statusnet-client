@@ -387,7 +387,7 @@ StatusNet.Client.prototype.directMessageDialog = function(nickname) {
  */
 StatusNet.Client.prototype.deleteNotice = function(noticeId, linkDom) {
 
-    var url = 'statuses/destroy/' + noticeId + '.json';
+    var method = 'statuses/destroy/' + noticeId + '.xml';
 
     StatusNet.debug("StatusNet.Client.deleteNotice() - deleting notice " + noticeId);
 
@@ -397,18 +397,23 @@ StatusNet.Client.prototype.deleteNotice = function(noticeId, linkDom) {
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Deleted notice " + noticeId);
+            StatusNet.Infobar.flashMessage("Deleted notice " + noticeId);
             that.timeline.decacheNotice(noticeId);
             that.view.removeNotice(noticeId);
          },
-         function(client, responseText) {
+         function(status, response) {
              $(linkDom).removeAttr('disabled');
-             var msg = Titanium.JSON.parse(responseText);
-             StatusNet.debug('Error deleting notice: ' + msg.error);
-             alert('Error deleting notice: ' + msg.error);
+             var msg = $(response).find('error').text();
+             if (msg) {
+                 StatusNet.debug("Error deleting notice " + noticeId + " - " + msg);
+                 StatusNet.Infobar.flashMessage("Error deleting notice " + noticeId + " - " + msg);
+             } else {
+                 StatusNet.debug("Error deleting notice " + noticeId + " - " + status + " - " + response);
+                 StatusNet.Infobar.flashMessage("Error deleting notice: " + status + " - " + response);
+             }
          }
     );
 }
@@ -426,7 +431,7 @@ StatusNet.Client.prototype.deleteNotice = function(noticeId, linkDom) {
  */
 StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
 {
-    var url = 'favorites/create/' + noticeId + '.json';
+    var method = 'favorites/create/' + noticeId + '.xml';
 
     StatusNet.debug("StatusNet.Client.faveNotice() - faving notice " + noticeId);
 
@@ -436,20 +441,25 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Faved notice" + noticeId);
+            StatusNet.Infobar.flashMessage("Faved notice " + noticeId);
             $(linkDom).text('Unfave');
             $(linkDom).removeClass('notice_fave');
             $(linkDom).addClass('notice_unfave');
             that.timeline.refreshNotice(noticeId);
         },
-        function(client, responseText) {
+        function(status, response) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error favoriting notice: ' + msg.error);
-            alert('Error favoriting notice: ' + msg.error);
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error favoriting notice " + noticeId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error favoriting notice " + noticeId + " - " + msg);
+            } else {
+                StatusNet.debug("Error favoriting notice " + noticeId + " - " + status + " - " + response);
+                StatusNet.Infobar.flashMessage("Error favoriting notice " + noticeId + " - " + status + " - " + response);
+            }
         }
     );
 }
@@ -467,7 +477,7 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
  */
 StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
 {
-    var url = 'favorites/destroy/' + noticeId + '.json';
+    var method = 'favorites/destroy/' + noticeId + '.xml';
 
     StatusNet.debug("StatusNet.Client.unFaveNotice() - unfaving notice " + noticeId);
 
@@ -477,20 +487,25 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Unfaved notice " + noticeId);
+            StatusNet.Infobar.flashMessage("Unfaved notice " + noticeId);
             $(linkDom).text('Fave');
             $(linkDom).removeClass('notice_unfave');
             $(linkDom).addClass('notice_fave');
             that.timeline.refreshNotice(noticeId);
         },
-        function(client, responseText) {
+        function(status, response) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error unfavoring notice: ' + msg.error);
-            alert('Error unfavoring notice: ' + msg.error);
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error unfavoriting notice " + noticeId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error unfavoriting notice " + noticeId + " - " + msg);
+            } else {
+                StatusNet.debug("Error unfavoriting notice " + noticeId + " - " + status + " - " + response);
+                StatusNet.Infobar.flashMessage("Error unfavoriting notice " + noticeId + " - " + status + " - " + response);
+            }
         }
     );
 }
@@ -506,7 +521,7 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
  */
 StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
 {
-    var url = 'statuses/retweet/' + noticeId + '.json';
+    var method = 'statuses/retweet/' + noticeId + '.xml';
 
     $(linkDom).attr('disabled', 'disabled');
 
@@ -516,19 +531,24 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
             $(linkDom).remove();
+            StatusNet.debug("Repeated notice " + noticeId);
+            StatusNet.Infobar.flashMessage("Repeated notice " + noticeId);
             that.timeline.refreshNotice(noticeId);
             that.timeline.update();
         },
-        function(client, responseText) {
+        function(status, response) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error repeating notice: ' + msg.error);
-            alert('Error repeating notice: ' + msg.error);
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error repeating notice " + noticeId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error repeating notice " + noticeId + " - " + msg);
+            } else {
+                StatusNet.debug("Error repeating notice " + noticeId + " - " + status + " - " + response);
+                StatusNet.Infobar.flashMessage("Error repeating notice " + noticeId + " - " + status + " - " + response);
+            }
         }
     );
 }
@@ -543,7 +563,7 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
  */
 StatusNet.Client.prototype.subscribe = function(profileId, linkDom, onSuccess)
 {
-    var url = 'friendships/create/' + profileId + '.json';
+    var method = 'friendships/create/' + profileId + '.xml';
 
     $(linkDom).attr('disabled', 'disabled');
 
@@ -553,10 +573,10 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom, onSuccess)
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Subscribed to profile " + profileId);
+            StatusNet.Infobar.flashMessage("Subscribed to profile " + profileId);
             $(linkDom).text('Unsubscribe');
             $(linkDom).removeClass('profile_subscribe');
             $(linkDom).addClass('profile_unsubscribe');
@@ -570,11 +590,16 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom, onSuccess)
                 onSuccess();
             }
         },
-        function(client, responseText) {
+        function(method, response) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error subscribing to profile: ' + msg.error);
-            alert('Error subscribing to profile: ' + msg.error);
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error subscribing to profile " + profileId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error subscribing to profile " + profileId + " - " + msg);
+            } else {
+                StatusNet.debug("Error subscribing to profile " + profileId + " - " + status + " - " + response);
+                StatusNet.Infobar.flashMessage("Error subscribing to profile " + profileId + " - " + status + " - " + response);
+            }
         }
     );
 }
@@ -590,7 +615,7 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom, onSuccess)
  */
 StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom, onSuccess)
 {
-    var url = 'friendships/destroy/' + profileId + '.json';
+    var method = 'friendships/destroy/' + profileId + '.xml';
 
     $(linkDom).attr('disabled', 'disabled');
 
@@ -600,10 +625,10 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom, onSuccess)
 
     var that = this;
 
-    this.account.postUrl(url, params,
+    this.account.apiPost(method, params,
         function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+            StatusNet.debug("Unsubscribed from profile " + profileId);
+            StatusNet.Infobar.flashMessage("Unsubscribed from profile " + profileId);
             $(linkDom).text('Subscribe');
             $(linkDom).removeClass('profile_unsubscribe');
             $(linkDom).addClass('profile_subscribe');
@@ -619,9 +644,14 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom, onSuccess)
         },
         function(client, responseText) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error unsubscribing from profile: ' + msg.error);
-            alert('Error unsubscribing from profile: ' + msg.error);
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error unsubscribing from profile " + profileId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error unsubscribing from profile " + profileId + " - " + msg);
+            } else {
+                StatusNet.debug("Error unsubscribing from profile " + profileId + " - " + status + " - " + response);
+                StatusNet.Infobar.flashMessage("Error unsubscribing from profile " + profileId + " - " + status + " - " + response);
+            }
         }
     );
 }
@@ -637,7 +667,7 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom, onSuccess)
  */
 StatusNet.Client.prototype.joinGroup = function(groupId, linkDom)
 {
-    var url = 'statusnet/groups/join/' + groupId + '.json';
+    var method = 'statusnet/groups/join/' + groupId + '.xml';
 
     $(linkDom).attr('disabled', 'disabled');
 
@@ -647,10 +677,10 @@ StatusNet.Client.prototype.joinGroup = function(groupId, linkDom)
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Joined group " + groupId);
+            StatusNet.Infobar.flashMessage("Joined group " + groupId);
             $(linkDom).text('Leave');
             $(linkDom).removeClass('group_join');
             $(linkDom).addClass('group_leave');
@@ -661,11 +691,15 @@ StatusNet.Client.prototype.joinGroup = function(groupId, linkDom)
                 }
             );
         },
-        function(client, responseText) {
+        function(status, response) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error joining group: ' + msg.error);
-            alert('Error joining group: ' + msg.error);
+            if (msg) {
+                StatusNet.debug("Error joining group " + groupId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error joining group " + groupId + " - " + msg);
+            } else {
+                StatusNet.debug("Error joining group " + groupId + " - " + response);
+                StatusNet.Infobar.flashMessage("Error joining group " + groupId + " - " + response);
+            }
         }
     );
 }
@@ -681,7 +715,7 @@ StatusNet.Client.prototype.joinGroup = function(groupId, linkDom)
  */
 StatusNet.Client.prototype.leaveGroup = function(groupId, linkDom)
 {
-    var url = 'statusnet/groups/leave/' + groupId + '.json';
+    var method = 'statusnet/groups/leave/' + groupId + '.xml';
 
     $(linkDom).attr('disabled', 'disabled');
 
@@ -691,10 +725,10 @@ StatusNet.Client.prototype.leaveGroup = function(groupId, linkDom)
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Left group " + groupId);
+            StatusNet.Infobar.flashMessage("Left group " + groupId);
             $(linkDom).text('Join');
             $(linkDom).removeClass('group_leave');
             $(linkDom).addClass('group_join');
@@ -705,11 +739,15 @@ StatusNet.Client.prototype.leaveGroup = function(groupId, linkDom)
                 }
             );
         },
-        function(client, responseText) {
+        function(status, response) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error leaving group: ' + msg.error);
-            alert('Error leaving group: ' + msg.error);
+            if (msg) {
+                StatusNet.debug("Error leaving group " + groupId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error leaving group " + groupId + " - " + msg);
+            } else {
+                StatusNet.debug("Error leaving group " + groupId + " - " + response);
+                StatusNet.Infobar.flashMessage("Error leaving group " + groupId + " - " + response);
+            }
         }
     );
 }
@@ -724,7 +762,7 @@ StatusNet.Client.prototype.leaveGroup = function(groupId, linkDom)
  */
 StatusNet.Client.prototype.block = function(profileId, linkDom, onSuccess)
 {
-    var url = 'blocks/create/' + profileId + '.json';
+    var method = 'blocks/create/' + profileId + '.xml';
 
     $(linkDom).attr('disabled', 'disabled');
 
@@ -734,10 +772,10 @@ StatusNet.Client.prototype.block = function(profileId, linkDom, onSuccess)
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Blocked profile " + profileId);
+            StatusNet.Infobar.flashMessage("Blocked profile " + profileId);
             $(linkDom).text('Unblock');
             $(linkDom).removeClass('profile_block');
             $(linkDom).addClass('profile_unblock');
@@ -751,11 +789,15 @@ StatusNet.Client.prototype.block = function(profileId, linkDom, onSuccess)
                 onSuccess();
             }
         },
-        function(client, responseText) {
+        function(status, response) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error blocking profile: ' + msg.error);
-            alert('Error blocking profile: ' + msg.error);
+            if (msg) {
+                StatusNet.debug("Error blocking profile " + profileId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error blocking profile " + profileId + " - " + msg);
+            } else {
+                StatusNet.debug("Error blocking profile " + profileId + " - " + response);
+                StatusNet.Infobar.flashMessage("Error blocking profile " + profileId + " - " + response);
+            }
         }
     );
 }
@@ -770,7 +812,7 @@ StatusNet.Client.prototype.block = function(profileId, linkDom, onSuccess)
  */
 StatusNet.Client.prototype.unblock = function(profileId, linkDom, onSuccess)
 {
-    var url = 'blocks/destroy/' + profileId + '.json';
+    var url = 'blocks/destroy/' + profileId + '.xml';
 
     $(linkDom).attr('disabled', 'disabled');
 
@@ -780,10 +822,10 @@ StatusNet.Client.prototype.unblock = function(profileId, linkDom, onSuccess)
 
     var that = this;
 
-    this.account.postUrl(url, params,
-        function(status, data) {
-            StatusNet.debug(status);
-            StatusNet.debug(data);
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Unblocked profile " + profileId);
+            StatusNet.Infobar.flashMessage("Unblocked profile " + profileId);
             $(linkDom).text('Block');
             $(linkDom).removeClass('profile_unblock');
             $(linkDom).addClass('profile_block');
@@ -797,11 +839,15 @@ StatusNet.Client.prototype.unblock = function(profileId, linkDom, onSuccess)
                 onSuccess();
             }
         },
-        function(client, responseText) {
+        function(status, response) {
             $(linkDom).removeAttr('disabled');
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error unblocking profile: ' + msg.error);
-            alert('Error unblocking profile: ' + msg.error);
+            if (msg) {
+                StatusNet.debug("Error unblocking profile " + profileId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error unblocking profile " + profileId + " - " + msg);
+            } else {
+                StatusNet.debug("Error unblocking profile " + profileId + " - " + response);
+                StatusNet.Infobar.flashMessage("Error unblocking profile " + profileId + " - " + response);
+            }
         }
     );
 }

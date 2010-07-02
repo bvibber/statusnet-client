@@ -83,10 +83,10 @@ StatusNet.NewNoticeView.prototype.init = function() {
 StatusNet.NewNoticeView.prototype.postNotice = function()
 {
     StatusNet.debug("NewNoticeView.postNotice()");
-    var that = this;
-    var url = 'statuses/update.json';
-    var noticeText = $('#notice_textarea').val();
 
+    var that = this;
+    var method = 'statuses/update.xml';
+    var noticeText = $('#notice_textarea').val();
     var base = 'status=' + encodeURIComponent(noticeText);
     var params = [];
     params.push('source=' + encodeURIComponent('StatusNet Desktop'));
@@ -102,17 +102,22 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
 
     StatusNet.debug("Sending these post parameters: " + postParams);
 
-    this.account.postUrl(url, postParams,
-        function(status, data) {
-            StatusNet.debug(data);
-            StatusNet.debug(data.user);
+    this.account.apiPost(method, postParams,
+        function(status, response) {
+            var id = $(response).find('status > id').text()
+            if (id) {
+                StatusNet.debug("Posted notice " + id);
+            }
             // play notice posted sound
             me.close();
         },
-        function(client, responseText) {
-            var msg = Titanium.JSON.parse(responseText);
-            StatusNet.debug('Error: ' + msg.error);
-            alert('Error: ' + msg.error);
+        function(status, response) {
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error posting notice" + " - " + msg);
+            } else {
+                StatusNet.debug("Error posting notice - " + status + " - " + response);
+            }
             me.close();
         }
     );

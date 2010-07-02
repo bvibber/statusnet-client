@@ -110,31 +110,35 @@ StatusNet.Account.listAll = function(db) {
 }
 
 /**
- * Start an asynchronous, authenticated API call.
- * Currently only supports GET requests; any needed parameters
- * must be in the method, as part of the path or query string.
+ * Start an asynchronous, authenticated web call. If the data argument is
+ * supplied the request will be a POST, otherwise it will be a GET. Any
+ * needed parameters for GET must be in the url, as part of the path or
+ * query string.
  *
- * @param string method URL fragment, appended to API root to create final URL.
+ * @param string url         the URL
  * @param callable onSuccess callback function called after successful HTTP fetch: function(status, data)
- * @param callable onError callback function called if there's a low-level HTTP error: function(status, thrown)
+ * @param callable onError   callback function called if there's an HTTP error: function(status, data)
+ * @param String data        any POST data
  */
-StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
+StatusNet.Account.prototype.webRequest = function(url, onSuccess, onError, data) {
 
-    StatusNet.debug('in fetchUrl: ' + this.apiroot + method);
+    StatusNet.debug('in webRequest: ' + url);
 
-    var client = Titanium.Network.createHTTPClient();
+    try {
 
-    if (Titanium.Network.online == false) {
-       StatusNet.debug("No internet.");
-       onError(client, "No Internet connection!");
-       return;
-    }
+        var client = Titanium.Network.createHTTPClient();
 
-    client.onload = function() {
-        StatusNet.debug("fetchUrl: in onload - " + this.status);
-        if (this.status == 200) {
+        if (Titanium.Network.online == false) {
+           StatusNet.debug("No internet.");
+           onError(client, "No Internet connection!");
+           return;
+        }
 
-            StatusNet.debug("fetchUrl: before parse " + this.status);
+        client.onload = function() {
+            StatusNet.debug("webRequest: in onload - " + this.status);
+
+            StatusNet.debug("webRequest: before parse " + this.status);
+
             StatusNet.debug(Titanium.version);
             if (Titanium.version < '1.3.0') {
                 // @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
@@ -145,94 +149,75 @@ StatusNet.Account.prototype.fetchUrl = function(method, onSuccess, onError) {
                 var responseXML = this.responseXML;
             }
 
-            StatusNet.debug("fetchUrl: after parse, before onSuccess");
-            onSuccess(this.status, responseXML);
-            StatusNet.debug("fetchUrl: after onSuccess");
-        } else {
-            onError(client, "HTTP status: " + this.status);
+            StatusNet.debug("webRequest: after parse, before onSuccess");
+            StatusNet.debug("webRequest: after onSuccess");
+
+            if (this.status == 200) {
+                onSuccess(this.status, responseXML);
+            } else {
+                onError(this.status, responseXML);
+            }
+            StatusNet.debug("webRequest: done with onload.");
+        };
+
+        // @fixme Desktop vs Mobile auth differences HTTPClient hack
+        //
+        // Titanium Mobile 1.3.0 seems to lack the ability to do HTTP basic auth
+        // on its HTTPClient implementation. The setBasicCredentials method
+        // claims to exist (typeof client.setBasicCredentials == 'function') however
+        // calling it triggers an "invalid method 'setBasicCredentials:'" error.
+        // The method is also not listed in the documentation for Mobile, nor do I see
+        // it in the source code for the proxy object.
+        //
+        // Moreover, the Titanium.Utils namespace, which contains the base 64 utility
+        // functions, isn't present on Desktop. So for now, we'll check for that and
+        // use the manual way assuming it's mobile. Seriously, can't the core libs be
+        // synchronized better?
+        StatusNet.debug("webRequest: Titanium.Utils is: " + typeof Titanium.Utils);
+        StatusNet.debug("webRequest: client.setBasicCredentials is: " + typeof client.setBasicCredentials);
+        if (typeof Titanium.Utils == "undefined") {
+            client.setBasicCredentials(this.username, this.password);
         }
-        StatusNet.debug("fetchUrl: done with onload.");
-    };
 
-    client.onerror = function(e) {
-        onError(client, "Error: " + e.error);
+        // @fixme Hack to work around bug in the Titanium Desktop 1.2.1
+        // onload will not fire unless there a function assigned to
+        // onreadystatechange.
+        client.onreadystatechange = function() {
+            // NOP
+        };
+
+        if (data) {
+            client.open("POST", url);
+        } else {
+            client.open("GET", url);
+        }
+
+        // @fixme Desktop vs Mobile auth differences HTTPClient hack
+        // setRequestHeader must be called between open() and send()
+        if (typeof Titanium.Utils != "undefined") {
+            var auth = 'Basic ' + Titanium.Utils.base64encode(this.username + ':' + this.password);
+            StatusNet.debug("webRequest: Authorization: " + auth);
+            client.setRequestHeader('Authorization', auth);
+        }
+
+        if (data) {
+            client.send(data);
+        } else {
+            client.send();
+        }
+
+	} catch (e) {
+        StatusNet.debug('webRequest: HTTP client exception: ' + e);
+        onError(client, e);
     }
-
-    // @fixme Desktop vs Mobile auth differences HTTPClient hack
-    //
-    // Titanium Mobile 1.3.0 seems to lack the ability to do HTTP basic auth
-    // on its HTTPClient implementation. The setBasicCredentials method
-    // claims to exist (typeof client.setBasicCredentials == 'function') however
-    // calling it triggers an "invalid method 'setBasicCredentials:'" error.
-    // The method is also not listed in the documentation for Mobile, nor do I see
-    // it in the source code for the proxy object.
-    //
-    // Moreover, the Titanium.Utils namespace, which contains the base 64 utility
-    // functions, isn't present on Desktop. So for now, we'll check for that and
-    // use the manual way assuming it's mobile. Seriously, can't the core libs be
-    // synchronized better?
-    StatusNet.debug("fetchUrl: Titanium.Utils is: " + typeof Titanium.Utils);
-    StatusNet.debug("fetchUrl: client.setBasicCredentials is: " + typeof client.setBasicCredentials);
-    if (typeof Titanium.Utils == "undefined") {
-        client.setBasicCredentials(this.username, this.password);
-    }
-
-    // @fixme Hack to work around bug in the Titanium Desktop 1.2.1
-    // onload will not fire unless there a function assigned to
-    // onreadystatechange.
-    client.onreadystatechange = function() {
-        // NOP
-    };
-
-    client.open("GET", this.apiroot + method);
-    // @fixme Desktop vs Mobile auth differences HTTPClient hack
-    // setRequestHeader must be called between open() and send()
-    if (typeof Titanium.Utils != "undefined") {
-        var auth = 'Basic ' + Titanium.Utils.base64encode(this.username + ':' + this.password);
-        StatusNet.debug("fetchUrl: Authorization: " + auth);
-        client.setRequestHeader('Authorization', auth);
-    }
-    client.send();
 }
 
-StatusNet.Account.prototype.postUrl = function(method, data, onSuccess, onError) {
+StatusNet.Account.prototype.apiGet = function(method, onSuccess, onError) {
+    this.webRequest(this.apiroot + method, onSuccess, onError);
+}
 
-    StatusNet.debug('in postUrl');
-
-    var client = Titanium.Network.createHTTPClient();
-
-    if (Titanium.Network.online == false) {
-       StatusNet.debug("No internet.");
-       onError(client, '{"error": "No internet connection!"}');
-       return;
-    }
-
-    client.onload = function() {
-        if (this.status == 200) {
-            StatusNet.debug(this.responseText);
-            var json = JSON.parse(this.responseText);
-            onSuccess(this.status, json);
-        } else {
-            StatusNet.debug("ERROR - Received HTTP status code: " + this.status + " - reponse text:" + this.responseText);
-            onError(client, this.responseText);
-        }
-    };
-
-    client.onerror = function(e) {
-        onError(client, "Error: " + e.error);
-    }
-
-    client.setBasicCredentials(this.username, this.password);
-
-    // @fixme Hack to work around bug in the Titanium Desktop 1.2.1
-    // onload will not fire unless there a function assigned to
-    // onreadystatechange.
-    client.onreadystatechange = function() {
-        // NOP
-    };
-
-    client.open("POST", this.apiroot + method);
-    client.send(data);
+StatusNet.Account.prototype.apiPost = function(method, data, onSuccess, onError) {
+    this.webRequest(this.apiroot + method, onSuccess, onError, data);
 }
 
 /**

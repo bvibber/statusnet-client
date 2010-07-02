@@ -100,7 +100,7 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
 
     var that = this;
 
-    this.account.fetchUrl(noticeUrl,
+    this.account.apiGet(noticeUrl,
         function(status, data) {
             StatusNet.debug('Fetched ' + that.noticeUrl);
 
@@ -166,7 +166,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
 
     var that = this;
 
-    this.account.fetchUrl(this.getUrl(),
+    this.account.apiGet(this.getUrl(),
 
         function(status, data) {
 
