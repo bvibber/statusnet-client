@@ -125,19 +125,21 @@ StatusNet.Account.listAll = function(db) {
 }
 
 /**
- * Start an asynchronous, authenticated web call. If the data argument is
- * supplied the request will be a POST, otherwise it will be a GET. Any
- * needed parameters for GET must be in the url, as part of the path or
- * query string.
+ * Start an asynchronous, web call. If username and password are provided,
+ * use HTTP Basic Auth.  If the data argument is supplied the request will
+ * be a POST, otherwise it will be a GET. Any needed parameters for GET
+ * must be in the url, as part of the path or query string.
  *
- * @param string url         the URL
- * @param callable onSuccess callback function called after successful HTTP fetch: function(status, data)
- * @param callable onError   callback function called if there's an HTTP error: function(status, data)
- * @param String data        any POST data
+ * @param string   url         the URL
+ * @param callable onSuccess   callback function called after successful HTTP fetch: function(status, response)
+ * @param callable onError     callback function called if there's an HTTP error: function(status, response)
+ * @param String   data        any POST data
+ * @param String   username    optional username for HTTP Basic Auth
+ * @param String   password    optional password for HTTP Basic Auth
  */
-StatusNet.Account.prototype.webRequest = function(url, onSuccess, onError, data) {
+StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username, password) {
 
-    StatusNet.debug('in webRequest: ' + url);
+    StatusNet.debug("in webRequest");
 
     try {
 
@@ -150,9 +152,8 @@ StatusNet.Account.prototype.webRequest = function(url, onSuccess, onError, data)
         }
 
         client.onload = function() {
-            StatusNet.debug("webRequest: in onload - " + this.status);
 
-            StatusNet.debug("webRequest: before parse " + this.status);
+            StatusNet.debug("webRequest: in onload, before parse " + this.status);
 
             StatusNet.debug(Titanium.version);
             if (Titanium.version < '1.3.0') {
@@ -165,34 +166,17 @@ StatusNet.Account.prototype.webRequest = function(url, onSuccess, onError, data)
             }
 
             StatusNet.debug("webRequest: after parse, before onSuccess");
-            StatusNet.debug("webRequest: after onSuccess");
 
             if (this.status == 200) {
                 onSuccess(this.status, responseXML);
+
+                StatusNet.debug("webRequest: after onSuccess");
+
             } else {
                 onError(this.status, responseXML);
             }
             StatusNet.debug("webRequest: done with onload.");
         };
-
-        // @fixme Desktop vs Mobile auth differences HTTPClient hack
-        //
-        // Titanium Mobile 1.3.0 seems to lack the ability to do HTTP basic auth
-        // on its HTTPClient implementation. The setBasicCredentials method
-        // claims to exist (typeof client.setBasicCredentials == 'function') however
-        // calling it triggers an "invalid method 'setBasicCredentials:'" error.
-        // The method is also not listed in the documentation for Mobile, nor do I see
-        // it in the source code for the proxy object.
-        //
-        // Moreover, the Titanium.Utils namespace, which contains the base 64 utility
-        // functions, isn't present on Desktop. So for now, we'll check for that and
-        // use the manual way assuming it's mobile. Seriously, can't the core libs be
-        // synchronized better?
-        StatusNet.debug("webRequest: Titanium.Utils is: " + typeof Titanium.Utils);
-        StatusNet.debug("webRequest: client.setBasicCredentials is: " + typeof client.setBasicCredentials);
-        if (typeof Titanium.Utils == "undefined") {
-            client.setBasicCredentials(this.username, this.password);
-        }
 
         // @fixme Hack to work around bug in the Titanium Desktop 1.2.1
         // onload will not fire unless there a function assigned to
@@ -202,17 +186,38 @@ StatusNet.Account.prototype.webRequest = function(url, onSuccess, onError, data)
         };
 
         if (data) {
+            StatusNet.debug("HTTP POST to: " + url);
             client.open("POST", url);
         } else {
+            StatusNet.debug("HTTP GET to: " + url)
             client.open("GET", url);
         }
 
-        // @fixme Desktop vs Mobile auth differences HTTPClient hack
-        // setRequestHeader must be called between open() and send()
-        if (typeof Titanium.Utils != "undefined") {
-            var auth = 'Basic ' + Titanium.Utils.base64encode(this.username + ':' + this.password);
-            StatusNet.debug("webRequest: Authorization: " + auth);
-            client.setRequestHeader('Authorization', auth);
+        if (username && password) {
+            // @fixme Desktop vs Mobile auth differences HTTPClient hack
+            //
+            // Titanium Mobile 1.3.0 seems to lack the ability to do HTTP basic auth
+            // on its HTTPClient implementation. The setBasicCredentials method
+            // claims to exist (typeof client.setBasicCredentials == 'function') however
+            // calling it triggers an "invalid method 'setBasicCredentials:'" error.
+            // The method is also not listed in the documentation for Mobile, nor do I see
+            // it in the source code for the proxy object.
+            //
+            // Moreover, the Titanium.Utils namespace, which contains the base 64 utility
+            // functions, isn't present on Desktop. So for now, we'll check for that and
+            // use the manual way assuming it's mobile. Seriously, can't the core libs be
+            // synchronized better?
+            StatusNet.debug("webRequest: Titanium.Utils is: " + typeof Titanium.Utils);
+            StatusNet.debug("webRequest: client.setBasicCredentials is: " + typeof client.setBasicCredentials);
+            if (typeof Titanium.Utils == "undefined") {
+                client.setBasicCredentials(username, password);
+            } else {
+                // @fixme Desktop vs Mobile auth differences HTTPClient hack
+                // setRequestHeader must be called between open() and send()
+                var auth = 'Basic ' + Titanium.Utils.base64encode(username + ':' + password);
+                StatusNet.debug("webRequest: Authorization: " + auth);
+                client.setRequestHeader('Authorization', auth);
+            }
         }
 
         if (data) {
@@ -221,18 +226,35 @@ StatusNet.Account.prototype.webRequest = function(url, onSuccess, onError, data)
             client.send();
         }
 
-	} catch (e) {
+    } catch (e) {
         StatusNet.debug('webRequest: HTTP client exception: ' + e);
         onError(client, e);
     }
 }
 
+/**
+ * HTTP GET an API resource using the crendials for this account
+ *
+ * @param String   method    API method to call -- will be appended to the API root
+ * @param callable onSuccess callback function called after successful HTTP fetch: function(status, response)
+ * @param callable onError   callback function called if there's an HTTP error: function(status, response)
+ *
+ */
 StatusNet.Account.prototype.apiGet = function(method, onSuccess, onError) {
-    this.webRequest(this.apiroot + method, onSuccess, onError);
+    StatusNet.Account.webRequest(this.apiroot + method, onSuccess, onError, null, this.username, this.password);
 }
 
+/**
+ * HTTP POST to an API resource using the crendials for this account
+ *
+ * @param String   method    API method to call -- will be appended to the API root
+ * @param String   data      POST data
+ * @param callable onSuccess callback function called after successful HTTP fetch: function(status, response)
+ * @param callable onError   callback function called if there's an HTTP error: function(status, response)
+ *
+ */
 StatusNet.Account.prototype.apiPost = function(method, data, onSuccess, onError) {
-    this.webRequest(this.apiroot + method, onSuccess, onError, data);
+    StatusNet.Account.webRequest(this.apiroot + method, onSuccess, onError, data, this.username, this.password);
 }
 
 /**
