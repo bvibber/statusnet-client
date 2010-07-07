@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Account info management constructor.
  *
@@ -44,19 +45,24 @@ StatusNet.Account.getDefault = function(db) {
 
     StatusNet.debug('in StatusNet.Account.getDefault()');
 
-    var row = db.execute('select * from account where is_default = 1');
+    try {
+        var row = db.execute('select * from account where is_default = 1');
 
-    if (row.isValidRow()) {
-        StatusNet.debug('found an account');
-        var acct = StatusNet.Account.fromRow(row);
-        // @FIXME UI-specific code needs to be moved!
-        if (typeof Titanium.Desktop != "undefined") {
-            $('ul.nav li#nav_timeline_profile > img').attr('src', acct.avatar);
+        if (row.isValidRow()) {
+            StatusNet.debug('found an account');
+            var acct = StatusNet.Account.fromRow(row);
+            // @FIXME UI-specific code needs to be moved!
+            if (typeof Titanium.Desktop != "undefined") {
+                $('ul.nav li#nav_timeline_profile > img').attr('src', acct.avatar);
+            }
+            row.close();
+            return acct;
+        } else {
+            StatusNet.debug('did not find an account');
+            return null;
         }
-        row.close();
-        return acct;
-    } else {
-        StatusNet.debug('did not find an account');
+    } catch (e) {
+        StatusNet.debug('Exception getting account: ' + e);
         return null;
     }
 }
@@ -65,9 +71,13 @@ StatusNet.Account.getDefault = function(db) {
  * Set this account as the default.
  */
 StatusNet.Account.prototype.setDefault = function(db) {
-    db.execute("update account set is_default=0 where is_default=1");
-    db.execute("update account set is_default=1 where username=? and apiroot=?",
-               this.username, this.apiroot);
+    try {
+        db.execute("update account set is_default=0 where is_default=1");
+        db.execute("update account set is_default=1 where username=? and apiroot=?",
+            this.username, this.apiroot);
+    } catch (e) {
+        StatusNet.debug("Exception setting default account: " + e);
+    }
 }
 
 /**
@@ -98,15 +108,20 @@ StatusNet.Account.fromRow = function(row) {
  */
 StatusNet.Account.listAll = function(db) {
 
-    var accounts = [];
+    try {
+        var accounts = [];
 
-    result = db.execute('select * from account');
-    while (result.isValidRow()) {
-        accounts[accounts.length] = StatusNet.Account.fromRow(result);
-        result.next();
+        result = db.execute('select * from account');
+        while (result.isValidRow()) {
+            accounts[accounts.length] = StatusNet.Account.fromRow(result);
+            result.next();
+        }
+        result.close();
+        return accounts;
+    } catch (e) {
+        StatusNet.debug("Exception setting getting accounts: " + e);
+        return null;
     }
-    result.close();
-    return accounts;
 }
 
 /**
@@ -234,27 +249,32 @@ StatusNet.Account.prototype.ensure = function(db) {
     StatusNet.debug("textLimit = " + this.textLimit);
     StatusNet.debug("siteLogo = " + this.siteLogo);
 
-    var rs = db.execute("select * from account where username=? " +
-                        "and apiroot=?",
-                        this.username, this.apiroot);
+    try {
+        var rs = db.execute("select * from account where username=? " +
+                            "and apiroot=?",
+                            this.username, this.apiroot);
 
-    if (StatusNet.rowCount(rs) === 0) {
+        if (StatusNet.rowCount(rs) === 0) {
 
-        rs = db.execute("INSERT INTO account " +
-                        "(username, password, apiroot, is_default, profile_image_url, text_limit, site_logo) " +
-                        "VALUES (?, ?, ?, 0, ?, ?, ?)",
-                        this.username,
-                        this.password,
-                        this.apiroot,
-                        this.avatar,
-                        this.textLimit,
-                        this.siteLogo);
+            rs = db.execute("INSERT INTO account " +
+                            "(username, password, apiroot, is_default, profile_image_url, text_limit, site_logo) " +
+                            "VALUES (?, ?, ?, 0, ?, ?, ?)",
+                            this.username,
+                            this.password,
+                            this.apiroot,
+                            this.avatar,
+                            this.textLimit,
+                            this.siteLogo);
 
-        StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
+            StatusNet.debug('inserted ' + db.rowsAffected + 'rows');
 
+        }
+
+        return true;
+    } catch (e) {
+        StatusNet.debug('ensure() - Exception saving credentials: ' + e);
+        return false;
     }
-
-    return true;
 }
 
 /**
@@ -279,25 +299,30 @@ StatusNet.Account.prototype.equals = function(other) {
  * account as the new default.
  */
 StatusNet.Account.prototype.deleteAccount = function() {
-    var db = StatusNet.getDB();
 
-    StatusNet.debug("deleting...");
-    db.execute("delete from account where username=? and apiroot=?",
-               this.username, this.apiroot);
-    StatusNet.debug("deleted.");
+    try {
+        var db = StatusNet.getDB();
 
-    StatusNet.debug("checking default...");
-    if (StatusNet.Account.getDefault(db) == null) {
-        StatusNet.debug("setting new default...");
-        // Set the first one we find as default if we removed the default...
-        var row = db.execute("select * from account limit 1");
-        if (row.isValidRow()) {
-            var acct = StatusNet.Account.fromRow(row);
-            acct.setDefault();
+        StatusNet.debug("deleting...");
+        db.execute("delete from account where username=? and apiroot=?",
+                   this.username, this.apiroot);
+        StatusNet.debug("deleted.");
+
+        StatusNet.debug("checking default...");
+        if (StatusNet.Account.getDefault(db) == null) {
+            StatusNet.debug("setting new default...");
+            // Set the first one we find as default if we removed the default...
+            var row = db.execute("select * from account limit 1");
+            if (row.isValidRow()) {
+                var acct = StatusNet.Account.fromRow(row);
+                acct.setDefault();
+            }
+            StatusNet.debug("new default set!");
         }
-        StatusNet.debug("new default set!");
+        StatusNet.debug("done deleting!");
+    } catch (e) {
+        StatusNet.debug('Exception deleting account: ' + e);
     }
-    StatusNet.debug("done deleting!");
 }
 
 /**
