@@ -89,9 +89,9 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     }
 
     html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
-    html.push('<div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a>');
+    html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
     html.push('</div>');
-    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '">' + author + '</a>');
+    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
     html.push('<div class="content">'+ notice.content +'</div>');
     html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
     if (notice.source) {
@@ -324,6 +324,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
         });
     });
 
+    $('div.content a', noticeDom).attr('rel', 'external');
 }
 
 /**
