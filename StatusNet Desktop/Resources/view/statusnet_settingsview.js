@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 StatusNet.SettingsView = function() {
     var db = StatusNet.getDB();
     this.accounts = StatusNet.Account.listAll(db);
@@ -37,17 +38,23 @@ StatusNet.SettingsView.prototype.init = function() {
         return false;
     });
     $("#new-username").change(function() {
-        that.updateNewAccount();
+        if (that.formComplete()) {
+            that.updateNewAccount();
+        }
     }).keydown(function() {
         that.startUpdateTimeout();
     });
     $("#new-password").change(function() {
-        that.updateNewAccount();
+        if (that.formComplete()) {
+            that.updateNewAccount();
+        }
     }).keydown(function() {
         that.startUpdateTimeout();
     });
     $("#new-site").change(function() {
-        that.updateNewAccount();
+        if (that.formComplete()) {
+            that.updateNewAccount();
+        }
     }).keydown(function() {
         that.startUpdateTimeout();
     });
@@ -57,6 +64,19 @@ StatusNet.SettingsView.prototype.init = function() {
     $("#new-cancel").click(function() {
         that.hideAddAccount();
     });
+}
+
+StatusNet.SettingsView.prototype.formComplete = function() {
+
+    var username = $("#new-username").val();
+    var password = $("#new-password").val();
+    var site = $("#new-site").val();
+
+    if (username != "" && password != "" && site != "") {
+        return true;
+    } else {
+        return false
+    }
 }
 
 StatusNet.SettingsView.prototype.showAddAccount = function() {
@@ -151,10 +171,10 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
  * @return string HTML fragment with prettified name
  */
 StatusNet.SettingsView.prototype.prettySiteName = function(acct) {
-	var html = $("<span></span>").text(acct.getHost())
-								 .attr("title", acct.apiroot)
-								 .addClass(acct.isSecure() ? 'https' : 'http');
-	return $("<div></div>").append(html).html(); // @fixme ok this is lame
+    var html = $("<span></span>").text(acct.getHost())
+                                 .attr("title", acct.apiroot)
+                                 .addClass(acct.isSecure() ? 'https' : 'http');
+    return $("<div></div>").append(html).html(); // @fixme ok this is lame
 }
 
 /**
@@ -166,7 +186,11 @@ StatusNet.SettingsView.prototype.startUpdateTimeout = function() {
     this.cancelUpdateTimeout();
 
     var that = this;
-    this.updateTimeout = window.setTimeout(function() { that.updateNewAccount() }, 2000);
+    this.updateTimeout = window.setTimeout(function() {
+        if (that.formComplete()) {
+            that.updateNewAccount();
+        }
+    }, 2000);
 }
 
 /**
@@ -198,7 +222,7 @@ StatusNet.SettingsView.prototype.validVersion = function(version)
         if (minor < 9) {
             return false;
         } else {
-            if (rev < 3) { 
+            if (rev < 3) {
                 return false;
             }
         }
@@ -212,12 +236,12 @@ StatusNet.SettingsView.prototype.validVersion = function(version)
  */
 StatusNet.SettingsView.prototype.updateNewAccount = function() {
     var that = this;
+
     this.cancelUpdateTimeout();
     this.discoverNewAccount(function(acct) {
         if (acct.equals(that.workAcct)) {
             // No change.
             StatusNet.debug("No change!");
-            $("#new-status").text("No change.");
         } else {
             $("#new-status").text("Testing login...");
 
@@ -266,20 +290,23 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                                     StatusNet.debug("Couldn't get site logo!");
                                     that.workAcct.siteLogo = '';
                                 }
-                            }, function(status) {
-                                StatusNet.debug("Couldn't load statusnet/config.xml for site.");
+                            }, function(status, xml) {
+                                $("#new-status").text("Couldn't load site configuration info.");
+                                StatusNet.debug("Couldn't load statusnet/config.xml for site: " + status);
+                                $("#new-avatar").attr("src", "images/default-avatar-stream.png");
                             }
                         );
 
-                    }, function(status) {
-                        $("#new-status").text("Bad nickname or password.");
-                        StatusNet.debug("We failed to load account info");
+                    }, function(status, xml) {
+                        $("#new-status").text("Error checking version.");
+                        StatusNet.debug("Couldn't load statusnet/version.xml for site: " + status);
                         $("#new-avatar").attr("src", "images/default-avatar-stream.png");
                     });
-
                 },
-                function(status) {
-                    StatusNet.debug("Couldn't load statusnet/version.xml for site.");
+                function(status, xml) {
+                    $("#new-status").text("Bad nickname or password.");
+                    StatusNet.debug("We failed to load account info: " + status);
+                    $("#new-avatar").attr("src", "images/default-avatar-stream.png");
                 }
             );
 
@@ -290,6 +317,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
         that.workAcct = null;
         $("#new-save").attr("disabled", "disabled");
         $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+
     });
 }
 
