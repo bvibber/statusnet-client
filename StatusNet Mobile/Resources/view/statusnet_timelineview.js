@@ -35,21 +35,39 @@ StatusNet.TimelineView = function(client) {
 StatusNet.TimelineView.prototype.show = function () {
 
     StatusNet.debug("TimelineView.show");
+/*
+    StatusNet.debug("QQQ: this.tabName: " + this.tabName);
+    StatusNet.debug("QQQ: this.tabName(): " + this.tabName());
+    StatusNet.debug("QQQ: StatusNet: " + StatusNet);
+    StatusNet.debug("QQQ: StatusNet.windows: " + StatusNet.windows);
+    StatusNet.debug("QQQ: StatusNet.windows[this.tabName()]: " + StatusNet.windows[this.tabName()]);
 
     // @fixme don't recreate the table, or else kill it on close?
     this.window = StatusNet.windows[this.tabName()];
+*/
+
+    StatusNet.debug("TimelineView.show this.window: " + this.window);
+
+    StatusNet.debug("TimelineView.show A");
     this.table = Titanium.UI.createTableView();
+    StatusNet.debug("TimelineView.show B");
     this.window.add(this.table);
 
+    StatusNet.debug("TimelineView.show C");
     var notices = this.client.timeline.getNotices();
+    StatusNet.debug("TimelineView.show D");
 
     // clear old notices
     // @todo be a little nicer; no need to clear if we just changed one thing
+    StatusNet.debug("TimelineView.show E");
     this.table.setData([]);
+    StatusNet.debug("TimelineView.show F");
 
     if (notices.length > 0) {
+    StatusNet.debug("TimelineView.show G");
 
         for (i = 0; i < notices.length; i++) {
+    StatusNet.debug("TimelineView.show Gx");
             
             this.table.appendRow({title: notices[i].content});
             /*
@@ -78,12 +96,17 @@ StatusNet.TimelineView.prototype.show = function () {
             that.enableNoticeControls(this);
         });
         */
+    StatusNet.debug("TimelineView.show G-done");
 
     } else {
-        table.appendRow({title: 'No notices in this timeline yet.'});
+    StatusNet.debug("TimelineView.show G-alt");
+        this.table.appendRow({title: 'No notices in this timeline yet.'});
+    StatusNet.debug("TimelineView.show G-alt-done");
     }
 
+    StatusNet.debug("TimelineView.show H");
     this.hideSpinner();
+    StatusNet.debug("TimelineView.show done");
 };
 
 /**

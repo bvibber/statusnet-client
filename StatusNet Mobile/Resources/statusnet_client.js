@@ -138,10 +138,10 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     // @todo localization
     var tabInfo = {'public':    {title: 'Public',
                               timeline: StatusNet.TimelinePublic,
-                                  view: StatusNet.TimelineViewPublic}/*,
+                                  view: StatusNet.TimelineViewPublic},
                     friends:    {title: 'Personal',
                               timeline: StatusNet.TimelineFriends,
-                                  view: StatusNet.TimelineViewFriends},
+                                  view: StatusNet.TimelineViewFriends}/*,
                     profile:    {title: 'Profile',
                               timeline: StatusNet.TimelineUser,
                                   view: StatusNet.TimelineViewUser},
@@ -171,6 +171,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     StatusNet.debug('Done building tabs, timelines, views.');
 
     // @todo remember last-used tab
+    StatusNet.debug('friends tab is: ' + this.tabs.friends);
     this.tabGroup.setActiveTab(this.tabs.friends);
     this.tabGroup.open();
 
@@ -215,8 +216,12 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
             StatusNet.debug('timeline tab? updating timeline...');
             StatusNet.debug(info.timeline);
             client.timeline = new info.timeline(client);
+            
+            StatusNet.debug('telling the view to show...');
+            client.view.show();
+
             StatusNet.debug('created, now telling it to update:');
-            //client.timeline.update();
+            client.timeline.update();
             StatusNet.debug('timeline updated.');
         } else {
             StatusNet.debug('settings tab? showing view...');
