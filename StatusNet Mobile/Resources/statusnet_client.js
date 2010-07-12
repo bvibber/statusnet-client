@@ -132,6 +132,7 @@ StatusNet.Client.prototype.init = function() {
 };
 
 StatusNet.Client.prototype.initAccountView = function(acct) {
+    StatusNet.debug('initAccountView entered...');
     this.account = acct;
 
     // For now let's stick with the same tabs we have on the desktop sidebar
@@ -158,9 +159,11 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
                               timeline: StatusNet.TimelineSearch,
                                   view: StatusNet.TimelineViewSearch}*/};
 
+    StatusNet.debug('initAccountView made a big list.');
     this.tabs = {};
     this.windows = {};
     this.tabGroup = Titanium.UI.createTabGroup();
+    StatusNet.debug('initAccountView created a tab group.');
 
     StatusNet.debug('Starting building tabs, timelines, views...');
     for (var tab in tabInfo) {

@@ -29,22 +29,36 @@ StatusNet.SettingsView = function(client) {
     this.lastSite = '';
 };
 
-StatusNet.SettingsView.prototype.init = function(client) {
+StatusNet.SettingsView.prototype.init = function() {
     StatusNet.debug('SettingsView.init');
-    this.client = client;
     var view = this;
+    var client = this.client;
 
     // Set up our table view...
     this.table = Titanium.UI.createTableView({
         editable: true
     });
     this.table.addEventListener('click', function(event) {
+        StatusNet.debug('Got a click event on the table view.');
         // Selected an account
-        var acct = event.rowData.acct;
+        StatusNet.debug('QQQ: event: ' + event);
+        StatusNet.debug('QQQ: event.rowData: ' + event.rowData);
+        StatusNet.debug('QQQ: event.rowData.acct: ' + event.rowData.acct);
+        //var acct = event.rowData.acct;
+        var x = event.rowData.acct;
+        var acct = new StatusNet.Account(x.username, x.password, x.apiroot);
+        // hack -- on Android, we don't seem to get the original object back
+        // but only have its properties, so all the methods are missing.
+        StatusNet.debug('QQQ: acct.username: ' + acct.username);
+        StatusNet.debug('QQQ: acct.ensure: ' + acct.ensure);
+        StatusNet.debug('QQQ: acct.getHost: ' + acct.getHost);
+        StatusNet.debug('QQQ: acct.getHost(): ' + acct.getHost());
         StatusNet.debug('Attempting to select account: ' + acct.username + '@' + acct.getHost());
         acct.setDefault(StatusNet.getDB());
         StatusNet.debug('Saved!');
-        this.client.initAccountView(acct);
+        StatusNet.debug('QQQ: client: ' + client);
+        StatusNet.debug('QQQ: client.initAccountView: ' + client.initAccountView);
+        client.initAccountView(acct);
         StatusNet.debug('Switched to timeline.');
     });
     this.table.addEventListener('delete', function(event) {
