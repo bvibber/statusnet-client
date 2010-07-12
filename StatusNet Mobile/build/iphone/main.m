@@ -8,7 +8,7 @@
 #define STRING(x) _QUOTEME(x)
 
 NSString * const TI_APPLICATION_DEPLOYTYPE = @"development";
-NSString * const TI_APPLICATION_ID = @"net.status.client.mobile";
+NSString * const TI_APPLICATION_ID = @"new.status.client.mobile";
 NSString * const TI_APPLICATION_PUBLISHER = @"StatusNet, Inc.";
 NSString * const TI_APPLICATION_URL = @"http://status.net/";
 NSString * const TI_APPLICATION_NAME = @"StatusNet Mobile";
@@ -19,7 +19,7 @@ NSString * const TI_APPLICATION_GUID = @"cca143fb-473f-4e8c-9bcb-91b02a08e548";
 BOOL const TI_APPLICATION_ANALYTICS = true;
 
 #ifdef TARGET_IPHONE_SIMULATOR
-NSString * const TI_APPLICATION_RESOURCE_DIR = @"/Users/brion/src/StatusNet/client/statusnet-client/StatusNet Mobile/Resources";
+NSString * const TI_APPLICATION_RESOURCE_DIR = @"/Users/zcopley/Documents/Projects/statusnet-client/StatusNet Mobile/Resources";
 #endif
 
 int main(int argc, char *argv[]) {

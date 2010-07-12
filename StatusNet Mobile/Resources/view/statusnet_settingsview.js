@@ -296,25 +296,29 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             that.workAcct = acct;
             //$("#new-save").attr("disabled", "disabled");
             //$("#new-avatar").attr("src", "images/icon_processing.gif");
-    
-            that.workAcct.fetchUrl('account/verify_credentials.xml', function(status, xml) {
+
+            that.workAcct.apiGet('account/verify_credentials.xml', function(status, xml) {
                 that.fields.status.text = "Login confirmed.";
                 that.xml = xml;
+
+                StatusNet.debug("got xml: " + xml);
+
+                that.workAcct.avatar  = $(xml).find('user > profile_image_url').text();
+
                 /*
                 // @fixme replace avatar update code for mobile...
-                that.workAcct.avatar = $("user profile_image_url", xml).text();
                 StatusNet.debug(that.workAcct.avatar);
                 */
                 //$("#new-avatar").attr("src", that.workAcct.avatar);
                 //$("#new-save").removeAttr("disabled");
-                
+
                 // get site specific configuration info
-                that.workAcct.fetchUrl('statusnet/config.xml', function(status, xml) {
+                that.workAcct.apiGet('statusnet/config.xml', function(status, xml) {
                     StatusNet.debug("Loaded statusnet/config.xml");
-                    //that.workAcct.textLimit = $(xml).find('site > textlimit:first').text();
-                    //that.workAcct.siteLogo = $(xml).find('site > logo:first').text();
+                    that.workAcct.textLimit = $(xml).find('site > textlimit').text();
+                    that.workAcct.siteLogo = $(xml).find('site > logo').text();
                 }, function(status) {
-                    StatusNet.debug("Couldn't load statusnet/config.xml for site."); 
+                    StatusNet.debug("Couldn't load statusnet/config.xml for site.");
                 });
 
             }, function(status) {

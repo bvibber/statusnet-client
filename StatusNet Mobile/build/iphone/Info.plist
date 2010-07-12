@@ -11,7 +11,7 @@
 	<key>CFBundleIconFile</key>
 	<string>logo.png</string>
 	<key>CFBundleIdentifier</key>
-	<string>net.status.client.mobile</string>
+	<string>new.status.client.mobile</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
