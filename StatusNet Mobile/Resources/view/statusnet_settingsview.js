@@ -221,11 +221,17 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
  */
 StatusNet.SettingsView.prototype.showAccounts = function() {
     StatusNet.debug('SettingsView.showAccounts');
+    var android = (Titanium.Platform.osname == "android");
+
     if (this.accounts.length == 0) {
         this.showAddAccount();
     } else {
         for (var i = 0; i < this.accounts.length; i++) {
             this.showAccountRow(this.accounts[i]);
+        }
+        // crappy temp hack -- single row is hidden on android
+        if (android && this.accounts.length == 1) {
+            this.table.appendRow({});
         }
     }
 };
@@ -243,8 +249,11 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     StatusNet.debug('show account row: ' + acct);
     var title = acct.username + '@' + acct.getHost();
     StatusNet.debug('adding row: ' + title);
+
+    // Note -- if I add *two* rows it works on Android with 'auto'. Sighhhhhh
     var row = {title: title,
-               acct: acct};
+               acct: acct,
+               height: 'auto'};
     this.table.appendRow(row);
     StatusNet.debug('show account row done.');
 };
