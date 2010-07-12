@@ -158,13 +158,17 @@ StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username,
             StatusNet.debug(Titanium.version);
 
             var responseXML;
-
-            if (Titanium.version < '1.3.0') {
-                // @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
-                // to use this work-around.
-                responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
+            if (this.responseXML == null) {
+                if (typeof DOMParser != "undefined") {
+                    // Titanium Desktop 1.0 doesn't fill out responseXML.
+                    // We'll use WebKit's XML parser...
+                    responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
+                } else {
+                    // Titanium Mobile 1.3 doesn't fill out responseXML on Android.
+                    // We'll use Titanium's XML parser...
+                    responseXML = Titanium.XML.parseString(this.responseText);
+                }
             } else {
-                // Is implemented in Titanium Mobile 1.3, whereas the above doesn't work there.
                 responseXML = this.responseXML;
             }
 

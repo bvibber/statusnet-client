@@ -33,6 +33,7 @@ StatusNet.SettingsView.prototype.init = function() {
     StatusNet.debug('SettingsView.init');
     var view = this;
     var client = this.client;
+    var android = (Titanium.Platform.osname == "android");
 
     // Set up our table view...
     this.table = Titanium.UI.createTableView({
@@ -44,6 +45,13 @@ StatusNet.SettingsView.prototype.init = function() {
         StatusNet.debug('QQQ: event: ' + event);
         StatusNet.debug('QQQ: event.rowData: ' + event.rowData);
         StatusNet.debug('QQQ: event.rowData.acct: ' + event.rowData.acct);
+
+        if (event.rowData.acct == "add-stub") {
+            // Special case!
+            view.showAddAccount();
+            return;
+        }
+
         //var acct = event.rowData.acct;
         var x = event.rowData.acct;
         var acct = new StatusNet.Account(x.username, x.password, x.apiroot);
@@ -70,36 +78,58 @@ StatusNet.SettingsView.prototype.init = function() {
     });
     this.window.add(this.table);
 
-    // Create-account button
-    var create = Titanium.UI.createButton({
-        title: '+'
-    });
-    create.addEventListener('click', function() {
-        if (view.table.editing) {
-            view.table.editing = false;
-            view.window.setLeftNavButton(edit);
-        }
-        view.showAddAccount();
-    });
-    this.window.setRightNavButton(create);
+    if (android) {
+        // Stick an 'add account' item at the top of the list, similar to
+        // the default Android browser's bookmarks list.
+        var row = Titanium.UI.createTableViewRow({
+            title: 'Add account...',
+            height: 'auto',
+            acct: "add-stub"
+        });
+        /*
+        // The tableview seems to get this click before the row does, so bumping the code up.
+        row.addEventListener('click', function() {
+            StatusNet.debug('clicked the add account thingy');
+            view.showAddAccount();
+        });
+        */
+        this.table.appendRow(row);
 
-    // Edit/cancel buttons for the table view...
-    var edit = Titanium.UI.createButton({
-        title: 'Edit'
-    });
-    var cancel = Titanium.UI.createButton({
-        title: 'Cancel',
-        style: Titanium.UI.iPhone.SystemButtonStyle.DONE
-    });
-    edit.addEventListener('click', function() {
-        view.window.setLeftNavButton(cancel);
-        view.table.editing = true;
-    });
-    cancel.addEventListener('click', function() {
-        view.window.setLeftNavButton(edit);
-        view.table.editing = false;
-    });
-    this.window.setLeftNavButton(edit);
+        // @fixme -- add a way to remove items!
+    } else {
+        // Create-account button
+        var create = Titanium.UI.createButton({
+            title: '+'
+        });
+        create.addEventListener('click', function() {
+            if (view.table.editing) {
+                view.table.editing = false;
+                view.window.setLeftNavButton(edit);
+            }
+            view.showAddAccount();
+        });
+    
+        // Edit/cancel buttons for the table view...
+        var edit = Titanium.UI.createButton({
+            title: 'Edit'
+        });
+        var cancel = Titanium.UI.createButton({
+            title: 'Cancel',
+            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
+        });
+        edit.addEventListener('click', function() {
+            view.window.setLeftNavButton(cancel);
+            view.table.editing = true;
+        });
+        cancel.addEventListener('click', function() {
+            view.window.setLeftNavButton(edit);
+            view.table.editing = false;
+        });
+
+        // ...and plop them onto the tab header.
+        this.window.setLeftNavButton(edit);
+        this.window.setRightNavButton(create);
+    }
 
     // Now let's fill out the table!
     this.showAccounts();
@@ -155,7 +185,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
             font: {fontSize: '30'}
         });
         window.add(label);
-        // Add the buttons at the bottom.
+        // Add the buttons at the bottom later...
     } else {
         window.setLeftNavButton(cancel);
         window.setRightNavButton(save);
@@ -325,10 +355,10 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             //$("#new-avatar").attr("src", "images/icon_processing.gif");
 
             that.workAcct.apiGet('account/verify_credentials.xml', function(status, xml) {
+                StatusNet.debug("got xml: " + xml);
+
                 that.fields.status.text = "Login confirmed.";
                 that.xml = xml;
-
-                StatusNet.debug("got xml: " + xml);
 
                 that.workAcct.avatar  = $(xml).find('user > profile_image_url').text();
 
