@@ -47,28 +47,35 @@ StatusNet.getDB = function() {
 
         this.db = Titanium.Database.open('statusnet');
 
-        var sql = 'CREATE TABLE IF NOT EXISTS account (' +
-            'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
-            'username TEXT NOT NULL, ' +
-            'password TEXT NOT NULL, ' +
-            'apiroot TEXT NOT NULL, ' +
-            'is_default INTEGER DEFAULT 0, ' +
-            'last_timeline_id INTEGER, ' +
-            'profile_image_url TEXT, ' +
-            'text_limit INTEGER DEFAULT 0, ' +
-            'site_logo TEXT, ' +
-            'UNIQUE (username, apiroot)' +
-            ')';
+        var sql = 'CREATE TABLE IF NOT EXISTS account ('
+            + 'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+            + 'username TEXT NOT NULL, '
+            + 'password TEXT NOT NULL, '
+            + 'apiroot TEXT NOT NULL, '
+            + 'is_default INTEGER DEFAULT 0, '
+            + 'profile_image_url TEXT, '
+            + 'text_limit INTEGER DEFAULT 0, '
+            + 'site_logo TEXT, '
+            + 'UNIQUE (username, apiroot)'
+            + ')';
 
         this.db.execute(sql);
 
-        sql = 'CREATE TABLE IF NOT EXISTS notice_cache (' +
-            'notice_id INTEGER, ' +
-            'account_id INTEGER, ' +
-            'timeline TEXT NOT NULL, ' +
-            'atom_entry TEXT NOT NULL, ' +
-            'PRIMARY KEY (notice_id, account_id)' +
-            ')';
+        sql = 'CREATE TABLE IF NOT EXISTS entry ('
+            + 'notice_id INTEGER NOT NULL, '
+            + 'atom_entry TEXT NOT NULL, '
+            + 'PRIMARY KEY (notice_id)'
+            + ')';
+
+        this.db.execute(sql);
+
+        sql = 'CREATE TABLE IF NOT EXISTS notice_entry ('
+            + 'notice_id INTEGER NOT NULL REFERENCES entry (notice_id), '
+            + 'account_id INTEGER NOT NULL, '
+            + 'timeline TEXT NOT NULL, '
+            + 'timestamp INTEGER NOT NULL, '
+            + 'PRIMARY KEY (notice_id, timeline, account_id)'
+            + ')';
 
         this.db.execute(sql);
 
@@ -110,3 +117,25 @@ function heir(p) {
     f.prototype = p;
     return new f();
 };
+
+StatusNet.Event = function(sender) {
+    StatusNet.debug("registering new event");
+    this._sender = sender;
+    StatusNet.debug("sender = " + sender);
+    this._listeners = [];
+}
+
+StatusNet.Event.prototype.attach = function(listener) {
+    StatusNet.debug("Attaching event listener");
+    this._listeners.push(listener);
+}
+
+StatusNet.Event.prototype.notify = function(args) {
+    if (args) {
+        StatusNet.debug("Notify called with arg: " + Titanium.JSON.stringify(args));
+    }
+    for (var i = 0; i < this._listeners.length; i++) {
+        this._listeners[i].call(this._sender, args);
+    }
+}
+
