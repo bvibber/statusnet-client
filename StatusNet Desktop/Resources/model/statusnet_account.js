@@ -168,11 +168,14 @@ StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username,
             StatusNet.debug("webRequest: after parse, before onSuccess");
 
             if (this.status == 200) {
+                StatusNet.debug("webRequest: calling onSuccess");
                 onSuccess(this.status, responseXML);
 
                 StatusNet.debug("webRequest: after onSuccess");
 
             } else {
+                StatusNet.debug("webRequest: calling onError");
+
                 onError(this.status, responseXML);
             }
             StatusNet.debug("webRequest: done with onload.");
