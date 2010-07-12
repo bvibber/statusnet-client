@@ -24,7 +24,7 @@
 StatusNet.Sidebar = function(client) {
     StatusNet.debug("StatusNet.sidebar()");
     this.client = client;
-}
+};
 
 /**
  * Class method to higlight the icon associated with the selected timeline
@@ -33,4 +33,4 @@ StatusNet.Sidebar = function(client) {
  */
 StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
     // no-op: the tab bar manages itself
-}
+};

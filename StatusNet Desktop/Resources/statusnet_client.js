@@ -71,7 +71,7 @@ StatusNet.Client = function(_account) {
         },
         60000
     );
-}
+};
 
 StatusNet.Client.prototype.getActiveTimeline = function() {
     if (this.timeline) {
@@ -79,7 +79,7 @@ StatusNet.Client.prototype.getActiveTimeline = function() {
     } else {
         StatusNet.debug("Client.getActiveTimeline() - null timeline, help!");
     }
-}
+};
 
 StatusNet.Client.prototype.getActiveView = function() {
     if (this.view) {
@@ -87,11 +87,11 @@ StatusNet.Client.prototype.getActiveView = function() {
     } else {
         StatusNet.debug("Client.getActiveView() - null view, help!");
     }
-}
+};
 
 StatusNet.Client.prototype.getServer = function() {
     return this.server;
-}
+};
 
 /**
  * Switch the view to a specified timeline
@@ -181,7 +181,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             60000 // @todo Make this configurable
         );
     }
-}
+};
 
 /**
  * Switch the user timeline based on the ID of the user. This only
@@ -220,7 +220,7 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
         },
         false
     );
-}
+};
 
 StatusNet.Client.prototype.showSubscriptions = function(authorId) {
 
@@ -247,7 +247,7 @@ StatusNet.Client.prototype.showSubscriptions = function(authorId) {
             $("#body").scrollTop(0);
         }
     );
-}
+};
 
 StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
     StatusNet.debug("in showGroupTimeline()");
@@ -269,7 +269,7 @@ StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
         },
         false
     );
-}
+};
 
 StatusNet.Client.prototype.showTagTimeline = function(tag) {
     StatusNet.debug("in showTagTimeline() for tag: " + tag);
@@ -292,7 +292,7 @@ StatusNet.Client.prototype.showTagTimeline = function(tag) {
         },
         false
     );
-}
+};
 
 /**
  * General initialization stuff
@@ -332,7 +332,7 @@ StatusNet.Client.prototype.init = function() {
 
     // setup sounds
     this.newNoticesSound = Titanium.Media.createSound('app://sounds/kalimba.wav');
-}
+};
 
 /**
  * Show notice input dialog
@@ -360,7 +360,7 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
     });
 
     win.open();
-}
+};
 
 /**
  * Show direct message input dialog
@@ -378,7 +378,7 @@ StatusNet.Client.prototype.directMessageDialog = function(nickname) {
     }
 
     win.open();
-}
+};
 
 /**
  * Delete a notice from the timeline
@@ -416,7 +416,7 @@ StatusNet.Client.prototype.deleteNotice = function(noticeId, linkDom) {
              }
          }
     );
-}
+};
 
 /**
  * Favorite a notice
@@ -462,7 +462,7 @@ StatusNet.Client.prototype.faveNotice = function(noticeId, linkDom)
             }
         }
     );
-}
+};
 
 /**
  * Unfavorite a notice
@@ -508,7 +508,7 @@ StatusNet.Client.prototype.unFaveNotice = function(noticeId, linkDom)
             }
         }
     );
-}
+};
 
 /**
  * Repeat a notice
@@ -551,7 +551,7 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
             }
         }
     );
-}
+};
 
 /**
  * Subscribe to a profile
@@ -602,7 +602,7 @@ StatusNet.Client.prototype.subscribe = function(profileId, linkDom, onSuccess)
             }
         }
     );
-}
+};
 
 /**
  * Unsubscribe from a profile
@@ -654,7 +654,7 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, linkDom, onSuccess)
             }
         }
     );
-}
+};
 
 /**
  * Join a group
@@ -702,7 +702,7 @@ StatusNet.Client.prototype.joinGroup = function(groupId, linkDom)
             }
         }
     );
-}
+};
 
 /**
  * Leave a group
@@ -750,7 +750,7 @@ StatusNet.Client.prototype.leaveGroup = function(groupId, linkDom)
             }
         }
     );
-}
+};
 
 /**
  * Block to a profile
@@ -800,7 +800,7 @@ StatusNet.Client.prototype.block = function(profileId, linkDom, onSuccess)
             }
         }
     );
-}
+};
 
 /**
  * Unblock to a profile
@@ -850,7 +850,7 @@ StatusNet.Client.prototype.unblock = function(profileId, linkDom, onSuccess)
             }
         }
     );
-}
+};
 
 /**
  * Dump all cached notices
@@ -871,5 +871,5 @@ StatusNet.Client.prototype.flushNoticeCache = function(onSuccess) {
     if (onSuccess) {
         onSuccess();
     }
-}
+};
 

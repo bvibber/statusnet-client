@@ -20,7 +20,7 @@
 /**
  * Atom parsing class that understands some Activity Streams data
  */
-StatusNet.AtomParser = function() {}
+StatusNet.AtomParser = function() {};
 
 /**
  * Class method for generating a notice obj from an Direct Message Atom entry
@@ -57,7 +57,7 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
     notice.avatar = $(entry).find('link[rel=image]').attr('href');
 
     return notice;
-}
+};
 
 /**
  * Class method for generating a notice from an Atom entry
@@ -67,6 +67,7 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
 StatusNet.AtomParser.noticeFromEntry = function(entry) {
 
     var notice = {};
+    var result;
 
     // note: attribute selectors seem to have problems with [media:width=48]
     $(entry).find('link[rel=avatar]').each(function(i, el) {
@@ -88,7 +89,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     // XXX: Special case for search Atom entries
     if (!notice.id) {
         var searchId = $(entry).find('id').text();
-        var result = searchId.match(idRegexp);
+        result = searchId.match(idRegexp);
         if (result) {
             notice.id = result[0];
         }
@@ -125,7 +126,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.authorUri = $(entry).find('author uri').text();
     notice.fullname = $(entry).find('[nodeName=poco:displayName]').text();
 
-    var result = notice.authorUri.match(idRegexp);
+    result = notice.authorUri.match(idRegexp);
     if (result) {
         notice.authorId = result[0];
     }
@@ -158,7 +159,7 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     // @todo category / tags / groups ?
 
     return notice;
-}
+};
 
 StatusNet.AtomParser.parseSubject = function(subject) {
 
@@ -214,7 +215,7 @@ StatusNet.AtomParser.parseSubject = function(subject) {
     });
 
     return author;
-}
+};
 
 /**
  * Class method for generating a user object from an
@@ -224,7 +225,7 @@ StatusNet.AtomParser.parseSubject = function(subject) {
  */
 StatusNet.AtomParser.userFromSubject = function(subject) {
     return StatusNet.AtomParser.parseSubject(subject);
-}
+};
 
 /**
  * Class method for generating an group object from an
@@ -234,7 +235,7 @@ StatusNet.AtomParser.userFromSubject = function(subject) {
  */
 StatusNet.AtomParser.groupFromSubject = function(subject) {
     return StatusNet.AtomParser.parseSubject(subject);
-}
+};
 
 StatusNet.AtomParser.getGroup = function(data) {
 
@@ -246,4 +247,4 @@ StatusNet.AtomParser.getGroup = function(data) {
     group.blocked = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('blocked');
 
     return group;
-}
+};

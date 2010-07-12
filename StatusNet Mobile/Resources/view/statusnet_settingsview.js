@@ -27,7 +27,7 @@ StatusNet.SettingsView = function(client) {
     this.lastUsername = '';
     this.lastPassword = '';
     this.lastSite = '';
-}
+};
 
 StatusNet.SettingsView.prototype.init = function(client) {
     StatusNet.debug('SettingsView.init');
@@ -89,7 +89,7 @@ StatusNet.SettingsView.prototype.init = function(client) {
 
     // Now let's fill out the table!
     this.showAccounts();
-}
+};
 
 /**
  * Open the add-new-account modal dialog
@@ -165,19 +165,23 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
                     returnKeyType:Titanium.UI.RETURNKEY_DONE
                   }}};
     for (var i in fields) {
-        var props = {
-            left: 8,
-            right: 8,
-            height: android ? 'auto' : 32, // argghhhhh auto doesn't work on iphone
-            borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED
-        };
-        for (var j in fields[i].props) {
-            props[j] = fields[i].props[j];
-        }
-        var text = Titanium.UI.createTextField(props);
-        window.add(text);
+        if (fields.hasOwnProperty(i)) {
+            var props = {
+                left: 8,
+                right: 8,
+                height: android ? 'auto' : 32, // argghhhhh auto doesn't work on iphone
+                borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED
+            };
+            for (var j in fields[i].props) {
+                if (fields[i].props.hasOwnProperty(j)) {
+                    props[j] = fields[i].props[j];
+                }
+            }
+            var text = Titanium.UI.createTextField(props);
+            window.add(text);
 
-        this.fields[i] = text;
+            this.fields[i] = text;
+        }
     }
     this.fields.site.addEventListener('return', function() {
         view.fields.username.focus();
@@ -210,7 +214,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     window.open({
         modal: true
     });
-}
+};
 
 /**
  * @fixme really should separate this a bit more to model/view?
@@ -224,7 +228,7 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
             this.showAccountRow(this.accounts[i]);
         }
     }
-}
+};
 
 /**
  * Add an account row to the accounts list.
@@ -243,7 +247,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
                acct: acct};
     this.table.appendRow(row);
     StatusNet.debug('show account row done.');
-}
+};
 
 /**
  * Start a timeout to try updating the account if the user stops
@@ -257,7 +261,7 @@ StatusNet.SettingsView.prototype.startUpdateTimeout = function() {
     var that = this;
     this.updateTimeout = window.setTimeout(function() { that.updateNewAccount() }, 2000);
     */
-}
+};
 
 /**
  * Cancel the account update timeout if it's been started.
@@ -269,7 +273,7 @@ StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
         this.updateTimeout = null;
     }
     */
-}
+};
 
 /**
  * Validate input and see if we can make it work yet
@@ -336,7 +340,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
         //$("#new-avatar").attr("src", "images/default-avatar-stream.png");
     });
     StatusNet.debug("yadda: the end");
-}
+};
 
 /**
  * Build an account object from the info in our form, if possible.
@@ -347,9 +351,9 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
  */
 StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onError) {
     StatusNet.debug('bizbax 1');
-    var username = this.fields['username'].value;
-    var password = this.fields['password'].value;
-    var site = this.fields['site'].value;
+    var username = this.fields.username.value;
+    var password = this.fields.password.value;
+    var site = this.fields.site.value;
     StatusNet.debug('bizbax 2');
 
     if (this.workAcct != null &&
@@ -374,9 +378,12 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
     }
 
     StatusNet.debug('bizbax 8');
+
+    var url;
+
     if (site.substr(0, 7) == 'http://' || site.substr(0, 8) == 'https://') {
         StatusNet.debug('bizbax 9');
-        var url = site;
+        url = site;
         if (url.substr(url.length - 1, 1) != '/') {
             url += '/';
         }
@@ -385,7 +392,7 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
         StatusNet.debug('bizbax 10');
         // Special case Twitter...
         // but it probably ain't super great as we do SN-specific stuff!
-        var url = 'https://twitter.com/';
+        url = 'https://twitter.com/';
         onSuccess(new StatusNet.Account(username, password, url));
     } else {
         StatusNet.debug('bizbax 11');
@@ -409,9 +416,9 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
         StatusNet.debug('bizbax 16');
     }
     StatusNet.debug('bizbax 99');
-}
+};
 
 StatusNet.SettingsView.prototype.saveNewAccount = function() {
     this.workAcct.ensure(StatusNet.getDB());
     this.showAccountRow(this.workAcct);
-}
+};

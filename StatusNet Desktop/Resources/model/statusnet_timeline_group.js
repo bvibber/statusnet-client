@@ -33,7 +33,7 @@ StatusNet.TimelineGroup = function(client, groupId) {
     this._url = 'statusnet/groups/timeline/' + groupId + '.atom';
 
     this.group = null;
-}
+};
 
 // Make StatusNet.TimelineGroup inherit Timeline's prototype
 StatusNet.TimelineGroup.prototype = heir(StatusNet.Timeline.prototype);
@@ -77,7 +77,7 @@ StatusNet.TimelineGroup.prototype.update = function(onFinish) {
             if (onFinish) {
                 onFinish(entries.length);
             }
-            that.finishedFetch(entries.length)
+            that.finishedFetch(entries.length);
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving group timeline: " + msg);
@@ -85,5 +85,5 @@ StatusNet.TimelineGroup.prototype.update = function(onFinish) {
         }
     );
 
-}
+};
 

@@ -34,7 +34,7 @@ StatusNet.Timeline = function(client) {
     this.noticeAdded = new StatusNet.Event(this);
     this.updateStart = new StatusNet.Event(this);
     this.updateFinished = new StatusNet.Event(this);
-}
+};
 
 /**
  * Add a notice (Atom entry) to the cache
@@ -62,7 +62,7 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
     );
 
     // @todo Check for an error condition -- how?
-}
+};
 
 /**
  * Remove a notice (Atom entry) from the cache (all timelines)
@@ -84,7 +84,7 @@ StatusNet.Timeline.prototype.decacheNotice = function(noticeId) {
     );
 
     // @todo Check for an error condition -- how?
-}
+};
 
 /**
  * Refresh the cache for a single notice (Atom entry)
@@ -117,7 +117,7 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
             StatusNet.Infobar.flashMessage("Could not refresh notice " + noticeId +": " + msg);
         }
     );
-}
+};
 
 /**
  * Add a notice to the Timeline if it's not already in it. Also
@@ -146,7 +146,7 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications)
         }
     }
 
-    StatusNet.debug("addNotice - finished encaching notice")
+    StatusNet.debug("addNotice - finished encaching notice");
 
     if (prepend) {
         this._notices.unshift(notice);
@@ -154,7 +154,7 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications)
     } else {
         this._notices.push(notice);
     }
-}
+};
 
 /**
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
@@ -188,7 +188,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             if (onFinish) {
                 onFinish(entries.length);
             }
-            that.finishedFetch(entries.length)
+            that.finishedFetch(entries.length);
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
@@ -197,7 +197,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
         }
     );
 
-}
+};
 
 /**
  * Get the URL for the Atom feed of this timeline
@@ -225,7 +225,7 @@ StatusNet.Timeline.prototype.getUrl = function() {
     } else {
         return this._url;
     }
-}
+};
 
 /**
  * Trim the notice cache for this timeline.  Hard limit of 200 notices per
@@ -246,18 +246,18 @@ StatusNet.Timeline.prototype.trimNotices = function() {
     cutoff.setTime(now.getTime() - (86400 * 3 * 1000));
 
     StatusNet.debug(
-        "Clearing out old cache entries for timeline "
-        + this.timeline_name
-        + " (NOW = "
-        + now.getTime()
-        + ", CUTOFF = "
-        + cutoff.getTime()
-        + ")"
+        "Clearing out old cache entries for timeline " +
+        this.timeline_name +
+        " (NOW = " +
+        now.getTime() +
+        ", CUTOFF = " +
+        cutoff.getTime() +
+        ")"
     );
 
     var rs = this.db.execute(
-        "DELETE FROM entry WHERE notice_id IN "
-        + "(SELECT notice_id FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?)",
+        "DELETE FROM entry WHERE notice_id IN " +
+        "(SELECT notice_id FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?)",
         cutoff.getTime(),
         this.timeline_name,
         this.account.id
@@ -290,8 +290,8 @@ StatusNet.Timeline.prototype.trimNotices = function() {
 
             StatusNet.debug("Row count for " + this.timeline_name + " = " + count + ", overflow = " + diff);
 
-            var sql = "DELETE FROM entry WHERE notice_id IN "
-                + "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)";
+            var sql = "DELETE FROM entry WHERE notice_id IN " +
+                "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)";
 
             rs = this.db.execute(sql,
                 this.timeline_name,
@@ -300,15 +300,15 @@ StatusNet.Timeline.prototype.trimNotices = function() {
             );
 
             rs = this.db.execute(
-                "DELETE FROM notice_entry WHERE notice_id IN "
-                + "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)",
+                "DELETE FROM notice_entry WHERE notice_id IN " +
+                "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)",
                 this.timeline_name,
                 this.account.id,
                 diff
             );
         }
     }
-}
+};
 
 /**
  * Whether to cache this timeline - may be overrided by timelines
@@ -316,7 +316,7 @@ StatusNet.Timeline.prototype.trimNotices = function() {
  */
 StatusNet.Timeline.prototype.cacheable = function() {
     return true;
-}
+};
 
 /**
  * Do anything that needs doing after retrieving timeline data.
@@ -331,7 +331,7 @@ StatusNet.Timeline.prototype.finishedFetch = function(notice_count) {
     if (this.cacheable()) {
         this.trimNotices();
     }
-}
+};
 
 /**
  * Accessor for notices
@@ -343,8 +343,8 @@ StatusNet.Timeline.prototype.getNotices = function() {
     StatusNet.debug("Account ID = " + this.account.id);
     StatusNet.debug("Timeline name = " + this.timeline_name);
 
-    var sql = "SELECT * FROM notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id "
-        + "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? ORDER BY notice_entry.notice_id";
+    var sql = "SELECT * FROM notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id " +
+        "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? ORDER BY notice_entry.notice_id";
 
     var rs = this.db.execute(sql,
         this.account.id,
@@ -362,7 +362,7 @@ StatusNet.Timeline.prototype.getNotices = function() {
     rs.close();
 
     return this._notices;
-}
+};
 
 /**
  * Constructor for mentions timeline model
@@ -374,7 +374,7 @@ StatusNet.TimelineMentions = function(client) {
 
     this._url = 'statuses/mentions.atom';
 
-}
+};
 
 // Make StatusNet.TimelineMentions inherit Timeline's prototype
 StatusNet.TimelineMentions.prototype = heir(StatusNet.Timeline.prototype);
@@ -389,7 +389,7 @@ StatusNet.TimelinePublic = function(client) {
 
     this._url = 'statuses/public_timeline.atom';
 
-}
+};
 
 // Make StatusNet.TimelinePublic inherit Timeline's prototype
 StatusNet.TimelinePublic.prototype = heir(StatusNet.Timeline.prototype);
@@ -404,7 +404,7 @@ StatusNet.TimelineFavorites = function(client) {
 
     this._url = 'favorites.atom';
 
-}
+};
 
 // Make StatusNet.TimelineFavorites inherit Timeline's prototype
 StatusNet.TimelineFavorites.prototype = heir(StatusNet.Timeline.prototype);
@@ -425,7 +425,7 @@ StatusNet.TimelineTag = function(client, tag) {
     StatusNet.debug("TimelineTag constructor - timeline name: " + this.timeline_name);
 
     StatusNet.debug("Tag timeline URL = " + this._url);
-}
+};
 
 // Make StatusNet.TimelineTag inherit Timeline's prototype
 StatusNet.TimelineTag.prototype = heir(StatusNet.Timeline.prototype);
@@ -434,4 +434,4 @@ StatusNet.TimelineTag.prototype = heir(StatusNet.Timeline.prototype);
 // until we fix it, I'm going to disable caching of tag timelines --Z
 StatusNet.TimelineTag.prototype.cacheable = function() {
     return false;
-}
+};

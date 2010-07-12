@@ -34,7 +34,7 @@ StatusNet.Client = function(_account) {
 
     this.switchTimeline('friends');
     */
-}
+};
 
 StatusNet.Client.prototype.setActiveTab = function(tabName) {
     this.tabGroup.setActiveTab(this.tabs[tabName]);
@@ -61,7 +61,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     this.timeline.update();
     */
 
-}
+};
 
 /**
  * Switch the user timeline based on the ID of the user. This only
@@ -92,14 +92,14 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
     this.view.showSpinner();
     this.timeline.update();
     this.view.showHeader();
-}
+};
 
 /**
  * Reload timeline notices
  */
 StatusNet.Client.prototype.refresh = function() {
     this.timeline.update();
-}
+};
 
 /**
  * General initialization stuff
@@ -127,7 +127,7 @@ StatusNet.Client.prototype.init = function() {
         client.view.window = window;
         client.view.init();
     });
-}
+};
 
 StatusNet.Client.prototype.initAccountView = function(acct) {
     this.account = acct;
@@ -162,14 +162,16 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     StatusNet.debug('Starting building tabs, timelines, views...');
     for (var tab in tabInfo) {
-        this.createTab(tab, tabInfo[tab]);
+        if (tabInfo.hasOwnProperty(tab)) {
+            this.createTab(tab, tabInfo[tab]);
+        }
     }
     StatusNet.debug('Done building tabs, timelines, views.');
 
     // @todo remember last-used tab
-    this.tabGroup.setActiveTab(this.tabs['friends']);
+    this.tabGroup.setActiveTab(this.tabs.friends);
     this.tabGroup.open();
-}
+};
 
 /**
  * Build an individual tab for the user interface and set up its
@@ -216,7 +218,7 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
             client.view.init();
         }
     });
-}
+};
 
 /**
  * Show notice input dialog
@@ -246,4 +248,4 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
     });
 
     win.open();
-}
+};

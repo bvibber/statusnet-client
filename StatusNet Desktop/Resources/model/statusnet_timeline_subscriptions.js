@@ -42,7 +42,7 @@ StatusNet.TimelineSubscriptions = function(client, authorId) {
     this._url = 'statuses/friends.xml?count=100';
 
     StatusNet.debug("TimelineSubscriptions constructor - timeline name: " + this.timeline_name);
-}
+};
 
 // Make StatusNet.TimelineSubscriptions inherit Timeline's prototype
 StatusNet.TimelineSubscriptions.prototype = heir(StatusNet.Timeline.prototype);
@@ -60,7 +60,7 @@ StatusNet.TimelineSubscriptions.prototype.getUrl = function() {
     } else {
         return base + "&user_id=" + this.authorId;
     }
-}
+};
 
 StatusNet.TimelineSubscriptions.prototype.addUser = function(userXml) {
 
@@ -85,7 +85,7 @@ StatusNet.TimelineSubscriptions.prototype.addUser = function(userXml) {
     this._users.unshift(user);
 
     this.userAdded.notify({user: user});
-}
+};
 
 StatusNet.TimelineSubscriptions.prototype.update = function(onFinish) {
 
@@ -117,7 +117,7 @@ StatusNet.TimelineSubscriptions.prototype.update = function(onFinish) {
             if (onFinish) {
                 onFinish(users.length);
             }
-            that.finishedFetch(users.length)
+            that.finishedFetch(users.length);
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving subscriptions: " + msg);
@@ -125,14 +125,14 @@ StatusNet.TimelineSubscriptions.prototype.update = function(onFinish) {
         }
     );
 
-}
+};
 
 /**
  * Don't cache subscription info
  */
 StatusNet.TimelineSubscriptions.prototype.cacheable = function() {
     return false;
-}
+};
 
 /**
  * Accessor for users
@@ -141,7 +141,7 @@ StatusNet.TimelineSubscriptions.prototype.cacheable = function() {
  */
 StatusNet.TimelineSubscriptions.prototype.getUsers = function() {
     return this._users;
-}
+};
 
 /**
  * Do anything that needs doing after retrieving timeline data.
@@ -150,5 +150,5 @@ StatusNet.TimelineSubscriptions.prototype.finishedFetch = function(notice_count)
     if (this._users.length === 0) {
         this.client.getActiveView().showEmptyTimeline();
     }
-}
+};
 

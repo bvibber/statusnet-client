@@ -30,7 +30,7 @@ StatusNet.TimelineSearch = function(client) {
     this._url = 'search.atom';
 
     this._searchTerm = this.lastQuery();
-}
+};
 
 // Make StatusNet.TimelineSearch inherit Timeline's prototype
 StatusNet.TimelineSearch.prototype = heir(StatusNet.Timeline.prototype);
@@ -41,11 +41,11 @@ StatusNet.TimelineSearch.prototype = heir(StatusNet.Timeline.prototype);
 StatusNet.TimelineSearch.prototype.getUrl = function() {
     //var base = StatusNet.Timeline.prototype.getUrl.call(this);
     return this._url + '?q=' + encodeURIComponent(this.searchTerm());
-}
+};
 
 StatusNet.TimelineSearch.prototype.searchTerm = function() {
     return this._searchTerm;
-}
+};
 
 /**
  * Get the last-used search term, if any.
@@ -59,7 +59,7 @@ StatusNet.TimelineSearch.prototype.lastQuery = function() {
     } else {
         return "";
     }
-}
+};
 
 /**
  * Store the search term in our history.
@@ -71,7 +71,7 @@ StatusNet.TimelineSearch.prototype.storeQuery = function(q) {
     db.execute('delete from search_history');
     db.execute('insert into search_history (searchterm) values (?)',
                q);
-}
+};
 
 /**
  * Store the search term in our history and update the timeline
@@ -85,7 +85,7 @@ StatusNet.TimelineSearch.prototype.updateSearch = function(q) {
         that.client.view.showHeader();
         that.client.view.show();
     });
-}
+};
 
 /**
  * Override updates for search: don't search if we have nothing,
@@ -99,7 +99,7 @@ StatusNet.TimelineSearch.prototype.update = function(onFinish) {
 
     if (this.searchTerm() == '') {
         // nothing to search for!
-        this.finishedFetch()
+        this.finishedFetch();
     } else {
         StatusNet.Timeline.prototype.update.call(this);
     }
@@ -107,7 +107,7 @@ StatusNet.TimelineSearch.prototype.update = function(onFinish) {
     if (onFinish) {
         onFinish();
     }
-}
+};
 
 /**
  * Add a notice to the Timeline if it's not already in it.
@@ -142,11 +142,11 @@ StatusNet.TimelineSearch.prototype.addNotice = function(entry, prepend) {
         this._notices.push(notice);
     }
 
-}
+};
 
 /**
  * Don't cache search results yet
  */
 StatusNet.TimelineSearch.prototype.cacheable = function() {
     return false;
-}
+};

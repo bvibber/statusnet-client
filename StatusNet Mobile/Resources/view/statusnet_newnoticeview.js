@@ -25,7 +25,7 @@ StatusNet.NewNoticeView = function() {
     this.account = StatusNet.Account.getDefault(db);
 
     StatusNet.debug("NewNoticeView constructor");
-}
+};
 
 /**
  * Initialize the window -- add @-reply text if necessary
@@ -67,7 +67,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
         $('#counter').html(that.account.textLimit - len);
     });
-}
+};
 
 /**
  * Setup post parameters and post the notice
@@ -106,4 +106,4 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
             me.close();
         }
     );
-}
+};

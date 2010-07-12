@@ -40,7 +40,7 @@ StatusNet.TimelineUser = function(client, authorId) {
 
     this.user = null;
     this.extended = null;
-}
+};
 
 // Make StatusNet.TimelineUser inherit Timeline's prototype
 StatusNet.TimelineUser.prototype = heir(StatusNet.Timeline.prototype);
@@ -64,7 +64,7 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
             return base + "?user_id=" + this.authorId;
         }
     }
-}
+};
 
 StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) {
 
@@ -85,7 +85,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
             StatusNet.debug(status);
             StatusNet.debug((new XMLSerializer()).serializeToString(data));
 
-            var extended = new Object();
+            var extended = {};
             extended.followers_cnt = $(data).find('followers_count').text();
             extended.friends_cnt = $(data).find('friends_count').text();
             extended.statuses_cnt = $(data).find('statuses_count').text();
@@ -108,7 +108,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
             StatusNet.Infobar.flashMessage('Could not get extended user info: ' + msg);
         }
     );
-}
+};
 
 /**
  * Add a notice to the Timeline if it's not already in it.
@@ -142,7 +142,7 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
         this._notices.push(notice);
     }
 
-}
+};
 
 /**
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
@@ -186,7 +186,7 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
             if (onFinish) {
                 onFinish(entries.length);
             }
-            that.finishedFetch(entries.length)
+            that.finishedFetch(entries.length);
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving user timeline: " + msg);
@@ -195,12 +195,12 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
         }
     );
 
-}
+};
 
 /**
  * Don't cache user timelines yet
  */
 StatusNet.TimelineUser.prototype.cacheable = function() {
     return false;
-}
+};
 

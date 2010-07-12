@@ -42,4 +42,5 @@ StatusNet.RSD.discoverTwitterApi = function(url, onSuccess, onError) {
         },
         onError
     );
-}
+};
+

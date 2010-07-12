@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 /** StatusNet Namespace -- maybe we should just use SN? */
-function StatusNet() {}
+function StatusNet() {};
 
 /**
  * Live database connection for local storage, if opened.
@@ -34,7 +34,7 @@ StatusNet.db = null;
  */
 StatusNet.debug = function(msg) {
     Titanium.API.debug(msg);
-}
+};
 
 /**
  * Lazy-open our local storage database.
@@ -59,47 +59,47 @@ StatusNet.getDB = function() {
 
         this.db = Titanium.Database.openFile(dbFile);
 
-        var sql = 'CREATE TABLE IF NOT EXISTS account ('
-            + 'id INTEGER PRIMARY KEY AUTOINCREMENT, '
-            + 'username TEXT NOT NULL, '
-            + 'password TEXT NOT NULL, '
-            + 'apiroot TEXT NOT NULL, '
-            + 'is_default INTEGER DEFAULT 0, '
-            + 'profile_image_url TEXT, '
-            + 'text_limit INTEGER DEFAULT 0, '
-            + 'site_logo TEXT, '
-            + 'UNIQUE (username, apiroot)'
-            + ')';
+        var sql = 'CREATE TABLE IF NOT EXISTS account (' +
+            'id INTEGER PRIMARY KEY AUTOINCREMENT, ' +
+            'username TEXT NOT NULL, ' +
+            'password TEXT NOT NULL, ' +
+            'apiroot TEXT NOT NULL, ' +
+            'is_default INTEGER DEFAULT 0, ' +
+            'profile_image_url TEXT, ' +
+            'text_limit INTEGER DEFAULT 0, ' +
+            'site_logo TEXT, ' +
+            'UNIQUE (username, apiroot)' +
+            ')';
 
         this.db.execute(sql);
 
-        sql = 'CREATE TABLE IF NOT EXISTS entry ('
-            + 'notice_id INTEGER NOT NULL, '
-            + 'atom_entry TEXT NOT NULL, '
-            + 'PRIMARY KEY (notice_id)'
-            + ')';
+        sql = 'CREATE TABLE IF NOT EXISTS entry (' +
+            'notice_id INTEGER NOT NULL, ' +
+            'atom_entry TEXT NOT NULL, ' +
+            'PRIMARY KEY (notice_id)' +
+            ')';
 
         this.db.execute(sql);
 
-        sql = 'CREATE TABLE IF NOT EXISTS notice_entry ('
-            + 'notice_id INTEGER NOT NULL REFERENCES entry (notice_id), '
-            + 'account_id INTEGER NOT NULL, '
-            + 'timeline TEXT NOT NULL, '
-            + 'timestamp INTEGER NOT NULL, '
-            + 'PRIMARY KEY (notice_id, timeline, account_id)'
-            + ')';
+        sql = 'CREATE TABLE IF NOT EXISTS notice_entry (' +
+            'notice_id INTEGER NOT NULL REFERENCES entry (notice_id), ' +
+            'account_id INTEGER NOT NULL, ' +
+            'timeline TEXT NOT NULL, ' +
+            'timestamp INTEGER NOT NULL, ' +
+            'PRIMARY KEY (notice_id, timeline, account_id)' +
+            ')';
 
         this.db.execute(sql);
 
-        sql = 'CREATE TABLE IF NOT EXISTS search_history ('
-            + 'searchterm TEXT NOT NULL'
-            + ')';
+        sql = 'CREATE TABLE IF NOT EXISTS search_history (' +
+            'searchterm TEXT NOT NULL' +
+            ')';
 
         this.db.execute(sql);
     }
 
     return this.db;
-}
+};
 
 /**
  * Abstract away completely gratuitous differences between database result
@@ -110,7 +110,7 @@ StatusNet.getDB = function() {
  */
 StatusNet.rowCount = function(rs) {
     return rs.rowCount();
-}
+};
 
 
 /**
@@ -124,7 +124,7 @@ StatusNet.showSettings = function() {
         width: 400,
         height: 500});
     win.open();
-}
+};
 
 /**
  * Utility function to create a prototype for the subclass
@@ -134,7 +134,7 @@ function heir(p) {
     function f(){}
     f.prototype = p;
     return new f();
-}
+};
 
 /**
  * Utility function to validate a URL
@@ -148,7 +148,7 @@ function heir(p) {
 StatusNet.validUrl = function(url) {
     var regexp = /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
     return regexp.test(url);
-}
+};
 
 /**
  * Utility JQuery function to control the selection in an input.
@@ -167,19 +167,19 @@ $.fn.selectRange = function(start, end) {
             range.select();
         }
     });
-}
+};
 
 StatusNet.Event = function(sender) {
     StatusNet.debug("registering new event");
     this._sender = sender;
     StatusNet.debug("sender = " + sender);
     this._listeners = [];
-}
+};
 
 StatusNet.Event.prototype.attach = function(listener) {
     StatusNet.debug("Attaching event listener");
     this._listeners.push(listener);
-}
+};
 
 StatusNet.Event.prototype.notify = function(args) {
     if (args) {
@@ -188,7 +188,7 @@ StatusNet.Event.prototype.notify = function(args) {
     for (var i = 0; i < this._listeners.length; i++) {
         this._listeners[i].call(this._sender, args);
     }
-}
+};
 
 StatusNet.nativeNotifications = function() {
 
@@ -209,4 +209,4 @@ StatusNet.nativeNotifications = function() {
     StatusNet.debug("Version = " + Titanium.Platform.version);
 
     return false;
-}
+};

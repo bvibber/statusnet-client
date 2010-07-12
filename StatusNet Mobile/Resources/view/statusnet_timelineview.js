@@ -26,7 +26,7 @@ StatusNet.TimelineView = function(client) {
     StatusNet.debug("in StatusNet.TimelineView");
     this.client = client;
     this.title = "Timeline on {site}";
-}
+};
 
 /**
  * Render the HTML display of a given timeline
@@ -84,7 +84,7 @@ StatusNet.TimelineView.prototype.show = function () {
     }
 
     this.hideSpinner();
-}
+};
 
 /**
  * Determines whether the notice is local (by permalink)
@@ -99,7 +99,7 @@ StatusNet.TimelineView.prototype.localAuthor = function(uri) {
         return true;
     }
     return false;
-}
+};
 
 StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     var name = $(noticeDom).attr('name');
@@ -162,7 +162,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
                            .replace("{site}", this.client.account.getHost());
     //$("#header").html("<h1></h1>");
     //$("#header h1").text(title);
-}
+};
 
 /**
  * Show wait cursor
@@ -171,7 +171,7 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
 //    $('#notices').empty();
 //    $('#notices').append('<img id="spinner" src="/images/icon_processing.gif" />');
-}
+};
 
 /**
  * Hide wait cursor
@@ -179,7 +179,7 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
 //    $('#spinner').remove();
-}
+};
 
 /**
  * Constructor for a view for a friends timeline
@@ -188,7 +188,7 @@ StatusNet.TimelineViewFriends = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name} and friends on {site}";
     this.tab = 'friends';
-}
+};
 
 // Make StatusNet.TimelineViewFriends inherit TimelineView's prototype
 StatusNet.TimelineViewFriends.prototype = heir(StatusNet.TimelineView.prototype);
@@ -201,7 +201,7 @@ StatusNet.TimelineViewMentions = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name} and friends on {site}";
     this.tab = 'mentions';
-}
+};
 
 // Make StatusNet.TimelineViewMentions inherit TimelineView's prototype
 StatusNet.TimelineViewMentions.prototype = heir(StatusNet.TimelineView.prototype);
@@ -213,7 +213,7 @@ StatusNet.TimelineViewPublic = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Public timeline on {site}";
     this.tab = 'public';
-}
+};
 
 // Make StatusNet.TimelineViewPublic inherit TimelineView's prototype
 StatusNet.TimelineViewPublic.prototype = heir(StatusNet.TimelineView.prototype);
@@ -225,7 +225,7 @@ StatusNet.TimelineViewFavorites = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s favorite notices on {site}";
     this.tab = 'favorites';
-}
+};
 
 // Make StatusNet.TimelineViewFavorites inherit TimelineView's prototype
 StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototype);
@@ -238,7 +238,7 @@ StatusNet.TimelineViewInbox = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Inbox for {name} on {site}";
     this.tab = 'inbox';
-}
+};
 
 // Make StatusNet.TimelineViewInbox inherit TimelineView's prototype
 StatusNet.TimelineViewInbox.prototype = heir(StatusNet.TimelineView.prototype);
@@ -252,7 +252,7 @@ StatusNet.TimelineViewSearch = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Text search on {site}";
     this.tab = 'search';
-}
+};
 
 // Make StatusNet.TimelineViewSearch inherit TimelineView's prototype
 StatusNet.TimelineViewSearch.prototype = heir(StatusNet.TimelineView.prototype);
@@ -274,4 +274,4 @@ StatusNet.TimelineViewSearch.prototype.showHeader = function () {
         timeline.updateSearch($(this).val());
     });
     */
-}
+};

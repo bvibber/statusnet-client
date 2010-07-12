@@ -23,7 +23,7 @@
 StatusNet.TimelineViewUser = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s profile on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewUser inherit TimelineView's prototype
 StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
@@ -43,7 +43,7 @@ StatusNet.TimelineViewUser.prototype.show = function () {
 
     if (notices.length > 0) {
 
-        var html = new Array();
+        var html = [];
 
         for (i = 0; i < notices.length; i++) {
             html.push('<div class="notice">');
@@ -53,8 +53,8 @@ StatusNet.TimelineViewUser.prototype.show = function () {
             html.push('   <div class="content">'+ notices[i].content +'<br/></div>');
             if (notices[i].contextLink && notices[i].inReplyToLink) {
                 html.push(
-                    '   <div class="context"><a class="context" href="'
-                    + notices[i].contextLink +'">in context</a><br/></div>'
+                    '   <div class="context"><a class="context" href="' +
+                    notices[i].contextLink +'">in context</a><br/></div>'
                 );
             }
             html.push('</div>');
@@ -85,7 +85,7 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function () {
 
     $('#profile_info').remove();
 
-    var html = new Array();
+    var html = [];
 
     html.push('<div id="profile_info">');
     html.push('<img src="' + user.avatarMedium + '"/>');

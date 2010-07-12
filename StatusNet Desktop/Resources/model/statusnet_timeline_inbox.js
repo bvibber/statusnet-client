@@ -27,7 +27,7 @@ StatusNet.TimelineInbox = function(client) {
 
     this._url = 'direct_messages.atom';
 
-}
+};
 
 // Make StatusNet.TimelineInbox inherit Timeline's prototype
 StatusNet.TimelineInbox.prototype = heir(StatusNet.Timeline.prototype);
@@ -59,14 +59,15 @@ StatusNet.TimelineInbox.prototype.addNotice = function(entry, prepend) {
         this._notices.push(notice);
     }
 
-}
+};
 
 /**
  * Don't cache this timeline (yet)
  */
 StatusNet.TimelineInbox.prototype.cacheable = function() {
     return false;
-}
+};
+
 
 
 

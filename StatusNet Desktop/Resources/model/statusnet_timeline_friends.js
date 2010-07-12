@@ -30,7 +30,7 @@ StatusNet.TimelineFriends = function(client) {
 
     this._url = 'statuses/friends_timeline.atom';
 
-}
+};
 
 // Make StatusNet.TimelineFriends inherit Timeline's prototype
 StatusNet.TimelineFriends.prototype = heir(StatusNet.Timeline.prototype);

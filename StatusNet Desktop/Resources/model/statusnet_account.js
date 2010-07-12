@@ -33,7 +33,7 @@ StatusNet.Account = function(username, password, apiroot) {
     this.username = username;
     this.password = password;
     this.apiroot  = apiroot;
-}
+};
 
 /**
  * Load up the default account's credentials from the local database,
@@ -65,7 +65,7 @@ StatusNet.Account.getDefault = function(db) {
         StatusNet.debug('Exception getting account: ' + e);
         return null;
     }
-}
+};
 
 /**
  * Set this account as the default.
@@ -78,7 +78,7 @@ StatusNet.Account.prototype.setDefault = function(db) {
     } catch (e) {
         StatusNet.debug("Exception setting default account: " + e);
     }
-}
+};
 
 /**
  * Load an Account object from a database row w/ info
@@ -99,7 +99,7 @@ StatusNet.Account.fromRow = function(row) {
     ac.siteLogo = row.fieldByName('site_logo');
 
     return ac;
-}
+};
 
 /**
  * Load up all configured accounts from the database, if any.
@@ -122,7 +122,7 @@ StatusNet.Account.listAll = function(db) {
         StatusNet.debug("Exception setting getting accounts: " + e);
         return null;
     }
-}
+};
 
 /**
  * Start an asynchronous, web call. If username and password are provided,
@@ -156,13 +156,16 @@ StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username,
             StatusNet.debug("webRequest: in onload, before parse " + this.status);
 
             StatusNet.debug(Titanium.version);
+
+            var responseXML;
+
             if (Titanium.version < '1.3.0') {
                 // @fixme Argh. responseXML is unimplemented in Titanium 1.2.1 So we have
                 // to use this work-around.
-                var responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
+                responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
             } else {
                 // Is implemented in Titanium Mobile 1.3, whereas the above doesn't work there.
-                var responseXML = this.responseXML;
+                responseXML = this.responseXML;
             }
 
             StatusNet.debug("webRequest: after parse, before onSuccess");
@@ -192,7 +195,7 @@ StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username,
             StatusNet.debug("HTTP POST to: " + url);
             client.open("POST", url);
         } else {
-            StatusNet.debug("HTTP GET to: " + url)
+            StatusNet.debug("HTTP GET to: " + url);
             client.open("GET", url);
         }
 
@@ -233,7 +236,7 @@ StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username,
         StatusNet.debug('webRequest: HTTP client exception: ' + e);
         onError(client, e);
     }
-}
+};
 
 /**
  * HTTP GET an API resource using the crendials for this account
@@ -245,7 +248,7 @@ StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username,
  */
 StatusNet.Account.prototype.apiGet = function(method, onSuccess, onError) {
     StatusNet.Account.webRequest(this.apiroot + method, onSuccess, onError, null, this.username, this.password);
-}
+};
 
 /**
  * HTTP POST to an API resource using the crendials for this account
@@ -258,7 +261,7 @@ StatusNet.Account.prototype.apiGet = function(method, onSuccess, onError) {
  */
 StatusNet.Account.prototype.apiPost = function(method, data, onSuccess, onError) {
     StatusNet.Account.webRequest(this.apiroot + method, onSuccess, onError, data, this.username, this.password);
-}
+};
 
 /**
  * Make sure we've recorded account credentials to the local database.
@@ -300,7 +303,7 @@ StatusNet.Account.prototype.ensure = function(db) {
         StatusNet.debug('ensure() - Exception saving credentials: ' + e);
         return false;
     }
-}
+};
 
 /**
  * Is this the same?
@@ -316,7 +319,7 @@ StatusNet.Account.prototype.equals = function(other) {
             this.username == other.username &&
             this.password == other.password &&
             this.apiroot == other.apiroot);
-}
+};
 
 /**
  * Remove this account from the database, should it exist!
@@ -348,7 +351,7 @@ StatusNet.Account.prototype.deleteAccount = function() {
     } catch (e) {
         StatusNet.debug('Exception deleting account: ' + e);
     }
-}
+};
 
 /**
  * Get an attractive description of the hostname
@@ -362,7 +365,7 @@ StatusNet.Account.prototype.getHost = function() {
         // hmmm
         return this.apiroot;
     }
-}
+};
 
 /**
  * Is this account set up with a secure connection?
@@ -370,4 +373,4 @@ StatusNet.Account.prototype.getHost = function() {
  */
 StatusNet.Account.prototype.isSecure = function() {
     return (this.apiroot.match(/^https:/));
-}
+};
