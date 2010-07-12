@@ -221,7 +221,18 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
             client.view.show();
 
             StatusNet.debug('created, now telling it to update:');
-            client.timeline.update();
+            client.timeline.update(function() {
+                client.timeline.noticeAdded.attach(
+                    function(args) {
+                        if (args.notifications) {
+                            client.view.notifyNewNotice(args.notice);
+                        } else {
+                            StatusNet.debug("noticeAdded event with no args!");
+                        }
+                    },
+                    false
+                );
+            });
             StatusNet.debug('timeline updated.');
         } else {
             StatusNet.debug('settings tab? showing view...');

@@ -28,6 +28,7 @@ var sources = ['statusnet.js',
                'model/statusnet_timeline_user.js',
                'model/statusnet_rsd.js',
                'model/statusnet_timeline_friends.js',
+               'model/statusnet_atom_parser.js',
 
                'view/statusnet_newnoticeview.js',
                'view/statusnet_sidebar.js',

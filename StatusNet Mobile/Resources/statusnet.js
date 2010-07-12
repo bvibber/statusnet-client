@@ -132,7 +132,9 @@ StatusNet.Event.prototype.attach = function(listener) {
 
 StatusNet.Event.prototype.notify = function(args) {
     if (args) {
-        StatusNet.debug("Notify called with arg: " + Titanium.JSON.stringify(args));
+        // no JSON on mobile
+        //StatusNet.debug("Notify called with arg: " + Titanium.JSON.stringify(args));
+        StatusNet.debug("Notify called with arg: " + args);
     }
     for (var i = 0; i < this._listeners.length; i++) {
         this._listeners[i].call(this._sender, args);

@@ -128,16 +128,21 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  *
  */
 StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications) {
-
+StatusNet.debug('Timeline.addNotice enter:');
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
+StatusNet.debug('Timeline.addNotice parsed...');
 
     // Dedupe here?
+StatusNet.debug('Timeline.addNotice dedupe check; ' + this._notices.length + ' iterations to go');
     for (i = 0; i < this._notices.length; i++) {
-        if (this._notices[i].id === notices.id) {
+StatusNet.debug('Timeline.addNotice iter ' + i);
+        if (this._notices[i].id === notice.id) {
             StatusNet.debug("skipping duplicate notice: " + notice.id);
+StatusNet.debug('Timeline.addNotice DONE early.');
             return;
         }
     }
+StatusNet.debug('Timeline.addNotice dedupe check done.');
 
     if (notice.id !== undefined) {
         if (this.cacheable()) {
@@ -148,12 +153,22 @@ StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications)
 
     StatusNet.debug("addNotice - finished encaching notice");
 
+StatusNet.debug('Timeline.addNotice A');
     if (prepend) {
+StatusNet.debug('Timeline.addNotice B');
         this._notices.unshift(notice);
+StatusNet.debug('Timeline.addNotice B2');
+StatusNet.debug('Timeline.addNotice this.noticeAdded: ' + this.noticeAdded);
+StatusNet.debug('Timeline.addNotice this.noticeAdded.notify: ' + this.noticeAdded.notify);
+        // the below crashes on mobile
         this.noticeAdded.notify({notice: notice, notifications: notifications});
+StatusNet.debug('Timeline.addNotice B3');
     } else {
+StatusNet.debug('Timeline.addNotice C');
         this._notices.push(notice);
+StatusNet.debug('Timeline.addNotice C2');
     }
+StatusNet.debug('Timeline.addNotice DONE.');
 };
 
 /**
@@ -169,6 +184,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
     this.account.apiGet(this.getUrl(),
 
         function(status, data) {
+            StatusNet.debug('Timeline.update GOT DATA:');
 
             var entries = [];
 
@@ -176,19 +192,25 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
                 StatusNet.debug('Timeline.update: found an entry.');
                 entries.push(this);
             });
+            StatusNet.debug('Timeline.update finished entry push loop.');
 
             entries.reverse(); // keep correct notice order
 
+            StatusNet.debug('Timeline.update starting addNotice loop:');
             for (var i = 0; i < entries.length; i++) {
+                StatusNet.debug('Timeline.update starting addNotice loop ' + i);
                 that.addNotice(entries[i], true, notifications);
             }
+            StatusNet.debug('Timeline.update finished addNotice loop.');
 
             that.updateFinished.notify({notice_count: entries.length});
 
             if (onFinish) {
                 onFinish(entries.length);
             }
+            StatusNet.debug('Timeline.update calling finishedFetch...');
             that.finishedFetch(entries.length);
+            StatusNet.debug('Timeline.update DONE.');
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
@@ -196,6 +218,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             that.updateFinished.notify();
         }
     );
+    StatusNet.debug('Timeline.update EXITED: waiting for data return.');
 
 };
 

@@ -109,6 +109,39 @@ StatusNet.TimelineView.prototype.show = function () {
     StatusNet.debug("TimelineView.show done");
 };
 
+StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
+    StatusNet.debug('Stubbed TimelineView.notifyNewNotice');
+/*
+    if (!StatusNet.nativeNotifications()) {
+        return;
+    }
+
+    if (this.client.account.username === notice.author) {
+        return;
+    }
+
+    var msg;
+
+    if (notice.atomSource) {
+        msg = "New notice from " + notice.atomSource;
+    } else {
+        msg = "New notice from " + notice.author;
+    }
+
+    var notification = Titanium.Notification.createNotification(Titanium.UI.getMainWindow());
+    notification.setTitle(msg);
+    notification.setMessage(notice.title);
+
+    notification.setIcon("app://logo.png");
+    notification.setDelay(5000);
+    notification.setCallback(function () {
+    // @todo Bring the app window back to focus / on top
+        StatusNet.debug("i've been clicked");
+    });
+    notification.show();
+*/
+}
+
 /**
  * Determines whether the notice is local (by permalink)
  *
