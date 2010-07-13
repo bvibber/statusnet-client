@@ -121,9 +121,47 @@ StatusNet.TimelineView.prototype.show = function () {
                     StatusNet.debug('     notices[i].' + x + ': ' + notices[i][x]);
                 }
             }
+
+            var baseSize = 14;
             var text = notices[i].content;
             StatusNet.debug('QQQQ: text content: ' + text);
-            this.table.appendRow({title: text});
+
+            var row = Titanium.UI.createTableViewRow({
+                height: 'auto',
+                notice: notices[i]
+            });
+
+            var avatar = Titanium.UI.createImageView({
+                top: 2,
+                right: 2,
+                width: 64,
+                height: 64,
+                image: notices[i].avatar
+            });
+            row.add(avatar);
+
+            var name = Titanium.UI.createLabel({
+                top: 2,
+                left: 4,
+                right: 72,
+                height: 'auto',
+                text: notices[i].author,
+                font: {fontSize: baseSize + 2, fontWeight:'bold'}
+            });
+            row.add(name);
+
+            var text = Titanium.UI.createLabel({
+                top: 24,
+                left: 4,
+                right: 72,
+                height: 'auto',
+                text: this.stripHtml(text),
+                font: {fontSize: baseSize}
+            });
+            row.add(text);
+            this.table.appendRow(row);
+
+
             /*
             html.push('<div class="notice" name="notice-' + notices[i].id +'">');
             html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + notices[i].avatar + '"/></a></div>');
@@ -162,6 +200,22 @@ StatusNet.TimelineView.prototype.show = function () {
     this.hideSpinner();
     StatusNet.debug("TimelineView.show done");
 };
+
+/**
+ * @param string html
+ * @return string plaintext
+ * @access private
+ */
+StatusNet.TimelineView.prototype.stripHtml = function(html) {
+    var src = '<div>' + html + '</div>';
+    StatusNet.debug('STRIP src: ' + src);
+    var dom = Titanium.XML.parseString(src);
+    StatusNet.debug('STRIP dom: ' + dom);
+    var txt = $(dom).text();
+    StatusNet.debug('STRIP txt: ' + txt);
+    return txt;
+}
+
 
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
     StatusNet.debug('Stubbed TimelineView.notifyNewNotice');
