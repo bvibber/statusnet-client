@@ -386,12 +386,17 @@ StatusNet.Timeline.prototype.getNotices = function() {
     var sql = "SELECT * FROM notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id " +
         "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? ORDER BY notice_entry.notice_id";
 
+    StatusNet.debug("Timeline.getNotices A");
+
     var rs = this.db.execute(sql,
         this.account.id,
         this.timeline_name
     );
 
+    StatusNet.debug("Timeline.getNotices B");
+
     while (rs.isValidRow()) {
+        StatusNet.debug("Timeline.getNotices B1");
         StatusNet.debug("Valid row found");
         xmlEntry = rs.fieldByName('atom_entry');
         entry = (new DOMParser()).parseFromString(xmlEntry, "text/xml");
@@ -399,8 +404,11 @@ StatusNet.Timeline.prototype.getNotices = function() {
         this._notices.unshift(notice);
         rs.next();
     }
+    StatusNet.debug("Timeline.getNotices C");
     rs.close();
+    StatusNet.debug("Timeline.getNotices D");
 
+    StatusNet.debug('Timeline.getNotices out: ' + this._notices.length + ' items.');
     return this._notices;
 };
 

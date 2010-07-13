@@ -68,6 +68,35 @@ StatusNet.Account.getDefault = function(db) {
 };
 
 /**
+ * Load up the a given account's full data by id.
+ *
+ * @return mixed StatusNet.Account object or null
+ */
+StatusNet.Account.getById = function(id) {
+    var db = StatusNet.getDB();
+    try {
+        var row = db.execute('select * from account where id=?', id);
+
+        if (row.isValidRow()) {
+            StatusNet.debug('found an account for id ' + id);
+            var acct = StatusNet.Account.fromRow(row);
+            // @FIXME UI-specific code needs to be moved!
+            if (typeof Titanium.Desktop != "undefined") {
+                $('ul.nav li#nav_timeline_profile > img').attr('src', acct.avatar);
+            }
+            row.close();
+            return acct;
+        } else {
+            StatusNet.debug('did not find an account for id ' + i);
+            return null;
+        }
+    } catch (e) {
+        StatusNet.debug('Exception getting account for id ' + id + ': ' + e);
+        return null;
+    }
+};
+
+/**
  * Set this account as the default.
  */
 StatusNet.Account.prototype.setDefault = function(db) {

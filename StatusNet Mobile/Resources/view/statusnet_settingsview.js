@@ -52,9 +52,13 @@ StatusNet.SettingsView.prototype.init = function() {
             return;
         }
 
+        StatusNet.debug('QQQ: event.rowData.acct.id: ' + event.rowData.acct.id);
+
         //var acct = event.rowData.acct;
         var x = event.rowData.acct;
-        var acct = new StatusNet.Account(x.username, x.password, x.apiroot);
+        //var acct = new StatusNet.Account(x.username, x.password, x.apiroot);
+        var acct = StatusNet.Account.getById(x.id);
+
         // hack -- on Android, we don't seem to get the original object back
         // but only have its properties, so all the methods are missing.
         StatusNet.debug('QQQ: acct.username: ' + acct.username);
