@@ -26,6 +26,52 @@ StatusNet.TimelineView = function(client) {
     StatusNet.debug("in StatusNet.TimelineView");
     this.client = client;
     this.title = "Timeline on {site}";
+
+    StatusNet.debug("TimelineView constructor");
+    // XXX: Woah, it doesn't work to pass the timeline into the constructor!
+    if (client) {
+        this.timeline = client.timeline;
+    }
+
+    var that = this;
+
+    // Attach event listeners
+
+    StatusNet.debug("TimelineView constructor - attaching events");
+
+    this.timeline.updateStart.attach(
+        function() {
+            StatusNet.debug("TimelineView got updateStart event!");
+            that.showSpinner();
+            StatusNet.debug("TimelineView updateStart DONE");
+        }
+    );
+
+    StatusNet.debug("TimelineView constructor - finished attaching updateStart");
+
+    this.timeline.updateFinished.attach(
+        function() {
+            StatusNet.debug("TimelineView got updateFinished event!");
+            that.hideSpinner();
+            StatusNet.debug("TimelineView showing:");
+            that.show();
+            StatusNet.debug("TimelineView updateFinished DONE");
+        }
+    );
+
+    this.timeline.noticeAdded.attach(
+        function(args) {
+            StatusNet.debug("TimelineView got noticeAdded event!");
+            if (args) {
+                StatusNet.debug("FIXME: implement TimelineView.showNewNotice");
+                //that.showNewNotice(args.notice);
+            } else {
+                StatusNet.debug("noticeAdded event with no args!");
+            }
+            StatusNet.debug("TimelineView noticeAdded DONE");
+        }
+    );
+
 };
 
 /**
@@ -48,10 +94,11 @@ StatusNet.TimelineView.prototype.show = function () {
 
     StatusNet.debug("TimelineView.show this.window: " + this.window);
 
-    StatusNet.debug("TimelineView.show A");
-    this.table = Titanium.UI.createTableView();
-    StatusNet.debug("TimelineView.show B");
-    this.window.add(this.table);
+    if (!this.table) {
+        StatusNet.debug("TimelineView.show creating table view...");
+        this.table = Titanium.UI.createTableView();
+        this.window.add(this.table);
+    }
 
     StatusNet.debug("TimelineView.show C");
     var notices = this.client.timeline.getNotices();
@@ -64,12 +111,19 @@ StatusNet.TimelineView.prototype.show = function () {
     StatusNet.debug("TimelineView.show F");
 
     if (notices.length > 0) {
-    StatusNet.debug("TimelineView.show G");
+    StatusNet.debug("TimelineView.show G: " + notices.length + " notice(s)");
 
         for (i = 0; i < notices.length; i++) {
-    StatusNet.debug("TimelineView.show Gx");
-            
-            this.table.appendRow({title: notices[i].content});
+            StatusNet.debug("TimelineView.show Gx " + i);
+            StatusNet.debug('QQQQ: notices[i]: ' + notices[i]);
+            for (var x in notices[i]) {
+                if (notices[i].hasOwnProperty(x)) {
+                    StatusNet.debug('     notices[i].' + x + ': ' + notices[i][x]);
+                }
+            }
+            var text = notices[i].content;
+            StatusNet.debug('QQQQ: text content: ' + text);
+            this.table.appendRow({title: text});
             /*
             html.push('<div class="notice" name="notice-' + notices[i].id +'">');
             html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + notices[i].avatar + '"/></a></div>');

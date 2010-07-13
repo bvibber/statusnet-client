@@ -44,7 +44,11 @@ StatusNet.Timeline = function(client) {
  * @param DOM    entry          XML Atom entry for the notice
  */
 StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
-
+    if (typeof XMLSerializer == "undefined") {
+        StatusNet.debug("Timeline.encacheNotice() skipped - no XML serializer");
+        return;
+    }
+    
     StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
     rc = this.db.execute(
@@ -104,7 +108,8 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
         function(status, data) {
             StatusNet.debug('Fetched ' + that.noticeUrl);
 
-            var entry = $(data).find('feed > entry:first').get(0);
+            //var entry = $(data).find('feed > entry:first').get(0); // feed > entry:first doesn't work on Titanium Mobile right now
+            var entry = $(data).find('entry:first').get(0);
 
             if (entry && that.cacheable()) {
                 that.encacheNotice(noticeId, entry);
@@ -176,8 +181,11 @@ StatusNet.debug('Timeline.addNotice DONE.');
  * timeline and notifies the view the model has changed.
  */
 StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
+    StatusNet.debug('Timeline.update ENTERED');
 
     this.updateStart.notify();
+
+    StatusNet.debug('Timeline.update called updateStart.notify');
 
     var that = this;
 
@@ -189,7 +197,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             var entries = [];
 
             $(data).find('feed > entry').each(function() {
-                StatusNet.debug('Timeline.update: found an entry.');
+                StatusNet.debug('Timeline.update: found an entry: ' + this);
                 entries.push(this);
             });
             StatusNet.debug('Timeline.update finished entry push loop.');
@@ -278,6 +286,7 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         ")"
     );
 
+    StatusNet.debug("trimNotices A");
     var rs = this.db.execute(
         "DELETE FROM entry WHERE notice_id IN " +
         "(SELECT notice_id FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?)",
@@ -285,6 +294,7 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         this.timeline_name,
         this.account.id
     );
+    StatusNet.debug("trimNotices B");
 
     rs = this.db.execute(
         'DELETE FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?',
@@ -292,6 +302,7 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         this.timeline_name,
         this.account.id
     );
+    StatusNet.debug("trimNotices C");
 
     // Also keep an absolute maximum of 200 notices per timeline
 
@@ -300,14 +311,18 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         this.timeline_name,
         this.account.id
     );
+    StatusNet.debug("trimNotices D");
 
     if (rs.isValidRow()) {
+    StatusNet.debug("trimNotices E1");
 
         var count = rs.fieldByName("count(*)");
 
         StatusNet.debug("COUNT = " + count);
 
+    StatusNet.debug("trimNotices E2");
         if (count > 200) {
+    StatusNet.debug("trimNotices E2A");
 
             var diff = (count - 200);
 
@@ -329,8 +344,10 @@ StatusNet.Timeline.prototype.trimNotices = function() {
                 this.account.id,
                 diff
             );
+    StatusNet.debug("trimNotices E2Z");
         }
     }
+    StatusNet.debug("trimNotices DONE");
 };
 
 /**

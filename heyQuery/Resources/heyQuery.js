@@ -88,7 +88,7 @@ heyQueryObj.prototype.get = function(i) {
  */
 heyQueryObj.prototype.each = function(callback) {
     for (var i = 0; i < this.nodes.length; i++) {
-        callback(i, this.get(i));
+        callback.call(this[i], i, this[i]);
     }
 }
 
