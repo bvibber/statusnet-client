@@ -9,7 +9,7 @@ function is_boolean(s) {
 }
 
 test("home", function() {
-	expect(2);
+	expect(3);
 	reset();
 
     var data = readXmlFile('tests/data/atom-home.xml');
@@ -17,6 +17,15 @@ test("home", function() {
     equals($(data).find('feed > entry:first').length, 1, "First entry in feed"); // @fail -- get no results
     equals($(data).find('entry:first').length, 1, "First entry in feed -- hack");
     equals($(data).find('feed > entry').length, 3, "All entries in feed");
+
+    //var expected = ['generator', 'id', 'title', 'subtitle', 'logo', 'updated', 'link', 'link', 'entry', 'entry', 'entry'];
+    //var found = [];
+    $(data).find('feed > entry').each(function(i, el) {
+        ok(el === this, "Each should set 'this' to found element...");
+        //found.push(this.name);
+    });
+    //equals(found, expected, 'Each setting "this" to found elements');
+
 });
 
 
