@@ -45,7 +45,6 @@ function heyQueryObj(context) {
     this.length = 0;
     heyQuery.appendArray(this.nodes, this); // copies in the array indexes
     this.length = this.nodes.length;
-    Titanium.API.debug('heyQueryObj constructor complete');
 }
 
 /**
