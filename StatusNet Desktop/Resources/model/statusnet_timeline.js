@@ -44,7 +44,11 @@ StatusNet.Timeline = function(client) {
  * @param DOM    entry          XML Atom entry for the notice
  */
 StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
-
+    if (typeof XMLSerializer == "undefined") {
+        StatusNet.debug("Timeline.encacheNotice() skipped - no XML serializer");
+        return;
+    }
+    
     StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
     rc = this.db.execute(
@@ -104,7 +108,8 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
         function(status, data) {
             StatusNet.debug('Fetched ' + that.noticeUrl);
 
-            var entry = $(data).find('feed > entry:first').get(0);
+            //var entry = $(data).find('feed > entry:first').get(0); // feed > entry:first doesn't work on Titanium Mobile right now
+            var entry = $(data).find('entry:first').get(0);
 
             if (entry && that.cacheable()) {
                 that.encacheNotice(noticeId, entry);
@@ -192,7 +197,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             var entries = [];
 
             $(data).find('feed > entry').each(function() {
-                StatusNet.debug('Timeline.update: found an entry.');
+                StatusNet.debug('Timeline.update: found an entry: ' + this);
                 entries.push(this);
             });
             StatusNet.debug('Timeline.update finished entry push loop.');

@@ -65,6 +65,9 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
  * @param DOM entry the Atom entry representing the notice
  */
 StatusNet.AtomParser.noticeFromEntry = function(entry) {
+StatusNet.debug('noticeFromEntry: ' + entry);
+
+StatusNet.debug("noticeFromEntry: $(entry).find('*').length " + $(entry).find('*').length);
 
     var notice = {};
     var result;
@@ -121,6 +124,9 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
     notice.atomSource = $(entry).find('source > title').text();
 
     notice.content = $(entry).find('content').text();
+StatusNet.debug("noticeFromEntry $(entry).find('content') " + $(entry).find('content'));
+StatusNet.debug("noticeFromEntry $(entry).find('content').length " + $(entry).find('content').length);
+StatusNet.debug('noticeFromEntry notice.content ' + notice.content);
 
     notice.author = $(entry).find('author name').text();
     notice.authorUri = $(entry).find('author uri').text();
