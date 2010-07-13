@@ -13,3 +13,7 @@ which looks sorta ok on both.
 
 Android is also scaling our large app icon down very badly, while things look ok
 on iPhone.
+
+I've attempted making a separate version of the icon for Android; as documented
+on Appcelerator's web site it *should* work to drop a same-named 'logo.png' into
+Resources/android and it'll take, but this doesn't seem to actually do it.
