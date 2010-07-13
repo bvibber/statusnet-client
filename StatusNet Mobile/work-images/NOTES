@@ -1,0 +1,15 @@
+It would be good if we can have separate app icons for iPhone and Android:
+
+iPhone needs an icon which fills the entire area due to it not allowing transparency...
+A glossy finish, rounded corners, and black background (if transparency) are
+automatically added.
+
+Android allows and encourages transparency in app icons, and adds no texture.
+
+For now, we're using a compromise icon that has a rounded solid gradient background,
+which looks sorta ok on both.
+
+
+
+Android is also scaling our large app icon down very badly, while things look ok
+on iPhone.
