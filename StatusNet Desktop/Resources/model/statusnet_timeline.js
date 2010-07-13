@@ -176,8 +176,11 @@ StatusNet.debug('Timeline.addNotice DONE.');
  * timeline and notifies the view the model has changed.
  */
 StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
+    StatusNet.debug('Timeline.update ENTERED');
 
     this.updateStart.notify();
+
+    StatusNet.debug('Timeline.update called updateStart.notify');
 
     var that = this;
 
@@ -278,6 +281,7 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         ")"
     );
 
+    StatusNet.debug("trimNotices A");
     var rs = this.db.execute(
         "DELETE FROM entry WHERE notice_id IN " +
         "(SELECT notice_id FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?)",
@@ -285,6 +289,7 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         this.timeline_name,
         this.account.id
     );
+    StatusNet.debug("trimNotices B");
 
     rs = this.db.execute(
         'DELETE FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?',
@@ -292,6 +297,7 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         this.timeline_name,
         this.account.id
     );
+    StatusNet.debug("trimNotices C");
 
     // Also keep an absolute maximum of 200 notices per timeline
 
@@ -300,14 +306,18 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         this.timeline_name,
         this.account.id
     );
+    StatusNet.debug("trimNotices D");
 
     if (rs.isValidRow()) {
+    StatusNet.debug("trimNotices E1");
 
         var count = rs.fieldByName("count(*)");
 
         StatusNet.debug("COUNT = " + count);
 
+    StatusNet.debug("trimNotices E2");
         if (count > 200) {
+    StatusNet.debug("trimNotices E2A");
 
             var diff = (count - 200);
 
@@ -329,8 +339,10 @@ StatusNet.Timeline.prototype.trimNotices = function() {
                 this.account.id,
                 diff
             );
+    StatusNet.debug("trimNotices E2Z");
         }
     }
+    StatusNet.debug("trimNotices DONE");
 };
 
 /**

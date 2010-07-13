@@ -142,7 +142,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
                                   view: StatusNet.TimelineViewPublic},
                     friends:    {title: 'Personal',
                               timeline: StatusNet.TimelineFriends,
-                                  view: StatusNet.TimelineViewFriends}/*,
+                                  view: StatusNet.TimelineViewFriends},
                     profile:    {title: 'Profile',
                               timeline: StatusNet.TimelineUser,
                                   view: StatusNet.TimelineViewUser},
@@ -154,7 +154,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
                                   view: StatusNet.TimelineViewFavorites},
                       inbox:    {title: 'Inbox',
                               timeline: StatusNet.TimelineInbox,
-                                  view: StatusNet.TimelineViewInbox},
+                                  view: StatusNet.TimelineViewInbox}/*,
                      search:    {title: 'Search',
                               timeline: StatusNet.TimelineSearch,
                                   view: StatusNet.TimelineViewSearch}*/};
@@ -165,18 +165,32 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     this.tabGroup = Titanium.UI.createTabGroup();
     StatusNet.debug('initAccountView created a tab group.');
 
-    StatusNet.debug('Starting building tabs, timelines, views...');
+    StatusNet.debug('initAccountView Starting building tabs, timelines, views...');
     for (var tab in tabInfo) {
         if (tabInfo.hasOwnProperty(tab)) {
             this.createTab(tab, tabInfo[tab]);
         }
     }
-    StatusNet.debug('Done building tabs, timelines, views.');
+    StatusNet.debug('initAccountView Done building tabs, timelines, views.');
 
     // @todo remember last-used tab
-    StatusNet.debug('friends tab is: ' + this.tabs.friends);
+    StatusNet.debug('initAccountView friends tab is: ' + this.tabs.friends);
     this.tabGroup.setActiveTab(this.tabs.friends);
     this.tabGroup.open();
+
+    /*
+    var that = this;
+    this.timeline.update(
+        function() {
+            StatusNet.debug('initAccountView post-update START');
+            that.view.showHeader();
+            StatusNet.debug('initAccountView post-update shown header');
+            that.view.show();
+            StatusNet.debug('initAccountView post-update DONE');
+        },
+        false
+    );
+    */
 
     StatusNet.debug('initAccountView done.');
 };
@@ -195,8 +209,8 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
     StatusNet.debug('info: ' + info);
 
     var window = Titanium.UI.createWindow({
-        title: info.title,
-        tabBarHidden: true
+        title: info.title//,
+        //tabBarHidden: true
     });
     this.windows[tab] = window;
 
@@ -213,17 +227,18 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
     var client = this;
     window.addEventListener('open', function() {
         StatusNet.debug("Open tab: " + tab);
-        client.view = new info.view(client);
-        client.view.window = window;
         if (info.timeline) {
             StatusNet.debug('timeline tab? updating timeline...');
             StatusNet.debug(info.timeline);
             client.timeline = new info.timeline(client);
             
+            StatusNet.debug('Creating the view...');
+            client.view = new info.view(client);
+            client.view.window = window;
             StatusNet.debug('telling the view to show...');
             client.view.show();
 
-            StatusNet.debug('created, now telling it to update:');
+            StatusNet.debug('Telling timeline to update:');
             client.timeline.update(function() {
                 client.timeline.noticeAdded.attach(
                     function(args) {
@@ -241,6 +256,8 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
             StatusNet.debug('settings tab? showing view...');
             // Settings dialog
             client.timeline = null;
+            client.view = new info.view(client);
+            client.view.window = window;
             client.view.init();
             StatusNet.debug('settings shown.');
         }
