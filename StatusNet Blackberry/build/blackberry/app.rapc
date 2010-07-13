@@ -1,0 +1,10 @@
+MIDlet-Name: StatusNet Blackberry
+MIDlet-Version: 1.0
+MIDlet-Vendor: StatusNet, Inc.
+MIDlet-Description: A Blackberry client for StatusNet
+MIDlet-Jar-URL: StatusNet Blackberry.jar
+MIDlet-Jar-Size: 0
+MicroEdition-Profile: MIDP-2.0
+MicroEdition-Configuration: CLDC-1.1
+MIDlet-1: StatusNet Blackberry,Resources/appicon.png
+RIM-MIDlet-Flags-1: 0
