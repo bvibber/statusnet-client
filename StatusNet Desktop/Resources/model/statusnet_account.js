@@ -334,7 +334,17 @@ StatusNet.Account.prototype.ensure = function(db) {
 
         }
 
-        return true;
+		rs = db.execute("select * from account where username=? " +
+                        "and apiroot=?",
+                        this.username, 
+                        this.apiroot);
+
+		if (rs.isValidRow()) {
+			return rs.fieldByName("id");
+		} else {
+			return false;
+		}
+
     } catch (e) {
         StatusNet.debug('ensure() - Exception saving credentials: ' + e);
         return false;
