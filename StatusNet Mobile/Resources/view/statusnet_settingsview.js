@@ -164,17 +164,23 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     });
     save.addEventListener('click', function() {
         StatusNet.debug('clicked save');
-        view.updateNewAccount();
-        StatusNet.debug('save click: updated');
-        if (view.workAcct != null) {
-            // @fixme separate the 'update state' and 'save' actions better
-            view.saveNewAccount();
-            StatusNet.debug('save click: saved');
-            window.close();
-            StatusNet.debug('hide: closed');
-            view.fields = null;
-            StatusNet.debug('hide: killed fields');
-        }
+		save.enabled = false;
+        view.verifyAccount(function() {
+	        StatusNet.debug('save click: updated');
+	        if (view.workAcct != null) {
+	            // @fixme separate the 'update state' and 'save' actions better
+	            view.saveNewAccount();
+	            StatusNet.debug('save click: saved');
+	            window.close();
+	            StatusNet.debug('hide: closed');
+	            view.fields = null;
+	            StatusNet.debug('hide: killed fields');
+	        }
+		},
+		function() {
+			StatusNet.debug("Could not verify account.");
+			save.enabled = true;
+		});
     });
     if (android) {
         // Android has no navigation area on tab header
@@ -331,7 +337,7 @@ StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
 /**
  * Validate input and see if we can make it work yet
  */
-StatusNet.SettingsView.prototype.updateNewAccount = function() {
+StatusNet.SettingsView.prototype.verifyAccount = function(onSuccess, onError) {
     var that = this;
     StatusNet.debug('yadda 1');
     this.cancelUpdateTimeout();
@@ -374,14 +380,20 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                     StatusNet.debug("Loaded statusnet/config.xml");
                     that.workAcct.textLimit = $(xml).find('site > textlimit').text();
                     that.workAcct.siteLogo = $(xml).find('site > logo').text();
+
+					// finally call our success
+					onSuccess();
+
                 }, function(status) {
                     StatusNet.debug("Couldn't load statusnet/config.xml for site.");
+					onError();
                 });
 
             }, function(status) {
                 that.fields.status.text = "Bad nickname or password.";
                 StatusNet.debug("We failed to load account info");
                 //$("#new-avatar").attr("src", "images/default-avatar-stream.png");
+				onError();
             });
         }
     }, function() {
@@ -389,6 +401,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
         that.fields.status.text = "Could not verify site.";
         StatusNet.debug("Bogus acct");
         that.workAcct = null;
+		onError();
         //$("#new-save").attr("disabled", "disabled");
         //$("#new-avatar").attr("src", "images/default-avatar-stream.png");
     });
