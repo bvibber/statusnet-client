@@ -224,6 +224,12 @@ StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username,
             // NOP
         };
 
+		// XXX: client.onerror is only called by mobile's HTTPClient
+		client.onerror = function(e) {
+			StatusNet.debug("webRequest: failure!");
+	        onError(client.status, "Error: " + e.error);
+		};
+
         if (data) {
             StatusNet.debug("HTTP POST to: " + url);
             client.open("POST", url);
@@ -336,7 +342,7 @@ StatusNet.Account.prototype.ensure = function(db) {
 
 		rs = db.execute("select * from account where username=? " +
                         "and apiroot=?",
-                        this.username, 
+                        this.username,
                         this.apiroot);
 
 		if (rs.isValidRow()) {
