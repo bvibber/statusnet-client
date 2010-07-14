@@ -260,6 +260,9 @@ StatusNet.Account.webRequest = function(url, onSuccess, onError, data, username,
         }
 
         if (data) {
+            StatusNet.debug('webRequest: sending data: ' + data);
+            // Titanium Mobile/iPhone doesn't set Content-Type, which breaks PHP's processing.
+            client.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             client.send(data);
         } else {
             client.send();

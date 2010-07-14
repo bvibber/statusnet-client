@@ -239,6 +239,15 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
     //window.client = this;
     //window.timeline = tab;
     var client = this;
+
+    var updateButton = Titanium.UI.createButton({
+        title: "New" // @fixme use the system icon for new-message
+    });
+    updateButton.addEventListener('click', function() {
+        client.newNoticeDialog();
+    });
+    window.setRightNavButton(updateButton);
+
     window.addEventListener('open', function() {
         StatusNet.debug("Open tab: " + tab);
         if (info.timeline) {
@@ -282,28 +291,19 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
  * Show notice input dialog
  */
 StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername) {
-    var win = Titanium.UI.getCurrentWindow().createWindow({
-        url: 'app:///new_notice.html',
-        title: 'New notice',
-        width: 420,
-        height: 120});
-
-    // Pass the reply-to info in via the window itself.
-    // XXX: Is there a better way?
-
-    if (replyToId) {
-        win.setTitle('Replying to ' + replyToUsername);
-        win.replyToId = replyToId;
-        win.replyToUsername = replyToUsername;
-    }
-
     var that = this;
-
-    win.addEventListener(Titanium.CLOSE, function(event) {
+    var view = new StatusNet.NewNoticeView({
+        replyToId: replyToId,
+        replyToUsername: replyToUsername
+    });
+    view.close.attach(function() {
+        StatusNet.debug('gonna re-load');
         that.view.showHeader();
         that.view.showSpinner();
-        that.timeline.update();
+        that.timeline.update(function() {
+            that.view.show();
+        });
+        StatusNet.debug('ALL DONE waiting');
     });
-
-    win.open();
+    view.init();
 };
