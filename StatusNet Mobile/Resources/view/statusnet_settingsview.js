@@ -206,16 +206,22 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
                     hintText: "Server",
                     returnKeyType:Titanium.UI.RETURNKEY_NEXT,
                     keyboardType: Titanium.UI.KEYBOARD_URL,
+                    autocapitalization: Titanium.UI.TEXT_AUTOCAPITALIZATION_NONE,
                     autocorrect: false
                   }},
                   username: {props: {
                     hintText: "Username",
-                    returnKeyType:Titanium.UI.RETURNKEY_NEXT,
+                    returnKeyType: Titanium.UI.RETURNKEY_NEXT,
+                    keyboardType: Titanium.UI.KEYBOARD_EMAIL,
+                    autocapitalization: Titanium.UI.TEXT_AUTOCAPITALIZATION_NONE,
                     autocorrect: false
                   }},
                   password: {props: {
                     hintText: "Password",
                     passwordMask:true,
+                    autocapitalization: Titanium.UI.TEXT_AUTOCAPITALIZATION_NONE,
+                    autocorrect: false, // we need to add this explicitly for Android, or it'll "suggest" your password to you!
+                    keyboardType: Titanium.UI.KEYBOARD_EMAIL, // we need to specify *this* or the autocorrect setting doesn't get set on the actual field for Android?!
                     returnKeyType:Titanium.UI.RETURNKEY_DONE
                   }}};
     for (var i in fields) {
