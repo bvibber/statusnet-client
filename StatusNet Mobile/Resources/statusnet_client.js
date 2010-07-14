@@ -129,6 +129,20 @@ StatusNet.Client.prototype.init = function() {
         client.view.window = window;
         client.view.init();
     });
+
+    Titanium.Gesture.addEventListener('shake', function(event) {
+        StatusNet.debug("Shaken, not stirred.");
+        if (client.timeline) {
+            StatusNet.debug("Triggering update for shake gesture...");
+            client.timeline.update(function() {
+                StatusNet.debug("Updated, gonna show:");
+                client.view.show();
+                StatusNet.debug("Updated and done showing.");
+            });
+            StatusNet.debug("Started an update, waiting...");
+        }
+        StatusNet.debug("Done checking out the shake.");
+    });
 };
 
 StatusNet.Client.prototype.initAccountView = function(acct) {
