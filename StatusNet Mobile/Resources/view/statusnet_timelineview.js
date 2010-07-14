@@ -50,11 +50,19 @@ StatusNet.TimelineView = function(client) {
     StatusNet.debug("TimelineView constructor - finished attaching updateStart");
 
     this.timeline.updateFinished.attach(
-        function() {
+        function(args) {
             StatusNet.debug("TimelineView got updateFinished event!");
             that.hideSpinner();
             StatusNet.debug("TimelineView showing:");
             that.show();
+
+			StatusNet.debug("TimelineView checking for total number of notices")
+		    var notices = that.client.timeline.getNotices();
+			if (notices.length == 0) {
+				StatusNet.debug("TimelineView: no notices found");
+	        	that.table.appendRow({title: 'No notices in this timeline yet.'});
+			}
+			StatusNet.debug("TimelineView - there are " + notices.length + " notices in timeline");
             StatusNet.debug("TimelineView updateFinished DONE");
         }
     );
@@ -190,10 +198,6 @@ StatusNet.TimelineView.prototype.show = function () {
         */
     StatusNet.debug("TimelineView.show G-done");
 
-    } else {
-    StatusNet.debug("TimelineView.show G-alt");
-        this.table.appendRow({title: 'No notices in this timeline yet.'});
-    StatusNet.debug("TimelineView.show G-alt-done");
     }
 
     StatusNet.debug("TimelineView.show H");
