@@ -155,7 +155,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
     var method = 'statuses/update.xml';
     var base = 'status=' + encodeURIComponent(noticeText);
     var params = [];
-    params.push('source=' + encodeURIComponent('StatusNet Desktop'));
+    params.push('source=' + encodeURIComponent('StatusNet Mobile'));
 
     var data = this.data;
 
