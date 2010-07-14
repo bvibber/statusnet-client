@@ -209,9 +209,9 @@ StatusNet.TimelineView.prototype.show = function () {
 StatusNet.TimelineView.prototype.stripHtml = function(html) {
     var src = '<div>' + html + '</div>';
     StatusNet.debug('STRIP src: ' + src);
-    var dom = Titanium.XML.parseString(src);
-    StatusNet.debug('STRIP dom: ' + dom);
-    var txt = $(dom).text();
+    //var dom = Titanium.XML.parseString(src);
+    //StatusNet.debug('STRIP dom: ' + dom);
+    var txt = $(src).text();
     StatusNet.debug('STRIP txt: ' + txt);
     return txt;
 }

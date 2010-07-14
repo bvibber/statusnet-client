@@ -155,7 +155,7 @@ function heyQuery(a, b) {
         // HTML/XML to parse!
         var html = a, doc = b;
         var dom = Titanium.XML.parseString(html);
-        return new heyQueryObj(Sizzle.hacks.documentElement(dom));
+        return new heyQueryObj([Sizzle.hacks.documentElement(dom)]);
     } else if (typeof a == "string") {
         // CSS selector in a DOM tree!
         var selector = a, context = b;
