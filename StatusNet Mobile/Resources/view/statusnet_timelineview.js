@@ -95,7 +95,6 @@ StatusNet.TimelineView.prototype.init = function() {
 	this.act.font = {fontFamily:'Helvetica Neue', fontSize:15,fontWeight:'bold'};
 	this.act.color = 'white';
 	this.act.message = 'Loading...';
-	this.window.setToolbar([this.act],{animated:true});
 
 	StatusNet.debug("TimelineView: Finished adding activity indicator");
 };
@@ -355,6 +354,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
+	this.window.setToolbar([this.act],{animated:true});
 	this.act.show();
 };
 
@@ -364,6 +364,7 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
 	this.act.hide();
+	this.window.setToolbar(null,{animated:true});
 };
 
 /**
