@@ -33,7 +33,6 @@ StatusNet.SettingsView.prototype.init = function() {
     StatusNet.debug('SettingsView.init');
     var view = this;
     var client = this.client;
-    var android = (Titanium.Platform.osname == "android");
 
     // Set up our table view...
     this.table = Titanium.UI.createTableView({
@@ -82,25 +81,7 @@ StatusNet.SettingsView.prototype.init = function() {
     });
     this.window.add(this.table);
 
-    if (android) {
-        // Stick an 'add account' item at the top of the list, similar to
-        // the default Android browser's bookmarks list.
-        var row = Titanium.UI.createTableViewRow({
-            title: 'Add account...',
-            height: 'auto',
-            acct: "add-stub"
-        });
-        /*
-        // The tableview seems to get this click before the row does, so bumping the code up.
-        row.addEventListener('click', function() {
-            StatusNet.debug('clicked the add account thingy');
-            view.showAddAccount();
-        });
-        */
-        this.table.appendRow(row);
-
-        // @fixme -- add a way to remove items!
-    } else {
+    if (StatusNet.Platform.hasNavBar()) {
         // Create-account button
         var create = Titanium.UI.createButton({
             title: '+'
@@ -133,6 +114,20 @@ StatusNet.SettingsView.prototype.init = function() {
         // ...and plop them onto the tab header.
         this.window.setLeftNavButton(edit);
         this.window.setRightNavButton(create);
+
+    } else {
+        // No native navigation bar on Android.
+
+        // Stick an 'add account' item at the top of the list, similar to
+        // the default Android browser's bookmarks list.
+        var row = Titanium.UI.createTableViewRow({
+            title: 'Add account...',
+            height: 'auto',
+            acct: "add-stub"
+        });
+        this.table.appendRow(row);
+
+        // @fixme -- add a way to remove items!
     }
 
     // Now let's fill out the table!
@@ -143,12 +138,10 @@ StatusNet.SettingsView.prototype.init = function() {
  * Open the add-new-account modal dialog
  */
 StatusNet.SettingsView.prototype.showAddAccount = function() {
-    var android = (Titanium.Platform.osname == "android");
-
     var view = this;
     var window = Titanium.UI.createWindow({
         title: "Add Account",
-        backgroundColor: (android ? "black" : "#bbbfcc"),
+        backgroundColor: StatusNet.Platform.dialogBackground(),
         layout: 'vertical'
     });
 
@@ -186,8 +179,13 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
             save.enabled = true;
         });
     });
-    if (android) {
-        // Android has no navigation area on tab header
+
+    if (StatusNet.Platform.hasNavBar()) {
+        window.setLeftNavButton(cancel);
+        window.setRightNavButton(save);
+    } else {
+        // Android has no navigation area on tab header;
+        // we'll toss a manual label in at the top.
         var label = Titanium.UI.createLabel({
             text: "Add Account",
             width: 'auto',
@@ -195,10 +193,8 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
             font: {fontSize: '30'}
         });
         window.add(label);
+
         // Add the buttons at the bottom later...
-    } else {
-        window.setLeftNavButton(cancel);
-        window.setRightNavButton(save);
     }
 
     this.fields = {};
@@ -229,7 +225,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
             var props = {
                 left: 8,
                 right: 8,
-                height: android ? 'auto' : 32, // argghhhhh auto doesn't work on iphone
+                height: StatusNet.Platform.isAndroid() ? 'auto' : 32, // argghhhhh auto doesn't work on iphone
                 borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED
             };
             for (var j in fields[i].props) {
@@ -255,13 +251,14 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
 
     this.fields.status = Titanium.UI.createLabel({
         text: "",
-        height: android ? 'auto' : 32
+        height: StatusNet.Platform.isAndroid() ? 'auto' : 32
     });
     window.add(this.fields.status);
 
-    if (android) {
+    if (!StatusNet.Platform.hasNavBar()) {
+        // No native nav bar for our save/cancel buttons?
+        // Put them in the dialog area.
         var xview = Titanium.UI.createView();
-        // For some reason, horizontal layout appears to be missing. :P
         save.left = 10;
         save.width = 100;
         cancel.width = 100;
@@ -281,7 +278,6 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
  */
 StatusNet.SettingsView.prototype.showAccounts = function() {
     StatusNet.debug('SettingsView.showAccounts');
-    var android = (Titanium.Platform.osname == "android");
 
     if (this.accounts.length == 0) {
         this.showAddAccount();
@@ -290,9 +286,11 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
             this.showAccountRow(this.accounts[i]);
         }
         // crappy temp hack -- single row is hidden on android
+        /*
         if (android && this.accounts.length == 1) {
             this.table.appendRow({});
         }
+        */
     }
 };
 
@@ -310,7 +308,6 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     var title = acct.username + '@' + acct.getHost();
     StatusNet.debug('adding row: ' + title);
 
-    // Note -- if I add *two* rows it works on Android with 'auto'. Sighhhhhh
     var row = {title: title,
                acct: acct,
                height: 'auto'};

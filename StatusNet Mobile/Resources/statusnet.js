@@ -141,3 +141,34 @@ StatusNet.Event.prototype.notify = function(args) {
     }
 }
 
+/**
+ * Wrapper functions wooo
+ */
+StatusNet.Platform = {
+    isApple: function() {
+        return Titanium.Platform.osname == "iphone" || Titanium.Platform.osname == "ipad";
+    },
+
+    isAndroid: function() {
+        return Titanium.Platform.osname == "android";
+    },
+
+    /**
+     * Returns an appropriate background color for dialog box-style screens
+     * on the current platform.
+     *
+     * @return string
+     */
+    dialogBackground: function() {
+        if (this.isAndroid()) {
+            // Android dialogs are mostly white-on-black
+            return "black";
+        } else if (this.isApple()) {
+            // iOS likes a light gray-bluish BG
+            return "#bbbfcc";
+        }
+        return "#eee"; // ???
+    }
+};
+StatusNet.Platform.hasNavBar = StatusNet.Platform.isApple;
+StatusNet.Platform.hasMenu = StatusNet.Platform.isAndroid;

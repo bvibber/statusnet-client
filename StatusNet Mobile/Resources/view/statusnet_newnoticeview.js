@@ -40,10 +40,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
     StatusNet.debug("NewNoticeView.init");
 
     StatusNet.debug("NewNoticeView.init A");
-    var android = (Titanium.Platform.osname == "android");
     var window = this.window = Titanium.UI.createWindow({
         title: 'New Notice',
-        backgroundColor: (android ? "black" : "#bbbfcc")
+        backgroundColor: StatusNet.Platform.dialogBackground()
     });
 
     StatusNet.debug("NewNoticeView.init B");
@@ -88,12 +87,12 @@ StatusNet.NewNoticeView.prototype.init = function() {
     updateButton.addEventListener('click', function(event) {
         that.postNotice(noticeTextArea.value);
     });
-    if (android) {
-        window.add(cancelButton);
-        window.add(updateButton);
-    } else {
+    if (StatusNet.Platform.hasNavBar()) {
         window.setLeftNavButton(cancelButton);
         window.setRightNavButton(updateButton);
+    } else {
+        window.add(cancelButton);
+        window.add(updateButton);
     }
 
     var textLimit = this.account.textLimit;
@@ -147,7 +146,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         right: 0,
         top: 200,
         bottom: 0,
-        backgroundColor: (android ? "black" : "#bbbfcc"),
+        backgroundColor: StatusNet.Platform.dialogBackground(),
         layout: 'vertical'
     });
     window.add(moreStuff);

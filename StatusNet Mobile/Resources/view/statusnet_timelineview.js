@@ -120,8 +120,28 @@ StatusNet.TimelineView.prototype.show = function() {
     StatusNet.debug("TimelineView.show this.window: " + this.window);
 
     if (!this.table) {
+        var top = 0;
+        if (!StatusNet.Platform.hasNavBar()) {
+            // On Android, tabbed windows don't have a native navigation bar.
+            var navbarHeight = 32;
+            this.navbar = Titanium.UI.createView({
+                top: 0,
+                left: 0,
+                right: 0,
+                height: navbarHeight,
+                backgroundColor: '#eee'
+            });
+
+            top += navbarHeight;
+        }
+
         StatusNet.debug("TimelineView.show creating table view...");
-        this.table = Titanium.UI.createTableView();
+        this.table = Titanium.UI.createTableView({
+            top: top,
+            left: 0,
+            right: 0,
+            bottom: 0
+        });
         this.window.add(this.table);
     }
 
