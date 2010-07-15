@@ -247,14 +247,6 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
     //window.timeline = tab;
     var client = this;
 
-    var updateButton = Titanium.UI.createButton({
-        title: "New" // @fixme use the system icon for new-message
-    });
-    updateButton.addEventListener('click', function() {
-        client.newNoticeDialog();
-    });
-    window.setRightNavButton(updateButton);
-
     window.addEventListener('open', function() {
         StatusNet.debug("Open tab: " + tab);
         if (info.timeline) {

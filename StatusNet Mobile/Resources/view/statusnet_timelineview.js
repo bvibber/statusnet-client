@@ -104,40 +104,24 @@ StatusNet.TimelineView.prototype.init = function() {
  *
  */
 StatusNet.TimelineView.prototype.show = function() {
-
     StatusNet.debug("TimelineView.show");
-/*
-    StatusNet.debug("QQQ: this.tabName: " + this.tabName);
-    StatusNet.debug("QQQ: this.tabName(): " + this.tabName());
-    StatusNet.debug("QQQ: StatusNet: " + StatusNet);
-    StatusNet.debug("QQQ: StatusNet.windows: " + StatusNet.windows);
-    StatusNet.debug("QQQ: StatusNet.windows[this.tabName()]: " + StatusNet.windows[this.tabName()]);
-
-    // @fixme don't recreate the table, or else kill it on close?
-    this.window = StatusNet.windows[this.tabName()];
-*/
-
-    StatusNet.debug("TimelineView.show this.window: " + this.window);
+    var that = this;
 
     if (!this.table) {
-        var top = 0;
-        if (!StatusNet.Platform.hasNavBar()) {
-            // On Android, tabbed windows don't have a native navigation bar.
-            var navbarHeight = 32;
-            this.navbar = Titanium.UI.createView({
-                top: 0,
-                left: 0,
-                right: 0,
-                height: navbarHeight,
-                backgroundColor: '#eee'
-            });
+        StatusNet.debug("TimelineView.show creating navbar...");
+        var navbar = StatusNet.Platform.createNavBar(this.window);
 
-            top += navbarHeight;
-        }
+        var updateButton = Titanium.UI.createButton({
+            title: "New" // @fixme use the system compose icon
+        });
+        updateButton.addEventListener('click', function() {
+            that.client.newNoticeDialog();
+        });
+        navbar.setRightNavButton(updateButton);
 
         StatusNet.debug("TimelineView.show creating table view...");
         this.table = Titanium.UI.createTableView({
-            top: top,
+            top: navbar.height,
             left: 0,
             right: 0,
             bottom: 0
@@ -173,7 +157,8 @@ StatusNet.TimelineView.prototype.show = function() {
 
             var row = Titanium.UI.createTableViewRow({
                 height: 'auto',
-                notice: notices[i]
+                notice: notices[i],
+                backgroundColor: 'white'
             });
 
             var avatar = Titanium.UI.createImageView({
@@ -191,7 +176,8 @@ StatusNet.TimelineView.prototype.show = function() {
                 right: 72,
                 height: 'auto',
                 text: notices[i].author,
-                font: {fontSize: baseSize + 2, fontWeight:'bold'}
+                font: {fontSize: baseSize + 2, fontWeight:'bold'},
+                color: 'black'
             });
             row.add(name);
 
@@ -201,7 +187,8 @@ StatusNet.TimelineView.prototype.show = function() {
                 right: 72,
                 height: 'auto',
                 text: this.stripHtml(text),
-                font: {fontSize: baseSize}
+                font: {fontSize: baseSize},
+                color: 'black'
             });
             row.add(text);
             this.table.appendRow(row);
