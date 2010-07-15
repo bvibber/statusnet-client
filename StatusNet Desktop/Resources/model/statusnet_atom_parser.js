@@ -88,7 +88,7 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT B: ' + (Date.now() - startTime) + 'ms');
 
-    var notice_info = $entry.find('[nodeName=statusnet:notice_info]:first');
+    var notice_info = $entry.find('[nodeName=statusnet:notice_info]');
     notice.id = notice_info.attr('local_id');
 
     var idRegexp = /(\d)+$/;
@@ -147,6 +147,7 @@ Titanium.API.info('noticeFromEntry CHECKPOINT F: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT G: ' + (Date.now() - startTime) + 'ms');
 
+    // @fixme why is this looking for the second one? Sounds unstable!
     notice.link = $entry.find('link[rel=alternate]:eq(1)').attr('href');
 
 Titanium.API.info('noticeFromEntry CHECKPOINT H: ' + (Date.now() - startTime) + 'ms');
@@ -161,8 +162,8 @@ Titanium.API.info('noticeFromEntry CHECKPOINT H: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT I: ' + (Date.now() - startTime) + 'ms');
 
-    notice.contextLink = $entry.find('link[rel=ostatus:conversation]:first').attr('href');
-    notice.inReplyToLink = $entry.find("[nodeName=thr:in-reply-to]:first").attr('ref');
+    notice.contextLink = $entry.find('link[rel=ostatus:conversation]').attr('href');
+    notice.inReplyToLink = $entry.find("[nodeName=thr:in-reply-to]").attr('ref');
 
     if (notice.inReplyToLink) {
         result = notice.inReplyToLink.match(idRegexp);
