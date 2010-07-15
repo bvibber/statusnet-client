@@ -68,11 +68,12 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
 StatusNet.debug('noticeFromEntry ENTER');
 var startTime = Date.now();
 
+    var $entry = $(entry);
     var notice = {};
     var result;
 
     // note: attribute selectors seem to have problems with [media:width=48]
-    $(entry).find('link[rel=avatar]').each(function(i, el) {
+    $entry.find('link[rel=avatar]').each(function(i, el) {
         if ($(el).attr('media:width') == '48') {
             notice.avatar = $(el).attr('href');
         }
@@ -82,12 +83,12 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
 
     // XXX: Special case for search Atom entries
     if (!notice.avatar) {
-        notice.avatar = $(entry).find('link[rel=related]').attr('href');
+        notice.avatar = $entry.find('link[rel=related]').attr('href');
     }
 
 Titanium.API.info('noticeFromEntry CHECKPOINT B: ' + (Date.now() - startTime) + 'ms');
 
-    var notice_info = $(entry).find('[nodeName=statusnet:notice_info]:first');
+    var notice_info = $entry.find('[nodeName=statusnet:notice_info]:first');
     notice.id = notice_info.attr('local_id');
 
     var idRegexp = /(\d)+$/;
@@ -96,7 +97,7 @@ Titanium.API.info('noticeFromEntry CHECKPOINT C: ' + (Date.now() - startTime) + 
 
     // XXX: Special case for search Atom entries
     if (!notice.id) {
-        var searchId = $(entry).find('id').text();
+        var searchId = $entry.find('id').text();
         result = searchId.match(idRegexp);
         if (result) {
             notice.id = result[0];
@@ -111,8 +112,8 @@ Titanium.API.info('noticeFromEntry CHECKPOINT D: ' + (Date.now() - startTime) + 
     notice.repeated = notice_info.attr('repeated');
     notice.repeat_of = notice_info.attr('repeat_of');
 
-    notice.published = $(entry).find('published').text();
-    var updated = $(entry).find('updated').text();
+    notice.published = $entry.find('published').text();
+    var updated = $entry.find('updated').text();
 
     // knock off the millisecs to make the date string work with humane.js
     notice.updated = updated.substring(0, 19);
@@ -122,7 +123,7 @@ Titanium.API.info('noticeFromEntry CHECKPOINT E: ' + (Date.now() - startTime) + 
     // In most timelines, the plain text version of the notice content
     // is in the second title element in the entry, but in user feeds,
     // it's in the first.
-    var titles = $(entry).find('title');
+    var titles = $entry.find('title');
     if (titles.length >= 2) {
         notice.title = $(titles[1]).text();
     } else {
@@ -132,12 +133,12 @@ Titanium.API.info('noticeFromEntry CHECKPOINT E: ' + (Date.now() - startTime) + 
 Titanium.API.info('noticeFromEntry CHECKPOINT F: ' + (Date.now() - startTime) + 'ms');
 
     // atom:source (not the source client, eh) - this might not be in the feed
-    notice.atomSource = $(entry).find('source > title').text();
+    notice.atomSource = $entry.find('source > title').text();
 
-    notice.content = $(entry).find('content').text();
-    notice.author = $(entry).find('author name').text();
-    notice.authorUri = $(entry).find('author uri').text();
-    notice.fullname = $(entry).find('[nodeName=poco:displayName]').text();
+    notice.content = $entry.find('content').text();
+    notice.author = $entry.find('author name').text();
+    notice.authorUri = $entry.find('author uri').text();
+    notice.fullname = $entry.find('[nodeName=poco:displayName]').text();
 
     result = notice.authorUri.match(idRegexp);
     if (result) {
@@ -146,11 +147,11 @@ Titanium.API.info('noticeFromEntry CHECKPOINT F: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT G: ' + (Date.now() - startTime) + 'ms');
 
-    notice.link = $(entry).find('link[rel=alternate]:eq(1)').attr('href');
+    notice.link = $entry.find('link[rel=alternate]:eq(1)').attr('href');
 
 Titanium.API.info('noticeFromEntry CHECKPOINT H: ' + (Date.now() - startTime) + 'ms');
 
-    var geoPoint = $(entry).find("[nodeName=georss:point]:first").text();
+    var geoPoint = $entry.find("[nodeName=georss:point]:first").text();
 
     if (geoPoint) {
         var gArray = geoPoint.split(' ');
@@ -160,8 +161,8 @@ Titanium.API.info('noticeFromEntry CHECKPOINT H: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT I: ' + (Date.now() - startTime) + 'ms');
 
-    notice.contextLink = $(entry).find('link[rel=ostatus:conversation]:first').attr('href');
-    notice.inReplyToLink = $(entry).find("[nodeName=thr:in-reply-to]:first").attr('ref');
+    notice.contextLink = $entry.find('link[rel=ostatus:conversation]:first').attr('href');
+    notice.inReplyToLink = $entry.find("[nodeName=thr:in-reply-to]:first").attr('ref');
 
     if (notice.inReplyToLink) {
         result = notice.inReplyToLink.match(idRegexp);
@@ -172,7 +173,7 @@ Titanium.API.info('noticeFromEntry CHECKPOINT I: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT J: ' + (Date.now() - startTime) + 'ms');
 
-    var profile_info = $(entry).find('[nodeName=statusnet:profile_info]');
+    var profile_info = $entry.find('[nodeName=statusnet:profile_info]');
     notice.following = profile_info.attr('following');
     notice.blocking = profile_info.attr('blocking');
 
