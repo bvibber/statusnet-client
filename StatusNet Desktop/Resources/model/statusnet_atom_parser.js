@@ -122,11 +122,11 @@ Titanium.API.info('noticeFromEntry CHECKPOINT E: ' + (Date.now() - startTime) + 
     // In most timelines, the plain text version of the notice content
     // is in the second title element in the entry, but in user feeds,
     // it's in the first.
-    notice.title = $(entry).find('title:eq(1)');
-    if (notice.title.size() < 1) {
-        notice.title = $(entry).find('title').text();
+    var titles = $(entry).find('title');
+    if (titles.length >= 2) {
+        notice.title = $(titles[1]).text();
     } else {
-        notice.title = $(entry).find('title:eq(1)').text();
+        notice.title = titles.text();
     }
 
 Titanium.API.info('noticeFromEntry CHECKPOINT F: ' + (Date.now() - startTime) + 'ms');
