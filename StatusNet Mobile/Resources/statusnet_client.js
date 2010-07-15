@@ -25,6 +25,8 @@
  */
 StatusNet.Client = function(_account) {
 
+    StatusNet.debug("Client constructor");
+
     this.account = _account;
 
     this.init();
@@ -107,6 +109,7 @@ StatusNet.Client.prototype.refresh = function() {
  * General initialization stuff
  */
 StatusNet.Client.prototype.init = function() {
+    StatusNet.debug("Client init");
     var tabGroup = Titanium.UI.createTabGroup();
 
     var window = Titanium.UI.createWindow({
@@ -121,6 +124,7 @@ StatusNet.Client.prototype.init = function() {
 
     tabGroup.addTab(tab);
     tabGroup.open();
+    StatusNet.debug("Client setting up open event");
 
     var client = this;
     window.addEventListener('open', function() {

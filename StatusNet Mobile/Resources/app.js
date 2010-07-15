@@ -23,6 +23,7 @@
 
 var sources = ['statusnet.js',
 
+               'model/statusnet_httpclient.js',
                'model/statusnet_account.js',
                'model/statusnet_timeline.js',
                'model/statusnet_timeline_user.js',
@@ -50,15 +51,7 @@ Titanium.UI.setBackgroundColor('#000');
 
 // Initialize database
 var db = StatusNet.getDB();
-var acct = StatusNet.Account.getDefault(db);
-StatusNet.debug(acct);
-if (!acct) {
-    // @fixme add the settings dialog!
-    /*
-    acct = new StatusNet.Account('username', 'pass', 'baseUrl');
-    acct.ensure(db);
-    acct.setDefault(db);
-    */
-}
 
+// Find default account, if any, and fire up the client!
+var acct = StatusNet.Account.getDefault(db);
 var client = new StatusNet.Client(acct);

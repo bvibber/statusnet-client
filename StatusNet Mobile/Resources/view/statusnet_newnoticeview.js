@@ -24,6 +24,7 @@ StatusNet.NewNoticeView = function(data) {
     StatusNet.debug("NewNoticeView constructor");
 
     this.data = data;
+    this.attachment = null;
 
     var db = StatusNet.getDB();
     this.account = StatusNet.Account.getDefault(db);
@@ -42,8 +43,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var android = (Titanium.Platform.osname == "android");
     var window = this.window = Titanium.UI.createWindow({
         title: 'New Notice',
-        backgroundColor: (android ? "black" : "#bbbfcc"),
-        layout: 'vertical'
+        backgroundColor: (android ? "black" : "#bbbfcc")
     });
 
     StatusNet.debug("NewNoticeView.init B");
@@ -52,7 +52,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var data = this.data;
 
     var noticeTextArea = Titanium.UI.createTextArea({
-        width: '100%',
+        top: 0,
+        left: 0,
+        right: 0,
         height: 160,
         value: '',
         returnKeyType: Titanium.UI.RETURNKEY_SEND
@@ -101,8 +103,8 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
     var counter = Titanium.UI.createLabel({
         text: textLimit,
+        top: 160,
         right: 4,
-        bottom: 4,
         width: 'auto',
         height: 'auto'
     });
@@ -128,6 +130,74 @@ StatusNet.NewNoticeView.prototype.init = function() {
     });
     */
 
+    var moreButton = Titanium.UI.createButton({
+        title: 'More...',
+        top: 162,
+        left: 4,
+        width: 80, //'auto',
+        height: 32 //'auto'
+    });
+    moreButton.addEventListener('click', function() {
+        noticeTextArea.blur();
+    });
+    window.add(moreButton);
+
+    var moreStuff = Titanium.UI.createView({
+        left: 0,
+        right: 0,
+        top: 200,
+        bottom: 0,
+        backgroundColor: (android ? "black" : "#bbbfcc"),
+        layout: 'vertical'
+    });
+    window.add(moreStuff);
+
+    // Titanium.Media.isCameraSupported is documented as being a function,
+    // but it appears to be an int-bool property.
+    if (Titanium.Media.isCameraSupported) {
+        var cameraButton = Titanium.UI.createButton({
+            title: 'Take photo',
+            top: 4,
+            left: 4,
+            right: 4,
+            height: 32
+        });
+        cameraButton.addEventListener('click', function() {
+            Titanium.Media.showCamera({
+                success: function(event) {
+                    that.addAttachment(event);
+                },
+                autohide: true,
+                animated: true,
+                saveToPhotoGallery: true,
+                allowEditing: true
+            });
+        });
+        moreStuff.add(cameraButton);
+    }
+
+    var galleryButton = Titanium.UI.createButton({
+        title: 'Existing photo',
+        top: 4,
+        left: 4,
+        right: 4,
+        height: 32
+    });
+    galleryButton.addEventListener('click', function() {
+        StatusNet.debug('WTF');
+        Titanium.Media.openPhotoGallery({
+            success: function(event) {
+                StatusNet.debug('WTF-amazing');
+                that.addAttachment(event);
+            },
+            autohide: true,
+            animated: true,
+            allowEditing: true
+        });
+        StatusNet.debug('WTF2');
+    });
+    moreStuff.add(galleryButton);
+
     window.addEventListener('open', function(event) {
         // set focus to the text entry field
         noticeTextArea.focus();
@@ -142,7 +212,20 @@ StatusNet.NewNoticeView.prototype.init = function() {
     });
 
     StatusNet.debug("NewNoticeView.init END");
-}
+};
+
+StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
+    var image = event.media; // What is this exactly, a blob?
+    for (var x in event) {
+        if (event.hasOwnProperty(x)) {
+            StatusNet.debug('Camera event.' + x + ' : ' + typeof event[x]);
+        }
+    }
+    StatusNet.debug('Media type: ' + event.mediaType);
+    // @fixme implement attachments ;)
+
+    this.attachment = event.media;
+};
 
 /**
  * Setup post parameters and post the notice
@@ -153,22 +236,23 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
 
     var that = this;
     var method = 'statuses/update.xml';
-    var base = 'status=' + encodeURIComponent(noticeText);
-    var params = [];
-    params.push('source=' + encodeURIComponent('StatusNet Mobile'));
+    var params = {status: noticeText,
+                  source: 'StatusNet Mobile'};
 
     var data = this.data;
 
     if (data.replyToId) {
         StatusNet.debug("replyToId = " + data.replyToId);
-        params.push('in_reply_to_status_id=' + data.replyToId);
+        params.in_reply_to_status_id = data.replyToId;
     }
 
-    var postParams = base + '&' + params.join('&');
+    if (this.attachment) {
+        params.media = this.attachment;
+    }
 
-    StatusNet.debug("Sending these post parameters: " + postParams);
+    StatusNet.debug("Sending these post parameters: " + params);
 
-    this.account.apiPost(method, postParams,
+    this.account.apiPost(method, params,
         function(status, response) {
             var id = $(response).find('status > id').text()
             if (id) {
