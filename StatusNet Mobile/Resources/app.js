@@ -51,15 +51,7 @@ Titanium.UI.setBackgroundColor('#000');
 
 // Initialize database
 var db = StatusNet.getDB();
-var acct = StatusNet.Account.getDefault(db);
-StatusNet.debug(acct);
-if (!acct) {
-    // @fixme add the settings dialog!
-    /*
-    acct = new StatusNet.Account('username', 'pass', 'baseUrl');
-    acct.ensure(db);
-    acct.setDefault(db);
-    */
-}
 
+// Find default account, if any, and fire up the client!
+var acct = StatusNet.Account.getDefault(db);
 var client = new StatusNet.Client(acct);
