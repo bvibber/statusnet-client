@@ -166,7 +166,7 @@ StatusNet.TimelineView.prototype.show = function() {
                 right: 2,
                 width: 64,
                 height: 64,
-                image: notices[i].avatar
+                url: notices[i].avatar // note: 'image' works with URLs on iPhone, but tries to load from local filesystem on Android
             });
             row.add(avatar);
 
