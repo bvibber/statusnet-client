@@ -58,11 +58,16 @@ heyQueryObj.prototype.find = function(selector) {
     var lookup = Sizzle;
     var msg = selector;
     var start = Date.now();
+    var matches;
 
-    //if (heyQuery.quickTagMatch.test(selector)) {
-    //    lookup = heyQuery.quickTagFind;
-    //    msg += ' [quickTagFind]';
-    //}
+    if (heyQuery.quickTagMatch.test(selector)) {
+        lookup = heyQuery.quickTagFind;
+        msg += ' [quickTagFind]';
+    } else if (matches = heyQuery.quickTagMatch2.exec(selector)) {
+        selector = matches[1];
+        lookup = heyQuery.quickTagFind;
+        msg += ' [quickTagFind]';
+    }
     for (var i = 0; i < this.nodes.length; i++) {
         var chunk = lookup(selector, this.nodes[i]);
 
@@ -219,6 +224,7 @@ heyQuery.appendArray = function(a, result) {
 heyQuery.makeArray = heyQuery.appendArray;
 
 heyQuery.quickTagMatch = /^[A-Za-z0-9_-]+$/;
+heyQuery.quickTagMatch2 = /^\[nodeName=([A-Za-z0-9_:-]+)\]$/;
 heyQuery.quickTagFind = function(selector, context) {
     return context.getElementsByTagName(selector);
 }
