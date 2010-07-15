@@ -121,9 +121,8 @@ StatusNet.Client.prototype.init = function() {
         title: 'Accounts',
         window: window
     });
-
     tabGroup.addTab(tab);
-    tabGroup.open();
+
     StatusNet.debug("Client setting up open event");
 
     var client = this;
@@ -134,6 +133,7 @@ StatusNet.Client.prototype.init = function() {
         client.view.init();
     });
 
+    StatusNet.debug("Client setting up shake event");
     Titanium.Gesture.addEventListener('shake', function(event) {
         StatusNet.debug("Shaken, not stirred.");
         if (client.timeline) {
@@ -147,6 +147,9 @@ StatusNet.Client.prototype.init = function() {
         }
         StatusNet.debug("Done checking out the shake.");
     });
+
+    StatusNet.debug("Client opening main window/tab group");
+    tabGroup.open();
 };
 
 StatusNet.Client.prototype.initAccountView = function(acct) {
