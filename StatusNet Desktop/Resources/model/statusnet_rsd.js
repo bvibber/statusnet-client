@@ -28,7 +28,7 @@ StatusNet.RSD.discoverTwitterApi = function(url, onSuccess, onError) {
 
     StatusNet.debug("in discoverTwitterApi");
 
-    StatusNet.Account.webRequest(url,
+    StatusNet.HttpClient.webRequest(url,
         function(status, xml) {
             StatusNet.debug("Got RSD info for " + url);
             var apiroot = $("api[name='Twitter']", xml).attr("apiLink");

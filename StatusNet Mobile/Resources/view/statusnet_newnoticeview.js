@@ -24,6 +24,7 @@ StatusNet.NewNoticeView = function(data) {
     StatusNet.debug("NewNoticeView constructor");
 
     this.data = data;
+    this.attachment = null;
 
     var db = StatusNet.getDB();
     this.account = StatusNet.Account.getDefault(db);
@@ -219,9 +220,11 @@ StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
         if (event.hasOwnProperty(x)) {
             StatusNet.debug('Camera event.' + x + ' : ' + typeof event[x]);
         }
-        StatusNet.debug('Media type: ' + event.mediaType);
-        // @fixme implement attachments ;)
     }
+    StatusNet.debug('Media type: ' + event.mediaType);
+    // @fixme implement attachments ;)
+
+    this.attachment = event.media;
 };
 
 /**
@@ -233,22 +236,23 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
 
     var that = this;
     var method = 'statuses/update.xml';
-    var base = 'status=' + encodeURIComponent(noticeText);
-    var params = [];
-    params.push('source=' + encodeURIComponent('StatusNet Mobile'));
+    var params = {status: noticeText,
+                  source: 'StatusNet Mobile'};
 
     var data = this.data;
 
     if (data.replyToId) {
         StatusNet.debug("replyToId = " + data.replyToId);
-        params.push('in_reply_to_status_id=' + data.replyToId);
+        params.in_reply_to_status_id = data.replyToId;
     }
 
-    var postParams = base + '&' + params.join('&');
+    if (this.attachment) {
+        params.media = this.attachment;
+    }
 
-    StatusNet.debug("Sending these post parameters: " + postParams);
+    StatusNet.debug("Sending these post parameters: " + params);
 
-    this.account.apiPost(method, postParams,
+    this.account.apiPost(method, params,
         function(status, response) {
             var id = $(response).find('status > id').text()
             if (id) {
