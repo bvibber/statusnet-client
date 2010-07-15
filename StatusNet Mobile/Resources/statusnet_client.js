@@ -254,10 +254,13 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
             StatusNet.debug('timeline tab? updating timeline...');
             StatusNet.debug(info.timeline);
             client.timeline = new info.timeline(client);
-            
+
             StatusNet.debug('Creating the view...');
             client.view = new info.view(client);
             client.view.window = window;
+			StatusNet.debug("Initializing view...");
+			client.view.init();
+
             StatusNet.debug('telling the view to show...');
             client.view.show();
 

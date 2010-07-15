@@ -83,10 +83,28 @@ StatusNet.TimelineView = function(client) {
 };
 
 /**
+ * Additional initialization stuff that can't be done in the constructor
+ */
+StatusNet.TimelineView.prototype.init = function() {
+	StatusNet.debug("TimelineView init");
+
+	StatusNet.debug("TimelineView: adding adding activity indicator -- spinner");
+
+	this.act = Titanium.UI.createActivityIndicator();
+	this.act.style = Titanium.UI.iPhone.ActivityIndicatorStyle.PLAIN;
+	this.act.font = {fontFamily:'Helvetica Neue', fontSize:15,fontWeight:'bold'};
+	this.act.color = 'white';
+	this.act.message = 'Loading...';
+	this.window.setToolbar([this.act],{animated:true});
+
+	StatusNet.debug("TimelineView: Finished adding activity indicator");
+};
+
+/**
  * Render the HTML display of a given timeline
  *
  */
-StatusNet.TimelineView.prototype.show = function () {
+StatusNet.TimelineView.prototype.show = function() {
 
     StatusNet.debug("TimelineView.show");
 /*
@@ -337,8 +355,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-//    $('#notices').empty();
-//    $('#notices').append('<img id="spinner" src="/images/icon_processing.gif" />');
+	this.act.show();
 };
 
 /**
@@ -346,7 +363,7 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
  */
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
-//    $('#spinner').remove();
+	this.act.hide();
 };
 
 /**
