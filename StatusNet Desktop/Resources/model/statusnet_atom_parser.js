@@ -65,7 +65,8 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
  * @param DOM entry the Atom entry representing the notice
  */
 StatusNet.AtomParser.noticeFromEntry = function(entry) {
-StatusNet.debug('noticeFromEntry: ' + entry);
+StatusNet.debug('noticeFromEntry ENTER');
+var startTime = Date.now();
 
     var notice = {};
     var result;
@@ -77,15 +78,20 @@ StatusNet.debug('noticeFromEntry: ' + entry);
         }
     });
 
+Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 'ms');
 
     // XXX: Special case for search Atom entries
     if (!notice.avatar) {
         notice.avatar = $(entry).find('link[rel=related]').attr('href');
     }
 
+Titanium.API.info('noticeFromEntry CHECKPOINT B: ' + (Date.now() - startTime) + 'ms');
+
     notice.id = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('local_id');
 
     var idRegexp = /(\d)+$/;
+
+Titanium.API.info('noticeFromEntry CHECKPOINT C: ' + (Date.now() - startTime) + 'ms');
 
     // XXX: Special case for search Atom entries
     if (!notice.id) {
@@ -95,6 +101,8 @@ StatusNet.debug('noticeFromEntry: ' + entry);
             notice.id = result[0];
         }
     }
+
+Titanium.API.info('noticeFromEntry CHECKPOINT D: ' + (Date.now() - startTime) + 'ms');
 
     // source client
     notice.source = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('source');
@@ -108,6 +116,8 @@ StatusNet.debug('noticeFromEntry: ' + entry);
     // knock off the millisecs to make the date string work with humane.js
     notice.updated = updated.substring(0, 19);
 
+Titanium.API.info('noticeFromEntry CHECKPOINT E: ' + (Date.now() - startTime) + 'ms');
+
     // In most timelines, the plain text version of the notice content
     // is in the second title element in the entry, but in user feeds,
     // it's in the first.
@@ -117,6 +127,8 @@ StatusNet.debug('noticeFromEntry: ' + entry);
     } else {
         notice.title = $(entry).find('title:eq(1)').text();
     }
+
+Titanium.API.info('noticeFromEntry CHECKPOINT F: ' + (Date.now() - startTime) + 'ms');
 
     // atom:source (not the source client, eh) - this might not be in the feed
     notice.atomSource = $(entry).find('source > title').text();
@@ -131,7 +143,11 @@ StatusNet.debug('noticeFromEntry: ' + entry);
         notice.authorId = result[0];
     }
 
+Titanium.API.info('noticeFromEntry CHECKPOINT G: ' + (Date.now() - startTime) + 'ms');
+
     notice.link = $(entry).find('link[rel=alternate]:eq(1)').attr('href');
+
+Titanium.API.info('noticeFromEntry CHECKPOINT H: ' + (Date.now() - startTime) + 'ms');
 
     var geoPoint = $(entry).find("[nodeName=georss:point]:first").text();
 
@@ -140,6 +156,8 @@ StatusNet.debug('noticeFromEntry: ' + entry);
         notice.lat = gArray[0];
         notice.lon = gArray[1];
     }
+
+Titanium.API.info('noticeFromEntry CHECKPOINT I: ' + (Date.now() - startTime) + 'ms');
 
     notice.contextLink = $(entry).find('link[rel=ostatus:conversation]:first').attr('href');
     notice.inReplyToLink = $(entry).find("[nodeName=thr:in-reply-to]:first").attr('ref');
@@ -151,6 +169,8 @@ StatusNet.debug('noticeFromEntry: ' + entry);
         }
     }
 
+Titanium.API.info('noticeFromEntry CHECKPOINT J: ' + (Date.now() - startTime) + 'ms');
+
     notice.following = $(entry).find('[nodeName=statusnet:profile_info]').attr('following');
     notice.blocking = $(entry).find('[nodeName=statusnet:profile_info]').attr('blocking');
 
@@ -158,6 +178,8 @@ StatusNet.debug('noticeFromEntry: ' + entry);
 
     // @todo category / tags / groups ?
 
+var ms = Date.now() - startTime;
+Titanium.API.info('noticeFromEntry EXIT: ' + ms + 'ms');
     return notice;
 };
 
