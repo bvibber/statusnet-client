@@ -212,7 +212,7 @@ Sizzle.find = function(expr, context, isXML){
 // note that nodelist[i] doesn't work on mobile!
 Sizzle.filter = function(expr, set, inplace, not){
 	var old = expr, result = [], curLoop = makeArray(set), match, anyFound,
-		isXMLFilter = set && (set.item ? set.item(0) : set[0]) && Sizzle.isXML((set.item ? set.item(0) : set[0]));
+		isXMLFilter = set && (set.length > 0) && Sizzle.isXML((set.item ? set.item(0) : set[0]));
 	while ( expr && set.length ) {
 		for ( var type in Expr.filter ) {
 			if ( (match = Expr.leftMatch[ type ].exec( expr )) != null && match[2] ) {
@@ -295,11 +295,12 @@ Sizzle.error = function( msg ) {
 };
 
 var Expr = Sizzle.selectors = {
-	order: [ /*"ID", "NAME",*/ "TAG" ],
+	order: [ "ID", "NAME", "TAG", "NODENAME" ], // NODENAME special-case added
 	match: {
 		ID: /#((?:[\w\u00c0-\uFFFF\-]|\\.)+)/,
 		CLASS: /\.((?:[\w\u00c0-\uFFFF\-]|\\.)+)/,
 		NAME: /\[name=['"]*((?:[\w\u00c0-\uFFFF\-]|\\.)+)['"]*\]/,
+		NODENAME: /\[nodeName=['"]*((?:[\w\u00c0-\uFFFF:\-]|\\.)+)['"]*\]/, // special-case for pattern we use a lot in StatusNet
 		ATTR: /\[\s*((?:[\w\u00c0-\uFFFF\-]|\\.)+)\s*(?:(\S?=)\s*(['"]*)(.*?)\3|)\s*\]/,
 		TAG: /^((?:[\w\u00c0-\uFFFF\*\-]|\\.)+)/,
 		CHILD: /:(only|nth|last|first)-child(?:\((even|odd|[\dn+\-]*)\))?/,
@@ -411,13 +412,18 @@ var Expr = Sizzle.selectors = {
 				var ret = [], results = Sizzle.hacks.getElementsByName(context, match[1]);
 
 				for ( var i = 0, l = results.length; i < l; i++ ) {
-					if ( results[i].getAttribute("name") === match[1] ) {
-						ret.push( results[i] );
+					if ( results.item(i).getAttribute("name") === match[1] ) {
+						ret.push( results.item(i) );
 					}
 				}
 
 				return ret.length === 0 ? null : ret;
 			//}
+		},
+		NODENAME: function(match, context){
+			// regular tag name thingy doesn't include ':' since it's special,
+			// but manual filtering of all elements is insanely inefficient.
+			return context.getElementsByTagName(match[1]);
 		},
 		TAG: function(match, context){
 			if (match[1] == '*') {

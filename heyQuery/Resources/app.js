@@ -90,6 +90,6 @@ Titanium.include('tests/selector.js');
 Titanium.API.info('we lived past selector.js load');
 
 Titanium.include('tests/atom.js');
-Titanium.API.info('we lived past selector.js load');
+Titanium.API.info('we lived past atom.js load');
 
 Titanium.API.info('We are DONE!');
