@@ -87,7 +87,8 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT B: ' + (Date.now() - startTime) + 'ms');
 
-    notice.id = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('local_id');
+    var notice_info = $(entry).find('[nodeName=statusnet:notice_info]:first');
+    notice.id = notice_info.attr('local_id');
 
     var idRegexp = /(\d)+$/;
 
@@ -105,11 +106,11 @@ Titanium.API.info('noticeFromEntry CHECKPOINT C: ' + (Date.now() - startTime) + 
 Titanium.API.info('noticeFromEntry CHECKPOINT D: ' + (Date.now() - startTime) + 'ms');
 
     // source client
-    notice.source = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('source');
+    notice.source = notice_info.attr('source');
+    notice.favorite = notice_info.attr('favorite');
+    notice.repeated = notice_info.attr('repeated');
+    notice.repeat_of = notice_info.attr('repeat_of');
 
-    notice.favorite = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('favorite');
-    notice.repeated = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('repeated');
-    notice.repeat_of = $(entry).find('[nodeName=statusnet:notice_info]:first').attr('repeat_of');
     notice.published = $(entry).find('published').text();
     var updated = $(entry).find('updated').text();
 
@@ -171,8 +172,9 @@ Titanium.API.info('noticeFromEntry CHECKPOINT I: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT J: ' + (Date.now() - startTime) + 'ms');
 
-    notice.following = $(entry).find('[nodeName=statusnet:profile_info]').attr('following');
-    notice.blocking = $(entry).find('[nodeName=statusnet:profile_info]').attr('blocking');
+    var profile_info = $(entry).find('[nodeName=statusnet:profile_info]');
+    notice.following = profile_info.attr('following');
+    notice.blocking = profile_info.attr('blocking');
 
     // @todo ostatus:attention ?
 
@@ -264,9 +266,10 @@ StatusNet.AtomParser.getGroup = function(data) {
     var subject = $(data).find("feed > [nodeName=activity:subject]:first");
     var group = StatusNet.AtomParser.groupFromSubject(subject);
 
-    group.member = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('member');
-    group.memberCount = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('member_count');
-    group.blocked = $(data).find('feed > [nodeName=statusnet:group_info]:first').attr('blocked');
+    var group_info = $(data).find('feed > [nodeName=statusnet:group_info]:first');
+    group.member = group_info.attr('member');
+    group.memberCount = group_info.attr('member_count');
+    group.blocked = group_info.attr('blocked');
 
     return group;
 };
