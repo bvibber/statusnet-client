@@ -74,11 +74,12 @@ StatusNet.AtomParser.mapOverElements = function(parent, map) {
     var last = list.length;
     for (var i = 0; i < last; i++) {
         var el = list.item(i);
-        if (el.nodeType == 1) {
-            var name = el.nodeName;
-            if (typeof map[name] == "function") {
-                map[name](el);
-            }
+        var name = el.nodeName;
+        if (map[name] !== undefined) {
+            var start = Date.now();
+            map[name](el);
+            var ms = Date.now() - start;
+            Titanium.API.info('WWW - ' + ms + 'ms to process ' + name);
         }
     }
 }
