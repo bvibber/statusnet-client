@@ -36,9 +36,6 @@ function readXmlFile(fn) {
 }
 
 
-// Grab the equiv function from QUnit
-Titanium.include('equiv.js');
-
 // stubs for QUnit bits
 function module(name) {}
 function test(name, callback) {

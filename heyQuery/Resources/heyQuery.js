@@ -55,21 +55,36 @@ function heyQueryObj(context) {
  */
 heyQueryObj.prototype.find = function(selector) {
     var set = [];
-    var lookup = Sizzle;
     var msg = selector;
     var start = Date.now();
-    var matches;
+    var xpath, matches;
 
+    // Shortcuts for some common cases
     if (heyQuery.quickTagMatch.test(selector)) {
-        lookup = heyQuery.quickTagFind;
-        msg += ' [quickTagFind]';
+        xpath = 'descendant::' + selector;
     } else if (matches = heyQuery.quickTagMatch2.exec(selector)) {
-        selector = matches[1];
-        lookup = heyQuery.quickTagFind;
-        msg += ' [quickTagFind]';
+        xpath = 'descendant::*[name()=\'' + matches[1] + '\']';
+    } else if (matches = heyQuery.quickTagAttribMatch.exec(selector)) {
+        xpath = 'descendant::' + matches[1] + '[@' + matches[2] + '=\'' + matches[3] + '\']';
+    }
+    if (xpath) {
+        msg += ' -> ' + xpath;
     }
     for (var i = 0; i < this.nodes.length; i++) {
-        var chunk = lookup(selector, this.nodes[i]);
+        if (xpath) {
+            Titanium.API.info('UUU xpath: ' + xpath);
+            var chunk = this.nodes[i].evaluate(xpath);
+            if (chunk == null) {
+                // This really ought not to happen, should it?
+                // For some reason it's dying a LOT on iPhone.
+                Titanium.API.error("UUU GOT NULL FROM Xpath RESULTS : " + xpath);
+            } else {
+                heyQuery.appendArray(chunk, set);
+                continue;
+            }
+        }
+
+        var chunk = Sizzle(selector, this.nodes[i]);
 
         // @fixme we should check for duplicates between runs here, but
         // object identity doesn't seem to be preserved on the dom nodes
@@ -225,8 +240,10 @@ heyQuery.makeArray = heyQuery.appendArray;
 
 heyQuery.quickTagMatch = /^[A-Za-z0-9_-]+$/;
 heyQuery.quickTagMatch2 = /^\[nodeName=([A-Za-z0-9_:-]+)\]$/;
+heyQuery.quickTagAttribMatch = /^([A-Za-z0-9_-]+)\[([A-Za-z0-9_-]+)=([A-Za-z0-9_:-]+)\]$/;
+/*
 heyQuery.quickTagFind = function(selector, context) {
     return context.getElementsByTagName(selector);
 }
-
+*/
 var $ = jQuery = heyQuery;

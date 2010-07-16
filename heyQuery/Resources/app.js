@@ -83,6 +83,10 @@ Titanium.API.info('axpx: ' + axpx);
 Titanium.include('tests/test-shim.js');
 Titanium.API.info('we lived past test-shim load');
 
+// Grab the equiv function from QUnit
+Titanium.include('tests/equiv.js');
+
+
 Titanium.include('tests/data/testinit.js');
 Titanium.API.info('we lived past testinit.js load');
 
