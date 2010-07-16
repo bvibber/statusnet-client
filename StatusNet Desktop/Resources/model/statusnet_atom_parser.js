@@ -152,10 +152,10 @@ Titanium.API.info('noticeFromEntry CHECKPOINT G: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT H: ' + (Date.now() - startTime) + 'ms');
 
-    var geoPoint = $entry.find("[nodeName=georss:point]:first").text();
+    var geoPoint = $entry.find("[nodeName=georss:point]");
 
-    if (geoPoint) {
-        var gArray = geoPoint.split(' ');
+    if (geoPoint.length > 0) {
+        var gArray = $(geoPoint[0]).text().split(' ');
         notice.lat = gArray[0];
         notice.lon = gArray[1];
     }

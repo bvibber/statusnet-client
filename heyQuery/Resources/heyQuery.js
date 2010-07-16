@@ -60,19 +60,21 @@ heyQueryObj.prototype.find = function(selector) {
     var xpath, matches;
 
     // Shortcuts for some common cases
-    if (heyQuery.quickTagMatch.test(selector)) {
-        xpath = 'descendant::' + selector;
-    } else if (matches = heyQuery.quickTagMatch2.exec(selector)) {
+    var first = selector.substr(0, 1);
+    var last = selector.substr(selector.length - 1, 1);
+    if ((first == '[') && (matches = heyQuery.quickTagMatch2.exec(selector))) {
         xpath = 'descendant::*[name()=\'' + matches[1] + '\']';
-    } else if (matches = heyQuery.quickTagAttribMatch.exec(selector)) {
+    } else if ((last == ']') && (matches = heyQuery.quickTagAttribMatch.exec(selector))) {
         xpath = 'descendant::' + matches[1] + '[@' + matches[2] + '=\'' + matches[3] + '\']';
+    } else if (heyQuery.quickTagMatch.test(selector)) {
+        xpath = 'descendant::' + selector;
     }
     if (xpath) {
         msg += ' -> ' + xpath;
     }
     for (var i = 0; i < this.nodes.length; i++) {
         if (xpath) {
-            Titanium.API.info('UUU xpath: ' + xpath);
+            //Titanium.API.info('UUU xpath: ' + xpath);
             var chunk = this.nodes[i].evaluate(xpath);
             if (chunk == null) {
                 // This really ought not to happen, should it?
