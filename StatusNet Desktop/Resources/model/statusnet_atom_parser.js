@@ -70,7 +70,6 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
  * @access private
  */
 StatusNet.AtomParser.mapOverElements = function(parent, map) {
-    Titanium.API.info("YYY ENTER: " + parent.nodeName + ' (' + parent + ')');
     var list = parent.childNodes;
     var last = list.length;
     for (var i = 0; i < last; i++) {
@@ -78,16 +77,10 @@ StatusNet.AtomParser.mapOverElements = function(parent, map) {
         if (el.nodeType == 1) {
             var name = el.nodeName;
             if (typeof map[name] == "function") {
-                Titanium.API.info("YYY PROCESSING EL NODE: " + name);
                 map[name](el);
-            } else {
-                Titanium.API.info("YYY SKIPPING EL NODE: " + name);
             }
-        } else {
-            Titanium.API.info("YYY SKIP NON-EL NODE: " + el.nodeType);
         }
     }
-    Titanium.API.info("YYY EXIT: " + parent.nodeName);
 }
 
 /**
@@ -128,18 +121,17 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
             }
         },
         'statusnet:notice_info': function(el) {
-            var $el = $(el);
-            notice.id = $el.attr('local_id');
+            notice.id = el.getAttribute('local_id');
 
             // source client
-            notice.source = $el.attr('source');
-            notice.favorite = $el.attr('favorite');
-            notice.repeated = $el.attr('repeated');
-            notice.repeat_of = $el.attr('repeat_of');
+            notice.source = el.getAttribute('source');
+            notice.favorite = el.getAttribute('favorite');
+            notice.repeated = el.getAttribute('repeated');
+            notice.repeat_of = el.getAttribute('repeat_of');
         },
         'published': simpleNode,
         'updated': function(el) {
-            var updated = $entry.find('updated').text();
+            var updated = $(el).text();
 
             // knock off the millisecs to make the date string work with humane.js
             notice.updated = updated.substring(0, 19);
@@ -148,7 +140,11 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
         'content': simpleNode, // @fixme this should actually handle more complex cases, as there may be different data types
         'source': function(el) {
             // atom:source (not the source client, eh) - this might not be in the feed
-            notice.atomSource = $(el).find('title').text();
+            StatusNet.AtomParser.mapOverElements(el, {
+                'title': function(elem) {
+                    notice.atomSource = $(elem).text();
+                }
+            });
         },
         'author': function(el) {
             StatusNet.AtomParser.mapOverElements(el, {
@@ -163,35 +159,35 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
                     }
                 },
                 'statusnet:profile_info': function(elem) {
-                    var profile_info = $(elem);
-                    notice.following = profile_info.attr('following');
-                    notice.blocking = profile_info.attr('blocking');
+                    notice.following = elem.getAttribute('following');
+                    notice.blocking = elem.getAttribute('blocking');
                 }
             });
         },
         'activity:actor': function(el) {
-            var $subject = $(el);
-            notice.fullname = $subject.find('[nodeName=poco:displayName]').text();
-            // note: attribute selectors seem to have problems with [media:width=48]
-            $subject.find('link[rel=avatar]').each(function(i, el2) {
-                var $link = $(el2);
-                if ($link.attr('media:width') == '48') {
-                    notice.avatar = $link.attr('href');
+            StatusNet.AtomParser.mapOverElements(el, {
+                'poco:displayName': function(elem) {
+                    notice.fullname = $(elem).text();
+                },
+                'link': function(elem) {
+                    // @fixme accept other image sizes
+                    if (elem.getAttribute('rel') == 'avatar' && elem.getAttribute('media:width') == 48) {
+                        notice.avatar = elem.getAttribute('href');
+                    }
                 }
             });        
         },
         'link': function(el) {
-            var $el = $(el);
-            var rel = $el.attr('rel');
-            var type = $el.attr('type');
+            var rel = el.getAttribute('rel');
+            var type = el.getAttribute('type');
             if (rel == 'alternate') {
-                notice.link = $el.attr('href');
+                notice.link = el.getAttribute('href');
             } else if (rel == 'ostatus:conversation') {
-                notice.contextLink = $el.attr('href');
+                notice.contextLink = el.getAttribute('href');
             } else if (rel == 'related' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
                 // XXX: Special case for search Atom entries
                 if (!notice.avatar) {
-                    notice.avatar = $entry.find('link[rel=related]').attr('href');
+                    notice.avatar = el.getAttribute('href');
                 }
             }
         },
@@ -202,7 +198,7 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
             notice.lon = gArray[1];
         },
         'thr:in-reply-to': function(el) {
-            notice.inReplyToLink = $(el).attr('ref');
+            notice.inReplyToLink = el.getAttribute('ref');
             var result = notice.inReplyToLink.match(idRegexp);
             if (result) {
                 notice.inReplyToId = result[0]; // Could be useful
