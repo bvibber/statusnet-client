@@ -60,6 +60,37 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
 };
 
 /**
+ * Iterate over all direct children of the given DOM node, calling functions from a map
+ * based on the element's node name. This is used because doing a bunch of individual selector
+ * lookups for every element we need is hella slow on mobile; iterating directly over the
+ * element set has a lot less overhead.
+ *
+ * @param DOMNode parent
+ * @param object map dictionary of node names to functions, which will have the child element passed to them.
+ * @access private
+ */
+StatusNet.AtomParser.mapOverElements = function(parent, map) {
+    Titanium.API.info("YYY ENTER: " + parent.nodeName + ' (' + parent + ')');
+    var list = parent.childNodes;
+    var last = list.length;
+    for (var i = 0; i < last; i++) {
+        var el = list.item(i);
+        if (el.nodeType == 1) {
+            var name = el.nodeName;
+            if (typeof map[name] == "function") {
+                Titanium.API.info("YYY PROCESSING EL NODE: " + name);
+                map[name](el);
+            } else {
+                Titanium.API.info("YYY SKIPPING EL NODE: " + name);
+            }
+        } else {
+            Titanium.API.info("YYY SKIP NON-EL NODE: " + el.nodeType);
+        }
+    }
+    Titanium.API.info("YYY EXIT: " + parent.nodeName);
+}
+
+/**
  * Class method for generating a notice from an Atom entry
  *
  * @param DOM entry the Atom entry representing the notice
@@ -68,127 +99,123 @@ StatusNet.AtomParser.noticeFromEntry = function(entry) {
 StatusNet.debug('noticeFromEntry ENTER');
 var startTime = Date.now();
 
-    var $entry = $(entry);
-    var notice = {};
-    var result;
+    if (entry.documentElement) {
+        var $entry = $(entry).find('entry');
+        entry = $entry[0];
+    } else {
+        var $entry = $(entry);
+    }
 
-    // note: attribute selectors seem to have problems with [media:width=48]
-    $entry.find('link[rel=avatar]').each(function(i, el) {
-        if ($(el).attr('media:width') == '48') {
-            notice.avatar = $(el).attr('href');
-        }
-    });
+    var notice = {};
 
 Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 'ms');
 
-    // XXX: Special case for search Atom entries
-    if (!notice.avatar) {
-        notice.avatar = $entry.find('link[rel=related]').attr('href');
-    }
+    // STUFF IN THE <entry>
+    var idRegexp = /^(\d)+$/;
+    var simpleNode = function(el) {
+        notice[el.nodeName] = $(el).text();
+    };
 
-Titanium.API.info('noticeFromEntry CHECKPOINT B: ' + (Date.now() - startTime) + 'ms');
+    StatusNet.AtomParser.mapOverElements(entry, {
+        'id': function(el) {
+            // XXX: Special case for search Atom entries
+            var searchId = $(el).text();
+            if (searchId.substr(0, 4) == 'tag:') {
+                var result = searchId.match(idRegexp);
+                if (result) {
+                    notice.id = result[0];
+                }
+            }
+        },
+        'statusnet:notice_info': function(el) {
+            var $el = $(el);
+            notice.id = $el.attr('local_id');
 
-    var notice_info = $entry.find('[nodeName=statusnet:notice_info]');
-    notice.id = notice_info.attr('local_id');
+            // source client
+            notice.source = $el.attr('source');
+            notice.favorite = $el.attr('favorite');
+            notice.repeated = $el.attr('repeated');
+            notice.repeat_of = $el.attr('repeat_of');
+        },
+        'published': simpleNode,
+        'updated': function(el) {
+            var updated = $entry.find('updated').text();
 
-    var idRegexp = /(\d)+$/;
-
-Titanium.API.info('noticeFromEntry CHECKPOINT C: ' + (Date.now() - startTime) + 'ms');
-
-    // XXX: Special case for search Atom entries
-    if (!notice.id) {
-        var searchId = $entry.find('id').text();
-        result = searchId.match(idRegexp);
-        if (result) {
-            notice.id = result[0];
-        }
-    }
-
-Titanium.API.info('noticeFromEntry CHECKPOINT D: ' + (Date.now() - startTime) + 'ms');
-
-    // source client
-    notice.source = notice_info.attr('source');
-    notice.favorite = notice_info.attr('favorite');
-    notice.repeated = notice_info.attr('repeated');
-    notice.repeat_of = notice_info.attr('repeat_of');
-
-    notice.published = $entry.find('published').text();
-    var updated = $entry.find('updated').text();
-
-    // knock off the millisecs to make the date string work with humane.js
-    notice.updated = updated.substring(0, 19);
-
-Titanium.API.info('noticeFromEntry CHECKPOINT E: ' + (Date.now() - startTime) + 'ms');
-
-    // In most timelines, the plain text version of the notice content
-    // is in the second title element in the entry, but in user feeds,
-    // it's in the first.
-    var titles = $entry.find('title');
-    if (titles.length >= 2) {
-        notice.title = $(titles[1]).text();
-    } else {
-        notice.title = titles.text();
-    }
-
-Titanium.API.info('noticeFromEntry CHECKPOINT F: ' + (Date.now() - startTime) + 'ms');
-
-    // atom:source (not the source client, eh) - this might not be in the feed
-    notice.atomSource = $entry.find('source > title').text();
-
-    notice.content = $entry.find('content').text();
-    notice.author = $entry.find('author name').text();
-    notice.authorUri = $entry.find('author uri').text();
-    notice.fullname = $entry.find('[nodeName=poco:displayName]').text();
-
-    result = notice.authorUri.match(idRegexp);
-    if (result) {
-        notice.authorId = result[0];
-    }
-
-Titanium.API.info('noticeFromEntry CHECKPOINT G: ' + (Date.now() - startTime) + 'ms');
-
-    notice.link = '';
-    $entry.find('link[rel=alternate]').each(function() {
-        // make sure we didn't accidentally grab the author's link.
-        if (this.parentNode.nodeName == 'entry') {
-            notice.link = $(this).attr('href');
+            // knock off the millisecs to make the date string work with humane.js
+            notice.updated = updated.substring(0, 19);
+        },
+        'title': simpleNode,
+        'content': simpleNode, // @fixme this should actually handle more complex cases, as there may be different data types
+        'source': function(el) {
+            // atom:source (not the source client, eh) - this might not be in the feed
+            notice.atomSource = $(el).find('title').text();
+        },
+        'author': function(el) {
+            StatusNet.AtomParser.mapOverElements(el, {
+                'name': function(elem) {
+                    notice.author = $(elem).text();
+                },
+                'uri': function(elem) {
+                    notice.authorUri = $(elem).text();
+                    var result = notice.authorUri.match(idRegexp);
+                    if (result) {
+                        notice.authorId = result[0];
+                    }
+                },
+                'statusnet:profile_info': function(elem) {
+                    var profile_info = $(elem);
+                    notice.following = profile_info.attr('following');
+                    notice.blocking = profile_info.attr('blocking');
+                }
+            });
+        },
+        'activity:actor': function(el) {
+            var $subject = $(el);
+            notice.fullname = $subject.find('[nodeName=poco:displayName]').text();
+            // note: attribute selectors seem to have problems with [media:width=48]
+            $subject.find('link[rel=avatar]').each(function(i, el2) {
+                var $link = $(el2);
+                if ($link.attr('media:width') == '48') {
+                    notice.avatar = $link.attr('href');
+                }
+            });        
+        },
+        'link': function(el) {
+            var $el = $(el);
+            var rel = $el.attr('rel');
+            var type = $el.attr('type');
+            if (rel == 'alternate') {
+                notice.link = $el.attr('href');
+            } else if (rel == 'ostatus:conversation') {
+                notice.contextLink = $el.attr('href');
+            } else if (rel == 'related' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
+                // XXX: Special case for search Atom entries
+                if (!notice.avatar) {
+                    notice.avatar = $entry.find('link[rel=related]').attr('href');
+                }
+            }
+        },
+        'georss:point': function(el) {
+            // @fixme comma is also a valid separator
+            var gArray = $(el).text().split(' ');
+            notice.lat = gArray[0];
+            notice.lon = gArray[1];
+        },
+        'thr:in-reply-to': function(el) {
+            notice.inReplyToLink = $(el).attr('ref');
+            var result = notice.inReplyToLink.match(idRegexp);
+            if (result) {
+                notice.inReplyToId = result[0]; // Could be useful
+            }
         }
     });
-
-Titanium.API.info('noticeFromEntry CHECKPOINT H: ' + (Date.now() - startTime) + 'ms');
-
-    var geoPoint = $entry.find("[nodeName=georss:point]");
-
-    if (geoPoint.length > 0) {
-        var gArray = $(geoPoint[0]).text().split(' ');
-        notice.lat = gArray[0];
-        notice.lon = gArray[1];
-    }
-
-Titanium.API.info('noticeFromEntry CHECKPOINT I: ' + (Date.now() - startTime) + 'ms');
-
-    notice.contextLink = $entry.find('link[rel=ostatus:conversation]').attr('href');
-    notice.inReplyToLink = $entry.find("[nodeName=thr:in-reply-to]").attr('ref');
-
-    if (notice.inReplyToLink) {
-        result = notice.inReplyToLink.match(idRegexp);
-        if (result) {
-            notice.inReplyToId = result[0]; // Could be useful
-        }
-    }
-
-Titanium.API.info('noticeFromEntry CHECKPOINT J: ' + (Date.now() - startTime) + 'ms');
-
-    var profile_info = $entry.find('[nodeName=statusnet:profile_info]');
-    notice.following = profile_info.attr('following');
-    notice.blocking = profile_info.attr('blocking');
 
     // @todo ostatus:attention ?
 
     // @todo category / tags / groups ?
 
 var ms = Date.now() - startTime;
-Titanium.API.info('noticeFromEntry EXIT: ' + ms + 'ms');
+Titanium.API.info('noticeFromEntry CHECKPOINT EXIT: ' + ms + 'ms');
     return notice;
 };
 
