@@ -243,23 +243,36 @@ heyQuery.makeArray = heyQuery.appendArray;
 heyQuery.quickTagMatch = /^[A-Za-z0-9_-]+$/;
 heyQuery.quickTagMatch2 = /^\[nodeName=([A-Za-z0-9_:-]+)\]$/;
 heyQuery.quickTagAttribMatch = /^([A-Za-z0-9_-]+)\[([A-Za-z0-9_-]+)=([A-Za-z0-9_:-]+)\]$/;
-/*
-heyQuery.quickTagFind = function(selector, context) {
-    return context.getElementsByTagName(selector);
-}
-*/
-// on Android this gets confused, we have to dive in ourselves.
+
 heyQuery.elementText = function(el) {
-    if (el.nodeType == 1) {
-        var list = el.childNodes;
-        var out = [];
-        for (var i = 0; i < list.length; i++) {
-            out.push(heyQuery.elementText(list.item(i)));
+    return el.text;
+}
+var _xdoc = Titanium.XML.parseString('<a>a<b>b</b>a</a>');
+if (Sizzle.hacks.documentElement(_xdoc).text == 'aa') {
+    // XML proxy is buggy on Android in Titanium 1.3.2, fails to dive into
+    // child elements. If there are no child elements, then we can use the
+    // fast path, otherwise we'll have to dive in ourselves.
+    heyQuery.elementText = function(el) {
+        if (el.nodeType == 1) {
+            var els = Sizzle.hacks.getAllElements(el);
+            if (els.length > 0) {
+                var list = el.childNodes;
+                var out = [];
+                //Titanium.API.info("WWW ----- text {{{{{: " + el.nodeName + " has " + els.length + " (" + els.item(0).nodeName + ")");
+                for (var i = 0; i < list.length; i++) {
+                    var sub = heyQuery.elementText(list.item(i));
+                    //Titanium.API.info("WWW ----- text -----: " + sub);
+                    out.push(sub);
+                }
+                //Titanium.API.info("WWW ----- text }}}}}");
+                return out.join('');
+            } else {
+                //Titanium.API.info("WWW ----- text simple: " + el.nodeName);
+            }
         }
-        return out.join('');
-    } else {
         return el.text;
     }
 }
+_xdoc = null;
 
 var $ = jQuery = heyQuery;

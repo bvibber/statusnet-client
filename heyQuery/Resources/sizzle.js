@@ -1082,7 +1082,8 @@ this.Sizzle = Sizzle;
 
 // Hacks for Titanium
 Sizzle.hacks = {
-	getAllElements: function(context, result) {
+	getAllElements: function(context) {
+		/*
 		if (Titanium.Platform.osname == 'android') {
 			return context.getElementsByTagName('*');
 		} else {
@@ -1096,6 +1097,9 @@ Sizzle.hacks = {
 			}
 			return all; // @fixme are we expecting a nodelist?
 		}
+		*/
+		var nodes = context.evaluate("descendant::*");
+		return nodes;
 	},
 
 	getElementById: function(context, id) {
@@ -1108,7 +1112,7 @@ Sizzle.hacks = {
 
 			// The internal implementation does the EXACT same thing,
 			// but leaves out the quoting which is why it fails. :)
-			var nodes = context.evaluate("//*[@id='" + id + "']");
+			var nodes = context.evaluate("descendant::*[@id='" + id + "']");
 			if (nodes.length > 0) {
 				return nodes.item(0);
 			} else {
@@ -1121,7 +1125,7 @@ Sizzle.hacks = {
 		// getElementsByName() isn't implemented in Titanium's DOM proxy classes
 		// We'll fake it with xpath, which on Titanium returns a DOM nodelist
 		// @fixme escape or validate attribute value?
-		var nodes = context.evaluate("//*[@name='" + name + "']");
+		var nodes = context.evaluate("descendant::*[@name='" + name + "']");
 		return nodes;
 	},
 	
