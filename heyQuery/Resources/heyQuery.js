@@ -138,7 +138,7 @@ heyQueryObj.prototype.text = function(newtext) {
     }
     var out = [];
     this.each(function(i, item) {
-        out.push(item.text); // not .textContent
+        out.push(heyQuery.elementText(item));
     });
     return out.join('');
 }
@@ -248,4 +248,18 @@ heyQuery.quickTagFind = function(selector, context) {
     return context.getElementsByTagName(selector);
 }
 */
+// on Android this gets confused, we have to dive in ourselves.
+heyQuery.elementText = function(el) {
+    if (el.nodeType == 1) {
+        var list = el.childNodes;
+        var out = [];
+        for (var i = 0; i < list.length; i++) {
+            out.push(heyQuery.elementText(list.item(i)));
+        }
+        return out.join('');
+    } else {
+        return el.text;
+    }
+}
+
 var $ = jQuery = heyQuery;
