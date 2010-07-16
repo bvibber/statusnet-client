@@ -147,8 +147,13 @@ Titanium.API.info('noticeFromEntry CHECKPOINT F: ' + (Date.now() - startTime) + 
 
 Titanium.API.info('noticeFromEntry CHECKPOINT G: ' + (Date.now() - startTime) + 'ms');
 
-    // @fixme why is this looking for the second one? Sounds unstable!
-    notice.link = $entry.find('link[rel=alternate]:eq(1)').attr('href');
+    notice.link = '';
+    $entry.find('link[rel=alternate]').each(function() {
+        // make sure we didn't accidentally grab the author's link.
+        if (this.parentNode.nodeName == 'entry') {
+            notice.link = $(this).attr('href');
+        }
+    });
 
 Titanium.API.info('noticeFromEntry CHECKPOINT H: ' + (Date.now() - startTime) + 'ms');
 
