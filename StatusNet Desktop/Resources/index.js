@@ -36,6 +36,7 @@ $LAB
     .script("view/statusnet_timelineview_user.js")
     .script("view/statusnet_timelineview_group.js")
     .script("view/statusnet_timelineview_inbox.js")
+    .script("view/statusnet_timelineview_allgroups.js")
     .script("view/statusnet_timelineview_search.js")
     .script("view/statusnet_timelineview_subscriptions.js")
     .script("model/statusnet_timeline.js")
@@ -43,6 +44,7 @@ $LAB
     .script("model/statusnet_timeline_user.js")
     .script("model/statusnet_timeline_group.js")
     .script("model/statusnet_timeline_inbox.js")
+    .script("model/statusnet_timeline_allgroups.js")
     .script("model/statusnet_timeline_search.js")
     .script("model/statusnet_timeline_subscriptions.js")
     .script('model/statusnet_atom_parser.js')
@@ -62,3 +64,4 @@ $LAB
     }
 
 });
+

@@ -39,6 +39,7 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
+            $('#allgroups_img').attr('src', '/images/users.png');
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'mentions':
@@ -48,6 +49,7 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#mentions_img').attr('src', '/images/blue/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
+            $('#allgroups_img').attr('src', '/images/users.png');
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'favorites':
@@ -57,6 +59,7 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/blue/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
+            $('#allgroups_img').attr('src', '/images/users.png');
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'inbox':
@@ -66,6 +69,17 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/blue/mail.png');
+            $('#allgroups_img').attr('src', '/images/users.png');
+            $('#search_img').attr('src', '/images/magnifier.png');
+            break;
+        case 'allgroups':
+            $('#public_img').attr('class', '');
+            $('#user_img').attr('class', 'rounded');
+            $('#friends_img').attr('src', '/images/chat.png');
+            $('#mentions_img').attr('src', '/images/at.png');
+            $('#favorites_img').attr('src', '/images/star.png');
+            $('#inbox_img').attr('src', '/images/mail.png');
+            $('#allgroups_img').attr('src', '/images/blue/users.png');
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'search':
@@ -75,6 +89,7 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
+            $('#allgroups_img').attr('src', '/images/users.png');
             $('#search_img').attr('src', '/images/blue/magnifier.png');
             break;
         case 'user':
@@ -84,6 +99,7 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
+            $('#allgroups_img').attr('src', '/images/users.png');
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         case 'public':
@@ -93,6 +109,7 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
+            $('#allgroups_img').attr('src', '/images/users.png');
             $('#search_img').attr('src', '/images/magnifier.png');
             break;
         default:
@@ -102,8 +119,8 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             $('#mentions_img').attr('src', '/images/at.png');
             $('#favorites_img').attr('src', '/images/star.png');
             $('#inbox_img').attr('src', '/images/mail.png');
+            $('#allgroups_img').attr('src', '/images/users.png');
             $('#search_img').attr('src', '/images/magnifier.png');
-
 
             StatusNet.debug("I don\'t know how to highlight this timeline.");
             break;

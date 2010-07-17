@@ -130,6 +130,12 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             this.timeline = new StatusNet.TimelineInbox(this);
             this.view = new StatusNet.TimelineViewInbox(this);
             break;
+        case 'allgroups':
+            this.timeline = new StatusNet.TimelineAllGroups(this);
+            StatusNet.debug("finished making allgroups timeline");
+            this.view = new StatusNet.TimelineViewAllGroups(this);
+            StatusNet.debug("finished making allgroups view");
+            break;
         case 'search':
             this.timeline = new StatusNet.TimelineSearch(this);
             this.view = new StatusNet.TimelineViewSearch(this);
@@ -317,6 +323,7 @@ StatusNet.Client.prototype.init = function() {
     $('#mentions_img').bind('click', function() { that.switchTimeline('mentions'); });
     $('#favorites_img').bind('click', function() { that.switchTimeline('favorites'); });
     $('#inbox_img').bind('click', function() { that.switchTimeline('inbox'); });
+    $('#allgroups_img').bind('click', function() { that.switchTimeline('allgroups'); });
     $('#search_img').bind('click', function() { that.switchTimeline('search'); });
     $('#settings_img').bind('click', function() { StatusNet.showSettings(); });
 
