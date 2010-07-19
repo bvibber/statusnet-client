@@ -149,7 +149,7 @@ StatusNet.TimelineView.prototype.show = function() {
     //this.table.setData([]);
     StatusNet.debug("TimelineView.show F");
 
-    var html = '';
+    var html = this.htmlHeader();
     if (notices.length > 0) {
     StatusNet.debug("TimelineView.show G: " + notices.length + " notice(s)");
 
@@ -167,6 +167,8 @@ StatusNet.TimelineView.prototype.show = function() {
     StatusNet.debug("TimelineView.show G-done");
 
     }
+    
+    html += this.htmlFooter();
     StatusNet.debug('HTML IS: ' + html);
     this.table.html = html;
 
@@ -174,6 +176,18 @@ StatusNet.TimelineView.prototype.show = function() {
     this.hideSpinner();
     StatusNet.debug("TimelineView.show done");
 };
+
+
+StatusNet.TimelineView.prototype.htmlHeader = function(notice) {
+    return '<html>' +
+           '<head>' +
+           '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' +
+           '<body>';
+}
+
+StatusNet.TimelineView.prototype.htmlFooter = function(notice) {
+    return '</body></html>';
+}
 
 /**
  * Put together the HTML for a single notice
