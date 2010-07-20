@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for UI manager class for the client.
  *
@@ -168,7 +169,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
     // @todo multiple timeline auto-refresh
 
-    if (timeline !== 'user' && timeline !== 'inbox' && timeline !== 'search') {
+    if (this.timeline.autoRefresh()) {
         this.refresh = setInterval(
             function() {
                 StatusNet.debug("Refreshing visible timeline.");
@@ -259,7 +260,7 @@ StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
     StatusNet.debug("in showGroupTimeline()");
 
     StatusNet.debug("group ID is " + groupId);
-    timeline = 'user' + '-' + groupId;
+    timeline = 'group' + '-' + groupId;
     this.timeline = new StatusNet.TimelineGroup(this, groupId);
     this.view = new StatusNet.TimelineViewGroup(this);
 

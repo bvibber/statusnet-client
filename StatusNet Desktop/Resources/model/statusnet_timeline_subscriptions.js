@@ -135,6 +135,13 @@ StatusNet.TimelineSubscriptions.prototype.cacheable = function() {
 };
 
 /**
+ * Whether to automatically reload
+ */
+StatusNet.TimelineSubscriptions.prototype.autoRefresh = function() {
+	return false;
+};
+
+/**
  * Accessor for users
  *
  * @return Array an array of users

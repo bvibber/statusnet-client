@@ -68,6 +68,12 @@ StatusNet.TimelineInbox.prototype.cacheable = function() {
     return false;
 };
 
+/**
+ * Whether to automatically reload
+ */
+StatusNet.TimelineInbox.prototype.autoRefresh = function() {
+	return false;
+};
 
 
 
