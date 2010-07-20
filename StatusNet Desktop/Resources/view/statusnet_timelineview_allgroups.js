@@ -93,9 +93,9 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
     html.push('<div id="profile_panel">');
 
 	if (group.stream_logo) {
-    	html.push('<img src="' + group.stream_logo + '"/>');
+    	html.push('<a href="#" class="timeline_link"><img src="' + group.stream_logo + '"/></a>');
 	} else {
-		html.push('<img src="images/default-avatar-stream.png"/>');
+		html.push('<a href="#" class="timeline_link"><img src="images/default-avatar-stream.png"/></a>');
 	}
 
     html.push('<div id="profile_action_links"');
@@ -108,7 +108,7 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
 
     html.push('</div');
 
-    html.push('<h2>!' + group.nickname + '</h2>');
+    html.push('<h2><a href="#" class="timeline_link">!' + group.nickname + '</h2></a>');
     html.push('<dl class="profile_list" name="' + group.id + ',' + group.nickname + '">');
 
     html.push('<dt>Name</dt>');
@@ -167,6 +167,10 @@ StatusNet.TimelineViewAllGroups.prototype.enableGroupControls = function(profile
     StatusNet.debug("nameAtrr = " + nameAttr + ", id = " + id + ", name = " + groupname);
 
     var that = this;
+
+	$('a.timeline_link', profileXml).bind('click', function(event) {
+		that.client.showGroupTimeline(id);
+	});
 
     $('a.group_join', profileXml).bind('click', function(event) {
         that.client.joinGroup(id, this);

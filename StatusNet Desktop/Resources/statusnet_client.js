@@ -259,7 +259,7 @@ StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
     StatusNet.debug("in showGroupTimeline()");
 
     StatusNet.debug("group ID is " + groupId);
-    timeline = 'user' + '-' + groupId;
+    timeline = 'group' + '-' + groupId;
     this.timeline = new StatusNet.TimelineGroup(this, groupId);
     this.view = new StatusNet.TimelineViewGroup(this);
 
