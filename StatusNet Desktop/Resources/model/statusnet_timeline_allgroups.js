@@ -31,7 +31,7 @@ StatusNet.TimelineAllGroups = function(client) {
     this.groupAdded = new StatusNet.Event(this);
 
     // @todo handle more than 100 groups ... alpha paging?
-    this._url = 'statusnet/groups/list_all.xml?count=20';
+    this._url = 'statusnet/groups/list_all.xml?count=100';
 
 };
 
@@ -46,7 +46,7 @@ StatusNet.TimelineAllGroups.prototype.addGroup = function(groupXml) {
     var group = {};
 
     group.id = $(groupXml).find('id').text();
-    group.url = $(groupXml).find('url').text()
+	group.url = $(groupXml).find('url').text();
     group.nickname = $(groupXml).find('nickname').text();
     group.fullname = $(groupXml).find('fullname').text();
     group.member = $(groupXml).find('member').text();

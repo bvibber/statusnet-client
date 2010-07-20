@@ -62,15 +62,21 @@ StatusNet.TimelineViewAllGroups.prototype.show = function() {
         $('#notices').append(html.join(''));
     }
 
+	var that = this;
+
+    $('#notices > div#profile_panel').each(function() {
+        that.enableGroupControls(this);
+    });
+
     StatusNet.debug("StatusNet.TimelineViewAllGroups.show() - finished showing groups");
 }
 
 StatusNet.TimelineViewAllGroups.prototype.showNewGroup = function(group) {
     StatusNet.debug("prepending group " + group.id);
     $('#notices').prepend(this.renderGroup(group));
-    var notice = $('#notices > div#group_panel:first').get(0);
-    $('#notices > div#group_panel:first').hide();
-    $('#notices > div#group_panel:first').fadeIn("slow");
+	this.enableGroupControls($('#notices > div#profile_panel:first').get(0));
+    $('#notices > div#profile_panel:first').hide();
+    $('#notices > div#profile_panel:first').fadeIn("slow");
 }
 
 /**
@@ -82,12 +88,15 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
 
     StatusNet.debug("renderGroup()");
 
-    $('#profile_info').remove();
-
     var html = [];
 
     html.push('<div id="profile_panel">');
-    html.push('<img src="' + group.avatarLarge + '"/>');
+
+	if (group.stream_logo) {
+    	html.push('<img src="' + group.stream_logo + '"/>');
+	} else {
+		html.push('<img src="images/default-avatar-stream.png"/>');
+	}
 
     html.push('<div id="profile_action_links"');
 
@@ -100,7 +109,7 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
     html.push('</div');
 
     html.push('<h2>!' + group.nickname + '</h2>');
-    html.push('<dl class="profile_list">');
+    html.push('<dl class="profile_list" name="' + group.id + ',' + group.nickname + '">');
 
     html.push('<dt>Name</dt>');
     html.push('<dd class="name">');
@@ -109,6 +118,7 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
     } else {
         html.push(group.nickname);
     }
+
     html.push('</dd>');
 
     if (group.location) {
@@ -134,9 +144,8 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
     html.push('</dl>')
 
     html.push('</div>');
-    $('#header').append(html.join(''));
 
-    return html;
+    return html.join('');
 };
 
 /**
@@ -147,3 +156,23 @@ StatusNet.TimelineViewAllGroups.prototype.showEmptyTimeline = function() {
     $('#notices').append('<div id="empty_timeline">No groups yet.</div>');
 }
 
+StatusNet.TimelineViewAllGroups.prototype.enableGroupControls = function(profileXml) {
+
+    var nameAttr = $(profileXml).find('dl.profile_list').attr('name');
+    var result = nameAttr.split(",");
+
+    var id = result[0];
+    var groupname = result[1];
+
+    StatusNet.debug("nameAtrr = " + nameAttr + ", id = " + id + ", name = " + groupname);
+
+    var that = this;
+
+    $('a.group_join', profileXml).bind('click', function(event) {
+        that.client.joinGroup(id, this);
+    });
+
+    $('a.group_leave', profileXml).bind('click', function(event) {
+        that.client.leaveGroup(id, this);
+    });
+}
