@@ -60,7 +60,7 @@ StatusNet.TimelineView = function(client) {
 		    var notices = that.client.timeline.getNotices();
 			if (notices.length == 0) {
 				StatusNet.debug("TimelineView: no notices found");
-	        	that.table.appendRow({title: 'No notices in this timeline yet.'});
+	        	that.clearTimelineView({title: 'No notices in this timeline yet.'});
 			}
 			StatusNet.debug("TimelineView - there are " + notices.length + " notices in timeline");
             StatusNet.debug("TimelineView updateFinished DONE");
@@ -104,23 +104,30 @@ StatusNet.TimelineView.prototype.init = function() {
  *
  */
 StatusNet.TimelineView.prototype.show = function() {
-    StatusNet.debug("TimelineView.show");
     var that = this;
 
-    if (!this.table) {
-        StatusNet.debug("TimelineView.show creating navbar...");
+    if (!this.webview) {
         var navbar = StatusNet.Platform.createNavBar(this.window);
 
+        // @fixme how do we give it the standard back-button style?
+        var backButton = Titanium.UI.createButton({
+            title: "Accounts"
+        });
+        backButton.addEventListener('click', function() {
+            that.client.tabGroup.close();
+        });
+        navbar.setLeftNavButton(backButton);
+
         var updateButton = Titanium.UI.createButton({
-            title: "New" // @fixme use the system compose icon
+            title: "New",
+            systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
         });
         updateButton.addEventListener('click', function() {
             that.client.newNoticeDialog();
         });
         navbar.setRightNavButton(updateButton);
 
-        StatusNet.debug("TimelineView.show creating table webview...");
-        this.table = Titanium.UI.createWebView({
+        this.webview = Titanium.UI.createWebView({
             top: navbar.height,
             left: 0,
             right: 0,
@@ -129,163 +136,54 @@ StatusNet.TimelineView.prototype.show = function() {
             url: "timeline.html"
         });
 
-        Ti.App.addEventListener('sn_ready', function(event) {
-            StatusNet.debug('YAY GOT sn_ready EVENT! ' + event);
+        // @fixme move most of these up to Client
+        Ti.App.addEventListener('StatusNet_timelineReady', function(event) {
+            StatusNet.debug('YAY GOT StatusNet_timelineReady EVENT! ' + event);
         });
 
-        Ti.App.addEventListener('sn_external', function(event) {
-            StatusNet.debug('YAY sn_external event!');
-            StatusNet.debug('event: ' + event.url);
+        Ti.App.addEventListener('StatusNet_externalLink', function(event) {
             // Open external links in system default browser...
             // Note: on iPhone this will launch Safari and may cause us to close.
             Titanium.Platform.openURL(event.url);
         });
-        this.window.add(this.table);
+
+        Ti.App.addEventListener('StatusNet_switchUserTimeline', function(event) {
+            //event.authorId
+        });
+
+        Ti.App.addEventListener('StatusNet_replyToNotice', function(event) {
+            //noticeId: noticeId, noticeAuthor: noticeAuthor
+            that.client.newNoticeDialog(event.noticeId, event.noticeAuthor);
+        });
+
+        this.window.add(this.webview);
     }
 
-    StatusNet.debug("TimelineView.show C");
     var notices = this.client.timeline.getNotices();
-    StatusNet.debug("TimelineView.show D");
 
     // clear old notices
     // @todo be a little nicer; no need to clear if we just changed one thing
-    StatusNet.debug("TimelineView.show E");
-    //this.table.setData([]);
-    StatusNet.debug("TimelineView.show F");
+    //Titanium.App.fireEvent('updateTimeline', {html: '<p>Loading...</p>'});
+    this.clearTimelineView();
 
-    var html = this.htmlHeader();
     if (notices.length > 0) {
     StatusNet.debug("TimelineView.show G: " + notices.length + " notice(s)");
-
         for (i = 0; i < notices.length; i++) {
-            html += this.renderNotice(notices[i]);
+            this.appendTimelineNotice(notices[i]);
         }
-
-        /*
-        var that = this;
-
-        $('#notices div.notice').each(function() {
-            that.enableNoticeControls(this);
-        });
-        */
-    StatusNet.debug("TimelineView.show G-done");
-
     }
-    
-    html += this.htmlFooter();
-    StatusNet.debug('HTML IS: ' + html);
-    //this.table.html = html;
-    //this.table.evalJS("document.getElementById('timeline').innerHTML = " + Titanium.JSON.sringify(html));
-    StatusNet.debug("TimelineView.show FIRING TIMELINE EVENT");
-    Titanium.App.fireEvent('updateTimeline', {html: html});
-    StatusNet.debug("TimelineView.show FIRED TIMELINE EVENT");
 
-    StatusNet.debug("TimelineView.show H");
     this.hideSpinner();
-    StatusNet.debug("TimelineView.show done");
 };
 
-
-StatusNet.TimelineView.prototype.htmlHeader = function(notice) {
-    return '';
-    return '<html>' +
-           '<head>' +
-           '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' +
-           '<body>';
+StatusNet.TimelineView.prototype.clearTimelineView = function(html) {
+    if (!html) html = '';
+    Titanium.App.fireEvent('StatusNet_setTimeline', {html: html});
 }
 
-StatusNet.TimelineView.prototype.htmlFooter = function(notice) {
-    return '';
-    return '<script>' +
-           'Titanium.App.addEventListener("timeline", function(event) {' +
-           '  Titanium.API.info("hello: " + event);' +
-           '});' +
-           '$("a").click(function(event) {' +
-           '  Titanium.API.info("hello: " + this.href);' +
-           '  Titanium.App.fireEvent("sn_external", {wtf: "hey", url: this.href});' +
-           '  return false;' +
-           '});' +
-           '</script>';
+StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
+    Titanium.App.fireEvent('StatusNet_appendTimelineNotice', {notice: notice});
 }
-
-/**
- * Put together the HTML for a single notice
- *
- * @param object notice the notice
- */
-StatusNet.TimelineView.prototype.renderNotice = function(notice) {
-
-    var html = [];
-    var avatar = notice.avatar;
-    var author = notice.author;
-    var authorId = notice.authorId
-
-    var classes = ['notice'];
-
-    if (notice.favorite === "true") {
-        classes.push('notice-favorite');
-    }
-
-    if (notice.repeated === "true") {
-        classes.push('notice-repeated');
-    }
-
-    if (notice.repeat_of) {
-        classes.push('notice-repeat');
-    }
-
-    html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
-    html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
-    html.push('</div>');
-    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
-    html.push('<div class="content">'+ notice.content +'</div>');
-    //html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
-    html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + notice.updated + '</a></div>');
-    if (notice.source) {
-        html.push('<div class="notice_source"><span class="notice_source_inner">from ' + notice.source + '</span></div>');
-    }
-    if (notice.contextLink && notice.inReplyToLink) {
-        html.push(
-            '<div class="context_link"><a rel="external" title="View this conversation in browser" href="'
-            + notice.contextLink +'">in context</a></div>'
-        );
-    }
-    html.push('<div class="notice_links"><a href="#" class="notice_reply">Reply</a>');
-
-    if (notice.favorite === "true") {
-        html.push(' <a href="#" class="notice_unfave">Unfave</a>');
-    } else {
-        html.push(' <a href="#" class="notice_fave">Fave</a>')
-    }
-
-    if (author === this.client.account.username) {
-        html.push(' <a href="#" class="notice_delete">Delete</a>')
-    } else {
-        if (notice.repeated === "false") {
-            html.push(' <a href="#" class="notice_repeat">Repeat</a>');
-        }
-    }
-
-    html.push('</div></div>');
-    html.push('<div class="clear"></div>');
-
-    return html.join('');
-}
-/**
- * @param string html
- * @return string plaintext
- * @access private
- */
-StatusNet.TimelineView.prototype.stripHtml = function(html) {
-    var src = '<div>' + html + '</div>';
-    StatusNet.debug('STRIP src: ' + src);
-    //var dom = Titanium.XML.parseString(src);
-    //StatusNet.debug('STRIP dom: ' + dom);
-    var txt = $(src).text();
-    StatusNet.debug('STRIP txt: ' + txt);
-    return txt;
-}
-
 
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
     StatusNet.debug('Stubbed TimelineView.notifyNewNotice');
@@ -335,58 +233,7 @@ StatusNet.TimelineView.prototype.localAuthor = function(uri) {
     return false;
 };
 
-StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
-    var name = $(noticeDom).attr('name');
-    var noticeId = name.substring(7); // notice-
 
-    name = $(noticeDom).find('a.author').attr('name');
-    var authorId = name.substring(7); // author-
-
-    var noticeAuthor = $(noticeDom).find('a.author').text();
-
-    StatusNet.debug("authorId = " + authorId + " author name = " + noticeAuthor + " noticeId = " + noticeId);
-
-    var uri = $(noticeDom).find('div a.author').attr('href');
-
-    var that = this;
-
-    // Override links to external web view of the notice timelines
-    // with click event handlers to display timelines within the client
-    if (this.localAuthor(uri)) {
-
-        $(noticeDom).find('div a.author').attr('href', "#");
-        $(noticeDom).find('div a.author').bind('click', function(event) {
-            StatusNet.debug("Switching timeline to user " + authorId);
-            that.client.switchUserTimeline(authorId);
-        });
-
-        $(noticeDom).find('div.avatar a').attr('href', "#");
-        $(noticeDom).find('div.avatar').bind('click', function(event) {
-            StatusNet.debug("Switching timeline to user " + authorId);
-            that.client.switchUserTimeline(authorId);
-        });
-    }
-
-    $(noticeDom).find('a.notice_reply').bind('click', function(event) {
-        that.client.newNoticeDialog(noticeId, noticeAuthor);
-    });
-
-    // Override external web links to local users in-content
-    $(noticeDom).find('div.content span.vcard a').each(function() {
-        var href = $(this).attr('href');
-        if (that.localAuthor(href)) {
-            $(this).attr('href', '#');
-            $(this).click(function() {
-                var idRegexp = /(\d)+$/;
-                result = href.match(idRegexp);
-                if (result) {
-                    that.client.switchUserTimeline(result[0]);
-                }
-            });
-        }
-    });
-
-};
 
 /**
  * Set up anything that should go in the header section...
