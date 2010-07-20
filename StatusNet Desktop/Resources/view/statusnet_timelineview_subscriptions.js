@@ -119,7 +119,7 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
     var html = [];
 
     html.push('<div id="profile_panel">');
-    html.push('<img src="' + user.avatar + '"/>');
+    html.push('<a href="#" class="timeline_link"><img src="' + user.avatar + '"/></a>');
 
     html.push('<div id="profile_action_links"');
 
@@ -131,7 +131,7 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
     html.push('<a href="#" class="profile_block">Block</a>');
     html.push('</div>');
 
-    html.push('<h2>@' + user.username + '</h2>');
+    html.push('<h2><a href="#" class="timeline_link">@' + user.username + '</h2></a>');
     html.push('<dl class="profile_list" name="' + user.id + ',' + user.username + '">');
 
     html.push('<dt>Name</dt>');
@@ -199,6 +199,10 @@ StatusNet.TimelineViewSubscriptions.prototype.enableProfileControls = function(p
     StatusNet.debug("nameAtrr = " + nameAttr + ", id = " + id + ", name = " + username);
 
     var that = this;
+
+	$('a.timeline_link', profileXml).bind('click', function(event) {
+		that.client.switchUserTimeline(id);
+	});
 
     $('a.profile_unsubscribe:first', profileXml).bind('click', function(event) {
         that.client.unsubscribe(id, this, function() {
