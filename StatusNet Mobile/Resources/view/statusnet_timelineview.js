@@ -119,12 +119,26 @@ StatusNet.TimelineView.prototype.show = function() {
         });
         navbar.setRightNavButton(updateButton);
 
-        StatusNet.debug("TimelineView.show creating table view...");
-        this.table = Titanium.UI.createTableView({
+        StatusNet.debug("TimelineView.show creating table webview...");
+        this.table = Titanium.UI.createWebView({
             top: navbar.height,
             left: 0,
             right: 0,
-            bottom: 0
+            bottom: 0,
+            scalesPageToFit: false,
+            url: "timeline.html"
+        });
+
+        Ti.App.addEventListener('sn_ready', function(event) {
+            StatusNet.debug('YAY GOT sn_ready EVENT! ' + event);
+        });
+
+        Ti.App.addEventListener('sn_external', function(event) {
+            StatusNet.debug('YAY sn_external event!');
+            StatusNet.debug('event: ' + event.url);
+            // Open external links in system default browser...
+            // Note: on iPhone this will launch Safari and may cause us to close.
+            Titanium.Platform.openURL(event.url);
         });
         this.window.add(this.table);
     }
@@ -136,81 +150,15 @@ StatusNet.TimelineView.prototype.show = function() {
     // clear old notices
     // @todo be a little nicer; no need to clear if we just changed one thing
     StatusNet.debug("TimelineView.show E");
-    this.table.setData([]);
+    //this.table.setData([]);
     StatusNet.debug("TimelineView.show F");
 
+    var html = this.htmlHeader();
     if (notices.length > 0) {
     StatusNet.debug("TimelineView.show G: " + notices.length + " notice(s)");
 
         for (i = 0; i < notices.length; i++) {
-            StatusNet.debug("TimelineView.show Gx " + i);
-            StatusNet.debug('QQQQ: notices[i]: ' + notices[i]);
-            for (var x in notices[i]) {
-                if (notices[i].hasOwnProperty(x)) {
-                    StatusNet.debug('     notices[i].' + x + ': ' + notices[i][x]);
-                }
-            }
-
-            var baseSize = 14;
-            var text = notices[i].content;
-            StatusNet.debug('QQQQ: text content: ' + text);
-
-            var row = Titanium.UI.createTableViewRow({
-                height: 'auto',
-                notice: notices[i],
-                backgroundColor: 'white'
-            });
-
-            var avatar = Titanium.UI.createImageView({
-                top: 2,
-                right: 2,
-                width: 64,
-                height: 64,
-                url: notices[i].avatar // note: 'image' works with URLs on iPhone, but tries to load from local filesystem on Android
-            });
-            row.add(avatar);
-
-            var name = Titanium.UI.createLabel({
-                top: 2,
-                left: 4,
-                right: 72,
-                height: 'auto',
-                text: notices[i].author,
-                font: {fontSize: baseSize + 2, fontWeight:'bold'},
-                color: 'black'
-            });
-            row.add(name);
-
-            var text = Titanium.UI.createLabel({
-                top: 24,
-                left: 4,
-                right: 72,
-                height: 'auto',
-                text: this.stripHtml(text),
-                font: {fontSize: baseSize},
-                color: 'black'
-            });
-            row.add(text);
-            this.table.appendRow(row);
-
-
-            /*
-            html.push('<div class="notice" name="notice-' + notices[i].id +'">');
-            html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + notices[i].avatar + '"/></a></div>');
-            html.push('   <div><a class="author" name="author-' + notices[i].authorId + '" href="' + notices[i].link + '">' + notices[i].author + '</a><br/>');
-            html.push('   <div class="content">'+ notices[i].content +'<br/></div>');
-            html.push('   <small class="date">' + humane_date(notices[i].updated) + '</small></div>');
-            if (notices[i].contextLink && notices[i].inReplyToLink) {
-                html.push(
-                    '   <div class="context"><a class="context" href="'
-                    + notices[i].contextLink +'">in context</a><br/></div>'
-                );
-            }
-            html.push('<a href="#" class="notice_reply">Reply</a>');
-
-            html.push('</div>');
-            html.push('<div class="clear"></div>');
-            */
+            html += this.renderNotice(notices[i]);
         }
 
         /*
@@ -223,12 +171,106 @@ StatusNet.TimelineView.prototype.show = function() {
     StatusNet.debug("TimelineView.show G-done");
 
     }
+    
+    html += this.htmlFooter();
+    StatusNet.debug('HTML IS: ' + html);
+    //this.table.html = html;
+    //this.table.evalJS("document.getElementById('timeline').innerHTML = " + Titanium.JSON.sringify(html));
+    StatusNet.debug("TimelineView.show FIRING TIMELINE EVENT");
+    Titanium.App.fireEvent('updateTimeline', {html: html});
+    StatusNet.debug("TimelineView.show FIRED TIMELINE EVENT");
 
     StatusNet.debug("TimelineView.show H");
     this.hideSpinner();
     StatusNet.debug("TimelineView.show done");
 };
 
+
+StatusNet.TimelineView.prototype.htmlHeader = function(notice) {
+    return '';
+    return '<html>' +
+           '<head>' +
+           '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' +
+           '<body>';
+}
+
+StatusNet.TimelineView.prototype.htmlFooter = function(notice) {
+    return '';
+    return '<script>' +
+           'Titanium.App.addEventListener("timeline", function(event) {' +
+           '  Titanium.API.info("hello: " + event);' +
+           '});' +
+           '$("a").click(function(event) {' +
+           '  Titanium.API.info("hello: " + this.href);' +
+           '  Titanium.App.fireEvent("sn_external", {wtf: "hey", url: this.href});' +
+           '  return false;' +
+           '});' +
+           '</script>';
+}
+
+/**
+ * Put together the HTML for a single notice
+ *
+ * @param object notice the notice
+ */
+StatusNet.TimelineView.prototype.renderNotice = function(notice) {
+
+    var html = [];
+    var avatar = notice.avatar;
+    var author = notice.author;
+    var authorId = notice.authorId
+
+    var classes = ['notice'];
+
+    if (notice.favorite === "true") {
+        classes.push('notice-favorite');
+    }
+
+    if (notice.repeated === "true") {
+        classes.push('notice-repeated');
+    }
+
+    if (notice.repeat_of) {
+        classes.push('notice-repeat');
+    }
+
+    html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
+    html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
+    html.push('</div>');
+    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
+    html.push('<div class="content">'+ notice.content +'</div>');
+    //html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
+    html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + notice.updated + '</a></div>');
+    if (notice.source) {
+        html.push('<div class="notice_source"><span class="notice_source_inner">from ' + notice.source + '</span></div>');
+    }
+    if (notice.contextLink && notice.inReplyToLink) {
+        html.push(
+            '<div class="context_link"><a rel="external" title="View this conversation in browser" href="'
+            + notice.contextLink +'">in context</a></div>'
+        );
+    }
+    html.push('<div class="notice_links"><a href="#" class="notice_reply">Reply</a>');
+
+    if (notice.favorite === "true") {
+        html.push(' <a href="#" class="notice_unfave">Unfave</a>');
+    } else {
+        html.push(' <a href="#" class="notice_fave">Fave</a>')
+    }
+
+    if (author === this.client.account.username) {
+        html.push(' <a href="#" class="notice_delete">Delete</a>')
+    } else {
+        if (notice.repeated === "false") {
+            html.push(' <a href="#" class="notice_repeat">Repeat</a>');
+        }
+    }
+
+    html.push('</div></div>');
+    html.push('<div class="clear"></div>');
+
+    return html.join('');
+}
 /**
  * @param string html
  * @return string plaintext
