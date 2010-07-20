@@ -119,22 +119,23 @@ StatusNet.TimelineView.prototype.show = function() {
         });
         navbar.setRightNavButton(updateButton);
 
-        StatusNet.debug("TimelineView.show creating table view...");
-        /*
-        this.table = Titanium.UI.createTableView({
-            top: navbar.height,
-            left: 0,
-            right: 0,
-            bottom: 0
-        });
-        */
+        StatusNet.debug("TimelineView.show creating table webview...");
         this.table = Titanium.UI.createWebView({
             top: navbar.height,
             left: 0,
             right: 0,
             bottom: 0,
             scalesPageToFit: false,
-            html: '...'
+            url: "timeline.html"
+        });
+
+        Ti.App.addEventListener('sn_ready', function(event) {
+            StatusNet.debug('YAY GOT sn_ready EVENT! ' + event);
+        });
+        Ti.App.addEventListener('sn_external', function(event) {
+            StatusNet.debug('YAY sn_external event!');
+            StatusNet.debug('event: ' + event);
+            //that.handleViewEvent(event);
         });
         this.window.add(this.table);
     }
@@ -170,7 +171,11 @@ StatusNet.TimelineView.prototype.show = function() {
     
     html += this.htmlFooter();
     StatusNet.debug('HTML IS: ' + html);
-    this.table.html = html;
+    //this.table.html = html;
+    //this.table.evalJS("document.getElementById('timeline').innerHTML = " + Titanium.JSON.sringify(html));
+    StatusNet.debug("TimelineView.show FIRING TIMELINE EVENT");
+    Titanium.App.fireEvent('updateTimeline', {html: html});
+    StatusNet.debug("TimelineView.show FIRED TIMELINE EVENT");
 
     StatusNet.debug("TimelineView.show H");
     this.hideSpinner();
@@ -179,6 +184,7 @@ StatusNet.TimelineView.prototype.show = function() {
 
 
 StatusNet.TimelineView.prototype.htmlHeader = function(notice) {
+    return '';
     return '<html>' +
            '<head>' +
            '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' +
@@ -186,7 +192,17 @@ StatusNet.TimelineView.prototype.htmlHeader = function(notice) {
 }
 
 StatusNet.TimelineView.prototype.htmlFooter = function(notice) {
-    return '</body></html>';
+    return '';
+    return '<script>' +
+           'Titanium.App.addEventListener("timeline", function(event) {' +
+           '  Titanium.API.info("hello: " + event);' +
+           '});' +
+           '$("a").click(function(event) {' +
+           '  Titanium.API.info("hello: " + this.href);' +
+           '  Titanium.App.fireEvent("sn_external", {wtf: "hey", url: this.href});' +
+           '  return false;' +
+           '});' +
+           '</script>';
 }
 
 /**

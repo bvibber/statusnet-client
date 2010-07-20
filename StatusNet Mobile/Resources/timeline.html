@@ -1,0 +1,33 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+
+<div id="timeline">
+...
+</div>
+
+<script src="lib/jquery-1.4.2.min.js"></script>
+<script>
+if (typeof Titanium == "undefined") {
+    document.write('Titanium is undefined. Nothing will work in this webview.');
+} else {
+    document.write('Titanium is there.');
+    Titanium.API.info("YAY - Titanium visible from the webview");
+}
+Titanium.App.addEventListener("updateTimeline", function(event) {
+    Titanium.API.info("WEBVIEW got displayTimeline event!");
+    $("#timeline").html(event.html);
+    Titanium.API.info("WEBVIEW finished displayTimeline event.");
+});
+$("#timeline").delegate("a", "click", function(event) {
+  Titanium.API.info("hello: " + this.href);
+  Titanium.App.fireEvent("sn_external", {wtf: "hey", url: this.href});
+  return false;
+});
+Titanium.App.fireEvent("sn_ready", {hey: "foo"});
+Titanium.API.info("YAY - WebView is set up and waiting.");
+
+</script>
+</html>
