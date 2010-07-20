@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Base class for Timeline view
  *
@@ -60,7 +61,7 @@ StatusNet.TimelineView = function(client, showNotifications) {
             }
         }
     );
-}
+};
 
 /**
  * Put together the HTML for a single notice
@@ -123,7 +124,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     html.push('<div class="clear"></div>');
 
     return html.join('');
-}
+};
 
 /**
  * Render the HTML display of a given timeline
@@ -163,7 +164,7 @@ StatusNet.TimelineView.prototype.show = function(notices) {
     $('.notice a').attr('rel', 'external');
 
     StatusNet.debug("StatusNet.TimelineView.show() - finished showing notices");
-}
+};
 
 StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     StatusNet.debug("prepending notice " + notice.id);
@@ -172,7 +173,7 @@ StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     this.enableNoticeControls(notice);
     $('#notices > div.notice:first').hide();
     $('#notices > div.notice:first').fadeIn("slow");
-}
+};
 
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
 
@@ -203,7 +204,7 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
         StatusNet.debug("i've been clicked");
     });
     notification.show();
-}
+};
 
 /**
  * Determines whether the notice is local (by permalink)
@@ -224,7 +225,7 @@ StatusNet.TimelineView.prototype.isLocal = function(uri) {
         return true;
     }
     return false;
-}
+};
 
 StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
 
@@ -325,7 +326,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
     });
 
     $('div.content a', noticeDom).attr('rel', 'external');
-}
+};
 
 /**
  * Remove notice from the visible timeline
@@ -335,7 +336,7 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
 StatusNet.TimelineView.prototype.removeNotice = function(noticeId) {
     StatusNet.debug("TimelineView.removeNotice() - removing notice " + noticeId);
     $('#notices div.notice[name=notice-' + noticeId + ']').fadeOut("slow");
-}
+};
 
 /**
  * Set up anything that should go in the header section...
@@ -347,7 +348,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
     $("#header").html("<h1></h1>");
     $("#header h1").text(title);
     StatusNet.debug("StatusNet.TimelineView.showHeader() - finished");
-}
+};
 
 /**
  * Show wait cursor
@@ -355,7 +356,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
 	$('#notices').prepend('<img id="spinner" src="/images/loading.gif" />');
-}
+};
 
 /**
  * Hide wait cursor
@@ -363,7 +364,7 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
     $('#spinner').remove();
-}
+};
 
 /**
  * Show this if the timeline is empty
@@ -371,7 +372,7 @@ StatusNet.TimelineView.prototype.hideSpinner = function() {
 StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
     $('#notices').empty();
     $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
-}
+};
 
 /**
  * Constructor for a view for a friends timeline
@@ -379,7 +380,7 @@ StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
 StatusNet.TimelineViewFriends = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name} and friends on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewFriends inherit TimelineView's prototype
 StatusNet.TimelineViewFriends.prototype = heir(StatusNet.TimelineView.prototype);
@@ -391,7 +392,7 @@ StatusNet.TimelineViewFriends.prototype = heir(StatusNet.TimelineView.prototype)
 StatusNet.TimelineViewMentions = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Replies to {name} on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewMentions inherit TimelineView's prototype
 StatusNet.TimelineViewMentions.prototype = heir(StatusNet.TimelineView.prototype);
@@ -402,7 +403,7 @@ StatusNet.TimelineViewMentions.prototype = heir(StatusNet.TimelineView.prototype
 StatusNet.TimelineViewPublic = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Public timeline on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewPublic inherit TimelineView's prototype
 StatusNet.TimelineViewPublic.prototype = heir(StatusNet.TimelineView.prototype);
@@ -413,7 +414,7 @@ StatusNet.TimelineViewPublic.prototype = heir(StatusNet.TimelineView.prototype);
 StatusNet.TimelineViewFavorites = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s favorite notices on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewFavorites inherit TimelineView's prototype
 StatusNet.TimelineViewFavorites.prototype = heir(StatusNet.TimelineView.prototype);
@@ -425,7 +426,7 @@ StatusNet.TimelineViewTag = function(client) {
     StatusNet.TimelineView.call(this, client);
     StatusNet.debug("TimelineViewTag constructor");
     this.title = "Notices tagged #{tag} on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewTag inherit TimelineView's prototype
 StatusNet.TimelineViewTag.prototype = heir(StatusNet.TimelineView.prototype);
@@ -441,4 +442,4 @@ StatusNet.TimelineViewTag.prototype.showHeader = function () {
     $("#header").html("<h1></h1>");
     $("#header h1").text(title);
     StatusNet.debug("StatusNet.TimelineViewTag.showHeader() - finished");
-}
+};

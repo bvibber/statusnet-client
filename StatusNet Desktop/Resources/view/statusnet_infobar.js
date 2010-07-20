@@ -23,7 +23,7 @@
  */
 StatusNet.Infobar = function() {
     StatusNet.debug("StatusNet.Infobar()");
-}
+};
 
 /**
  * Flash an informational message to the user
@@ -43,5 +43,4 @@ StatusNet.Infobar.flashMessage = function(msg) {
         },
         10000
     );
-}
-
+};

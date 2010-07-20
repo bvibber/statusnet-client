@@ -17,13 +17,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for a group timeline
  */
 StatusNet.TimelineViewGroup = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "The {name} group on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewGroup inherit TimelineView's prototype
 StatusNet.TimelineViewGroup.prototype = heir(StatusNet.TimelineView.prototype);
@@ -102,7 +103,7 @@ StatusNet.TimelineViewGroup.prototype.showGroupInfo = function() {
     $('a.group_leave').bind('click', function(event) {
         that.client.leaveGroup(group.id, this);
     });
-}
+};
 
 /**
  * Override the header to show name of the group associated with
@@ -126,6 +127,4 @@ StatusNet.TimelineViewGroup.prototype.showHeader = function () {
     $("#header h1").text(title);
 
     this.showGroupInfo();
-}
-
-
+};

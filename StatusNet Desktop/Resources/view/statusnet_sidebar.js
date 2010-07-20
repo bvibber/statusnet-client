@@ -21,8 +21,7 @@
 /**
  * View class for managing the sidebar
  */
-StatusNet.Sidebar = function() {
-}
+StatusNet.Sidebar = function() {};
 
 /**
  * Class method to higlight the icon associated with the selected timeline
@@ -126,4 +125,4 @@ StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
             break;
     }
 
-}
+};

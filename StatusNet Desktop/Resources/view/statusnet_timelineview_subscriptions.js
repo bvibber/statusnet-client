@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 StatusNet.TimelineViewSubscriptions = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s subscriptions on {site}";
@@ -36,7 +37,7 @@ StatusNet.TimelineViewSubscriptions = function(client) {
             }
         }
     );
-}
+};
 
 // Make StatusNet.TimelineViewSubscriptions inherit TimelineView's prototype
 StatusNet.TimelineViewSubscriptions.prototype = heir(StatusNet.TimelineView.prototype);
@@ -70,7 +71,7 @@ StatusNet.TimelineViewSubscriptions.prototype.show = function() {
     $('div#profile_panel a').attr('rel', 'external');
 
     StatusNet.debug("StatusNet.TimelineViewSubscriptions.show() - finished showing notices");
-}
+};
 
 StatusNet.TimelineViewSubscriptions.prototype.showNewUser = function(user) {
     StatusNet.debug("prepending user " + user.id);
@@ -78,7 +79,7 @@ StatusNet.TimelineViewSubscriptions.prototype.showNewUser = function(user) {
     var notice = $('#notices > div#profile_panel:first').get(0);
     $('#notices > div#profile_panel:first').hide();
     $('#notices > div#profile_panel:first').fadeIn("slow");
-}
+};
 
 /**
  * Override the header to show name of the user associated with
@@ -107,7 +108,7 @@ StatusNet.TimelineViewSubscriptions.prototype.showHeader = function () {
 
     $("#header").html("<h1></h1>");
     $("#header h1").text(title);
-}
+};
 
 /**
  * Put together the HTML for a single notice for a User profile timeline
@@ -176,7 +177,7 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
     html.push('</div>')
 
     return html.join('');
-}
+};
 
 /**
  * Show this if the timeline is empty
@@ -184,7 +185,7 @@ StatusNet.TimelineViewSubscriptions.prototype.renderUser = function(user) {
 StatusNet.TimelineViewSubscriptions.prototype.showEmptyTimeline = function() {
     $('#notices').empty();
     $('#notices').append('<div id="empty_timeline">No subscriptions yet.</div>');
-}
+};
 
 StatusNet.TimelineViewSubscriptions.prototype.enableProfileControls = function(profileXml) {
 
@@ -222,4 +223,4 @@ StatusNet.TimelineViewSubscriptions.prototype.enableProfileControls = function(p
             });
         }
     });
-}
+};
