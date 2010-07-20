@@ -109,8 +109,18 @@ StatusNet.TimelineView.prototype.show = function() {
     if (!this.webview) {
         var navbar = StatusNet.Platform.createNavBar(this.window);
 
+        // @fixme how do we give it the standard back-button style?
+        var backButton = Titanium.UI.createButton({
+            title: "Accounts"
+        });
+        backButton.addEventListener('click', function() {
+            that.client.tabGroup.close();
+        });
+        navbar.setLeftNavButton(backButton);
+
         var updateButton = Titanium.UI.createButton({
-            title: "New" // @fixme use the system compose icon
+            title: "New",
+            systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
         });
         updateButton.addEventListener('click', function() {
             that.client.newNoticeDialog();
