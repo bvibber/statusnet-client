@@ -204,3 +204,9 @@ StatusNet.TimelineUser.prototype.cacheable = function() {
     return false;
 };
 
+/**
+ * Whether to automatically reload
+ */
+StatusNet.TimelineUser.prototype.autoRefresh = function() {
+	return false;
+};

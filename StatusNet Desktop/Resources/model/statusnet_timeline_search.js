@@ -150,3 +150,11 @@ StatusNet.TimelineSearch.prototype.addNotice = function(entry, prepend) {
 StatusNet.TimelineSearch.prototype.cacheable = function() {
     return false;
 };
+
+/**
+ * Whether to automatically reload
+ */
+StatusNet.TimelineSearch.prototype.autoRefresh = function() {
+	return false;
+};
+

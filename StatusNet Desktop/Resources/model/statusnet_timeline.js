@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for base timeline model class
  *
@@ -411,6 +412,13 @@ StatusNet.Timeline.prototype.getNotices = function() {
     StatusNet.debug('Timeline.getNotices out: ' + this._notices.length + ' items.');
     return this._notices;
 };
+
+/**
+ * Whether to automatically reload
+ */
+StatusNet.Timeline.prototype.autoRefresh = function() {
+	return true;
+}
 
 /**
  * Constructor for mentions timeline model

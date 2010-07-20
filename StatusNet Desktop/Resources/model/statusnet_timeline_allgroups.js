@@ -130,3 +130,10 @@ StatusNet.TimelineAllGroups.prototype.finishedFetch = function(notice_count) {
         this.client.getActiveView().showEmptyTimeline();
     }
 };
+
+/**
+ * Whether to automatically reload
+ */
+StatusNet.TimelineAllGroups.prototype.autoRefresh = function() {
+	return false;
+};
