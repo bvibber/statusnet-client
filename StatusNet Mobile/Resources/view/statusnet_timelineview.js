@@ -132,10 +132,13 @@ StatusNet.TimelineView.prototype.show = function() {
         Ti.App.addEventListener('sn_ready', function(event) {
             StatusNet.debug('YAY GOT sn_ready EVENT! ' + event);
         });
+
         Ti.App.addEventListener('sn_external', function(event) {
             StatusNet.debug('YAY sn_external event!');
-            StatusNet.debug('event: ' + event);
-            //that.handleViewEvent(event);
+            StatusNet.debug('event: ' + event.url);
+            // Open external links in system default browser...
+            // Note: on iPhone this will launch Safari and may cause us to close.
+            Titanium.Platform.openURL(event.url);
         });
         this.window.add(this.table);
     }
