@@ -172,7 +172,7 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
                 },
                 'link': function(elem) {
                     // @fixme accept other image sizes
-                    if (elem.getAttribute('rel') == 'avatar' && elem.getAttribute('media:width') == 48) {
+                    if (elem.getAttribute('rel') == 'avatar' && elem.getAttribute('media:width') == StatusNet.Platform.avatarSize()) {
                         notice.avatar = elem.getAttribute('href');
                     }
                 }

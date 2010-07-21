@@ -190,7 +190,19 @@ StatusNet.Event.prototype.notify = function(args) {
     }
 };
 
-StatusNet.nativeNotifications = function() {
+
+StatusNet.Platform = {};
+
+/**
+ * Check the most appropriate size to fetch avatars for inline use
+ * @return number
+ */
+StatusNet.Platform.avatarSize = function() {
+    // @fixme someday sane high-res displays will exist, we should check
+    return 48;
+}
+
+StatusNet.Platform.nativeNotifications = function() {
 
     // Snow Lep has notifications
     if (Titanium.Platform.name === "Darwin") {

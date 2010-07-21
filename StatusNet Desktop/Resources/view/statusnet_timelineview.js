@@ -176,7 +176,7 @@ StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
 
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
 
-    if (!StatusNet.nativeNotifications()) {
+    if (!StatusNet.Platform.nativeNotifications()) {
         return;
     }
 
