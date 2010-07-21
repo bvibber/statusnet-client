@@ -49,9 +49,13 @@ Titanium.App.addEventListener("StatusNet_appendTimelineNotice", function(event) 
 
 // Default handling for link click events; we'll pass external links on to the app
 // for opening in a separate browser window.
-$("#notices").delegate("a.external", "click", function(event) {
-    Titanium.App.fireEvent("StatusNet_externalLink", {url: this.href});
-    return false; // don't load the link in the webview.
+$("#notices").delegate("a", "click", function(event) {
+    if (this.href.substr(0, 4) == 'app:') {
+        Titanium.API.info('Got a delegated click event for internal app link: ' + this.href);
+    } else {
+        Titanium.App.fireEvent("StatusNet_externalLink", {url: this.href});
+        return false; // don't load the link in the webview.
+    }
 });
 
 Titanium.App.fireEvent("StatusNet_timelineReady", {hey: "foo"});
