@@ -70,18 +70,20 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
  * @access private
  */
 StatusNet.AtomParser.mapOverElements = function(parent, map) {
+    Titanium.API.info('WWW IN');
+    var origstart = Date.now();
     var list = parent.childNodes;
+    var ms = Date.now() - origstart;
+    Titanium.API.info('WWW - ' + ms + 'ms to get child nodes');
     var last = list.length;
     for (var i = 0; i < last; i++) {
         var el = list.item(i);
-        var name = el.nodeName;
-        if (map[name] !== undefined) {
-            var start = Date.now();
-            map[name](el);
-            var ms = Date.now() - start;
-            Titanium.API.info('WWW - ' + ms + 'ms to process ' + name);
+        if (map[el.nodeName] !== undefined) {
+            map[el.nodeName](el);
         }
     }
+    var ms = Date.now() - origstart;
+    Titanium.API.info('WWW OUT - ' + ms + 'ms to process group in ' + parent.nodeName);
 }
 
 /**

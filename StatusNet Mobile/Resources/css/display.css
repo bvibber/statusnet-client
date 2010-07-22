@@ -432,3 +432,9 @@ a#new_notice:hover {
 	margin-left: 6px;
 	padding: 1px;
 }
+
+.spinner {
+    position: absolute;
+    left: 148px;
+    top: 148px;
+}

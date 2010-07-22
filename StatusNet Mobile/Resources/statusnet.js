@@ -150,13 +150,14 @@ StatusNet.Platform = {
      * @return number
      */
     avatarSize: function() {
-        StatusNet.debug('DPI IS ' + Titanium.Platform.displayCaps.dpi);
-        if (Titanium.Platform.displayCaps.dpi >= 240) {
+        if (StatusNet.Platform.dpi >= 240) {
             return 96;
         } else {
             return 48;
         }
     },
+
+    dpi: Titanium.Platform.displayCaps.dpi,
 
     isApple: function() {
         return Titanium.Platform.osname == "iphone" || Titanium.Platform.osname == "ipad";
