@@ -71,7 +71,9 @@ StatusNet.TimelineView = function(client, showNotifications) {
 StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     var html = [];
-    var avatar = notice.avatar;
+
+    var avatar = this.lookupAvatar(notice.avatar);
+
     var author = notice.author;
     var authorId = notice.authorId
 
@@ -92,7 +94,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
     html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
     html.push('</div>');
-    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
+    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + notice.author + '</a>');
     html.push('<div class="content">'+ notice.content +'</div>');
     html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
     if (notice.source) {
@@ -112,7 +114,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
         html.push(' <a href="#" class="notice_fave">Fave</a>')
     }
 
-    if (author === this.client.account.username) {
+    if (notice.author === this.client.account.username) {
         html.push(' <a href="#" class="notice_delete">Delete</a>')
     } else {
         if (notice.repeated === "false") {
@@ -373,6 +375,72 @@ StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
     $('#notices').empty();
     $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
 };
+
+/**
+ * Lookup avatar in our avatar cache
+ *
+ */
+StatusNet.TimelineView.prototype.lookupAvatar = function(url) {
+
+	var hash = Titanium.Codec.digestToHex(Titanium.Codec.SHA1, url);
+	StatusNet.debug('Avatar hash for ' + url + " == " + hash);
+
+	var dot = url.lastIndexOf(".");
+
+	if (dot == -1 ) {
+		// ooh weird, no extension
+		return url;
+	}
+
+ 	var extension = url.substr(dot, url.length);
+	var resourcesDir = Titanium.Filesystem.getResourcesDirectory();
+	var separator = Titanium.Filesystem.getSeparator();
+	var dirname = resourcesDir + separator + 'avatar_cache';
+
+	var cacheDir = Titanium.Filesystem.getFile(dirname);
+
+	if (!cacheDir.exists()) {
+		StatusNet.debug("XXXXXXXXXX directory doesn't exist");
+		cacheDir.createDirectory();
+	}
+
+	// relativeFilename for use in webview
+	var relativeFilename = 'avatar_cache' + separator + hash + extension;
+	var filename = dirname + separator + hash + extension;
+
+	StatusNet.debug("filename = " + filename);
+
+	var avatarFile = Titanium.Filesystem.getFile(filename);
+
+	StatusNet.debug('looking up avatar: ' + filename);
+	if (avatarFile.exists()) {
+		StatusNet.debug("Avatar cache hit");
+		return relativeFilename;
+	}
+
+	StatusNet.debug("Avatar cache miss");
+
+	var success = false;
+
+	StatusNet.HttpClient.fetchFile(
+		url,
+		filename,
+		function() {
+			StatusNet.debug("fetched avatar: " + url);
+			success = true;
+		},
+		function() {
+			common_debug("Couldn't fetch: " + url);
+		}
+	);
+
+	if (success) {
+		return filename;
+	} else {
+		return url;
+	}
+}
+
 
 /**
  * Constructor for a view for a friends timeline
