@@ -5,7 +5,7 @@ html, body {
 
 body, * {
 	font-family:"Lucida Grande",Tahoma, Helvetica, sans-serif;
-	font-size:12px;
+    font-size: 16px;
 	margin:0;
 	padding:0;
 }
@@ -161,15 +161,15 @@ h1 {
 }
 
 .notice .avatar img {
-	width: 48px;
-	height: 48px;
+	width: 64px;
+	height: 64px;
 	-webkit-border-radius: 3px;
 	-webkit-box-shadow: 0px 0px 3px gray;
 	background-color:#f8f8f8;
 }
 
 .notice .author {
-	font-size:14px;
+	font-size:18px;
 	color:#000;
 	text-decoration:none;
 	font-weight: normal;
@@ -261,7 +261,7 @@ a#new_notice:hover {
 	padding: 4px 8px 4px 8px;
 	background: #444;
 	color: #fff;
-	font-size: 1.5em;
+	font-size: 1.25em;
 	text-decoration: none;
 	border: 1px transparent #fff;
 	-webkit-border-radius: 6px;

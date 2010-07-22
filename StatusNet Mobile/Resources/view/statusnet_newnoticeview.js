@@ -56,6 +56,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         right: 0,
         height: 160,
         value: '',
+        font: {fontSize: 16},
         returnKeyType: Titanium.UI.RETURNKEY_SEND
     });
     noticeTextArea.addEventListener('return', function() {
