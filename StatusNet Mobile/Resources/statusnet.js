@@ -145,6 +145,20 @@ StatusNet.Event.prototype.notify = function(args) {
  * Wrapper functions wooo
  */
 StatusNet.Platform = {
+    /**
+     * Check the most appropriate size to fetch avatars for inline use
+     * @return number
+     */
+    avatarSize: function() {
+        if (StatusNet.Platform.dpi >= 240) {
+            return 96;
+        } else {
+            return 48;
+        }
+    },
+
+    dpi: Titanium.Platform.displayCaps.dpi,
+
     isApple: function() {
         return Titanium.Platform.osname == "iphone" || Titanium.Platform.osname == "ipad";
     },

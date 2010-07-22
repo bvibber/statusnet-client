@@ -7,17 +7,21 @@
 <body>
 
 <div id="notices">
-...
+<img class="spinner" src="images/loading.gif">
 </div>
 
 <script src="lib/jquery-1.4.2.min.js"></script>
+<script src="lib/humane.js"></script>
 <script>
 if (typeof Titanium == "undefined") {
     document.write('Titanium is undefined. Nothing will work in this webview.');
 }
 
+var activeNotice = null;
+
 // App-wide event registration, whee!
 Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
+    activeNotice = null;
     $("#notices").html(event.html);
 });
 Titanium.App.addEventListener("StatusNet_appendTimelineNotice", function(event) {
@@ -46,9 +50,13 @@ Titanium.App.addEventListener("StatusNet_appendTimelineNotice", function(event) 
 
 // Default handling for link click events; we'll pass external links on to the app
 // for opening in a separate browser window.
-$("#notices").delegate("a.external", "click", function(event) {
-    Titanium.App.fireEvent("StatusNet_externalLink", {url: this.href});
-    return false; // don't load the link in the webview.
+$("#notices").delegate("a", "click", function(event) {
+    if (this.href.substr(0, 4) == 'app:') {
+        Titanium.API.info('Got a delegated click event for internal app link: ' + this.href);
+    } else {
+        Titanium.App.fireEvent("StatusNet_externalLink", {url: this.href});
+        return false; // don't load the link in the webview.
+    }
 });
 
 Titanium.App.fireEvent("StatusNet_timelineReady", {hey: "foo"});
@@ -86,8 +94,8 @@ renderNotice = function(notice) {
     html.push('</div>');
     html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
     html.push('<div class="content">'+ notice.content +'</div>');
-    //html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
-    html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + notice.updated + '</a></div>');
+    html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
+    //html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + notice.updated + '</a></div>');
     if (notice.source) {
         html.push('<div class="notice_source"><span class="notice_source_inner">from ' + notice.source + '</span></div>');
     }
@@ -97,7 +105,7 @@ renderNotice = function(notice) {
             + notice.contextLink +'">in context</a></div>'
         );
     }
-    html.push('<div class="notice_links"><a href="#" class="notice_reply">Reply</a>');
+    html.push('<div class="notice_links"><div class="links"><a href="#" class="notice_reply">Reply</a>');
 
     if (notice.favorite === "true") {
         html.push(' <a href="#" class="notice_unfave">Unfave</a>');
@@ -113,7 +121,7 @@ renderNotice = function(notice) {
         }
     //}
 
-    html.push('</div></div>');
+    html.push('</div></div></div>');
     html.push('<div class="clear"></div>');
 
     return html.join('');
@@ -170,6 +178,17 @@ enableNoticeControls = function(noticeDom) {
                 }
             });
         //}
+    });
+
+    $(noticeDom).bind('click', function(event) {
+        var speed = 200;
+        if (activeNotice && activeNotice !== this) {
+            $(activeNotice).removeClass('foldout');
+            $(activeNotice).find('.links').slideUp(speed);
+        }
+        $(noticeDom).addClass('foldout');
+        $(noticeDom).find('.links').slideDown(speed);
+        activeNotice = noticeDom;
     });
 
 };

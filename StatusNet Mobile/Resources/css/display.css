@@ -5,7 +5,7 @@ html, body {
 
 body, * {
 	font-family:"Lucida Grande",Tahoma, Helvetica, sans-serif;
-	font-size:12px;
+    font-size: 16px;
 	margin:0;
 	padding:0;
 }
@@ -150,7 +150,7 @@ h1 {
 	-webkit-box-shadow: 2px 2px 2px #222;
 }
 
-.notice:hover {
+.notice[class~=foldout] {
 	background-color: #f2f2f2;
 	-webkit-box-shadow: 2px 2px 2px #111;
 }
@@ -161,15 +161,15 @@ h1 {
 }
 
 .notice .avatar img {
-	width: 48px;
-	height: 48px;
+	width: 64px;
+	height: 64px;
 	-webkit-border-radius: 3px;
 	-webkit-box-shadow: 0px 0px 3px gray;
 	background-color:#f8f8f8;
 }
 
 .notice .author {
-	font-size:14px;
+	font-size:18px;
 	color:#000;
 	text-decoration:none;
 	font-weight: normal;
@@ -197,10 +197,6 @@ h1 {
 .notice .notice_source a {
 	font-size: 1em;
 	text-decoration: none;
-}
-
-.notice .date_link a:hover, .notice .context_link a:hover, .notice .notice_source a:hover {
-	text-decoration: underline;
 }
 
 .notice .context_link a:before {
@@ -256,13 +252,16 @@ a#new_notice:hover {
 	padding-top: 8px;
 	margin-bottom: 2px;
 }
+.notice_links .links {
+    display: none;
+}
 
 .notice_links a {
 	margin-right: 2px;
-	padding: 2px 5px 2px 5px;
+	padding: 4px 8px 4px 8px;
 	background: #444;
 	color: #fff;
-	font-size: 0.95em;
+	font-size: 1.25em;
 	text-decoration: none;
 	border: 1px transparent #fff;
 	-webkit-border-radius: 6px;
@@ -270,7 +269,7 @@ a#new_notice:hover {
 	-webkit-box-shadow: 1px 1px 1px #dcdcdc;
 } 
 
-.notice_links a:hover {
+.notice_links[class~=foldout] a {
 	background: #b3b3b3;
 	color: #000;
 	text-shadow: 0px 1px 0px #ccc;
@@ -432,4 +431,10 @@ a#new_notice:hover {
 	-webkit-border-radius: 4px;
 	margin-left: 6px;
 	padding: 1px;
+}
+
+.spinner {
+    position: absolute;
+    left: 148px;
+    top: 148px;
 }

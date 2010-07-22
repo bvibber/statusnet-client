@@ -133,7 +133,8 @@ StatusNet.TimelineView.prototype.show = function() {
             right: 0,
             bottom: 0,
             scalesPageToFit: false,
-            url: "timeline.html"
+            url: "timeline.html",
+            backgroundColor: 'black'
         });
 
         // @fixme move most of these up to Client
@@ -188,7 +189,7 @@ StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
     StatusNet.debug('Stubbed TimelineView.notifyNewNotice');
 /*
-    if (!StatusNet.nativeNotifications()) {
+    if (!StatusNet.Platform.nativeNotifications()) {
         return;
     }
 
