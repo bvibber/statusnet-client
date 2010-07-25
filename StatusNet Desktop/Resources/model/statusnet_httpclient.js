@@ -146,8 +146,12 @@ StatusNet.HttpClient.fetchFile = function(url, filename, onSuccess, onError) {
 
         client.onreadystatechange = function() {
             if (client.readyState == 4) {
-                file.write(client.responseData);
-                onSuccess();
+                if (file.write(client.responseData)) {
+                    StatusNet.debug("HttpClient.fetchFile - saved file: " + file);
+                    onSuccess(client.status);
+                } else {
+                    StatusNet.debug("HttpClient.fetchFile - could not save file: " + file);
+                }
             }
         };
 

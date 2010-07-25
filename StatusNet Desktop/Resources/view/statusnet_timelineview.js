@@ -71,8 +71,16 @@ StatusNet.TimelineView = function(client, showNotifications) {
 StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     var html = [];
+	var avatar;
 
-    var avatar = this.lookupAvatar(notice.avatar);
+    var cachedAvatar = this.lookupAvatar(notice.avatar, null,  null);
+
+	if (cachedAvatar) {
+		avatar = cachedAvatar;
+	} else {
+		StatusNet.debug("cachedAvatar - is false");
+		avatar = notice.avatar;
+	}
 
     var author = notice.author;
     var authorId = notice.authorId
@@ -199,13 +207,27 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
     notification.setTitle(msg);
     notification.setMessage(notice.title);
 
-    notification.setIcon("app://logo.png");
-    notification.setDelay(5000);
-    notification.setCallback(function () {
-    // @todo Bring the app window back to focus / on top
-        StatusNet.debug("i've been clicked");
-    });
-    notification.show();
+	StatusNet.debug('notifyNewNotice - looking up avatar: ' + notice.avatar);
+
+	this.lookupAvatar(notice.avatar, function(avatarUrl) {
+		StatusNet.debug('notifyNewNotice - finished looking up avatar');
+
+		if (avatarUrl.match(/^http/)) {
+			// if it's a full URL it means the avatar isn't cached for some reason
+			StatusNet.debug("notifyNewNotice - we got a non-relative URL. Bummer.");
+			notification.setIcon("app://logo.png");
+		} else {
+			StatusNet.debug("Setting icon to app://" + avatarUrl);
+			notification.setIcon("app://" + avatarUrl);
+		}
+
+	    notification.setDelay(5000);
+	    notification.setCallback(function () {
+	    // @todo Bring the app window back to focus / on top
+	        StatusNet.debug("i've been clicked");
+	    });
+	    notification.show();
+	});
 };
 
 /**
@@ -377,10 +399,10 @@ StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
 };
 
 /**
- * Lookup avatar in our avatar cache
+ * Lookup avatar in our avatar cache.
  *
  */
-StatusNet.TimelineView.prototype.lookupAvatar = function(url) {
+StatusNet.TimelineView.prototype.lookupAvatar = function(url, onHit, onMiss) {
 
 	var hash = Titanium.Codec.digestToHex(Titanium.Codec.SHA1, url);
 	StatusNet.debug('Avatar hash for ' + url + " == " + hash);
@@ -395,52 +417,60 @@ StatusNet.TimelineView.prototype.lookupAvatar = function(url) {
  	var extension = url.substr(dot, url.length);
 	var resourcesDir = Titanium.Filesystem.getResourcesDirectory();
 	var separator = Titanium.Filesystem.getSeparator();
-	var dirname = resourcesDir + separator + 'avatar_cache';
+	var cacheDirname = resourcesDir + separator + 'avatar_cache';
 
-	var cacheDir = Titanium.Filesystem.getFile(dirname);
+	var cacheDir = Titanium.Filesystem.getFile(cacheDirname);
 
 	if (!cacheDir.exists()) {
-		StatusNet.debug("XXXXXXXXXX directory doesn't exist");
+		StatusNet.debug("lookupAvatar - avatar_cache directory doesn't exist");
 		cacheDir.createDirectory();
-	}
-
-	// relativeFilename for use in webview
-	var relativeFilename = 'avatar_cache' + separator + hash + extension;
-	var filename = dirname + separator + hash + extension;
-
-	StatusNet.debug("filename = " + filename);
-
-	var avatarFile = Titanium.Filesystem.getFile(filename);
-
-	StatusNet.debug('looking up avatar: ' + filename);
-	if (avatarFile.exists()) {
-		StatusNet.debug("Avatar cache hit");
-		return relativeFilename;
-	}
-
-	StatusNet.debug("Avatar cache miss");
-
-	var success = false;
-
-	StatusNet.HttpClient.fetchFile(
-		url,
-		filename,
-		function() {
-			StatusNet.debug("fetched avatar: " + url);
-			success = true;
-		},
-		function() {
-			common_debug("Couldn't fetch: " + url);
-		}
-	);
-
-	if (success) {
-		return filename;
 	} else {
-		return url;
+		StatusNet.debug("lookupAvatar - avatar_cache directory already exists");
+	}
+
+	var filename = hash + extension;
+	var filepath = cacheDir + separator + filename;
+
+	StatusNet.debug("lookupAvatar - filepath = " + filepath);
+
+	var relativePath = 'avatar_cache/' + filename; // for use in webview
+
+	var avatarFile = Titanium.Filesystem.getFile(filepath);
+
+	StatusNet.debug('lookupAvatar - looking up avatar: ' + filepath);
+	if (avatarFile.isFile()) {
+		StatusNet.debug("lookupAvatar - Yay, avatar cache hit");
+		if (onHit) {
+			onHit(relativePath);
+		}
+		return relativePath;
+	} else {
+
+		StatusNet.debug("lookupAvatar - Avatar cache miss, fetching avatar from web");
+
+		StatusNet.HttpClient.fetchFile(
+			url,
+			filepath,
+			function() {
+				StatusNet.debug("lookupAvatar - fetched avatar: " + url);
+				if (onHit) {
+					onHit(relativePath);
+					return relativePath;
+				}
+			},
+			function(code, e) {
+				StatusNet.debug("lookupAvatar - couldn't fetch: " + url);
+				StatusNet.debug("lookupAvatar - code: " + code + ", exception: " + e);
+			}
+		);
+
+		if (onMiss) {
+			onMiss(url)
+		}
+
+		return false;
 	}
 }
-
 
 /**
  * Constructor for a view for a friends timeline
