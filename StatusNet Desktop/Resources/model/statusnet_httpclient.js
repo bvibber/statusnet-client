@@ -71,11 +71,11 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
             // NOP
         };
 
-		// XXX: client.onerror is only called by mobile's HTTPClient
-		client.onerror = function(e) {
-			StatusNet.debug("webRequest: failure!");
-	        onError(client.status, "Error: " + e.error);
-		};
+        // XXX: client.onerror is only called by mobile's HTTPClient
+        client.onerror = function(e) {
+            StatusNet.debug("webRequest: failure!");
+            onError(client.status, "Error: " + e.error);
+        };
 
         if (data) {
             StatusNet.debug("HTTP POST to: " + url);
@@ -130,6 +130,45 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
         onError(client, e);
     }
 };
+
+StatusNet.HttpClient.fetchFile = function(url, filename, onSuccess, onError) {
+
+    try {
+
+        var file = Titanium.Filesystem.getFile(filename);
+        var client = Titanium.Network.createHTTPClient();
+
+        if (Titanium.Network.online == false) {
+           StatusNet.debug("No internet.");
+           onError(client.status, "No Internet connection!");
+           return;
+        }
+
+        client.onreadystatechange = function() {
+            if (client.readyState == 4) {
+                if (file.write(client.responseData)) {
+                    StatusNet.debug("HttpClient.fetchFile - saved file: " + file);
+                    onSuccess(client.status);
+                } else {
+                    StatusNet.debug("HttpClient.fetchFile - could not save file: " + file);
+                }
+            }
+        };
+
+        // XXX: client.onerror is only called by mobile's HTTPClient
+        client.onerror = function(e) {
+            StatusNet.debug("fetchFile: failure!");
+            onError(client.status, "Error: " + e.error);
+        };
+
+        client.open("GET", url);
+        client.send();
+
+    } catch (e) {
+        StatusNet.debug('fetchFile: HTTP client exception: ' + e);
+        onError(client.status, e);
+    }
+}
 
 
 /**

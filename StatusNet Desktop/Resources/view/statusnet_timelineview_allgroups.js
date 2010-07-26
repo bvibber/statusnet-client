@@ -37,7 +37,7 @@ StatusNet.TimelineViewAllGroups = function(client) {
             }
         }
     );
-}
+};
 
 // Make StatusNet.TimelineViewAllGroups inherit TimelineView's prototype
 StatusNet.TimelineViewAllGroups.prototype = heir(StatusNet.TimelineView.prototype);
@@ -69,7 +69,7 @@ StatusNet.TimelineViewAllGroups.prototype.show = function() {
     });
 
     StatusNet.debug("StatusNet.TimelineViewAllGroups.show() - finished showing groups");
-}
+};
 
 StatusNet.TimelineViewAllGroups.prototype.showNewGroup = function(group) {
     StatusNet.debug("prepending group " + group.id);
@@ -77,7 +77,7 @@ StatusNet.TimelineViewAllGroups.prototype.showNewGroup = function(group) {
 	this.enableGroupControls($('#notices > div#profile_panel:first').get(0));
     $('#notices > div#profile_panel:first').hide();
     $('#notices > div#profile_panel:first').fadeIn("slow");
-}
+};
 
 /**
  * Put together HTML for a group
@@ -154,7 +154,7 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
 StatusNet.TimelineViewAllGroups.prototype.showEmptyTimeline = function() {
     $('#notices').empty();
     $('#notices').append('<div id="empty_timeline">No groups yet.</div>');
-}
+};
 
 StatusNet.TimelineViewAllGroups.prototype.enableGroupControls = function(profileXml) {
 
@@ -179,4 +179,4 @@ StatusNet.TimelineViewAllGroups.prototype.enableGroupControls = function(profile
     $('a.group_leave', profileXml).bind('click', function(event) {
         that.client.leaveGroup(id, this);
     });
-}
+};

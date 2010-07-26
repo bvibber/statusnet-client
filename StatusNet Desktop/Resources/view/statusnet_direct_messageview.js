@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for direct message view
  */
@@ -25,7 +26,7 @@ StatusNet.DirectMessageView = function() {
     this.account = StatusNet.Account.getDefault(db);
 
     StatusNet.debug("DirectMessageView constructor");
-}
+};
 
 /**
  * Initialize the window
@@ -65,7 +66,7 @@ StatusNet.DirectMessageView.prototype.init = function() {
 
     // set focus to the text entry field
     $('#direct_message_textarea').focus();
-}
+};
 
 /**
  * Send direct message
@@ -100,4 +101,4 @@ StatusNet.DirectMessageView.prototype.send = function()
             me.close();
         }
     );
-}
+};

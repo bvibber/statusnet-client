@@ -17,13 +17,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for user's timeline
  */
 StatusNet.TimelineViewUser = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "{name}'s profile on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewUser inherit TimelineView's prototype
 StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
@@ -154,7 +155,7 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     $('a.profile_subscriptions').bind('click', function(event) {
          client.showSubscriptions(user.id);
     });
-}
+};
 
 /**
  * Override the header to show name of the user associated with
@@ -191,7 +192,7 @@ StatusNet.TimelineViewUser.prototype.showHeader = function () {
         that.showProfileInfo,
         that.client.timeline.authorId
     );
-}
+};
 
 /**
  * Put together the HTML for a single notice for a User profile timeline
@@ -259,6 +260,4 @@ StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
     html.push('<div class="clear"></div>');
 
     return html.join('');
-}
-
-
+};

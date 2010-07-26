@@ -26,7 +26,8 @@ StatusNet.SettingsView = function() {
     this.lastUsername = '';
     this.lastPassword = '';
     this.lastSite = '';
-}
+};
+
 StatusNet.SettingsView.prototype.init = function() {
     $("#new-account").hide();
 
@@ -64,7 +65,7 @@ StatusNet.SettingsView.prototype.init = function() {
     $("#new-cancel").click(function() {
         that.hideAddAccount();
     });
-}
+};
 
 StatusNet.SettingsView.prototype.formComplete = function() {
 
@@ -77,18 +78,18 @@ StatusNet.SettingsView.prototype.formComplete = function() {
     } else {
         return false
     }
-}
+};
 
 StatusNet.SettingsView.prototype.showAddAccount = function() {
     this.resetNewAccount();
     $("#new-account").show();
     $("#new-username").focus();
-}
+};
 
 StatusNet.SettingsView.prototype.hideAddAccount = function() {
     $("#new-account").hide();
     this.resetNewAccount();
-}
+};
 
 /**
  * @fixme really should separate this a bit more to model/view?
@@ -107,7 +108,7 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
         }
         me.setCloseable(true);
     }
-}
+};
 
 /**
  * Add an account row to the accounts list.
@@ -164,7 +165,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     }, function(status) {
         StatusNet.debug("We failed to load account info");
     });
-}
+};
 
 /**
  * @param StatusNet.Account acct
@@ -175,7 +176,7 @@ StatusNet.SettingsView.prototype.prettySiteName = function(acct) {
                                  .attr("title", acct.apiroot)
                                  .addClass(acct.isSecure() ? 'https' : 'http');
     return $("<div></div>").append(html).html(); // @fixme ok this is lame
-}
+};
 
 /**
  * Start a timeout to try updating the account if the user stops
@@ -191,7 +192,7 @@ StatusNet.SettingsView.prototype.startUpdateTimeout = function() {
             that.updateNewAccount();
         }
     }, 2000);
-}
+};
 
 /**
  * Cancel the account update timeout if it's been started.
@@ -201,7 +202,7 @@ StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
         window.clearTimeout(this.updateTimeout);
         this.updateTimeout = null;
     }
-}
+};
 
 /**
  * Determine wether the version of StatusNet will work with this client
@@ -229,7 +230,7 @@ StatusNet.SettingsView.prototype.validVersion = function(version)
     }
 
     return true;
-}
+};
 
 /**
  * Validate input and see if we can make it work yet
@@ -319,7 +320,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
         $("#new-avatar").attr("src", "images/default-avatar-stream.png");
 
     });
-}
+};
 
 /**
  * Build an account object from the info in our form, if possible.
@@ -375,14 +376,14 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
             });
         });
     }
-}
+};
 
 StatusNet.SettingsView.prototype.saveNewAccount = function() {
     this.workAcct.ensure(StatusNet.getDB());
     this.showAccountRow(this.workAcct);
 
     this.hideAddAccount();
-}
+};
 
 StatusNet.SettingsView.prototype.resetNewAccount = function() {
     this.workAcct = null;
@@ -391,4 +392,4 @@ StatusNet.SettingsView.prototype.resetNewAccount = function() {
     $("#new-site").val("");
     $("#new-avatar").attr("src", "images/default-avatar-stream.png");
     $("#new-save").attr("disabled", "disabled");
-}
+};

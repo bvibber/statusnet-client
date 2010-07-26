@@ -17,13 +17,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for a view for inbox timeline
  */
 StatusNet.TimelineViewInbox = function(client) {
     StatusNet.TimelineView.call(this, client);
     this.title = "Inbox for {name} on {site}";
-}
+};
 
 // Make StatusNet.TimelineViewInbox inherit TimelineView's prototype
 StatusNet.TimelineViewInbox.prototype = heir(StatusNet.TimelineView.prototype);
@@ -53,7 +54,7 @@ StatusNet.TimelineViewInbox.prototype.renderNotice = function(notice) {
     html.push('<div class="clear"></div>');
 
     return html.join('');
-}
+};
 
 StatusNet.TimelineViewInbox.prototype.enableNoticeControls = function(noticeDom) {
 
@@ -67,4 +68,4 @@ StatusNet.TimelineViewInbox.prototype.enableNoticeControls = function(noticeDom)
         that.client.directMessageDialog(noticeAuthor);
     });
 
-}
+};

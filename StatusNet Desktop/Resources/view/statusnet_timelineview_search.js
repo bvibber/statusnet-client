@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for a view for search timeline
  * @fixme this guy'll need an input box!
@@ -27,7 +28,7 @@ StatusNet.TimelineViewSearch = function(client) {
     
     StatusNet.debug("TimelineViewSearch constructor");
     
-}
+};
 
 // Make StatusNet.TimelineViewSearch inherit TimelineView's prototype
 StatusNet.TimelineViewSearch.prototype = heir(StatusNet.TimelineView.prototype);
@@ -51,4 +52,4 @@ StatusNet.TimelineViewSearch.prototype.showHeader = function () {
             timeline.updateSearch($(this).val());
         }
     );
-}
+};

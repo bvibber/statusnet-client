@@ -25,7 +25,7 @@ StatusNet.NewNoticeView = function() {
     this.account = StatusNet.Account.getDefault(db);
 
     StatusNet.debug("NewNoticeView constructor");
-}
+};
 
 /**
  * Initialize the window -- add @-reply text if necessary
@@ -75,7 +75,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
     // set focus to the text entry field
     $('textarea#notice_textarea').focus();
-}
+};
 
 /**
  * Setup post parameters and post the notice
@@ -121,4 +121,4 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
             me.close();
         }
     );
-}
+};
