@@ -177,7 +177,7 @@ h1 {
 }
 
 .notice .date_link {
-	float: left;
+	float: right;
 }
 
 .notice .context_link, .notice .notice_source {
@@ -256,6 +256,11 @@ a#new_notice:hover {
     display: none;
 }
 
+.notice_links div {
+    display: block; /* wtf? */
+}
+
+/*
 .notice_links a {
 	margin-right: 2px;
 	padding: 4px 8px 4px 8px;
@@ -275,6 +280,7 @@ a#new_notice:hover {
 	text-shadow: 0px 1px 0px #ccc;
 	-webkit-box-shadow: 1px 1px 1px #111;
 } 
+*/
 
 #empty_timeline {
 	margin: 10px 0px 0px 4px;

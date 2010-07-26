@@ -93,10 +93,16 @@ renderNotice = function(notice) {
     html.push('<div class="' + classes.join(" ") + '" id="notice-' + notice.id +'" name="notice-' + notice.id +'">');
     html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
     html.push('</div>');
-    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
+    html.push('<div>');
+    html.push('<div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
+    html.push('<a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
     html.push('<div class="content">'+ notice.content +'</div>');
-    html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
-    //html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + notice.updated + '</a></div>');
+    html.push('</div>');
+
+    html.push('<div class="notice_links">');
+    html.push('<div class="links">');
+
+    html.push('<div>');
     if (notice.source) {
         html.push('<div class="notice_source"><span class="notice_source_inner">from ' + notice.source + '</span></div>');
     }
@@ -106,22 +112,27 @@ renderNotice = function(notice) {
             + notice.contextLink +'">in context</a></div>'
         );
     }
-    html.push('<div class="notice_links"><div class="links"><a href="#" class="notice_reply">Reply</a>');
+    html.push('</div>');
+
+    html.push('<br>');
+    html.push('<div>');
+    html.push('<button class="notice_reply">Reply</button>');
 
     if (notice.favorite === "true") {
-        html.push(' <a href="#" class="notice_unfave">Unfave</a>');
+        html.push(' <button class="notice_unfave">Unfave</button>');
     } else {
-        html.push(' <a href="#" class="notice_fave">Fave</a>')
+        html.push(' <button class="notice_fave">Fave</button>')
     }
 
     /*if (author === this.client.account.username) {
         html.push(' <a href="#" class="notice_delete">Delete</a>')
     } else {*/
         if (notice.repeated === "false") {
-            html.push(' <a href="#" class="notice_repeat">Repeat</a>');
+            html.push(' <button class="notice_repeat">Repeat</button>');
         }
     //}
 
+    html.push('<div>');
     html.push('</div></div></div>');
     html.push('<div class="clear"></div>');
 
@@ -159,7 +170,7 @@ enableNoticeControls = function(noticeDom) {
         });
     //}
 
-    $(noticeDom).find('a.notice_reply').bind('click', function(event) {
+    $(noticeDom).find('button.notice_reply').bind('click', function(event) {
         Titanium.API.info('REPLYYYYYYY');
         Titanium.App.fireEvent("StatusNet_replyToNotice", {noticeId: noticeId, noticeAuthor: noticeAuthor});
         return false;
@@ -183,13 +194,17 @@ enableNoticeControls = function(noticeDom) {
 
     $(noticeDom).bind('click', function(event) {
         var speed = 200;
-        if (activeNotice && activeNotice !== this) {
+        if (activeNotice) {
             $(activeNotice).removeClass('foldout');
-            $(activeNotice).find('.links').slideUp(speed);
+            $(activeNotice).find('.links').hide();
         }
-        $(noticeDom).addClass('foldout');
-        $(noticeDom).find('.links').slideDown(speed);
-        activeNotice = noticeDom;
+        if (this === activeNotice) {
+            activeNotice = null;
+        } else {
+            $(noticeDom).addClass('foldout');
+            $(noticeDom).find('.links').show();
+            activeNotice = noticeDom;
+        }
     });
 
 };
