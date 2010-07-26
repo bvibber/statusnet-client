@@ -49,7 +49,7 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
         StatusNet.debug("Timeline.encacheNotice() skipped - no XML serializer");
         return;
     }
-    
+
     StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
     rc = this.db.execute(
@@ -418,6 +418,89 @@ StatusNet.Timeline.prototype.getNotices = function() {
  */
 StatusNet.Timeline.prototype.autoRefresh = function() {
 	return true;
+}
+
+/**
+ * Lookup avatar in our avatar cache.
+ *
+ */
+StatusNet.Timeline.prototype.lookupAvatar = function(url, onHit, onMiss) {
+
+    var hash;
+
+    if (typeof Titanium.Codec == "undefined") {
+        // mobile
+        hash = Titanium.Utils.md5HexDigest(url);
+    } else {
+        // desktop
+        hash = Titanium.Codec.digestToHex(Titanium.Codec.SHA1, url);
+	}
+
+	StatusNet.debug('Avatar hash for ' + url + " == " + hash);
+
+	var dot = url.lastIndexOf(".");
+
+	if (dot == -1 ) {
+		// ooh weird, no extension
+		return url;
+	}
+
+ 	var extension = url.substr(dot, url.length);
+	var resourcesDir = Titanium.Filesystem.getResourcesDirectory();
+	var separator = Titanium.Filesystem.getSeparator();
+	var cacheDirname = resourcesDir + separator + 'avatar_cache';
+
+	var cacheDir = Titanium.Filesystem.getFile(cacheDirname);
+
+	if (!cacheDir.exists()) {
+		StatusNet.debug("lookupAvatar - avatar_cache directory doesn't exist");
+		cacheDir.createDirectory();
+	} else {
+		StatusNet.debug("lookupAvatar - avatar_cache directory already exists");
+	}
+
+	var filename = hash + extension;
+	var filepath = cacheDir + separator + filename;
+
+	StatusNet.debug("lookupAvatar - filepath = " + filepath);
+
+	var relativePath = 'avatar_cache/' + filename; // for use in webview
+
+	var avatarFile = Titanium.Filesystem.getFile(filepath);
+
+	StatusNet.debug('lookupAvatar - looking up avatar: ' + filepath);
+	if (avatarFile.isFile()) {
+		StatusNet.debug("lookupAvatar - Yay, avatar cache hit");
+		if (onHit) {
+			onHit(relativePath);
+		}
+		return relativePath;
+	} else {
+
+		StatusNet.debug("lookupAvatar - Avatar cache miss, fetching avatar from web");
+
+		StatusNet.HttpClient.fetchFile(
+			url,
+			filepath,
+			function() {
+				StatusNet.debug("lookupAvatar - fetched avatar: " + url);
+				if (onHit) {
+					onHit(relativePath);
+					return relativePath;
+				}
+			},
+			function(code, e) {
+				StatusNet.debug("lookupAvatar - couldn't fetch: " + url);
+				StatusNet.debug("lookupAvatar - code: " + code + ", exception: " + e);
+			}
+		);
+
+		if (onMiss) {
+			onMiss(url)
+		}
+
+		return false;
+	}
 }
 
 /**
