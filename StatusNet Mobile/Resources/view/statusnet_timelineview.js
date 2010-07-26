@@ -109,14 +109,14 @@ StatusNet.TimelineView.prototype.show = function() {
     if (!this.webview) {
         var navbar = StatusNet.Platform.createNavBar(this.window);
 
-        // @fixme how do we give it the standard back-button style?
-        var backButton = Titanium.UI.createButton({
+        // @fixme make this show account info
+        var accountsButton = Titanium.UI.createButton({
             title: "Accounts"
         });
-        backButton.addEventListener('click', function() {
-            that.client.tabGroup.close();
+        accountsButton.addEventListener('click', function() {
+            StatusNet.showSettings();
         });
-        navbar.setLeftNavButton(backButton);
+        navbar.setLeftNavButton(accountsButton);
 
         var updateButton = Titanium.UI.createButton({
             title: "New",

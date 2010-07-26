@@ -105,6 +105,9 @@ StatusNet.rowCount = function(rs) {
  * @fixme make sure it's a singleton!
  */
 StatusNet.showSettings = function() {
+    StatusNet.debug('showSettings!');
+    StatusNet.debug('client: ' + client);
+    StatusNet.debug('client.setActiveTab: ' + client.setActiveTab);
     client.setActiveTab('settings');
 };
 

@@ -39,7 +39,13 @@ StatusNet.Client = function(_account) {
 };
 
 StatusNet.Client.prototype.setActiveTab = function(tabName) {
-    this.tabGroup.setActiveTab(this.tabs[tabName]);
+    if (tabName == 'settings') {
+        var view = new StatusNet.SettingsView(this);
+        view.init();
+    } else {
+        // @hack hack hack
+        this.tabGroup.setActiveTab(this.tabs[tabName]);
+    }
 };
 
 
@@ -110,28 +116,7 @@ StatusNet.Client.prototype.refresh = function() {
  */
 StatusNet.Client.prototype.init = function() {
     StatusNet.debug("Client init");
-    var tabGroup = Titanium.UI.createTabGroup();
-
-    var window = Titanium.UI.createWindow({
-        title: 'Accounts',
-        tabBarHidden: true
-    });
-    var tab = Titanium.UI.createTab({
-        icon: 'images/tabs/settings.png',
-        title: 'Accounts',
-        window: window
-    });
-    tabGroup.addTab(tab);
-
-    StatusNet.debug("Client setting up open event");
-
     var client = this;
-    window.addEventListener('open', function() {
-        StatusNet.debug("Open main tab");
-        client.view = new StatusNet.SettingsView(client);
-        client.view.window = window;
-        client.view.init();
-    });
 
     StatusNet.debug("Client setting up shake event");
     Titanium.Gesture.addEventListener('shake', function(event) {
@@ -148,13 +133,13 @@ StatusNet.Client.prototype.init = function() {
         StatusNet.debug("Done checking out the shake.");
     });
 
-    StatusNet.debug("Client opening main window/tab group");
-    tabGroup.open();
+    this.initAccountView(this.account);
 };
 
 StatusNet.Client.prototype.initAccountView = function(acct) {
     StatusNet.debug('initAccountView entered...');
     this.account = acct;
+    var that = this;
 
     // For now let's stick with the same tabs we have on the desktop sidebar
     // @todo localization
@@ -183,35 +168,40 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     StatusNet.debug('initAccountView made a big list.');
     this.tabs = {};
     this.windows = {};
-    this.tabGroup = Titanium.UI.createTabGroup();
-    StatusNet.debug('initAccountView created a tab group.');
-
-    StatusNet.debug('initAccountView Starting building tabs, timelines, views...');
-    for (var tab in tabInfo) {
-        if (tabInfo.hasOwnProperty(tab)) {
-            this.createTab(tab, tabInfo[tab]);
-        }
+    if (this.tabGroup) {
+        this.tabGroup.close();
     }
-    StatusNet.debug('initAccountView Done building tabs, timelines, views.');
+    this.tabGroup = Titanium.UI.createTabGroup();
+    if (!acct) {
+        this.createTab('settings', {
+            title: 'Settings',
+            timeline: null,
+            view: StatusNet.SettingsView
+        });
+        /*
+        StatusNet.debug('whoa whoa whoa');
+        this.tabGroup.addEventListener('open', function() {
+            StatusNet.debug("No account -- opening a settings view!");
+            var view = new StatusNet.SettingsView(that);
+            view.init();
+        });
+        */
+    } else {
+        StatusNet.debug('initAccountView created a tab group.');
 
-    // @todo remember last-used tab
-    StatusNet.debug('initAccountView friends tab is: ' + this.tabs.friends);
-    this.tabGroup.setActiveTab(this.tabs.friends);
+        StatusNet.debug('initAccountView Starting building tabs, timelines, views...');
+        for (var tab in tabInfo) {
+            if (tabInfo.hasOwnProperty(tab)) {
+                this.createTab(tab, tabInfo[tab]);
+            }
+        }
+        StatusNet.debug('initAccountView Done building tabs, timelines, views.');
+
+        // @todo remember last-used tab
+        StatusNet.debug('initAccountView friends tab is: ' + this.tabs.friends);
+        this.tabGroup.setActiveTab(1);
+    }
     this.tabGroup.open();
-
-    /*
-    var that = this;
-    this.timeline.update(
-        function() {
-            StatusNet.debug('initAccountView post-update START');
-            that.view.showHeader();
-            StatusNet.debug('initAccountView post-update shown header');
-            that.view.show();
-            StatusNet.debug('initAccountView post-update DONE');
-        },
-        false
-    );
-    */
 
     StatusNet.debug('initAccountView done.');
 };

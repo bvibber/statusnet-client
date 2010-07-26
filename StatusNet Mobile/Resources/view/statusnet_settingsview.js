@@ -29,8 +29,19 @@ StatusNet.SettingsView = function(client) {
     this.lastSite = '';
 };
 
+/**
+ * Initialize the account settings view...
+ * Creates a table view listing all configured accounts.
+ */
 StatusNet.SettingsView.prototype.init = function() {
     StatusNet.debug('SettingsView.init');
+
+    var window = this.window = Titanium.UI.createWindow({
+        title: 'Accounts',
+        backgroundColor: 'black',
+        tabBarHidden: true
+    });
+
     var view = this;
     var client = this.client;
 
@@ -67,10 +78,10 @@ StatusNet.SettingsView.prototype.init = function() {
         StatusNet.debug('Attempting to select account: ' + acct.username + '@' + acct.getHost());
         acct.setDefault(StatusNet.getDB());
         StatusNet.debug('Saved!');
-        StatusNet.debug('QQQ: client: ' + client);
-        StatusNet.debug('QQQ: client.initAccountView: ' + client.initAccountView);
+
+        StatusNet.debug('Switching to timeline...');
         client.initAccountView(acct);
-        StatusNet.debug('Switched to timeline.');
+        window.close();
     });
     this.table.addEventListener('delete', function(event) {
         // deleted a row
@@ -129,6 +140,8 @@ StatusNet.SettingsView.prototype.init = function() {
 
         // @fixme -- add a way to remove items!
     }
+
+    window.open({modal: true});
 
     // Now let's fill out the table!
     this.showAccounts();
