@@ -137,26 +137,6 @@ StatusNet.TimelineView.prototype.show = function() {
             backgroundColor: 'black'
         });
 
-        // @fixme move most of these up to Client
-        Ti.App.addEventListener('StatusNet_timelineReady', function(event) {
-            StatusNet.debug('YAY GOT StatusNet_timelineReady EVENT! ' + event);
-        });
-
-        Ti.App.addEventListener('StatusNet_externalLink', function(event) {
-            // Open external links in system default browser...
-            // Note: on iPhone this will launch Safari and may cause us to close.
-            Titanium.Platform.openURL(event.url);
-        });
-
-        Ti.App.addEventListener('StatusNet_switchUserTimeline', function(event) {
-            //event.authorId
-        });
-
-        Ti.App.addEventListener('StatusNet_replyToNotice', function(event) {
-            //noticeId: noticeId, noticeAuthor: noticeAuthor
-            that.client.newNoticeDialog(event.noticeId, event.noticeAuthor);
-        });
-
         this.window.add(this.webview);
     }
 

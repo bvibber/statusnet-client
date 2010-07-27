@@ -133,8 +133,56 @@ StatusNet.Client.prototype.init = function() {
         StatusNet.debug("Done checking out the shake.");
     });
 
+    this.initInternalListeners();
     this.initAccountView(this.account);
 };
+
+/**
+ * Set up event listeners for communications from our timeline web views
+ */
+StatusNet.Client.prototype.initInternalListeners = function() {
+    var that = this;
+
+    Ti.App.addEventListener('StatusNet_timelineReady', function(event) {
+        StatusNet.debug('YAY GOT StatusNet_timelineReady EVENT! ' + event);
+    });
+
+    Ti.App.addEventListener('StatusNet_externalLink', function(event) {
+        // Open external links in system default browser...
+        // Note: on iPhone this will launch Safari and may cause us to close.
+        Titanium.Platform.openURL(event.url);
+    });
+
+    Ti.App.addEventListener('StatusNet_switchUserTimeline', function(event) {
+        alert('Switch to user timeline for: ' + event.authorId);
+    });
+
+    Ti.App.addEventListener('StatusNet_replyToNotice', function(event) {
+        //noticeId: noticeId, noticeAuthor: noticeAuthor
+        that.newNoticeDialog(event.noticeId, event.noticeAuthor);
+    });
+
+    Ti.App.addEventListener('StatusNet_faveNotice', function(event) {
+        StatusNet.debug('Event: ' + event.name);
+        alert('Fave notice ' + event.noticeId);
+    });
+
+    Ti.App.addEventListener('StatusNet_unfaveNotice', function(event) {
+        StatusNet.debug('Event: ' + event.name);
+        alert('Unfave notice ' + event.noticeId);
+    });
+
+    Ti.App.addEventListener('StatusNet_repeatNotice', function(event) {
+        StatusNet.debug('Event: ' + event.name);
+        alert('Repeat notice ' + event.noticeId);
+    });
+
+    Ti.App.addEventListener('StatusNet_deleteNotice', function(event) {
+        StatusNet.debug('Event: ' + event.name);
+        alert('Delete notice ' + event.noticeId);
+    });
+
+}
 
 StatusNet.Client.prototype.initAccountView = function(acct) {
     StatusNet.debug('initAccountView entered...');

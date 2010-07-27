@@ -171,8 +171,27 @@ enableNoticeControls = function(noticeDom) {
     //}
 
     $(noticeDom).find('button.notice_reply').bind('click', function(event) {
-        Titanium.API.info('REPLYYYYYYY');
         Titanium.App.fireEvent("StatusNet_replyToNotice", {noticeId: noticeId, noticeAuthor: noticeAuthor});
+        return false;
+    });
+
+    $(noticeDom).find('button.notice_fave').bind('click', function(event) {
+        Titanium.App.fireEvent("StatusNet_faveNotice", {noticeId: noticeId});
+        return false;
+    });
+
+    $(noticeDom).find('button.notice_unfave').bind('click', function(event) {
+        Titanium.App.fireEvent("StatusNet_unfaveNotice", {noticeId: noticeId});
+        return false;
+    });
+
+    $(noticeDom).find('button.notice_repeat').bind('click', function(event) {
+        Titanium.App.fireEvent("StatusNet_repeatNotice", {noticeId: noticeId});
+        return false;
+    });
+
+    $(noticeDom).find('button.notice_delete').bind('click', function(event) {
+        Titanium.App.fireEvent("StatusNet_deleteNotice", {noticeId: noticeId});
         return false;
     });
 
