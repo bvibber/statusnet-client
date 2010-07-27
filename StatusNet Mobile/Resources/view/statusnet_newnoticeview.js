@@ -83,7 +83,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     });
 
     var updateButton = Titanium.UI.createButton({
-        title: "Update"
+        title: "Send"
     });
     updateButton.addEventListener('click', function(event) {
         that.postNotice(noticeTextArea.value);
@@ -113,6 +113,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
     // Note: pressing a key doesn't generate a keypress event on
     // Linux version of Titanium.
+    noticeTextArea.addEventListener('change', function(event) {
+        counter.text = "" + (textLimit - event.value.length);
+    });
     /*
     $('#notice_textarea').bind('keydown', function(event) {
         var len = $('#notice_textarea').val().length;
