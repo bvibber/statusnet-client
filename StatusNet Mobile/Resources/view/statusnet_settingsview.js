@@ -321,9 +321,39 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     var title = acct.username + '@' + acct.getHost();
     StatusNet.debug('adding row: ' + title);
 
-    var row = {title: title,
-               acct: acct,
-               height: 'auto'};
+    var row = Titanium.UI.createTableViewRow({
+        acct: acct,
+        height: 64
+    });
+
+    var avatar = Titanium.UI.createImageView({
+        url: acct.avatar,
+        top: 0,
+        left: 0,
+        width: 56,
+        height: 56
+    });
+    row.add(avatar);
+
+    // @fixme the scaling to this resolution doesn't seem to work on Android
+    var logo = Titanium.UI.createImageView({
+        url: acct.siteLogo,
+        top: 40,
+        left: 40,
+        width: 24,
+        height: 24
+    });
+    row.add(logo);
+
+    var label = Titanium.UI.createLabel({
+        text: title,
+        left: 80,
+        top: 0,
+        bottom: 0,
+        right: 0
+    });
+    row.add(label);
+
     this.table.appendRow(row);
     StatusNet.debug('show account row done.');
 };
