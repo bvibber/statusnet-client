@@ -58,7 +58,11 @@ StatusNet.SettingsView.prototype.init = function() {
 
         if (event.rowData.acct == "add-stub") {
             // Special case!
-            view.showAddAccount();
+            // @fixme need a better way to close-modal-and-open-other-modal smoothly
+            window.close();
+            setTimeout(function() {
+                view.showAddAccount();
+            }, 500);
             return;
         }
 
@@ -102,7 +106,11 @@ StatusNet.SettingsView.prototype.init = function() {
                 view.table.editing = false;
                 view.window.setLeftNavButton(edit);
             }
-            view.showAddAccount();
+            // @fixme need a better way to close-modal-and-open-other-modal smoothly
+            window.close();
+            setTimeout(function() {
+                view.showAddAccount();
+            }, 500);
         });
 
         // Edit/cancel buttons for the table view...
@@ -141,10 +149,15 @@ StatusNet.SettingsView.prototype.init = function() {
         // @fixme -- add a way to remove items!
     }
 
-    window.open({modal: true});
-
     // Now let's fill out the table!
     this.showAccounts();
+
+    if (this.accounts.length > 0) {
+        window.open({modal: true});
+    } else {
+        // Leave the main accounts window hidden until later...
+        this.showAddAccount();
+    }
 };
 
 /**
@@ -157,7 +170,16 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         backgroundColor: StatusNet.Platform.dialogBackground(),
         layout: 'vertical'
     });
-
+    window.addEventListener('close', function() {
+        // Re-show the main accounts list window
+        // @fixme there's got to be a better way to delay until animation's done...
+        // if we don't wait, it crashes or gets confused about who's modal to what.
+        setTimeout(function() {
+            view.window.open({
+                modal: true
+            });
+        }, 500);
+    });
     var cancel = Titanium.UI.createButton({
         title: "Cancel"
     });
@@ -291,9 +313,8 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
  */
 StatusNet.SettingsView.prototype.showAccounts = function() {
     StatusNet.debug('SettingsView.showAccounts');
-
     if (this.accounts.length == 0) {
-        this.showAddAccount();
+        //this.showAddAccount();
     } else {
         for (var i = 0; i < this.accounts.length; i++) {
             this.showAccountRow(this.accounts[i]);
@@ -326,24 +347,28 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
         height: 64
     });
 
-    var avatar = Titanium.UI.createImageView({
-        url: acct.avatar,
-        top: 0,
-        left: 0,
-        width: 56,
-        height: 56
-    });
-    row.add(avatar);
+    if (acct.avatar) {
+        var avatar = Titanium.UI.createImageView({
+            url: acct.avatar,
+            top: 0,
+            left: 0,
+            width: 56,
+            height: 56
+        });
+        row.add(avatar);
+    }
 
     // @fixme the scaling to this resolution doesn't seem to work on Android
-    var logo = Titanium.UI.createImageView({
-        url: acct.siteLogo,
-        top: 40,
-        left: 40,
-        width: 24,
-        height: 24
-    });
-    row.add(logo);
+    if (acct.siteLogo) {
+        var logo = Titanium.UI.createImageView({
+            url: acct.siteLogo,
+            top: 40,
+            left: 40,
+            width: 24,
+            height: 24
+        });
+        row.add(logo);
+    }
 
     var label = Titanium.UI.createLabel({
         text: title,
