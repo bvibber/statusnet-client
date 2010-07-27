@@ -352,6 +352,51 @@ StatusNet.Timeline.prototype.trimNotices = function() {
 };
 
 /**
+ * Clean up the avatar cache
+ */
+StatusNet.Timeline.prototype.trimAvatarCache = function() {
+
+    var MAX_AVATARS = 200; // @todo Make this configurable
+
+    var rdir = Titanium.Filesystem.getResourcesDirectory();
+    var separator = Titanium.Filesystem.getSeparator();
+    var cacheDir = Titanium.Filesystem.getFile(rdir + separator + 'avatar_cache');
+    var dirList = cacheDir.getDirectoryListing();
+
+    var avatars = [];
+
+    if (dirList) {
+        StatusNet.debug("timrAvatarCache - avatar cache directory has " + dirList.length + " files");
+        for (i = 0; i < dirList.length; i++) {
+            var avatar = {
+                "filename": dirList[i].toString(),
+                "timestamp": Titanium.Filesystem.getFile(dirList[i]).modificationTimestamp()
+            };
+            avatars.push(avatar);
+        }
+
+        // sort by timestamp - ascending
+        avatars.sort(function(a, b) {
+            return a.timestamp - b.timestamp;
+        });
+
+        if (dirList.length > MAX_AVATARS) {
+            var overflow = dirList.length - MAX_AVATARS;
+            StatusNet.debug("trimAvatarCache - avatar cache has " + overflow + " too many avatars, trimming...");
+
+            for (i = 0; i < overflow; i++) {
+                if (Titanium.Filesystem.getFile(avatars[i].filename).deleteFile()) {
+                    StatusNet.debug("TrimAvatarCache - deleted " + avatars[i].filename);
+                } else {
+                    StatusNet.debug("TrimAvatarCache - couldn't delete " + avatars[i].filename);
+                }
+            }
+            StatusNet.debug("TrimAvatarCache - done trimming avatars.")
+        }
+    }
+};
+
+/**
  * Whether to cache this timeline - may be overrided by timelines
  * we can't or don't want to cache ATM
  */
@@ -372,6 +417,8 @@ StatusNet.Timeline.prototype.finishedFetch = function(notice_count) {
     if (this.cacheable()) {
         this.trimNotices();
     }
+
+    this.trimAvatarCache();
 };
 
 /**
@@ -417,7 +464,7 @@ StatusNet.Timeline.prototype.getNotices = function() {
  * Whether to automatically reload
  */
 StatusNet.Timeline.prototype.autoRefresh = function() {
-	return true;
+    return true;
 }
 
 /**
@@ -434,73 +481,73 @@ StatusNet.Timeline.prototype.lookupAvatar = function(url, onHit, onMiss) {
     } else {
         // desktop
         hash = Titanium.Codec.digestToHex(Titanium.Codec.SHA1, url);
-	}
+    }
 
-	StatusNet.debug('Avatar hash for ' + url + " == " + hash);
+    StatusNet.debug('Avatar hash for ' + url + " == " + hash);
 
-	var dot = url.lastIndexOf(".");
+    var dot = url.lastIndexOf(".");
 
-	if (dot == -1 ) {
-		// ooh weird, no extension
-		return url;
-	}
+    if (dot == -1 ) {
+        // ooh weird, no extension
+        return url;
+    }
 
- 	var extension = url.substr(dot, url.length);
-	var resourcesDir = Titanium.Filesystem.getResourcesDirectory();
-	var separator = Titanium.Filesystem.getSeparator();
-	var cacheDirname = resourcesDir + separator + 'avatar_cache';
+    var extension = url.substr(dot, url.length);
+    var resourcesDir = Titanium.Filesystem.getResourcesDirectory();
+    var separator = Titanium.Filesystem.getSeparator();
+    var cacheDirname = resourcesDir + separator + 'avatar_cache';
 
-	var cacheDir = Titanium.Filesystem.getFile(cacheDirname);
+    var cacheDir = Titanium.Filesystem.getFile(cacheDirname);
 
-	if (!cacheDir.exists()) {
-		StatusNet.debug("lookupAvatar - avatar_cache directory doesn't exist");
-		cacheDir.createDirectory();
-	} else {
-		StatusNet.debug("lookupAvatar - avatar_cache directory already exists");
-	}
+    if (!cacheDir.exists()) {
+        StatusNet.debug("lookupAvatar - avatar_cache directory doesn't exist");
+        cacheDir.createDirectory();
+    } else {
+        StatusNet.debug("lookupAvatar - avatar_cache directory already exists");
+    }
 
-	var filename = hash + extension;
-	var filepath = cacheDir + separator + filename;
+    var filename = hash + extension;
+    var filepath = cacheDir + separator + filename;
 
-	StatusNet.debug("lookupAvatar - filepath = " + filepath);
+    StatusNet.debug("lookupAvatar - filepath = " + filepath);
 
-	var relativePath = 'avatar_cache/' + filename; // for use in webview
+    var relativePath = 'avatar_cache/' + filename; // for use in webview
 
-	var avatarFile = Titanium.Filesystem.getFile(filepath);
+    var avatarFile = Titanium.Filesystem.getFile(filepath);
 
-	StatusNet.debug('lookupAvatar - looking up avatar: ' + filepath);
-	if (avatarFile.isFile()) {
-		StatusNet.debug("lookupAvatar - Yay, avatar cache hit");
-		if (onHit) {
-			onHit(relativePath);
-		}
-		return relativePath;
-	} else {
+    StatusNet.debug('lookupAvatar - looking up avatar: ' + filepath);
+    if (avatarFile.isFile()) {
+        StatusNet.debug("lookupAvatar - Yay, avatar cache hit");
+        if (onHit) {
+            onHit(relativePath);
+        }
+        return relativePath;
+    } else {
 
-		StatusNet.debug("lookupAvatar - Avatar cache miss, fetching avatar from web");
+        StatusNet.debug("lookupAvatar - Avatar cache miss, fetching avatar from web");
 
-		StatusNet.HttpClient.fetchFile(
-			url,
-			filepath,
-			function() {
-				StatusNet.debug("lookupAvatar - fetched avatar: " + url);
-				if (onHit) {
-					onHit(relativePath);
-					return relativePath;
-				}
-			},
-			function(code, e) {
-				StatusNet.debug("lookupAvatar - couldn't fetch: " + url);
-				StatusNet.debug("lookupAvatar - code: " + code + ", exception: " + e);
-			}
-		);
+        StatusNet.HttpClient.fetchFile(
+            url,
+            filepath,
+            function() {
+                StatusNet.debug("lookupAvatar - fetched avatar: " + url);
+                if (onHit) {
+                    onHit(relativePath);
+                    return relativePath;
+                }
+            },
+            function(code, e) {
+                StatusNet.debug("lookupAvatar - couldn't fetch: " + url);
+                StatusNet.debug("lookupAvatar - code: " + code + ", exception: " + e);
+            }
+        );
 
-		if (onMiss) {
-			onMiss(url)
-		}
+        if (onMiss) {
+            onMiss(url)
+        }
 
-		return false;
-	}
+        return false;
+    }
 }
 
 /**
