@@ -288,7 +288,7 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
         replyToId: replyToId,
         replyToUsername: replyToUsername
     });
-    view.close.attach(function() {
+    view.sent.attach(function() {
         StatusNet.debug('gonna re-load');
         that.view.showHeader();
         that.view.showSpinner();

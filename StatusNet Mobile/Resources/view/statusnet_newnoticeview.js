@@ -29,7 +29,7 @@ StatusNet.NewNoticeView = function(data) {
     var db = StatusNet.getDB();
     this.account = StatusNet.Account.getDefault(db);
 
-    this.close = new StatusNet.Event();
+    this.sent = new StatusNet.Event();
 }
 
 /**
@@ -205,11 +205,6 @@ StatusNet.NewNoticeView.prototype.init = function() {
         // set focus to the text entry field
         noticeTextArea.focus();
     });
-    window.addEventListener('close', function(event) {
-        StatusNet.debug("Firing close event!");
-        that.close.notify();
-        StatusNet.debug("Firing close event! DONE");
-    });
     window.open({
         modal: true
     });
@@ -261,8 +256,12 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
             if (id) {
                 StatusNet.debug("Posted notice " + id);
             }
+
             // play notice posted sound
             that.window.close();
+
+            // Tell the client we've got something fun to do!
+            that.sent.notify();
         },
         function(status, response) {
             var msg = $(response).find('error').text();
