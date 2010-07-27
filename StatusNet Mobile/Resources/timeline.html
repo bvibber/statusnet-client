@@ -19,35 +19,40 @@ if (typeof Titanium == "undefined") {
 }
 
 var activeNotice = null;
+var clientAccountUsername = null;
 
 // App-wide event registration, whee!
 Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
     activeNotice = null;
+    clientAccountUsername = event.clientAccountUsername;
     $("#notices").html(event.html);
 });
+Titanium.App.addEventListener("StatusNet_prependTimelineNotice", function(event) {
+    var notice = objectOrJson(event.notice);
+    $("#notices").prepend(renderNotice(notice));
+    enableNoticeControls(document.getElementById('notice-' + notice.id));
+});
 Titanium.App.addEventListener("StatusNet_appendTimelineNotice", function(event) {
-    var notice;
-    if (typeof event.notice == "string") {
-        // On Android, objects get passed to us as JSON. Srsly?
-        notice = eval('(' + event.notice + ')');
-    } else {
-        notice = event.notice;
-    }
-    /*
-    Titanium.API.info('XXX: ' + typeof notice);
-    if (typeof notice == "object") {
-        for (var i in notice) {
-            if (notice.hasOwnProperty(i)) {
-                Titanium.API.info('XXX: notice.' + i + ': ' + typeof notice[i]);
-            }
-        }
-    } else {
-        Titanium.API.info('XXX: notice: ' + q);
-    }
-    */
+    var notice = objectOrJson(event.notice);
     $("#notices").append(renderNotice(notice));
     enableNoticeControls(document.getElementById('notice-' + notice.id));
 });
+Titanium.App.addEventListener("StatusNet_faveNoticeComplete", function(event) {
+    var $notice = $('#notice-' + event.noticeId);
+    $notice.find('button.notice_fave').
+        removeClass('notice_fave').
+        addClass('notice_unfave').
+        text('Unfave');
+});
+Titanium.App.addEventListener("StatusNet_unFaveNoticeComplete", function(event) {
+    var $notice = $('#notice-' + event.noticeId);
+    $notice.find('button.notice_unfave').
+        removeClass('notice_unfave').
+        addClass('notice_fave').
+        text('Fave');
+});
+
+
 
 // Default handling for link click events; we'll pass external links on to the app
 // for opening in a separate browser window.
@@ -62,6 +67,15 @@ $("#notices").delegate("a", "click", function(event) {
 
 Titanium.App.fireEvent("StatusNet_timelineReady", {hey: "foo"});
 Titanium.API.info("YAY - WebView is set up and waiting.");
+
+function objectOrJson(obj) {
+    if (typeof obj == "string") {
+        // On Android, objects get passed to us as JSON. Srsly?
+        notice = eval('(' + obj + ')');
+    } else {
+        notice = obj;
+    }
+}
 
 
 /**
@@ -124,13 +138,14 @@ renderNotice = function(notice) {
         html.push(' <button class="notice_fave">Fave</button>')
     }
 
-    /*if (author === this.client.account.username) {
+    // @fixme use URI or id or somthing?
+    if (author === clientAccountUsername) {
         html.push(' <a href="#" class="notice_delete">Delete</a>')
-    } else {*/
+    } else {
         if (notice.repeated === "false") {
             html.push(' <button class="notice_repeat">Repeat</button>');
         }
-    //}
+    }
 
     html.push('<div>');
     html.push('</div></div></div>');
@@ -141,62 +156,66 @@ renderNotice = function(notice) {
 
 
 enableNoticeControls = function(noticeDom) {
-    var name = $(noticeDom).attr('name');
+    var $notice = $(noticeDom);
+    var name = $notice.attr('name');
     var noticeId = name.substring(7); // notice-
 
-    name = $(noticeDom).find('a.author').attr('name');
+    name = $notice.find('a.author').attr('name');
     var authorId = name.substring(7); // author-
 
-    var noticeAuthor = $(noticeDom).find('a.author').text();
+    var noticeAuthor = $notice.find('a.author').text();
 
     Titanium.API.debug("authorId = " + authorId + " author name = " + noticeAuthor + " noticeId = " + noticeId);
 
-    var uri = $(noticeDom).find('div a.author').attr('href');
+    var uri = $notice.find('div a.author').attr('href');
 
     // Override links to external web view of the notice timelines
     // with click event handlers to display timelines within the client
     //if (this.localAuthor(uri)) {
 
-        $(noticeDom).find('div a.author').attr('href', "#");
-        $(noticeDom).find('div a.author').bind('click', function(event) {
+        $notice.find('div a.author').attr('href', "#");
+        $notice.find('div a.author').bind('click', function(event) {
             Titanium.App.fireEvent("StatusNet_switchUserTimeline", {authorId: authorId});
             return false;
         });
 
-        $(noticeDom).find('div.avatar a').attr('href', "#");
-        $(noticeDom).find('div.avatar').bind('click', function(event) {
+        $notice.find('div.avatar a').attr('href', "#");
+        $notice.find('div.avatar').bind('click', function(event) {
             Titanium.App.fireEvent("StatusNet_switchUserTimeline", {authorId: authorId});
             return false;
         });
     //}
 
-    $(noticeDom).find('button.notice_reply').bind('click', function(event) {
+
+    // Note -- using delegate rather than bind so that buttons that change
+    // state will continue to work with their new classes.
+    $notice.delegate('button.notice_reply', 'click', function(event) {
         Titanium.App.fireEvent("StatusNet_replyToNotice", {noticeId: noticeId, noticeAuthor: noticeAuthor});
         return false;
     });
 
-    $(noticeDom).find('button.notice_fave').bind('click', function(event) {
+    $notice.delegate('button.notice_fave', 'click', function(event) {
         Titanium.App.fireEvent("StatusNet_faveNotice", {noticeId: noticeId});
         return false;
     });
 
-    $(noticeDom).find('button.notice_unfave').bind('click', function(event) {
+    $notice.delegate('button.notice_unfave', 'click', function(event) {
         Titanium.App.fireEvent("StatusNet_unfaveNotice", {noticeId: noticeId});
         return false;
     });
 
-    $(noticeDom).find('button.notice_repeat').bind('click', function(event) {
+    $notice.delegate('button.notice_repeat', 'click', function(event) {
         Titanium.App.fireEvent("StatusNet_repeatNotice", {noticeId: noticeId});
         return false;
     });
 
-    $(noticeDom).find('button.notice_delete').bind('click', function(event) {
+    $notice.delegate('button.notice_delete', 'click', function(event) {
         Titanium.App.fireEvent("StatusNet_deleteNotice", {noticeId: noticeId});
         return false;
     });
 
     // Override external web links to local users in-content
-    $(noticeDom).find('div.content span.vcard a').each(function() {
+    $notice.find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');
         //if (that.localAuthor(href)) {
             $(this).attr('href', '#');
@@ -211,7 +230,7 @@ enableNoticeControls = function(noticeDom) {
         //}
     });
 
-    $(noticeDom).bind('click', function(event) {
+    $notice.bind('click', function(event) {
         var speed = 200;
         if (activeNotice) {
             $(activeNotice).removeClass('foldout');

@@ -164,22 +164,22 @@ StatusNet.Client.prototype.initInternalListeners = function() {
 
     Ti.App.addEventListener('StatusNet_faveNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
-        alert('Fave notice ' + event.noticeId);
+        that.faveNotice(event.noticeId);
     });
 
     Ti.App.addEventListener('StatusNet_unfaveNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
-        alert('Unfave notice ' + event.noticeId);
+        that.unFaveNotice(event.noticeId);
     });
 
     Ti.App.addEventListener('StatusNet_repeatNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
-        alert('Repeat notice ' + event.noticeId);
+        that.repeatNotice(event.noticeId);
     });
 
     Ti.App.addEventListener('StatusNet_deleteNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
-        alert('Delete notice ' + event.noticeId);
+        that.deleteNotice(event.noticeId);
     });
 
 }
@@ -337,6 +337,7 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
         replyToUsername: replyToUsername
     });
     view.sent.attach(function() {
+        // @fixme load just the posted message, and prepend it
         StatusNet.debug('gonna re-load');
         that.view.showHeader();
         that.view.showSpinner();
@@ -346,4 +347,160 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
         StatusNet.debug('ALL DONE waiting');
     });
     view.init();
+};
+
+/**
+ * Delete a notice from the timeline
+ *
+ * @param int noticeId  the ID of the notice to delete
+ */
+StatusNet.Client.prototype.deleteNotice = function(noticeId) {
+
+    var method = 'statuses/destroy/' + noticeId + '.xml';
+
+    StatusNet.debug("StatusNet.Client.deleteNotice() - deleting notice " + noticeId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Deleted notice " + noticeId);
+            // @fixme show some kind of output
+            //StatusNet.Infobar.flashMessage("Deleted notice " + noticeId);
+            alert("Deleted notice " + noticeId);
+            that.timeline.decacheNotice(noticeId);
+            that.view.removeNotice(noticeId);
+         },
+         function(status, response) {
+             //$(linkDom).removeAttr('disabled');
+            // @fixme send a notification back to the timeline?
+             var msg = $(response).find('error').text();
+             if (msg) {
+                 StatusNet.debug("Error deleting notice " + noticeId + " - " + msg);
+                 alert("Error deleting notice " + noticeId + " - " + msg);
+             } else {
+                 StatusNet.debug("Error deleting notice " + noticeId + " - " + status + " - " + response);
+                 alert("Error deleting notice: " + status + " - " + response);
+             }
+         }
+    );
+};
+
+/**
+ * Favorite a notice
+ *
+ * Change the class on the notice's fave link from notice_fave to
+ * notice_unfave and refresh the notice entry in the cache so it has
+ * the right state
+ *
+ * @param int noticeId  the ID of the notice to delete
+ *
+ */
+StatusNet.Client.prototype.faveNotice = function(noticeId)
+{
+    var method = 'favorites/create/' + noticeId + '.xml';
+
+    StatusNet.debug("StatusNet.Client.faveNotice() - faving notice " + noticeId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Faved notice" + noticeId);
+            Titanium.App.fireEvent('StatusNet_faveNoticeComplete', {noticeId: noticeId});
+            that.timeline.refreshNotice(noticeId);
+        },
+        function(status, response) {
+            // @fixme notify the timeline to update its view
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error favoriting notice " + noticeId + " - " + msg);
+                alert("Error favoriting notice " + noticeId + " - " + msg);
+            } else {
+                StatusNet.debug("Error favoriting notice " + noticeId + " - " + status + " - " + response);
+                alert("Error favoriting notice " + noticeId + " - " + status + " - " + response);
+            }
+        }
+    );
+};
+
+/**
+ * Unfavorite a notice
+ *
+ * Change the class on the notice's unfave link from notice_unfave
+ * to notice_fave and refresh the notice entry in the cache so it has
+ * the right state.
+ *
+ * @param int noticeId  the ID of the notice to delete
+ *
+ */
+StatusNet.Client.prototype.unFaveNotice = function(noticeId)
+{
+    var method = 'favorites/destroy/' + noticeId + '.xml';
+
+    StatusNet.debug("StatusNet.Client.unFaveNotice() - unfaving notice " + noticeId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Unfaved notice " + noticeId);
+            Titanium.App.fireEvent('StatusNet_unFaveNoticeComplete', {noticeId: noticeId});
+            that.timeline.refreshNotice(noticeId);
+        },
+        function(status, response) {
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error unfavoriting notice " + noticeId + " - " + msg);
+                alert("Error unfavoriting notice " + noticeId + " - " + msg);
+            } else {
+                StatusNet.debug("Error unfavoriting notice " + noticeId + " - " + status + " - " + $(response).text());
+                alert("Error unfavoriting notice " + noticeId + " - " + status + " - " + $(response).text());
+            }
+        }
+    );
+};
+
+/**
+ * Repeat a notice
+ *
+ * @param int noticeId  the ID of the notice to delete
+ *
+ * On success, removes the repeat link and refreshes the notice entry
+ * in the cache so it has the right state.
+ */
+StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
+{
+    var method = 'statuses/retweet/' + noticeId + '.xml';
+
+    StatusNet.debug("StatusNet.Client.repeatNotice() - repeating notice " + noticeId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.apiPost(method, params,
+        function(status, response) {
+            // @fixme load just the posted message, and prepend it
+            StatusNet.debug("Repeated notice " + noticeId);
+            that.timeline.refreshNotice(noticeId);
+            that.timeline.update();
+        },
+        function(status, response) {
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error repeating notice " + noticeId + " - " + msg);
+                alert.flashMessage("Error repeating notice " + noticeId + " - " + msg);
+            } else {
+                StatusNet.debug("Error repeating notice " + noticeId + " - " + status + " - " + response);
+                alert.flashMessage("Error repeating notice " + noticeId + " - " + status + " - " + response);
+            }
+        }
+    );
 };

@@ -159,7 +159,10 @@ StatusNet.TimelineView.prototype.show = function() {
 
 StatusNet.TimelineView.prototype.clearTimelineView = function(html) {
     if (!html) html = '';
-    Titanium.App.fireEvent('StatusNet_setTimeline', {html: html});
+    Titanium.App.fireEvent('StatusNet_setTimeline', {
+        html: html,
+        clientAccountUsername: clientAccountUsername
+    });
 }
 
 StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
