@@ -73,7 +73,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     var html = [];
 	var avatar;
 
-    var cachedAvatar = this.lookupAvatar(notice.avatar, null,  null);
+    var cachedAvatar = this.timeline.lookupAvatar(notice.avatar, null,  null);
 
 	if (cachedAvatar) {
 		avatar = cachedAvatar;
@@ -209,7 +209,7 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
 
 	StatusNet.debug('notifyNewNotice - looking up avatar: ' + notice.avatar);
 
-	this.lookupAvatar(notice.avatar, function(avatarUrl) {
+	this.timeline.lookupAvatar(notice.avatar, function(avatarUrl) {
 		StatusNet.debug('notifyNewNotice - finished looking up avatar');
 
 		if (avatarUrl.match(/^http/)) {
@@ -397,80 +397,6 @@ StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
     $('#notices').empty();
     $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
 };
-
-/**
- * Lookup avatar in our avatar cache.
- *
- */
-StatusNet.TimelineView.prototype.lookupAvatar = function(url, onHit, onMiss) {
-
-	var hash = Titanium.Codec.digestToHex(Titanium.Codec.SHA1, url);
-	StatusNet.debug('Avatar hash for ' + url + " == " + hash);
-
-	var dot = url.lastIndexOf(".");
-
-	if (dot == -1 ) {
-		// ooh weird, no extension
-		return url;
-	}
-
- 	var extension = url.substr(dot, url.length);
-	var resourcesDir = Titanium.Filesystem.getResourcesDirectory();
-	var separator = Titanium.Filesystem.getSeparator();
-	var cacheDirname = resourcesDir + separator + 'avatar_cache';
-
-	var cacheDir = Titanium.Filesystem.getFile(cacheDirname);
-
-	if (!cacheDir.exists()) {
-		StatusNet.debug("lookupAvatar - avatar_cache directory doesn't exist");
-		cacheDir.createDirectory();
-	} else {
-		StatusNet.debug("lookupAvatar - avatar_cache directory already exists");
-	}
-
-	var filename = hash + extension;
-	var filepath = cacheDir + separator + filename;
-
-	StatusNet.debug("lookupAvatar - filepath = " + filepath);
-
-	var relativePath = 'avatar_cache/' + filename; // for use in webview
-
-	var avatarFile = Titanium.Filesystem.getFile(filepath);
-
-	StatusNet.debug('lookupAvatar - looking up avatar: ' + filepath);
-	if (avatarFile.isFile()) {
-		StatusNet.debug("lookupAvatar - Yay, avatar cache hit");
-		if (onHit) {
-			onHit(relativePath);
-		}
-		return relativePath;
-	} else {
-
-		StatusNet.debug("lookupAvatar - Avatar cache miss, fetching avatar from web");
-
-		StatusNet.HttpClient.fetchFile(
-			url,
-			filepath,
-			function() {
-				StatusNet.debug("lookupAvatar - fetched avatar: " + url);
-				if (onHit) {
-					onHit(relativePath);
-					return relativePath;
-				}
-			},
-			function(code, e) {
-				StatusNet.debug("lookupAvatar - couldn't fetch: " + url);
-				StatusNet.debug("lookupAvatar - code: " + code + ", exception: " + e);
-			}
-		);
-
-		if (onMiss) {
-			onMiss(url)
-		}
-
-		return false;
-	}
-}
 
 /**
  * Constructor for a view for a friends timeline
