@@ -299,3 +299,10 @@ StatusNet.Account.prototype.getHost = function() {
 StatusNet.Account.prototype.isSecure = function() {
     return (this.apiroot.match(/^https:/));
 };
+
+/**
+ * Accessor for this account's text limit
+ */
+StatusNet.Account.prototype.getTextLimit = function() {
+    return this.textLimit;
+};

@@ -71,16 +71,16 @@ StatusNet.TimelineView = function(client, showNotifications) {
 StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     var html = [];
-	var avatar;
+    var avatar;
 
     var cachedAvatar = this.timeline.lookupAvatar(notice.avatar, null,  null);
 
-	if (cachedAvatar) {
-		avatar = cachedAvatar;
-	} else {
-		StatusNet.debug("cachedAvatar - is false");
-		avatar = notice.avatar;
-	}
+    if (cachedAvatar) {
+        avatar = cachedAvatar;
+    } else {
+        StatusNet.debug("cachedAvatar - is false");
+        avatar = notice.avatar;
+    }
 
     var author = notice.author;
     var authorId = notice.authorId
@@ -207,27 +207,27 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
     notification.setTitle(msg);
     notification.setMessage(notice.title);
 
-	StatusNet.debug('notifyNewNotice - looking up avatar: ' + notice.avatar);
+    StatusNet.debug('notifyNewNotice - looking up avatar: ' + notice.avatar);
 
-	this.timeline.lookupAvatar(notice.avatar, function(avatarUrl) {
-		StatusNet.debug('notifyNewNotice - finished looking up avatar');
+    this.timeline.lookupAvatar(notice.avatar, function(avatarUrl) {
+        StatusNet.debug('notifyNewNotice - finished looking up avatar');
 
-		if (avatarUrl.match(/^http/)) {
-			// if it's a full URL it means the avatar isn't cached for some reason
-			StatusNet.debug("notifyNewNotice - we got a non-relative URL. Bummer.");
-			notification.setIcon("app://logo.png");
-		} else {
-			StatusNet.debug("Setting icon to app://" + avatarUrl);
-			notification.setIcon("app://" + avatarUrl);
-		}
+        if (avatarUrl.match(/^http/)) {
+            // if it's a full URL it means the avatar isn't cached for some reason
+            StatusNet.debug("notifyNewNotice - we got a non-relative URL. Bummer.");
+            notification.setIcon("app://logo.png");
+        } else {
+            StatusNet.debug("Setting icon to app://" + avatarUrl);
+            notification.setIcon("app://" + avatarUrl);
+        }
 
-	    notification.setDelay(5000);
-	    notification.setCallback(function () {
-	    // @todo Bring the app window back to focus / on top
-	        StatusNet.debug("i've been clicked");
-	    });
-	    notification.show();
-	});
+        notification.setDelay(5000);
+        notification.setCallback(function () {
+        // @todo Bring the app window back to focus / on top
+            StatusNet.debug("i've been clicked");
+        });
+        notification.show();
+    });
 };
 
 /**
@@ -282,8 +282,14 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
 
     // Reply
     $(noticeDom).find('a.notice_reply').bind('click', function(event) {
-        that.client.newNoticeDialog(noticeId, noticeAuthor);
-    });
+        that.client.newNoticeDialog(noticeId, noticeAuthor,
+            function(msg) {
+                StatusNet.Infobar.flashMessage(msg);
+            },
+            function(msg) {
+                StatusNet.Infobar.flashMessage(msg);
+            });
+        });
 
     // Delete notice
     $(noticeDom).find('a.notice_delete').bind('click', function(event) {
@@ -379,7 +385,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-	$('#notices').prepend('<img id="spinner" src="/images/loading.gif" />');
+    $('#notices').prepend('<img id="spinner" src="/images/loading.gif" />');
 };
 
 /**

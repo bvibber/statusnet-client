@@ -90,6 +90,10 @@ StatusNet.Client.prototype.getActiveView = function() {
     }
 };
 
+StatusNet.Client.prototype.getActiveAccount = function() {
+    return this.account;
+};
+
 StatusNet.Client.prototype.getServer = function() {
     return this.server;
 };
@@ -336,36 +340,43 @@ StatusNet.Client.prototype.init = function() {
 
     // XXX: Woah, make sure the href in the HTML link has a # in it, or Titanium goes nutso
     // and adds additional event handlers! (last one from above?)
-    $('a#new_notice').bind('click', function() { that.newNoticeDialog(); });
+    $('a#new_notice').bind('click', function() {
+        that.newNoticeDialog(false, false,
+            function(msg) {
+                StatusNet.Infobar.flashMessage(msg);
+            },
+            function(msg) {
+                StatusNet.Infobar.flashMessage(msg);
+            });
+        });
 
     // setup sounds
     this.newNoticesSound = Titanium.Media.createSound('app://sounds/kalimba.wav');
+    this.postNoticeSound = Titanium.Media.createSound('app://sounds/whoosh.wav');
+
 };
 
 /**
  * Show notice input dialog
  */
-StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername) {
+StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername, onSuccess, onError) {
+
     var win = Titanium.UI.getCurrentWindow().createWindow({
         url: 'app:///new_notice.html',
         title: 'New notice',
         width: 420,
-        height: 120});
+        height: 120,
+    });
 
-    // Pass the reply-to info in via the window itself.
-    // XXX: Is there a better way?
+    win.client = this;
+    win.onSuccess = onSuccess;
+    win.onError = onError;
 
     if (replyToId) {
         win.setTitle('Replying to ' + replyToUsername);
         win.replyToId = replyToId;
         win.replyToUsername = replyToUsername;
     }
-
-    var that = this;
-
-    win.addEventListener(Titanium.CLOSE, function(event) {
-        that.timeline.update(null, false);
-    });
 
     win.open();
 };
