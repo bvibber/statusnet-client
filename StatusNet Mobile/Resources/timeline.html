@@ -71,9 +71,9 @@ Titanium.API.info("YAY - WebView is set up and waiting.");
 function objectOrJson(obj) {
     if (typeof obj == "string") {
         // On Android, objects get passed to us as JSON. Srsly?
-        notice = eval('(' + obj + ')');
+        return eval('(' + obj + ')');
     } else {
-        notice = obj;
+        return obj;
     }
 }
 
