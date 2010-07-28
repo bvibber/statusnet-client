@@ -384,12 +384,16 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
 /**
  * Show direct message input dialog
  */
-StatusNet.Client.prototype.directMessageDialog = function(nickname) {
+StatusNet.Client.prototype.directMessageDialog = function(nickname, onSuccess, onError) {
     var win = Titanium.UI.getCurrentWindow().createWindow({
         url: 'app:///direct_message.html',
         title: 'New Direct Message',
         width: 420,
         height: 120});
+
+    win.client = this;
+    win.onSuccess = onSuccess;
+    win.onError = onError;
 
     if (nickname) {
         win.setTitle('New Direct Message To: ' + nickname);

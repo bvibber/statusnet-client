@@ -65,7 +65,14 @@ StatusNet.TimelineViewInbox.prototype.enableNoticeControls = function(noticeDom)
 
     // Direct message reply
     $(noticeDom).find('a.notice_reply').bind('click', function(event) {
-        that.client.directMessageDialog(noticeAuthor);
+        that.client.directMessageDialog(noticeAuthor,
+            function(msg) {
+                StatusNet.Infobar.flashMessage(msg);
+            },
+            function(msg) {
+                StatusNet.Infobar.flashMessage(msg);
+            }
+        );
     });
 
 };

@@ -42,6 +42,8 @@ StatusNet.NewNoticeView.prototype.init = function() {
         );
     }
 
+    $('#update_button').attr('disabled', 'disabled');
+
     $('#update_button').bind('click', function(event) {
         that.postNotice();
     });
@@ -57,7 +59,15 @@ StatusNet.NewNoticeView.prototype.init = function() {
     $('#notice_textarea').bind('keydown', function(event) {
         var len = $('#notice_textarea').val().length;
 
-       // turn char counter red when it goes negative
+        if (len === 1) {
+            $('#update_button').removeAttr('disabled');
+        }
+
+        if (len === 0) {
+            $('#update_button').attr('disabled', 'disabled');
+        }
+
+        // turn char counter red when it goes negative
         if (textLimit - len < 0 && (textLimit - len) + 1 === 0) {
             $('#counter').addClass('negative');
         }
@@ -120,19 +130,15 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
             me.close();
         },
         function(status, response) {
-            var msg = $(response).find('error').text();
-            if (msg) {
-                StatusNet.debug("Error posting notice" + " - " + msg);
-            } else {
-                StatusNet.debug("Error posting notice - " + status + " - " + response);
+            var err = $(response).find('error').text();
+            var msg = "Error posting new notice";
+            if (err) {
+                msg += " - " + err;
             }
             if (me.onError) {
-                if (msg) {
-                    me.onError("Error posting notice - " + msg);
-                } else {
-                    me.onError("Error posting notice");
-                }
+                me.onError(msg);
             }
+            StatusNet.debug(msg + ", status = " + status + ", response = " + response);
             me.client.getActiveView().hideSpinner();
             me.close();
         }
