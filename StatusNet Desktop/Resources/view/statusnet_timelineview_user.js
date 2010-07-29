@@ -132,7 +132,13 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     });
 
     $('a.profile_direct_message').bind('click', function(event) {
-        client.directMessageDialog(user.username);
+        client.directMessageDialog(user.username,
+            function(msg) {
+                StatusNet.Infobar.flashMessage(msg);
+            },
+            function(msg) {
+                StatusNet.Infobar.flashMessage(msg);
+        });
     });
 
     $('a.profile_block').bind('click', function(event) {

@@ -17,15 +17,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for new notice view
  */
-StatusNet.NewNoticeView = function() {
-    var db = StatusNet.getDB();
-    this.account = StatusNet.Account.getDefault(db);
-
-    StatusNet.debug("NewNoticeView constructor");
-};
+StatusNet.NewNoticeView = function() { };
 
 /**
  * Initialize the window -- add @-reply text if necessary
@@ -46,11 +42,13 @@ StatusNet.NewNoticeView.prototype.init = function() {
         );
     }
 
+    $('#update_button').attr('disabled', 'disabled');
+
     $('#update_button').bind('click', function(event) {
         that.postNotice();
     });
 
-    var textLimit = this.account.textLimit;
+    var textLimit = me.client.getActiveAccount().getTextLimit();
 
     StatusNet.debug("textlimit = " + textLimit);
 
@@ -61,7 +59,15 @@ StatusNet.NewNoticeView.prototype.init = function() {
     $('#notice_textarea').bind('keydown', function(event) {
         var len = $('#notice_textarea').val().length;
 
-       // turn char counter red when it goes negative
+        if (len > 0 && $('#update_button').attr('disabled')) {
+            $('#update_button').removeAttr('disabled');
+        }
+
+        if (len === 0) {
+            $('#update_button').attr('disabled', 'disabled');
+        }
+
+        // turn char counter red when it goes negative
         if (textLimit - len < 0 && (textLimit - len) + 1 === 0) {
             $('#counter').addClass('negative');
         }
@@ -102,22 +108,38 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
 
     StatusNet.debug("Sending these post parameters: " + postParams);
 
-    this.account.apiPost(method, postParams,
+    me.client.getActiveView().showSpinner();
+    $('#update_button').attr('disabled', 'disabled');
+    me.client.getActiveAccount().apiPost(method, postParams,
         function(status, response) {
             var id = $(response).find('status > id').text()
             if (id) {
+                me.client.postNoticeSound.play();
                 StatusNet.debug("Posted notice " + id);
+                me.client.getActiveTimeline().update(null, false);
+                if (me.onSuccess) {
+                    if (me.replyToId) {
+                        msg = "Posted reply to notice " + me.replyToId;
+                    } else {
+                        msg = "Posted notice " + id;
+                    }
+                    me.onSuccess(msg);
+                }
             }
-            // play notice posted sound
+            me.client.getActiveView().hideSpinner();
             me.close();
         },
         function(status, response) {
-            var msg = $(response).find('error').text();
-            if (msg) {
-                StatusNet.debug("Error posting notice" + " - " + msg);
-            } else {
-                StatusNet.debug("Error posting notice - " + status + " - " + response);
+            var err = $(response).find('error').text();
+            var msg = "Error posting new notice";
+            if (err) {
+                msg += " - " + err;
             }
+            if (me.onError) {
+                me.onError(msg);
+            }
+            StatusNet.debug(msg + ", status = " + status + ", response = " + response);
+            me.client.getActiveView().hideSpinner();
             me.close();
         }
     );

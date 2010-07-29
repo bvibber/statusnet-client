@@ -21,12 +21,7 @@
 /**
  * Constructor for direct message view
  */
-StatusNet.DirectMessageView = function() {
-    var db = StatusNet.getDB();
-    this.account = StatusNet.Account.getDefault(db);
-
-    StatusNet.debug("DirectMessageView constructor");
-};
+StatusNet.DirectMessageView = function() {};
 
 /**
  * Initialize the window
@@ -38,19 +33,29 @@ StatusNet.DirectMessageView.prototype.init = function() {
     var that = this;
     var me = Titanium.UI.getCurrentWindow();
 
+    $('#send_button').attr('disabled', 'disabled');
+
     $('#send_button').bind('click', function(event) {
         that.send();
     });
 
-    var textLimit = this.account.textLimit;
+    var textLimit = me.client.getActiveAccount().getTextLimit();
 
     StatusNet.debug("textlimit = " + textLimit);
 
     // Note: backspace and other whitespace keys don't generate
     // a keypress event on linux, although they do on OS X.
-    $('#counter').html(that.account.textLimit);
+    $('#counter').html(textLimit);
     $('#direct_message_textarea').bind('keydown', function(event) {
         var len = $('#direct_message_textarea').val().length;
+
+        if (len > 0 && $('#send_button').attr('disabled')) {
+            $('#send_button').removeAttr('disabled');
+        }
+
+        if (len === 0) {
+            $('#send_button').attr('disabled', 'disabled');
+        }
 
         // turn char counter red when it goes negative
         if (textLimit - len < 0 && (textLimit - len) + 1 === 0) {
@@ -75,7 +80,7 @@ StatusNet.DirectMessageView.prototype.send = function()
 {
     StatusNet.debug("DirectMessageView.send()");
     var that = this;
-    var method = 'direct_messages/new.json';
+    var method = 'direct_messages/new.xml';
     var msgText = $('#direct_message_textarea').val();
 
     var me = Titanium.UI.getCurrentWindow();
@@ -85,19 +90,33 @@ StatusNet.DirectMessageView.prototype.send = function()
         + "&screen_name="
         + encodeURIComponent(me.nickname);
 
-    this.account.apiPost(method, params,
+    $('#send_button').attr('disabled', 'disabled');
+
+    me.client.getActiveView().showSpinner();
+
+    me.client.getActiveAccount().apiPost(method, params,
         function(status, response) {
-            StatusNet.debug("Send direct message to " + me.nickname);
+            me.client.postNoticeSound.play();
+            var msg = "Direct message to " + me.nickname + " sent";
+            StatusNet.debug(msg);
+            if (me.onSuccess) {
+                me.onSuccess(msg);
+            }
             // play new direct message sound
+            me.client.getActiveView().hideSpinner();
             me.close();
         },
         function(status, response) {
-            var msg = $(response).find('error').text();
-            if (msg) {
-                StatusNet.debug("Error posting direct message" + " - " + msg);
-            } else {
-                StatusNet.debug("Error posting direct message - " + status + " - " + response);
+            var err = $(response).find('error').text();
+            var msg = "Error posting direct message";
+            if (err) {
+                msg += " - " + err;
             }
+            if (me.onError) {
+                me.onError(msg);
+            }
+            StatusNet.debug(msg + ", status = " + status + ", response = " + response);
+            me.client.getActiveView().hideSpinner();
             me.close();
         }
     );

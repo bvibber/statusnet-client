@@ -139,7 +139,7 @@ var startTime = Date.now();
 Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 'ms');
 
     // STUFF IN THE <entry>
-    var idRegexp = /^(\d)+$/;
+    var idRegexp = /(\d)+$/;
     var simpleNode = function(match) {
         notice[match.name] = match.text;
     }
