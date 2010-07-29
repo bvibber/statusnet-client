@@ -90,10 +90,18 @@ StatusNet.AtomParser.mapOverElementsHelper = function(parent, map) {
         var el = list.item(i);
         var name = el.nodeName;
         if (map[name] !== undefined) {
+            var attribsDict = {};
+            var attributes = el.attributes;
+            var numAttribs = attributes.length;
+            for (var j = 0; j < numAttribs; j++) {
+                var attrib = attributes.item(j);
+                attribsDict[attrib.nodeName] = attrib.nodeValue;
+            }
             matches.push({
                 node: el,
                 name: name,
-                text: $(el).text()
+                text: $(el).text(),
+                attributes: attribsDict
             });
         }
     }
@@ -148,13 +156,13 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
             }
         },
         'statusnet:notice_info': function(match) {
-            notice.id = match.node.getAttribute('local_id');
+            notice.id = match.attributes['local_id'];
 
             // source client
-            notice.source = match.node.getAttribute('source');
-            notice.favorite = match.node.getAttribute('favorite');
-            notice.repeated = match.node.getAttribute('repeated');
-            notice.repeat_of = match.node.getAttribute('repeat_of');
+            notice.source = match.attributes['source'];
+            notice.favorite = match.attributes['favorite'];
+            notice.repeated = match.attributes['repeated'];
+            notice.repeat_of = match.attributes['repeat_of'];
         },
         'published': simpleNode,
         'updated': function(match) {
@@ -186,8 +194,8 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
                     }
                 },
                 'statusnet:profile_info': function(match2) {
-                    notice.following = match2.node.getAttribute('following');
-                    notice.blocking = match2.node.getAttribute('blocking');
+                    notice.following = match2.attributes['following'];
+                    notice.blocking = match2.attributes['blocking'];
                 }
             });
         },
@@ -198,24 +206,24 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
                 },
                 'link': function(match2) {
                     // @fixme accept other image sizes
-                    if (match2.node.getAttribute('rel') == 'avatar' &&
-                        match2.node.getAttribute('media:width') == StatusNet.Platform.avatarSize()) {
-                        notice.avatar = match2.node.getAttribute('href');
+                    if (match2.attributes['rel'] == 'avatar' &&
+                        match2.attributes['media:width'] == StatusNet.Platform.avatarSize()) {
+                        notice.avatar = match2.attributes['href'];
                     }
                 }
             });        
         },
         'link': function(match) {
-            var rel = match.node.getAttribute('rel');
-            var type = match.node.getAttribute('type');
+            var rel = match.attributes['rel'];
+            var type = match.attributes['type'];
             if (rel == 'alternate') {
-                notice.link = match.node.getAttribute('href');
+                notice.link = match.attributes['href'];
             } else if (rel == 'ostatus:conversation') {
-                notice.contextLink = match.node.getAttribute('href');
+                notice.contextLink = match.attributes['href'];
             } else if (rel == 'related' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
                 // XXX: Special case for search Atom entries
                 if (!notice.avatar) {
-                    notice.avatar = match.node.getAttribute('href');
+                    notice.avatar = match.attributes['href'];
                 }
             }
         },
@@ -226,7 +234,7 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
             notice.lon = gArray[1];
         },
         'thr:in-reply-to': function(match) {
-            notice.inReplyToLink = match.node.getAttribute('ref');
+            notice.inReplyToLink = match.attributes['ref'];
             var result = notice.inReplyToLink.match(idRegexp);
             if (result) {
                 notice.inReplyToId = result[0]; // Could be useful
