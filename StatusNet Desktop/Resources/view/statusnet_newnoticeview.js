@@ -59,7 +59,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     $('#notice_textarea').bind('keydown', function(event) {
         var len = $('#notice_textarea').val().length;
 
-        if (len === 1) {
+        if (len > 0 && $('#update_button').attr('disabled')) {
             $('#update_button').removeAttr('disabled');
         }
 

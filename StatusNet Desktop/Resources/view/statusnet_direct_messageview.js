@@ -49,7 +49,7 @@ StatusNet.DirectMessageView.prototype.init = function() {
     $('#direct_message_textarea').bind('keydown', function(event) {
         var len = $('#direct_message_textarea').val().length;
 
-        if (len === 1) {
+        if (len > 0 && $('#send_button').attr('disabled')) {
             $('#send_button').removeAttr('disabled');
         }
 
