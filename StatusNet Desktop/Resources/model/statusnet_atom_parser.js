@@ -70,21 +70,45 @@ StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
  * @access private
  */
 StatusNet.AtomParser.mapOverElements = function(parent, map) {
-    Titanium.API.info('WWW IN');
-    var origstart = Date.now();
+    var matches = StatusNet.AtomParser.mapOverElementsHelper(parent, map);
+    var last = matches.length;
+    for (var i = 0; i < last; i++) {
+        var match = matches[i];
+        map[match.name](match);
+    }
+}
+
+/**
+ * Inner loop to pull the matching nodes...
+ * ...this is very slow on Android.
+ */
+StatusNet.AtomParser.mapOverElementsHelper = function(parent, map) {
+    var matches = [];
     var list = parent.childNodes;
-    var ms = Date.now() - origstart;
-    Titanium.API.info('WWW - ' + ms + 'ms to get child nodes');
     var last = list.length;
     for (var i = 0; i < last; i++) {
         var el = list.item(i);
-        if (map[el.nodeName] !== undefined) {
-            map[el.nodeName](el);
+        var name = el.nodeName;
+        if (map[name] !== undefined) {
+            matches.push({
+                node: el,
+                name: name,
+                text: $(el).text()
+            });
         }
     }
-    var ms = Date.now() - origstart;
-    Titanium.API.info('WWW OUT - ' + ms + 'ms to process group in ' + parent.nodeName);
+    return matches;
 }
+
+/**
+ * Use our optimized native version of the loop if available...
+ */
+if (typeof Titanium.Statusnet != "undefined") {
+    if (typeof Titanium.Statusnet.mapOverElementsHelper != "undefined") {
+        StatusNet.AtomParser.mapOverElementsHelper = Titanium.Statusnet.mapOverElementsHelper;
+    }
+}
+
 
 /**
  * Class method for generating a notice from an Atom entry
@@ -108,14 +132,14 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
 
     // STUFF IN THE <entry>
     var idRegexp = /^(\d)+$/;
-    var simpleNode = function(el) {
-        notice[el.nodeName] = $(el).text();
-    };
+    var simpleNode = function(match) {
+        notice[match.name] = match.text;
+    }
 
     StatusNet.AtomParser.mapOverElements(entry, {
-        'id': function(el) {
+        'id': function(match) {
             // XXX: Special case for search Atom entries
-            var searchId = $(el).text();
+            var searchId = match.text;
             if (searchId.substr(0, 4) == 'tag:') {
                 var result = searchId.match(idRegexp);
                 if (result) {
@@ -123,85 +147,86 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
                 }
             }
         },
-        'statusnet:notice_info': function(el) {
-            notice.id = el.getAttribute('local_id');
+        'statusnet:notice_info': function(match) {
+            notice.id = match.node.getAttribute('local_id');
 
             // source client
-            notice.source = el.getAttribute('source');
-            notice.favorite = el.getAttribute('favorite');
-            notice.repeated = el.getAttribute('repeated');
-            notice.repeat_of = el.getAttribute('repeat_of');
+            notice.source = match.node.getAttribute('source');
+            notice.favorite = match.node.getAttribute('favorite');
+            notice.repeated = match.node.getAttribute('repeated');
+            notice.repeat_of = match.node.getAttribute('repeat_of');
         },
         'published': simpleNode,
-        'updated': function(el) {
-            var updated = $(el).text();
+        'updated': function(match) {
+            var updated = match.text;
 
             // knock off the millisecs to make the date string work with humane.js
             notice.updated = updated.substring(0, 19);
         },
         'title': simpleNode,
         'content': simpleNode, // @fixme this should actually handle more complex cases, as there may be different data types
-        'source': function(el) {
+        'source': function(match) {
             // atom:source (not the source client, eh) - this might not be in the feed
-            StatusNet.AtomParser.mapOverElements(el, {
-                'title': function(elem) {
-                    notice.atomSource = $(elem).text();
+            StatusNet.AtomParser.mapOverElements(match.node, {
+                'title': function(match) {
+                    notice.atomSource = match.text;
                 }
             });
         },
-        'author': function(el) {
-            StatusNet.AtomParser.mapOverElements(el, {
-                'name': function(elem) {
-                    notice.author = $(elem).text();
+        'author': function(match) {
+            StatusNet.AtomParser.mapOverElements(match.node, {
+                'name':  function(match) {
+                    notice.author = match.text;
                 },
-                'uri': function(elem) {
-                    notice.authorUri = $(elem).text();
+                'uri': function(match2) {
+                    notice.authorUri = match2.text;
                     var result = notice.authorUri.match(idRegexp);
                     if (result) {
                         notice.authorId = result[0];
                     }
                 },
-                'statusnet:profile_info': function(elem) {
-                    notice.following = elem.getAttribute('following');
-                    notice.blocking = elem.getAttribute('blocking');
+                'statusnet:profile_info': function(match2) {
+                    notice.following = match2.node.getAttribute('following');
+                    notice.blocking = match2.node.getAttribute('blocking');
                 }
             });
         },
-        'activity:actor': function(el) {
-            StatusNet.AtomParser.mapOverElements(el, {
-                'poco:displayName': function(elem) {
-                    notice.fullname = $(elem).text();
+        'activity:actor': function(match) {
+            StatusNet.AtomParser.mapOverElements(match.node, {
+                'poco:displayName':  function(match) {
+                    notice.fullname = match.text;
                 },
-                'link': function(elem) {
+                'link': function(match2) {
                     // @fixme accept other image sizes
-                    if (elem.getAttribute('rel') == 'avatar' && elem.getAttribute('media:width') == StatusNet.Platform.avatarSize()) {
-                        notice.avatar = elem.getAttribute('href');
+                    if (match2.node.getAttribute('rel') == 'avatar' &&
+                        match2.node.getAttribute('media:width') == StatusNet.Platform.avatarSize()) {
+                        notice.avatar = match2.node.getAttribute('href');
                     }
                 }
             });        
         },
-        'link': function(el) {
-            var rel = el.getAttribute('rel');
-            var type = el.getAttribute('type');
+        'link': function(match) {
+            var rel = match.node.getAttribute('rel');
+            var type = match.node.getAttribute('type');
             if (rel == 'alternate') {
-                notice.link = el.getAttribute('href');
+                notice.link = match.node.getAttribute('href');
             } else if (rel == 'ostatus:conversation') {
-                notice.contextLink = el.getAttribute('href');
+                notice.contextLink = match.node.getAttribute('href');
             } else if (rel == 'related' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
                 // XXX: Special case for search Atom entries
                 if (!notice.avatar) {
-                    notice.avatar = el.getAttribute('href');
+                    notice.avatar = match.node.getAttribute('href');
                 }
             }
         },
-        'georss:point': function(el) {
+        'georss:point': function(match) {
             // @fixme comma is also a valid separator
-            var gArray = $(el).text().split(' ');
+            var gArray = match.text.split(' ');
             notice.lat = gArray[0];
             notice.lon = gArray[1];
         },
-        'thr:in-reply-to': function(el) {
-            notice.inReplyToLink = el.getAttribute('ref');
+        'thr:in-reply-to': function(match) {
+            notice.inReplyToLink = match.node.getAttribute('ref');
             var result = notice.inReplyToLink.match(idRegexp);
             if (result) {
                 notice.inReplyToId = result[0]; // Could be useful
@@ -214,6 +239,13 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
     // @todo category / tags / groups ?
 
 var ms = Date.now() - startTime;
+
+for (var i in notice) {
+    if (notice.hasOwnProperty(i)) {
+        Titanium.API.info('WWW -- notice.' + i + ' = ' + notice[i]);
+    }
+}
+
 Titanium.API.info('noticeFromEntry CHECKPOINT EXIT: ' + ms + 'ms');
     return notice;
 };
