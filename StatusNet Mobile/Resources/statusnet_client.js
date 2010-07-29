@@ -369,6 +369,7 @@ StatusNet.Client.prototype.deleteNotice = function(noticeId) {
             StatusNet.debug("Deleted notice " + noticeId);
             // @fixme show some kind of output
             //StatusNet.Infobar.flashMessage("Deleted notice " + noticeId);
+            Titanium.App.fireEvent('StatusNet_deleteNoticeComplete', {noticeId: noticeId});
             alert("Deleted notice " + noticeId);
             that.timeline.decacheNotice(noticeId);
             that.view.removeNotice(noticeId);

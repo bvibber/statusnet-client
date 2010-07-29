@@ -38,18 +38,20 @@ Titanium.App.addEventListener("StatusNet_appendTimelineNotice", function(event) 
     enableNoticeControls(document.getElementById('notice-' + notice.id));
 });
 Titanium.App.addEventListener("StatusNet_faveNoticeComplete", function(event) {
-    var $notice = $('#notice-' + event.noticeId);
-    $notice.find('button.notice_fave').
+    $('#notice-' + event.noticeId).find('button.notice_fave').
         removeClass('notice_fave').
         addClass('notice_unfave').
         text('Unfave');
 });
 Titanium.App.addEventListener("StatusNet_unFaveNoticeComplete", function(event) {
-    var $notice = $('#notice-' + event.noticeId);
-    $notice.find('button.notice_unfave').
+    $('#notice-' + event.noticeId).find('button.notice_unfave').
         removeClass('notice_unfave').
         addClass('notice_fave').
         text('Fave');
+});
+Titanium.App.addEventListener("StatusNet_deleteNoticeComplete", function(event) {
+	Titanium.API.debug("********* got StatusNet_unDeleteNoticeComplete event");
+    $('#notices div.notice#notice-' + event.noticeId).fadeOut("slow");
 });
 
 
@@ -140,7 +142,7 @@ renderNotice = function(notice) {
 
     // @fixme use URI or id or somthing?
     if (author === clientAccountUsername) {
-        html.push(' <a href="#" class="notice_delete">Delete</a>')
+        html.push(' <button class="notice_delete">Delete</a>')
     } else {
         if (notice.repeated === "false") {
             html.push(' <button class="notice_repeat">Repeat</button>');
