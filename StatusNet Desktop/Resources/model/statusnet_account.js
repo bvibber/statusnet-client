@@ -219,7 +219,9 @@ StatusNet.Account.prototype.ensure = function(db) {
                         this.apiroot);
 
 		if (rs.isValidRow()) {
-			return rs.fieldByName("id");
+		    var id = rs.fieldByName("id");
+		    rs.close();
+			return id;
 		} else {
 			return false;
 		}
@@ -270,6 +272,7 @@ StatusNet.Account.prototype.deleteAccount = function() {
                 var acct = StatusNet.Account.fromRow(row);
                 acct.setDefault();
             }
+            row.close();
             StatusNet.debug("new default set!");
         }
         StatusNet.debug("done deleting!");

@@ -55,7 +55,9 @@ StatusNet.TimelineSearch.prototype.lastQuery = function() {
     var db = StatusNet.getDB();
     var row = db.execute("select searchterm from search_history limit 1");
     if (row.isValidRow()) {
-        return row.fieldByName('searchterm');
+        var searchterm = row.fieldByName('searchterm');
+        row.close();
+        return searchterm;
     } else {
         return "";
     }
@@ -68,9 +70,10 @@ StatusNet.TimelineSearch.prototype.lastQuery = function() {
 StatusNet.TimelineSearch.prototype.storeQuery = function(q) {
     this._searchTerm = q;
     var db = StatusNet.getDB();
-    db.execute('delete from search_history');
-    db.execute('insert into search_history (searchterm) values (?)',
+    var rs = db.execute('delete from search_history');
+    rs = db.execute('insert into search_history (searchterm) values (?)',
                q);
+    rs.close();
 };
 
 /**

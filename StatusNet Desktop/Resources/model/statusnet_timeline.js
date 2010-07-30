@@ -66,6 +66,8 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
         Date.now()
     );
 
+    rc.close();
+
     // @todo Check for an error condition -- how?
 };
 
@@ -87,6 +89,8 @@ StatusNet.Timeline.prototype.decacheNotice = function(noticeId) {
         "DELETE FROM entry WHERE notice_id = ?",
         noticeId
     );
+
+    rc.close();
 
     // @todo Check for an error condition -- how?
 };
@@ -250,6 +254,8 @@ StatusNet.Timeline.prototype.getUrl = function() {
         lastId = rs.fieldByName('last_id');
     }
 
+    rs.close();
+
     StatusNet.debug("lastId = " + lastId);
 
     if (lastId > 0) {
@@ -348,6 +354,7 @@ StatusNet.Timeline.prototype.trimNotices = function() {
     StatusNet.debug("trimNotices E2Z");
         }
     }
+    rs.close();
     StatusNet.debug("trimNotices DONE");
 };
 
