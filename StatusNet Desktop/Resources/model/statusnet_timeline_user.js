@@ -27,8 +27,8 @@ StatusNet.TimelineUser = function(client, authorId) {
 
     this.authorId = authorId;
 
-    if (this.authorId === null) {
-        StatusNet.debug("TimelineUser constructor - authorId was null");
+    if (!this.authorId) {
+        StatusNet.debug("TimelineUser constructor - no authorId");
         this.timeline_name = 'user';
     } else {
         this.timeline_name = 'user-' + authorId;
@@ -72,7 +72,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
 
     var url = null;
 
-    if (authorId === null) {
+    if (!authorId) {
         url = 'users/show.xml';
     } else {
         url = 'users/show/' + authorId + ".xml";
@@ -129,7 +129,7 @@ StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
 
     // dedupe here?
     for (i = 0; i < this._notices.length; i++) {
-        if (this._notices[i].id === notices.id) {
+        if (this._notices[i].id === notice.id) {
             StatusNet.debug("skipping duplicate notice: " + notice.id);
             return;
         }
