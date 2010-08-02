@@ -68,11 +68,11 @@ StatusNet.NewNoticeView.prototype.init = function() {
         }
 
         // turn char counter red when it goes negative
-        if (textLimit - len < 0 && (textLimit - len) + 1 === 0) {
+        if (textLimit - len < 0) {
             $('#counter').addClass('negative');
         }
 
-        if (textLimit - len === 0) {
+        if (textLimit - len >= 0) {
             $('#counter').removeClass('negative');
         }
 
