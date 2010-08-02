@@ -135,12 +135,9 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
             if (err) {
                 msg += " - " + err;
             }
-            if (me.onError) {
-                me.onError(msg);
-            }
+            $("#error").text(msg);
             StatusNet.debug(msg + ", status = " + status + ", response = " + response);
             me.client.getActiveView().hideSpinner();
-            me.close();
         }
     );
 };
