@@ -40,7 +40,11 @@ StatusNet.NewNoticeView.prototype.init = function() {
     StatusNet.debug("NewNoticeView.init");
     var that = this;
     var data = this.data;
+    
+    var margin = 4;
+    var buttonHeight = 40;
 
+	// @fixme if possible, hide the title bar on Android?
     var window = this.window = Titanium.UI.createWindow({
         title: 'New Notice',
         backgroundColor: StatusNet.Platform.dialogBackground(),
@@ -65,8 +69,8 @@ StatusNet.NewNoticeView.prototype.init = function() {
 	navbar.setRightNavButton(updateButton);
 
     var noticeTextArea = Titanium.UI.createTextArea({
-        left: 0,
-        right: 0,
+        left: margin,
+        right: margin,
         height: 160,
         value: '',
         font: {fontSize: 16},
@@ -88,9 +92,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
 	// Horizontal control strip that should live between the textarea
 	// and the on-screen keyboard...
 	var controlStrip = Titanium.UI.createView({
-		left: 0,
-		right: 0,
-		height: 32
+		left: margin,
+		right: margin,
+		height: buttonHeight
 	});
 	window.add(controlStrip);
 
@@ -100,7 +104,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var counter = Titanium.UI.createLabel({
         text: textLimit,
         top: 0,
-        right: 4,
+        right: 0,
         width: 'auto',
         height: 'auto'
     });
@@ -114,9 +118,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
     });
 
     var moreButton = Titanium.UI.createButton({
-        title: 'More...',
+        title: 'Options...',
         top: 2,
-        left: 4,
+        left: 0,
         width: 80, //'auto',
         height: 32 //'auto'
     });
