@@ -38,20 +38,33 @@ StatusNet.NewNoticeView = function(data) {
 StatusNet.NewNoticeView.prototype.init = function() {
     // post a new notice
     StatusNet.debug("NewNoticeView.init");
-
-    StatusNet.debug("NewNoticeView.init A");
-    var window = this.window = Titanium.UI.createWindow({
-        title: 'New Notice',
-        backgroundColor: StatusNet.Platform.dialogBackground()
-    });
-
-    StatusNet.debug("NewNoticeView.init B");
-
     var that = this;
     var data = this.data;
 
+    var window = this.window = Titanium.UI.createWindow({
+        title: 'New Notice',
+        backgroundColor: StatusNet.Platform.dialogBackground(),
+        layout: 'vertical'
+    });
+    var navbar = StatusNet.Platform.createNavBar(window);
+
+	var cancelButton = Titanium.UI.createButton({
+		title: "Cancel"
+	});
+    cancelButton.addEventListener('click', function(event) {
+        that.window.close();
+    });
+	navbar.setLeftNavButton(cancelButton);
+
+	var updateButton = Titanium.UI.createButton({
+		title: "Send"
+	});
+    updateButton.addEventListener('click', function(event) {
+        that.postNotice(noticeTextArea.value);
+    });
+	navbar.setRightNavButton(updateButton);
+
     var noticeTextArea = Titanium.UI.createTextArea({
-        top: 0,
         left: 0,
         right: 0,
         height: 160,
@@ -62,7 +75,6 @@ StatusNet.NewNoticeView.prototype.init = function() {
     noticeTextArea.addEventListener('return', function() {
         that.postNotice(noticeTextArea.value);
     });
-    StatusNet.debug("NewNoticeView.init C");
     if (data.replyToUsername) {
         noticeTextArea.value = '@' + data.replyToUsername + ' ';
         // set cursor position to after the @
@@ -71,71 +83,39 @@ StatusNet.NewNoticeView.prototype.init = function() {
         //    me.replyToUsername.length + 2
         //);
     }
-    StatusNet.debug("NewNoticeView.init D");
     window.add(noticeTextArea);
-    StatusNet.debug("NewNoticeView.init E");
 
-    var cancelButton = Titanium.UI.createButton({
-        title: "Cancel"
-    });
-    cancelButton.addEventListener('click', function(event) {
-        that.window.close();
-    });
-
-    var updateButton = Titanium.UI.createButton({
-        title: "Send"
-    });
-    updateButton.addEventListener('click', function(event) {
-        that.postNotice(noticeTextArea.value);
-    });
-    if (StatusNet.Platform.hasNavBar()) {
-        window.setLeftNavButton(cancelButton);
-        window.setRightNavButton(updateButton);
-    } else {
-        window.add(cancelButton);
-        window.add(updateButton);
-    }
+	// Horizontal control strip that should live between the textarea
+	// and the on-screen keyboard...
+	var controlStrip = Titanium.UI.createView({
+		left: 0,
+		right: 0,
+		height: 32
+	});
+	window.add(controlStrip);
 
     var textLimit = this.account.textLimit;
-    StatusNet.debug("NewNoticeView.init I");
-
     StatusNet.debug("textlimit = " + textLimit);
 
     var counter = Titanium.UI.createLabel({
         text: textLimit,
-        top: 160,
+        top: 0,
         right: 4,
         width: 'auto',
         height: 'auto'
     });
-    window.add(counter);
-    StatusNet.debug("NewNoticeView.init J");
+    controlStrip.add(counter);
 
     // Note: pressing a key doesn't generate a keypress event on
     // Linux version of Titanium.
     noticeTextArea.addEventListener('change', function(event) {
         counter.text = "" + (textLimit - event.value.length);
+        // @fixme change color or display when negative
     });
-    /*
-    $('#notice_textarea').bind('keydown', function(event) {
-        var len = $('#notice_textarea').val().length;
-
-       // turn char counter red when it goes negative
-        if (textLimit - len < 0 && (textLimit - len) + 1 === 0) {
-            $('#counter').addClass('negative');
-        }
-
-        if (textLimit - len === 0) {
-            $('#counter').removeClass('negative');
-        }
-
-        $('#counter').html(textLimit - len);
-    });
-    */
 
     var moreButton = Titanium.UI.createButton({
         title: 'More...',
-        top: 162,
+        top: 2,
         left: 4,
         width: 80, //'auto',
         height: 32 //'auto'
@@ -143,13 +123,12 @@ StatusNet.NewNoticeView.prototype.init = function() {
     moreButton.addEventListener('click', function() {
         noticeTextArea.blur();
     });
-    window.add(moreButton);
+    controlStrip.add(moreButton);
 
     var moreStuff = Titanium.UI.createView({
         left: 0,
         right: 0,
-        top: 200,
-        bottom: 0,
+        height: 'auto',
         backgroundColor: StatusNet.Platform.dialogBackground(),
         layout: 'vertical'
     });
