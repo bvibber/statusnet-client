@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Base class for Timeline view
  *
@@ -56,13 +57,13 @@ StatusNet.TimelineView = function(client) {
             StatusNet.debug("TimelineView showing:");
             that.show();
 
-			StatusNet.debug("TimelineView checking for total number of notices")
-		    var notices = that.client.timeline.getNotices();
-			if (notices.length == 0) {
-				StatusNet.debug("TimelineView: no notices found");
-	        	that.clearTimelineView({title: 'No notices in this timeline yet.'});
-			}
-			StatusNet.debug("TimelineView - there are " + notices.length + " notices in timeline");
+            StatusNet.debug("TimelineView checking for total number of notices")
+            var notices = that.client.timeline.getNotices();
+            if (notices.length == 0) {
+                StatusNet.debug("TimelineView: no notices found");
+                that.clearTimelineView({title: 'No notices in this timeline yet.'});
+            }
+            StatusNet.debug("TimelineView - there are " + notices.length + " notices in timeline");
             StatusNet.debug("TimelineView updateFinished DONE");
         }
     );
@@ -86,17 +87,17 @@ StatusNet.TimelineView = function(client) {
  * Additional initialization stuff that can't be done in the constructor
  */
 StatusNet.TimelineView.prototype.init = function() {
-	StatusNet.debug("TimelineView init");
+    StatusNet.debug("TimelineView init");
 
-	StatusNet.debug("TimelineView: adding adding activity indicator -- spinner");
+    StatusNet.debug("TimelineView: adding adding activity indicator -- spinner");
 
-	this.act = Titanium.UI.createActivityIndicator();
-	this.act.style = Titanium.UI.iPhone.ActivityIndicatorStyle.PLAIN;
-	this.act.font = {fontFamily:'Helvetica Neue', fontSize:15,fontWeight:'bold'};
-	this.act.color = 'white';
-	this.act.message = 'Loading...';
+    this.act = Titanium.UI.createActivityIndicator();
+    this.act.style = Titanium.UI.iPhone.ActivityIndicatorStyle.PLAIN;
+    this.act.font = {fontFamily:'Helvetica Neue', fontSize:15,fontWeight:'bold'};
+    this.act.color = 'white';
+    this.act.message = 'Loading...';
 
-	StatusNet.debug("TimelineView: Finished adding activity indicator");
+    StatusNet.debug("TimelineView: Finished adding activity indicator");
 };
 
 /**
@@ -104,41 +105,6 @@ StatusNet.TimelineView.prototype.init = function() {
  *
  */
 StatusNet.TimelineView.prototype.show = function() {
-    var that = this;
-
-    if (!this.webview) {
-        var navbar = StatusNet.Platform.createNavBar(this.window);
-
-        // @fixme make this show account info
-        var accountsButton = Titanium.UI.createButton({
-            title: "Accounts"
-        });
-        accountsButton.addEventListener('click', function() {
-            StatusNet.showSettings();
-        });
-        navbar.setLeftNavButton(accountsButton);
-
-        var updateButton = Titanium.UI.createButton({
-            title: "New",
-            systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
-        });
-        updateButton.addEventListener('click', function() {
-            that.client.newNoticeDialog();
-        });
-        navbar.setRightNavButton(updateButton);
-
-        this.webview = Titanium.UI.createWebView({
-            top: navbar.height,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            scalesPageToFit: false,
-            url: "timeline.html",
-            backgroundColor: 'black'
-        });
-
-        this.window.add(this.webview);
-    }
 
     var notices = this.client.timeline.getNotices();
 
@@ -217,8 +183,6 @@ StatusNet.TimelineView.prototype.localAuthor = function(uri) {
     return false;
 };
 
-
-
 /**
  * Set up anything that should go in the header section...
  */
@@ -234,8 +198,8 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-	this.window.setToolbar([this.act],{animated:true});
-	this.act.show();
+    this.client.mainwin.setToolbar([this.act],{animated:true});
+    this.act.show();
 };
 
 /**
@@ -243,14 +207,15 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
  */
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
-	this.act.hide();
-	this.window.setToolbar(null,{animated:true});
+    this.act.hide();
+    this.client.mainwin.setToolbar(null,{animated:true});
 };
 
 /**
  * Constructor for a view for a friends timeline
  */
 StatusNet.TimelineViewFriends = function(client) {
+    StatusNet.debug("StatusNet.TimelineViewFriends - constructor");
     StatusNet.TimelineView.call(this, client);
     this.title = "{name} and friends on {site}";
     this.tab = 'friends';

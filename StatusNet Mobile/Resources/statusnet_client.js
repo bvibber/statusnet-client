@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for UI manager class for the client.
  *
@@ -26,6 +27,12 @@
 StatusNet.Client = function(_account) {
 
     StatusNet.debug("Client constructor");
+
+    if (_account) {
+        StatusNet.debug("we have an account");
+    } else {
+        StatusNet.debug("we don't have an account");
+    }
 
     this.account = _account;
 
@@ -47,7 +54,6 @@ StatusNet.Client.prototype.setActiveTab = function(tabName) {
         this.tabGroup.setActiveTab(this.tabs[tabName]);
     }
 };
-
 
 /**
  * Switch the view to a specified timeline
@@ -104,6 +110,11 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
     this.view.showHeader();
 };
 
+
+StatusNet.Client.prototype.getActiveAccount = function() {
+    return this.account;
+};
+
 /**
  * Reload timeline notices
  */
@@ -118,23 +129,32 @@ StatusNet.Client.prototype.init = function() {
     StatusNet.debug("Client init");
     var client = this;
 
-    StatusNet.debug("Client setting up shake event");
-    Titanium.Gesture.addEventListener('shake', function(event) {
-        StatusNet.debug("Shaken, not stirred.");
-        if (client.timeline) {
-            StatusNet.debug("Triggering update for shake gesture...");
-            client.timeline.update(function() {
-                StatusNet.debug("Updated, gonna show:");
-                client.view.show();
-                StatusNet.debug("Updated and done showing.");
-            });
-            StatusNet.debug("Started an update, waiting...");
-        }
-        StatusNet.debug("Done checking out the shake.");
-    });
+    StatusNet.debug("StatusNet.Client.prototype.init - Checking for account...");
+    if (!this.account) {
+        StatusNet.debug("StatusNet.Client.prototype.init - No account, showing accountView");
+        this.accountView = new StatusNet.SettingsView()
+        this.accountView.init();
+    } else {
+        StatusNet.debug("StatusNet.Client.prototype.init - account is set...");
 
-    this.initInternalListeners();
-    this.initAccountView(this.account);
+        StatusNet.debug("Client setting up shake event");
+        Titanium.Gesture.addEventListener('shake', function(event) {
+            StatusNet.debug("Shaken, not stirred.");
+            if (client.timeline) {
+                StatusNet.debug("Triggering update for shake gesture...");
+                client.timeline.update(function() {
+                    StatusNet.debug("Updated, gonna show:");
+                    client.view.show();
+                    StatusNet.debug("Updated and done showing.");
+                });
+                StatusNet.debug("Started an update, waiting...");
+            }
+            StatusNet.debug("Done checking out the shake.");
+        });
+
+        client.initInternalListeners();
+        client.initAccountView(this.account);
+    }
 };
 
 /**
@@ -182,74 +202,160 @@ StatusNet.Client.prototype.initInternalListeners = function() {
         that.deleteNotice(event.noticeId);
     });
 
+    Ti.App.addEventListener('StatusNet_tabSelected', function(event) {
+        StatusNet.debug('Event: ' + event.name);
+        that.switchView(event.tabName);
+    });
+
 }
+
+/**
+ * Switch the view to a specified timeline
+ *
+ * @param String timeline   the timeline to show
+ */
+StatusNet.Client.prototype.switchView = function(view) {
+
+    StatusNet.debug("StatusNet.Client.prototype.switchView - view = " + view);
+
+    if (this.account) {
+        StatusNet.debug("we still have an account");
+    } else {
+        StatusNet.debug('we lost our account somehow');
+    }
+
+    var that = this;
+
+    switch (view) {
+
+        case 'public':
+            this.timeline = new StatusNet.TimelinePublic(this);
+            this.view = new StatusNet.TimelineViewPublic(this);
+            break;
+        case 'user':
+            this.switchUserTimeline();
+            return;
+            break;
+        case "friends":
+            this.timeline = new StatusNet.TimelineFriends(this);
+            this.view = new StatusNet.TimelineViewFriends(this);
+            break;
+        case 'mentions':
+            this.timeline = new StatusNet.TimelineMentions(this);
+            this.view = new StatusNet.TimelineViewMentions(this);
+            break;
+        case 'favorites':
+            this.timeline = new StatusNet.TimelineFavorites(this);
+            this.view = new StatusNet.TimelineViewFavorites(this);
+            break;
+        case 'inbox':
+            this.timeline = new StatusNet.TimelineInbox(this);
+            this.view = new StatusNet.TimelineViewInbox(this);
+            break;
+        case 'allgroups':
+            this.timeline = new StatusNet.TimelineAllGroups(this);
+            StatusNet.debug("finished making allgroups timeline");
+            this.view = new StatusNet.TimelineViewAllGroups(this);
+            StatusNet.debug("finished making allgroups view");
+            break;
+        case 'search':
+            this.timeline = new StatusNet.TimelineSearch(this);
+            this.view = new StatusNet.TimelineViewSearch(this);
+            break;
+        default:
+            throw "Gah wrong timeline";
+            break;
+    }
+
+    StatusNet.debug("Initializing view...");
+    this.view.init();
+
+    StatusNet.debug('telling the view to show...');
+    this.view.show();
+
+    StatusNet.debug('Telling timeline to update:');
+
+    this.timeline.update(function() {
+        that.timeline.noticeAdded.attach(
+            function(args) {
+                if (args.notifications) {
+                    that.view.notifyNewNotice(args.notice);
+                } else {
+                    StatusNet.debug("noticeAdded event with no args!");
+                }
+            },
+            false
+        );
+    });
+
+    StatusNet.debug('timeline updated.');
+};
 
 StatusNet.Client.prototype.initAccountView = function(acct) {
     StatusNet.debug('initAccountView entered...');
+
     this.account = acct;
+
     var that = this;
 
-    // For now let's stick with the same tabs we have on the desktop sidebar
-    // @todo localization
-    var tabInfo = {'public':    {title: 'Public',
-                              timeline: StatusNet.TimelinePublic,
-                                  view: StatusNet.TimelineViewPublic},
-                    friends:    {title: 'Personal',
-                              timeline: StatusNet.TimelineFriends,
-                                  view: StatusNet.TimelineViewFriends},
-                    profile:    {title: 'Profile',
-                              timeline: StatusNet.TimelineUser,
-                                  view: StatusNet.TimelineViewUser},
-                   mentions:    {title: 'Replies',
-                              timeline: StatusNet.TimelineMentions,
-                                  view: StatusNet.TimelineViewMentions},
-                  favorites:    {title: 'Favorites',
-                              timeline: StatusNet.TimelineFavorites,
-                                  view: StatusNet.TimelineViewFavorites},
-                      inbox:    {title: 'Inbox',
-                              timeline: StatusNet.TimelineInbox,
-                                  view: StatusNet.TimelineViewInbox}/*,
-                     search:    {title: 'Search',
-                              timeline: StatusNet.TimelineSearch,
-                                  view: StatusNet.TimelineViewSearch}*/};
+    this.mainwin = Titanium.UI.createWindow({
+        title:'Main View',
+        backgroundColor:'#fff'
+    });
 
-    StatusNet.debug('initAccountView made a big list.');
-    this.tabs = {};
-    this.windows = {};
-    if (this.tabGroup) {
-        this.tabGroup.close();
-    }
-    this.tabGroup = Titanium.UI.createTabGroup();
-    if (!acct) {
-        this.createTab('settings', {
-            title: 'Settings',
-            timeline: null,
-            view: StatusNet.SettingsView
-        });
-        /*
-        StatusNet.debug('whoa whoa whoa');
-        this.tabGroup.addEventListener('open', function() {
-            StatusNet.debug("No account -- opening a settings view!");
-            var view = new StatusNet.SettingsView(that);
-            view.init();
-        });
-        */
-    } else {
-        StatusNet.debug('initAccountView created a tab group.');
+    this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
-        StatusNet.debug('initAccountView Starting building tabs, timelines, views...');
-        for (var tab in tabInfo) {
-            if (tabInfo.hasOwnProperty(tab)) {
-                this.createTab(tab, tabInfo[tab]);
-            }
-        }
-        StatusNet.debug('initAccountView Done building tabs, timelines, views.');
+    // @fixme make this show account info
+    var accountsButton = Titanium.UI.createButton({
+        title: "Accounts"
+    });
 
-        // @todo remember last-used tab
-        StatusNet.debug('initAccountView friends tab is: ' + this.tabs.friends);
-        this.tabGroup.setActiveTab(1);
-    }
-    this.tabGroup.open();
+    accountsButton.addEventListener('click', function() {
+        StatusNet.showSettings();
+    });
+
+    this.navbar.setLeftNavButton(accountsButton);
+
+    var updateButton = Titanium.UI.createButton({
+        title: "New",
+        systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
+    });
+
+    updateButton.addEventListener('click', function() {
+        that.newNoticeDialog();
+    });
+
+    this.navbar.setRightNavButton(updateButton);
+
+    this.webview = Titanium.UI.createWebView({
+        top: this.navbar.height,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        scalesPageToFit: false,
+        url: "timeline.html",
+        backgroundColor: 'black'
+    });
+
+    this.mainwin.add(this.webview);
+
+    var tabinfo = {
+        'public': {deselectedImage: 'images/tabs/public.png', selectedImage: 'images/greenbox.png', name: 'public'},
+        'friends': {deselectedImage: 'images/tabs/friends.png', selectedImage: 'images/greenbox.png', name: 'friends'},
+        'mentions': {deselectedImage: 'images/tabs/mentions.png', selectedImage: 'images/greenbox.png', name: 'mentions'},
+        'profile': {deselectedImage: 'images/tabs/profile.png', selectedImage: 'images/greenbox.png', name: 'profile'},
+        'favorites': {deselectedImage: 'images/tabs/favorites.png', selectedImage: 'images/greenbox.png', name: 'favorites'},
+        'inbox': {deselectedImage: 'images/tabs/inbox.png', selectedImage: 'images/greenbox.png', name: 'inbox'},
+        'search': {deselectedImage: 'images/tabs/search.png', selectedImage: 'images/greenbox.png', name: 'search'}
+    };
+
+    this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin);
+
+    this.mainwin.open();
+
+    this.toolbar.setSelectedTab(1);
+
+    this.switchView('friends');
 
     StatusNet.debug('initAccountView done.');
 };
@@ -295,8 +401,8 @@ StatusNet.Client.prototype.createTab = function(tab, info) {
             StatusNet.debug('Creating the view...');
             client.view = new info.view(client);
             client.view.window = window;
-			StatusNet.debug("Initializing view...");
-			client.view.init();
+            StatusNet.debug("Initializing view...");
+            client.view.init();
 
             StatusNet.debug('telling the view to show...');
             client.view.show();
