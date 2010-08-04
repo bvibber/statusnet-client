@@ -98,6 +98,7 @@ StatusNet.TimelineView.prototype.init = function() {
     this.act.message = 'Loading...';
 
     StatusNet.debug("TimelineView: Finished adding activity indicator");
+    
 };
 
 /**
@@ -106,6 +107,7 @@ StatusNet.TimelineView.prototype.init = function() {
  */
 StatusNet.TimelineView.prototype.show = function() {
 
+    this.showHeader();
     var notices = this.client.timeline.getNotices();
 
     // clear old notices
@@ -189,6 +191,9 @@ StatusNet.TimelineView.prototype.localAuthor = function(uri) {
 StatusNet.TimelineView.prototype.showHeader = function () {
     var title = this.title.replace("{name}", this.client.account.username)
                            .replace("{site}", this.client.account.getHost());
+                           
+    this.client.setMainWindowTitle(title);
+
     //$("#header").html("<h1></h1>");
     //$("#header h1").text(title);
 };

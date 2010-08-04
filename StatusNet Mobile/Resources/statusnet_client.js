@@ -291,6 +291,10 @@ StatusNet.Client.prototype.switchView = function(view) {
     StatusNet.debug('timeline updated.');
 };
 
+StatusNet.Client.prototype.setMainWindowTitle = function(title) {
+    this.mainwin.title = title;
+};
+
 StatusNet.Client.prototype.initAccountView = function(acct) {
     StatusNet.debug('initAccountView entered...');
 
@@ -299,10 +303,9 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     var that = this;
 
     this.mainwin = Titanium.UI.createWindow({
-        title:'Main View',
         backgroundColor:'#fff'
     });
-
+    
     this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
     // @fixme make this show account info
