@@ -222,3 +222,23 @@ StatusNet.Platform.nativeNotifications = function() {
 
     return false;
 };
+
+/**
+ * Wrapper for platform-specific XML parser.
+ *
+ * @param string str
+ * @return DOMDocument
+ */
+StatusNet.Platform.parseXml = function(str) {
+    return (new DOMParser()).parseFromString(xmlEntry, "text/xml");
+}
+
+/**
+ * Wrapper for platform-specific XML output.
+ *
+ * @param DOMNode node
+ * @return string
+ */
+StatusNet.Platform.serializeXml = function(node) {
+    return (new XMLSerializer()).serializeToString(node);
+}

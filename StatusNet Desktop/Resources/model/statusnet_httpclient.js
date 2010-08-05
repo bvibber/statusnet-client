@@ -35,15 +35,7 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
             var responseXML;
             if (this.responseXML == null) {
-                if (typeof DOMParser != "undefined") {
-                    // Titanium Desktop 1.0 doesn't fill out responseXML.
-                    // We'll use WebKit's XML parser...
-                    responseXML = (new DOMParser()).parseFromString(this.responseText, "text/xml");
-                } else {
-                    // Titanium Mobile 1.3 doesn't fill out responseXML on Android.
-                    // We'll use Titanium's XML parser...
-                    responseXML = Titanium.XML.parseString(this.responseText);
-                }
+                return StatusNet.Platform.parseXml(this.responseText);
             } else {
                 responseXML = this.responseXML;
             }

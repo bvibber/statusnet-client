@@ -262,3 +262,25 @@ StatusNet.Platform.createNavBar = function(window) {
         return navbar;
     }
 };
+
+/**
+ * Wrapper for platform-specific XML parser.
+ *
+ * @param string str
+ * @return DOMDocument
+ */
+StatusNet.Platform.parseXml = function(str) {
+    return Titanium.XML.parseString(str);
+}
+
+// Custom patch for feature request...
+// https://appcelerator.lighthouseapp.com/projects/32238/tickets/1452-need-way-to-serialize-dom-trees-back-to-xml-on-mobile-save-xml-output
+if (typeof Titanium.XML.serializeToString == "function") {
+    /**
+     * Wrapper for platform-specific XML output.
+     *
+     * @param DOMNode node
+     * @return string
+     */
+    StatusNet.Platform.serializeXml = Titanium.XML.serializeToString;
+}

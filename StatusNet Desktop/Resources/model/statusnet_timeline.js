@@ -45,7 +45,7 @@ StatusNet.Timeline = function(client) {
  * @param DOM    entry          XML Atom entry for the notice
  */
 StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
-    if (typeof XMLSerializer == "undefined") {
+    if (typeof StatusNet.Platform.serializeXml != "function") {
         StatusNet.debug("Timeline.encacheNotice() skipped - no XML serializer");
         return;
     }
@@ -55,7 +55,7 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
     rc = this.db.execute(
         "INSERT OR REPLACE INTO entry (notice_id, atom_entry) VALUES (?, ?)",
         noticeId,
-        (new XMLSerializer()).serializeToString(entry)
+        StatusNet.Platform.serializeXml(entry)
     );
 
     rc = this.db.execute(
@@ -65,8 +65,6 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
         this.timeline_name,
         Date.now()
     );
-
-    rc.close();
 
     // @todo Check for an error condition -- how?
 };
@@ -89,8 +87,6 @@ StatusNet.Timeline.prototype.decacheNotice = function(noticeId) {
         "DELETE FROM entry WHERE notice_id = ?",
         noticeId
     );
-
-    rc.close();
 
     // @todo Check for an error condition -- how?
 };
@@ -140,19 +136,14 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
 StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications) {
 StatusNet.debug('Timeline.addNotice enter:');
     var notice = StatusNet.AtomParser.noticeFromEntry(entry);
-StatusNet.debug('Timeline.addNotice parsed...');
 
     // Dedupe here?
-StatusNet.debug('Timeline.addNotice dedupe check; ' + this._notices.length + ' iterations to go');
     for (i = 0; i < this._notices.length; i++) {
-StatusNet.debug('Timeline.addNotice iter ' + i);
         if (this._notices[i].id === notice.id) {
             StatusNet.debug("skipping duplicate notice: " + notice.id);
-StatusNet.debug('Timeline.addNotice DONE early.');
             return;
         }
     }
-StatusNet.debug('Timeline.addNotice dedupe check done.');
 
     if (notice.id !== undefined) {
         if (this.cacheable()) {
@@ -163,20 +154,11 @@ StatusNet.debug('Timeline.addNotice dedupe check done.');
 
     StatusNet.debug("addNotice - finished encaching notice");
 
-StatusNet.debug('Timeline.addNotice A');
     if (prepend) {
-StatusNet.debug('Timeline.addNotice B');
         this._notices.unshift(notice);
-StatusNet.debug('Timeline.addNotice B2');
-StatusNet.debug('Timeline.addNotice this.noticeAdded: ' + this.noticeAdded);
-StatusNet.debug('Timeline.addNotice this.noticeAdded.notify: ' + this.noticeAdded.notify);
-        // the below crashes on mobile
         this.noticeAdded.notify({notice: notice, notifications: notifications});
-StatusNet.debug('Timeline.addNotice B3');
     } else {
-StatusNet.debug('Timeline.addNotice C');
         this._notices.push(notice);
-StatusNet.debug('Timeline.addNotice C2');
     }
 StatusNet.debug('Timeline.addNotice DONE.');
 };
@@ -454,7 +436,7 @@ StatusNet.Timeline.prototype.getNotices = function() {
         StatusNet.debug("Timeline.getNotices B1");
         StatusNet.debug("Valid row found");
         xmlEntry = rs.fieldByName('atom_entry');
-        entry = (new DOMParser()).parseFromString(xmlEntry, "text/xml");
+        entry = StatusNet.Platform.parseXml(xmlEntry);
         var notice = StatusNet.AtomParser.noticeFromEntry(entry);
         this._notices.unshift(notice);
         rs.next();

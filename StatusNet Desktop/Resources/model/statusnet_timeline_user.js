@@ -83,7 +83,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
     this.client.account.apiGet(url,
         function(status, data) {
             StatusNet.debug(status);
-            StatusNet.debug((new XMLSerializer()).serializeToString(data));
+            //StatusNet.debug((new XMLSerializer()).serializeToString(data));
 
             var extended = {};
             extended.followers_cnt = $(data).find('followers_count').text();

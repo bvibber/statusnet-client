@@ -248,12 +248,6 @@ Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 
 
 var ms = Date.now() - startTime;
 
-for (var i in notice) {
-    if (notice.hasOwnProperty(i)) {
-        Titanium.API.info('WWW -- notice.' + i + ' = ' + notice[i]);
-    }
-}
-
 Titanium.API.info('noticeFromEntry CHECKPOINT EXIT: ' + ms + 'ms');
     return notice;
 };
