@@ -106,9 +106,8 @@ StatusNet.rowCount = function(rs) {
  */
 StatusNet.showSettings = function() {
     StatusNet.debug('showSettings!');
-    StatusNet.debug('client: ' + client);
-    StatusNet.debug('client.setActiveTab: ' + client.setActiveTab);
-    client.setActiveTab('settings');
+    var view = new StatusNet.SettingsView();
+    view.init();
 };
 
 /**

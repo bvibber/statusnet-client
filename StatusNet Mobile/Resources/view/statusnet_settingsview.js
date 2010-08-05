@@ -17,8 +17,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-StatusNet.SettingsView = function(client) {
-    this.client = client;
+
+StatusNet.SettingsView = function() {
 
     var db = StatusNet.getDB();
     this.accounts = StatusNet.Account.listAll(db);
@@ -43,7 +43,6 @@ StatusNet.SettingsView.prototype.init = function() {
     });
 
     var view = this;
-    var client = this.client;
 
     // Set up our table view...
     this.table = Titanium.UI.createTableView({
@@ -84,7 +83,7 @@ StatusNet.SettingsView.prototype.init = function() {
         StatusNet.debug('Saved!');
 
         StatusNet.debug('Switching to timeline...');
-        client.initAccountView(acct);
+        StatusNet.activeClient = new StatusNet.Client(acct);
         window.close();
     });
     this.table.addEventListener('delete', function(event) {

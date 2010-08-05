@@ -32,8 +32,9 @@ StatusNet.TabbedMenuBar = function() {
     });
 };
 
-StatusNet.createTabbedBar = function(tabInfo, win) {
+StatusNet.createTabbedBar = function(tabInfo, win, client) {
 
+    this.client = client;
     var tb = new StatusNet.TabbedMenuBar();
     var tab;
 
@@ -63,11 +64,46 @@ StatusNet.createTabbedBar = function(tabInfo, win) {
         for (tab in tabInfo) {
             if (tabInfo.hasOwnProperty(tab)) {
                 StatusNet.debug("Adding tab to tabGroup...");
+
+                var newWin = Titanium.UI.createWindow({
+                    height: 0,
+                    opacity: 0,
+                    visible: false
+                });
+
+                var navbar = StatusNet.Platform.createNavBar(newWin);
+
+                var accountsButton = Titanium.UI.createButton({
+                    title: "Accounts"
+                });
+
+                accountsButton.addEventListener('click', function() {
+                    StatusNet.showSettings();
+                });
+
+                navbar.setLeftNavButton(accountsButton);
+
+                var updateButton = Titanium.UI.createButton({
+                    title: "New",
+                    systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
+                });
+
+                var that = this;
+
+                updateButton.addEventListener('click', function() {
+                    that.client.newNoticeDialog();
+                });
+
+                navbar.setRightNavButton(updateButton);
+
                 var newTab = Titanium.UI.createTab({
                     icon: tabInfo[tab].deselectedImage,
-                    title: tabInfo[tab].name
+                    title: tabInfo[tab].name,
+                    window: newWin
                 });
+
                 newTab.name = tabInfo[tab].name;
+                newTab.navbar = navbar;
                 tb.tabGroup.addTab(newTab);
             }
         }

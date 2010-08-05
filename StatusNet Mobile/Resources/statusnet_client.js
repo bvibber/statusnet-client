@@ -45,16 +45,6 @@ StatusNet.Client = function(_account) {
     */
 };
 
-StatusNet.Client.prototype.setActiveTab = function(tabName) {
-    if (tabName == 'settings') {
-        var view = new StatusNet.SettingsView(this);
-        view.init();
-    } else {
-        // @hack hack hack
-        this.tabGroup.setActiveTab(this.tabs[tabName]);
-    }
-};
-
 /**
  * Switch the view to a specified timeline
  *
@@ -132,7 +122,7 @@ StatusNet.Client.prototype.init = function() {
     StatusNet.debug("StatusNet.Client.prototype.init - Checking for account...");
     if (!this.account) {
         StatusNet.debug("StatusNet.Client.prototype.init - No account, showing accountView");
-        this.accountView = new StatusNet.SettingsView()
+        this.accountView = new StatusNet.SettingsView();
         this.accountView.init();
     } else {
         StatusNet.debug("StatusNet.Client.prototype.init - account is set...");
@@ -264,7 +254,6 @@ StatusNet.Client.prototype.switchView = function(view) {
             break;
         default:
             throw "Gah wrong timeline";
-            break;
     }
 
     StatusNet.debug("Initializing view...");
@@ -303,12 +292,15 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     var that = this;
 
     this.mainwin = Titanium.UI.createWindow({
-        backgroundColor:'#fff'
+        backgroundColor:'#fff',
+        modal: true,
+        navBarHidden: true
     });
-    
+
+    this.mainwin.navBarHidden = true;
+
     this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
-    // @fixme make this show account info
     var accountsButton = Titanium.UI.createButton({
         title: "Accounts"
     });
@@ -334,13 +326,14 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         top: this.navbar.height,
         left: 0,
         right: 0,
-        bottom: 0,
+        bottom: 40,
         scalesPageToFit: false,
         url: "timeline.html",
         backgroundColor: 'black'
     });
 
     this.mainwin.add(this.webview);
+
 
     var tabinfo = {
         'public': {deselectedImage: 'images/tabs/public.png', selectedImage: 'images/greenbox.png', name: 'public'},
@@ -352,7 +345,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         'search': {deselectedImage: 'images/tabs/search.png', selectedImage: 'images/greenbox.png', name: 'search'}
     };
 
-    this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin);
+    this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, this);
 
     this.mainwin.open();
 
@@ -363,78 +356,6 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     StatusNet.debug('initAccountView done.');
 };
 
-/**
- * Build an individual tab for the user interface and set up its
- * associated view and timeline, if applicable.
- *
- * @param string tab identifier
- * @param object info associative array with name and related classes
- *
- * @access private
- */
-StatusNet.Client.prototype.createTab = function(tab, info) {
-    StatusNet.debug('tab: ' + tab);
-    StatusNet.debug('info: ' + info);
-
-    var window = Titanium.UI.createWindow({
-        title: info.title//,
-        //tabBarHidden: true
-    });
-    this.windows[tab] = window;
-
-    this.tabs[tab] = Titanium.UI.createTab({
-        icon: 'images/tabs/' + tab + '.png',
-        title: info.title,
-        window: window
-    });
-    this.tabGroup.addTab(this.tabs[tab]);
-
-    //window.StatusNet = StatusNet;
-    //window.client = this;
-    //window.timeline = tab;
-    var client = this;
-
-    window.addEventListener('open', function() {
-        StatusNet.debug("Open tab: " + tab);
-        if (info.timeline) {
-            StatusNet.debug('timeline tab? updating timeline...');
-            StatusNet.debug(info.timeline);
-            client.timeline = new info.timeline(client);
-
-            StatusNet.debug('Creating the view...');
-            client.view = new info.view(client);
-            client.view.window = window;
-            StatusNet.debug("Initializing view...");
-            client.view.init();
-
-            StatusNet.debug('telling the view to show...');
-            client.view.show();
-
-            StatusNet.debug('Telling timeline to update:');
-            client.timeline.update(function() {
-                client.timeline.noticeAdded.attach(
-                    function(args) {
-                        if (args.notifications) {
-                            client.view.notifyNewNotice(args.notice);
-                        } else {
-                            StatusNet.debug("noticeAdded event with no args!");
-                        }
-                    },
-                    false
-                );
-            });
-            StatusNet.debug('timeline updated.');
-        } else {
-            StatusNet.debug('settings tab? showing view...');
-            // Settings dialog
-            client.timeline = null;
-            client.view = new info.view(client);
-            client.view.window = window;
-            client.view.init();
-            StatusNet.debug('settings shown.');
-        }
-    });
-};
 
 /**
  * Show notice input dialog
