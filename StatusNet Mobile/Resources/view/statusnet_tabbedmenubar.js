@@ -23,6 +23,7 @@ StatusNet.TabbedMenuBar = function() {
     this.tabs = [];
     this.selectedTab = 0;
     this.tabGroup = null;
+    this.height = 48;
 
     this.tabView = Titanium.UI.createView({
         height: 48,

@@ -322,19 +322,6 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     this.navbar.setRightNavButton(updateButton);
 
-    this.webview = Titanium.UI.createWebView({
-        top: this.navbar.height,
-        left: 0,
-        right: 0,
-        bottom: 40,
-        scalesPageToFit: false,
-        url: "timeline.html",
-        backgroundColor: 'black'
-    });
-
-    this.mainwin.add(this.webview);
-
-
     var tabinfo = {
         'public': {deselectedImage: 'images/tabs/public.png', selectedImage: 'images/greenbox.png', name: 'public'},
         'friends': {deselectedImage: 'images/tabs/friends.png', selectedImage: 'images/greenbox.png', name: 'friends'},
@@ -346,6 +333,18 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     };
 
     this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, this);
+
+    this.webview = Titanium.UI.createWebView({
+        top: this.navbar.height,
+        left: 0,
+        right: 0,
+        bottom: this.toolbar.height,
+        scalesPageToFit: false,
+        url: "timeline.html",
+        backgroundColor: 'black'
+    });
+
+    this.mainwin.add(this.webview);
 
     this.mainwin.open();
 
