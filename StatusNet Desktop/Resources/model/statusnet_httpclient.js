@@ -35,7 +35,7 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
             var responseXML;
             if (this.responseXML == null) {
-                return StatusNet.Platform.parseXml(this.responseText);
+                responseXML = StatusNet.Platform.parseXml(this.responseText);
             } else {
                 responseXML = this.responseXML;
             }

@@ -230,7 +230,7 @@ StatusNet.Platform.nativeNotifications = function() {
  * @return DOMDocument
  */
 StatusNet.Platform.parseXml = function(str) {
-    return (new DOMParser()).parseFromString(xmlEntry, "text/xml");
+    return (new DOMParser()).parseFromString(str, "text/xml");
 }
 
 /**
