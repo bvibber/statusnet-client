@@ -190,9 +190,12 @@ StatusNet.Platform.hasNavBar = StatusNet.Platform.isApple;
 StatusNet.Platform.hasMenu = StatusNet.Platform.isAndroid;
 
 StatusNet.Platform.createNavBar = function(window) {
+
+    var navbar;
+
     if (StatusNet.Platform.hasNavBar()) {
         // Native navigation bar!
-        var navbar = {
+        navbar = {
             height: 0,
             setLeftNavButton: function(button) {
                 window.setLeftNavButton(button);
@@ -225,7 +228,7 @@ StatusNet.Platform.createNavBar = function(window) {
         });
         view.add(label);
 
-        var navbar = {
+        navbar = {
             _view: view,
             _label: label,
             _left: null,
