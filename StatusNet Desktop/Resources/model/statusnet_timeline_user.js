@@ -165,7 +165,7 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
 
             // @todo How we get author info will need to change when we
             // update output to match the latest Activity Streams spec
-            var subject = $(data).find("feed > [nodeName=activity:subject]:first");
+            var subject = $(data).find("feed > [nodeName=activity:subject]");
             that.user = StatusNet.AtomParser.userFromSubject(subject);
 
             var entries = [];
@@ -202,6 +202,10 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
  */
 StatusNet.TimelineUser.prototype.cacheable = function() {
     return false;
+};
+
+StatusNet.TimelineUser.prototype.getUser = function() {
+    return this.user;
 };
 
 /**
