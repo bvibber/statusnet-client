@@ -53,7 +53,7 @@ StatusNet.TimelineUser.prototype.getUrl = function() {
 
     StatusNet.debug("TimelineUser.getUrl() this.authorId = " + this.authorId);
 
-    if (this.authorId === null) {
+    if (!this.authorId) {
         return base;
     } else {
         var qRegexp = /atom\?/;

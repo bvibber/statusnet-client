@@ -37,6 +37,12 @@ Titanium.App.addEventListener("StatusNet_appendTimelineNotice", function(event) 
     $("#notices").append(renderNotice(notice));
     enableNoticeControls(document.getElementById('notice-' + notice.id));
 });
+Titanium.App.addEventListener("StatusNet_appendUserTimelineNotice", function(event) {
+    var notice = objectOrJson(event.notice);
+    var user = objectOrJson(event.user);
+    $("#notices").append(renderNotice(notice, user));
+    enableNoticeControls(document.getElementById('notice-' + notice.id));
+})
 Titanium.App.addEventListener("StatusNet_faveNoticeComplete", function(event) {
     $('#notice-' + event.noticeId).find('button.notice_fave').
         removeClass('notice_fave').
@@ -50,7 +56,6 @@ Titanium.App.addEventListener("StatusNet_unFaveNoticeComplete", function(event) 
         text('Fave');
 });
 Titanium.App.addEventListener("StatusNet_deleteNoticeComplete", function(event) {
-	Titanium.API.debug("********* got StatusNet_unDeleteNoticeComplete event");
     $('#notices div.notice#notice-' + event.noticeId).fadeOut("slow");
 });
 
@@ -85,12 +90,26 @@ function objectOrJson(obj) {
  *
  * @param object notice the notice
  */
-renderNotice = function(notice) {
+renderNotice = function(notice, user) {
 
     var html = [];
-    var avatar = notice.avatar;
-    var author = notice.author;
-    var authorId = notice.authorId
+    var avatar;
+    var author;
+    var authorId;
+    var authorUri;
+
+    // If a user is provided this is a user timeline
+    if (user) {
+        avatar = user.avatarMedium;
+        author = user.username;
+        authorId = user.id;
+        authorUri = user.link;
+    } else {
+        avatar = notice.avatar;
+        author = notice.author;
+        authorId = notice.authorId;
+        auuthorUri = notice.authorUri;
+    }
 
     var classes = ['notice'];
 
@@ -107,11 +126,13 @@ renderNotice = function(notice) {
     }
 
     html.push('<div class="' + classes.join(" ") + '" id="notice-' + notice.id +'" name="notice-' + notice.id +'">');
-    html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
-    html.push('</div>');
+    if (!user) {
+        html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
+        html.push('</div>');
+    }
     html.push('<div>');
     html.push('<div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
-    html.push('<a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
+    html.push('<a class="author" name="author-' + authorId + '" href="' + authorUri + '" rel="external">' + author + '</a>');
     html.push('<div class="content">'+ notice.content +'</div>');
     html.push('</div>');
 

@@ -29,50 +29,32 @@ StatusNet.TimelineViewUser = function(client) {
 StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
 
 /**
- * Render the HTML display of a given timeline
+ * Render the HTML display of a user timeline
  *
  */
 StatusNet.TimelineViewUser.prototype.show = function () {
-
+    //this.showHeader();
     var notices = this.client.timeline.getNotices();
 
-    $('#notices').empty();
-
-    var userAvatar = this.client.timeline.user.avatarMedium;
-    var author = this.client.timeline.user.username;
+    // clear old notices
+    // @todo be a little nicer; no need to clear if we just changed one thing
+    //Titanium.App.fireEvent('updateTimeline', {html: '<p>Loading...</p>'});
+    this.clearTimelineView();
 
     if (notices.length > 0) {
-
-        var html = [];
-
+    StatusNet.debug("TimelineViewUser.show GGG: " + notices.length + " notice(s)");
         for (i = 0; i < notices.length; i++) {
-            html.push('<div class="notice">');
-            html.push('   <div class="avatar"><a href="' + notices[i].link + '"><img src="' + userAvatar + '"/></a></div>');
-            html.push('   <div><a class="author" href="' + notices[i].link + '">' + author + '</a><br/>');
-            //html.push('   <small class="date">' + humane_date(notices[i].updated) + '</small></div>');
-            html.push('   <small class="date">' + notices[i].updated + '</small></div>');
-            html.push('   <div class="content">'+ notices[i].content +'<br/></div>');
-            if (notices[i].contextLink && notices[i].inReplyToLink) {
-                html.push(
-                    '   <div class="context"><a class="context" href="' +
-                    notices[i].contextLink +'">in context</a><br/></div>'
-                );
-            }
-            html.push('</div>');
-            html.push('<div class="clear"></div>');
+            this.appendUserTimelineNotice(notices[i]);
         }
-
-        $('#notices').append(html.join(''));
-        $('.notice a').attr('rel', 'external');
-    } else {
-        $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
     }
 
     this.hideSpinner();
-    this.showHeader();
-    this.showProfileInfo();
-
 };
+
+StatusNet.TimelineView.prototype.appendUserTimelineNotice = function(notice) {
+    var user = this.client.getActiveTimeline().getUser();
+    Titanium.App.fireEvent('StatusNet_appendUserTimelineNotice', {notice: notice, user: user});
+}
 
 /**
  * Show profile information header for this user
@@ -114,8 +96,6 @@ StatusNet.TimelineViewUser.prototype.showHeader = function () {
 
 	var title = this.title.replace("{name}", username)
 						  .replace("{site}", this.client.account.getHost());
-    $("#header").html("<h1></h1>");
-    $("#header h1").text(title);
 
 };
 

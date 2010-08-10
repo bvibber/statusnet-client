@@ -69,40 +69,16 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
 
 };
 
-/**
- * Switch the user timeline based on the ID of the user. This only
- * works for local users.  Remote user timeline open in a browser.
- *
- * @param int authorId ID of the (local site) user to display
- */
-StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
-
-    StatusNet.debug("in switchUserTimeline()");
-
-    this.view = new StatusNet.TimelineViewUser(this);
-
-    var timeline = 'user';
-
-    if (authorId === null) {
-        StatusNet.debug("authorId is null");
-        this.timeline = new StatusNet.TimelineUser(this, null);
-    } else {
-        StatusNet.debug("authorID is " + authorId);
-        timeline = 'user' + '-' + authorId;
-        this.timeline = new StatusNet.TimelineUser(this, authorId);
-    }
-
-    this._timeline = timeline;
-    StatusNet.Sidebar.setSelectedTimeline(timeline);
-
-    this.view.showSpinner();
-    this.timeline.update();
-    this.view.showHeader();
-};
-
-
 StatusNet.Client.prototype.getActiveAccount = function() {
     return this.account;
+};
+
+StatusNet.Client.prototype.getActiveTimeline = function() {
+    return this.timeline;
+};
+
+StatusNet.Client.prototype.getActiveView = function() {
+    return this.view;
 };
 
 /**
@@ -164,7 +140,7 @@ StatusNet.Client.prototype.initInternalListeners = function() {
     });
 
     Ti.App.addEventListener('StatusNet_switchUserTimeline', function(event) {
-        alert('Switch to user timeline for: ' + event.authorId);
+        that.switchUserTimeline(event.authorId);
     });
 
     Ti.App.addEventListener('StatusNet_replyToNotice', function(event) {
@@ -225,7 +201,6 @@ StatusNet.Client.prototype.switchView = function(view) {
         case 'user':
             this.switchUserTimeline();
             return;
-            break;
         case "friends":
             this.timeline = new StatusNet.TimelineFriends(this);
             this.view = new StatusNet.TimelineViewFriends(this);
@@ -280,6 +255,34 @@ StatusNet.Client.prototype.switchView = function(view) {
     StatusNet.debug('timeline updated.');
 };
 
+
+StatusNet.Client.prototype.switchUserTimeline = function(id) {
+
+    StatusNet.debug("in switchUserTimeline - user id = " + id);
+
+    if (id) {
+        StatusNet.debug("user id: " + id);
+        timeline = 'user' + '-' + id;
+        this.timeline = new StatusNet.TimelineUser(this, id);
+    } else {
+        StatusNet.debug("id is undefined");
+        this.timeline = new StatusNet.TimelineUser(this);
+    }
+
+    this.view = new StatusNet.TimelineViewUser(this);
+    this.view.init();
+
+    var that = this;
+
+    this.timeline.update(
+        function() {
+            that.view.showHeader();
+            that.view.show();
+        },
+        false
+    );
+};
+
 StatusNet.Client.prototype.setMainWindowTitle = function(title) {
     this.mainwin.title = title;
 };
@@ -323,7 +326,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         'public': {deselectedImage: 'images/tabs/public.png', selectedImage: 'images/greenbox.png', name: 'public'},
         'friends': {deselectedImage: 'images/tabs/friends.png', selectedImage: 'images/greenbox.png', name: 'friends'},
         'mentions': {deselectedImage: 'images/tabs/mentions.png', selectedImage: 'images/greenbox.png', name: 'mentions'},
-        'profile': {deselectedImage: 'images/tabs/profile.png', selectedImage: 'images/greenbox.png', name: 'profile'},
+        'profile': {deselectedImage: 'images/tabs/profile.png', selectedImage: 'images/greenbox.png', name: 'user'},
         'favorites': {deselectedImage: 'images/tabs/favorites.png', selectedImage: 'images/greenbox.png', name: 'favorites'},
         'inbox': {deselectedImage: 'images/tabs/inbox.png', selectedImage: 'images/greenbox.png', name: 'inbox'},
         'search': {deselectedImage: 'images/tabs/search.png', selectedImage: 'images/greenbox.png', name: 'search'}

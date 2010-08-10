@@ -33,6 +33,7 @@ var sources = ['statusnet.js',
 
                'view/statusnet_newnoticeview.js',
                'view/statusnet_sidebar.js',
+               'view/statusnet_infobar.js',
                'view/statusnet_tabbedmenubar.js',
                'view/statusnet_timelineview.js',
                'view/statusnet_timelineview_user.js',
