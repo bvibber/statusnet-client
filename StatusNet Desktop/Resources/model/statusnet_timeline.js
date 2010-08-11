@@ -52,21 +52,32 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
 
     StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
-    rc = this.db.execute(
-        "INSERT OR REPLACE INTO entry (notice_id, atom_entry) VALUES (?, ?)",
-        noticeId,
-        StatusNet.Platform.serializeXml(entry)
-    );
+    var xml = StatusNet.Platform.serializeXml(entry);
 
-    rc = this.db.execute(
-        "INSERT OR REPLACE INTO notice_entry (account_id, notice_id, timeline, timestamp) VALUES (?, ?, ?, ?)",
-        this.client.account.id,
-        noticeId,
-        this.timeline_name,
-        Date.now()
-    );
+    // FIXME: We need to add in the namespaces, so the XML parser doesn't blow up on when
+    // reparsing cached entries. This is a sick hack, but it's the only work-around 
+    // I can think of while we wait for Appcelerator to implement setAttribute in 
+    // their mobile DOM implementation.
 
-    // @todo Check for an error condition -- how?
+    var nsXml = xml.replace('<entry>', '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:thr="http://purl.org/syndication/thread/1.0" xmlns:georss="http://www.georss.org/georss" xmlns:activity="http://activitystrea.ms/spec/1.0/" xmlns:media="http://purl.org/syndication/atommedia" xmlns:poco="http://portablecontacts.net/spec/1.0" xmlns:ostatus="http://ostatus.org/schema/1.0" xmlns:statusnet="http://status.net/schema/api/1/">');
+
+    try {
+        rc = this.db.execute(
+            "INSERT OR REPLACE INTO entry (notice_id, atom_entry) VALUES (?, ?)",
+            noticeId,
+            nsXml
+        );
+
+        rc = this.db.execute(
+            "INSERT OR REPLACE INTO notice_entry (account_id, notice_id, timeline, timestamp) VALUES (?, ?, ?, ?)",
+            this.client.account.id,
+            noticeId,
+            this.timeline_name,
+            Date.now()
+        );
+    } catch (e) {
+        StatusNet.debug("encacheNotice - Oh no, I couldn't cache the entry: " + e);
+    }
 };
 
 /**
