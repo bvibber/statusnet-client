@@ -33,7 +33,7 @@ StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
  *
  */
 StatusNet.TimelineViewUser.prototype.show = function () {
-    //this.showHeader();
+    this.showHeader();
     var notices = this.client.timeline.getNotices();
 
     // clear old notices
@@ -86,16 +86,36 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function () {
  */
 StatusNet.TimelineViewUser.prototype.showHeader = function () {
 
+    StatusNet.debug("TimelineViewUser.showHeader()");
+
     var username = null;
 
     if (this.client.timeline.user) {
+        StatusNet.debug("TimelineViewUser.showHeader() - found a user for the timeline!");
         username = this.client.timeline.user.username;
     } else {
+        StatusNet.debug("TimelineViewUser.showHeader() - No user for timeline, falling back to account username");
         username = this.client.timeline.account.username;
     }
 
-	var title = this.title.replace("{name}", username)
-						  .replace("{site}", this.client.account.getHost());
+    StatusNet.debug("TimelineViewUser.showHeader() - username = " + username);
 
+    var title = this.title.replace("{name}", username)
+                          .replace("{site}", this.client.account.getHost());
+
+    var that = this;
+
+    // Show extended profile data after asynchronous load of api/users/show.xml
+    this.client.timeline.getExtendedInfo(
+        that.showProfileInfo,
+        that.client.timeline.authorId
+    );
 };
 
+StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended, client, authorId) {
+    StatusNet.debug("StatusNet.TimelineViewUser.prototype.showProfileInfo called");
+    Titanium.App.fireEvent(
+        'StatusNet_showProfile',
+        {user: user, extended: extended, authorId: authorId, acctUsername: client.account.username}
+    );
+};

@@ -146,7 +146,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             this.view = new StatusNet.TimelineViewSearch(this);
             break;
         default:
-            throw new Exception("Gah wrong timeline");
+            throw "Gah wrong timeline";
     }
 
     StatusNet.Sidebar.setSelectedTimeline(timeline);

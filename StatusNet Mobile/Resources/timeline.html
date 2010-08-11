@@ -5,7 +5,7 @@
 <link rel="stylesheet" type="text/css" href="css/display.css">
 </head>
 <body>
-
+<div id="header"></div>
 <div id="notices">
 <img class="spinner" src="images/loading.gif">
 </div>
@@ -25,6 +25,7 @@ var clientAccountUsername = null;
 Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
     activeNotice = null;
     clientAccountUsername = event.clientAccountUsername;
+    $('#header').empty();
     $("#notices").html(event.html);
 });
 Titanium.App.addEventListener("StatusNet_prependTimelineNotice", function(event) {
@@ -58,7 +59,11 @@ Titanium.App.addEventListener("StatusNet_unFaveNoticeComplete", function(event) 
 Titanium.App.addEventListener("StatusNet_deleteNoticeComplete", function(event) {
     $('#notices div.notice#notice-' + event.noticeId).fadeOut("slow");
 });
-
+Titanium.App.addEventListener("StatusNet_showProfile", function(event) {
+    var user = objectOrJson(event.user);
+    var extended = objectOrJson(event.extended);
+    showProfileHeader(user, extended, event.authorId, event.acctUsername);
+});
 
 
 // Default handling for link click events; we'll pass external links on to the app
@@ -269,5 +274,104 @@ enableNoticeControls = function(noticeDom) {
     });
 
 };
+
+/**
+ * Show profile information header for a user
+ */
+showProfileHeader = function(user, extended, authorId, acctUsername) {
+    Titanium.API.debug("showProfileInfo()");
+
+    $('#header').empty();
+
+    var html = [];
+
+    html.push('<div id="profile_panel">');
+    html.push('<img src="' + user.avatarLarge + '"/>');
+
+    if (extended) {
+        Titanium.API.debug("showProfileInfo() - found extended");
+
+        if (authorId !== null && user.username !== acctUsername) {
+
+            Titanium.API.debug("showProfileInfo() - checkpoint gar");
+
+            html.push('<div id="profile_action_links"');
+
+            if (extended.blocking !== "true") {
+                if (extended.following === "false") {
+                    html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
+                } else {
+                    html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
+                    html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
+                }
+                html.push('<a href="#" class="profile_block">Block</a>');
+            } else {
+                html.push('<a href="#" class="profile_unblock">Unblock</a>');
+            }
+            html.push('</div');
+        }
+    }
+
+    Titanium.API.debug("showProfileInfo() - checkpoint charlie");
+
+    html.push('<h2>@' + user.username + '</h2>');
+    html.push('<dl class="profile_list">');
+
+    html.push('<dt>Name</dt>');
+    html.push('<dd class="name">');
+    if (user.fullname) {
+        html.push(user.fullname);
+    } else {
+        html.push(user.username);
+    }
+    html.push('</dd>');
+
+    html.push('<dt class="id">User ID</dt>');
+    html.push('<dd class="id">' + user.id + '</dd>');
+
+    if (user.location) {
+        html.push('<dt>Location</dt>');
+        html.push('<dd class="location">' + user.location + '</dd>');
+    }
+
+    if (user.homepage) {
+        html.push('<dt>Homepage</dt>');
+        html.push('<dd><a rel="external" href="' + user.homepage + '">' + user.homepage + '</a></dd>');
+    }
+
+    if (user.bio) {
+        html.push('<dt>Bio</dt>');
+        html.push('<dd class="bio">' + user.bio + '</dd>');
+    }
+
+    html.push('</dl>');
+
+    if (extended) {
+
+        html.push('<dl class="profile_statistics">');
+        html.push('<dt>Subscribers</dt>');
+        html.push('<dd>' + extended.followers_cnt + '</dd>');
+
+        if (user.username === acctUsername) {
+            html.push('<dt><a href="#" class="profile_subscriptions">Subscriptions</a></dt>');
+        } else {
+            html.push('<dt>Subscriptions</dt>');
+        }
+
+        html.push('<dd>' + extended.friends_cnt + '</dd>');
+        html.push('<dt>Notices</dt>');
+        html.push('<dd>' + extended.statuses_cnt + '</dd>');
+        html.push('<dt>Favorites</dt>');
+        html.push('<dd>' + extended.favorites_cnt + '</dd>');
+        html.push('</dl>')
+    }
+
+    html.push('</div>');
+
+    Titanium.API.debug("showProfileInfo() - Done building html, doin' my injection");
+
+    $('#header').append(html.join(''));
+};
+
 </script>
 </html>

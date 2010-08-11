@@ -45,30 +45,6 @@ StatusNet.Client = function(_account) {
     */
 };
 
-/**
- * Switch the view to a specified timeline
- *
- * @param String timeline   the timeline to show
- */
-StatusNet.Client.prototype.switchTimeline = function(timeline) {
-
-    StatusNet.debug("StatusNet.Client.prototype.switchTimeline()");
-
-    this._timeline = timeline;
-
-    this.setActiveTab(timeline);
-
-    /*
-    // should happen in response to open event?
-    this.view.showHeader();
-    this.view.showSpinner();
-    this.timeline.update();
-    */
-
-    StatusNet.debug("StatusNet.Client.prototype.switchTimeline() DONE");
-
-};
-
 StatusNet.Client.prototype.getActiveAccount = function() {
     return this.account;
 };
@@ -173,7 +149,7 @@ StatusNet.Client.prototype.initInternalListeners = function() {
         that.switchView(event.tabName);
     });
 
-}
+};
 
 /**
  * Switch the view to a specified timeline
