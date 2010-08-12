@@ -149,6 +149,33 @@ StatusNet.Client.prototype.initInternalListeners = function() {
         that.switchView(event.tabName);
     });
 
+    Ti.App.addEventListener('StatusNet_subscribe', function(event) {
+        StatusNet.debug('Event: ' + event);
+        that.subscribe(event.userId, function() {
+            Titanium.App.fireEvent('StatusNet_subscribeComplete', {user: event.userId});
+        });
+    });
+
+    Ti.App.addEventListener('StatusNet_unsubscribe', function(event) {
+        StatusNet.debug('Event: ' + event);
+        that.unsubscribe(event.userId, function() {
+            Titanium.App.fireEvent('StatusNet_unsubscribeComplete', {user: event.userId});
+        });
+    });
+
+    Ti.App.addEventListener('StatusNet_block', function(event) {
+        StatusNet.debug('Event: ' + event);
+        that.block(event.userId, function() {
+            Titanium.App.fireEvent('StatusNet_blockComplete', {user: event.userId});
+        });
+    });
+
+    Ti.App.addEventListener('StatusNet_unblock', function(event) {
+        StatusNet.debug('Event: ' + event);
+        that.unblock(event.userId, function() {
+            Titanium.App.fireEvent('StatusNet_unblockComplete', {user: event.userId});
+        });
+    });
 };
 
 /**
@@ -506,6 +533,164 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
             } else {
                 StatusNet.debug("Error repeating notice " + noticeId + " - " + status + " - " + response);
                 alert.flashMessage("Error repeating notice " + noticeId + " - " + status + " - " + response);
+            }
+        }
+    );
+};
+
+/**
+ * Subscribe to a profile
+ *
+ * @param int profileId  the ID of the profile to subscribe to
+ *
+ * On success changes the link to an unsubscribe link
+ */
+StatusNet.Client.prototype.subscribe = function(profileId, onSuccess)
+{
+
+    StatusNet.debug("StatusNet.Client.prototype.subscribe - user id " + profileId);
+
+    var method = 'friendships/create/' + profileId + '.xml';
+
+    StatusNet.debug("StatusNet.Client.subscribe() - subscribing to " + profileId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Subscribed to profile " + profileId);
+            StatusNet.Infobar.flashMessage("Subscribed to profile " + profileId);
+            if (onSuccess) {
+                onSuccess();
+            }
+        },
+        function(method, response) {
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error subscribing to profile " + profileId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error subscribing to profile " + profileId + " - " + msg);
+            } else {
+                StatusNet.debug("Error subscribing to profile " + profileId + " - " + status + " - " + response);
+                StatusNet.Infobar.flashMessage("Error subscribing to profile " + profileId + " - " + status + " - " + response);
+            }
+        }
+    );
+
+};
+
+/**
+ * Unsubscribe from a profile
+ *
+ * @param int profileId  the ID of the profile to unsubscribe from
+ *
+ * On success changes the link to a subscribe link
+ *
+ */
+StatusNet.Client.prototype.unsubscribe = function(profileId, onSuccess)
+{
+    StatusNet.debug("StatusNet.Client.prototype.unsubscribe - user id " + profileId);
+
+    var method = 'friendships/destroy/' + profileId + '.xml';
+
+    StatusNet.debug("StatusNet.Client.unsubscribe() - unsubscribing from " + profileId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.apiPost(method, params,
+        function(status, data) {
+            StatusNet.debug("Unsubscribed from profile " + profileId);
+            StatusNet.Infobar.flashMessage("Unsubscribed from profile " + profileId);
+            if (onSuccess) {
+                onSuccess();
+            }
+        },
+        function(client, responseText) {
+            var msg = $(response).find('error').text();
+            if (msg) {
+                StatusNet.debug("Error unsubscribing from profile " + profileId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error unsubscribing from profile " + profileId + " - " + msg);
+            } else {
+                StatusNet.debug("Error unsubscribing from profile " + profileId + " - " + status + " - " + response);
+                StatusNet.Infobar.flashMessage("Error unsubscribing from profile " + profileId + " - " + status + " - " + response);
+            }
+        }
+    );
+};
+
+/**
+ * Block to a profile
+ *
+ * @param int profileId  the ID of the profile to block
+ *
+ * On success changes the link to an unblock link
+ */
+StatusNet.Client.prototype.block = function(profileId, onSuccess)
+{
+    var method = 'blocks/create/' + profileId + '.xml';
+
+    StatusNet.debug("StatusNet.Client.block() - blocking " + profileId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Blocked profile " + profileId);
+            StatusNet.Infobar.flashMessage("Blocked profile " + profileId);
+            if (onSuccess) {
+                onSuccess();
+            }
+        },
+        function(status, response) {
+            if (msg) {
+                StatusNet.debug("Error blocking profile " + profileId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error blocking profile " + profileId + " - " + msg);
+            } else {
+                StatusNet.debug("Error blocking profile " + profileId + " - " + response);
+                StatusNet.Infobar.flashMessage("Error blocking profile " + profileId + " - " + response);
+            }
+        }
+    );
+};
+
+/**
+ * Unblock to a profile
+ *
+ * @param int profileId  the ID of the profile to unblock
+ *
+ * On success changes the link to an unblock link
+ */
+StatusNet.Client.prototype.unblock = function(profileId, onSuccess)
+{
+    var method = 'blocks/destroy/' + profileId + '.xml';
+
+    StatusNet.debug("StatusNet.Client.block() - unblocking " + profileId);
+
+    var params = "gar=gar"; // XXX: we have to pass something to get web client to work
+
+    var that = this;
+
+    this.account.apiPost(method, params,
+        function(status, response) {
+            StatusNet.debug("Unblocked profile " + profileId);
+            StatusNet.Infobar.flashMessage("Unblocked profile " + profileId);
+            if (onSuccess) {
+                onSuccess();
+            }
+        },
+        function(status, response) {
+            $(linkDom).removeAttr('disabled');
+            if (msg) {
+                StatusNet.debug("Error unblocking profile " + profileId + " - " + msg);
+                StatusNet.Infobar.flashMessage("Error unblocking profile " + profileId + " - " + msg);
+            } else {
+                StatusNet.debug("Error unblocking profile " + profileId + " - " + response);
+                StatusNet.Infobar.flashMessage("Error unblocking profile " + profileId + " - " + response);
             }
         }
     );

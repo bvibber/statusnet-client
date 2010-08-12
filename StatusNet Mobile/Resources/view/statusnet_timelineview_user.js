@@ -116,6 +116,6 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     StatusNet.debug("StatusNet.TimelineViewUser.prototype.showProfileInfo called");
     Titanium.App.fireEvent(
         'StatusNet_showProfile',
-        {user: user, extended: extended, authorId: authorId, acctUsername: client.account.username}
+        {user: user, extended: extended, authorId: authorId}
     );
 };
