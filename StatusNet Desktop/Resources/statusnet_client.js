@@ -835,7 +835,7 @@ StatusNet.Client.prototype.block = function(profileId, linkDom, onSuccess)
  */
 StatusNet.Client.prototype.unblock = function(profileId, linkDom, onSuccess)
 {
-    var url = 'blocks/destroy/' + profileId + '.xml';
+    var method = 'blocks/destroy/' + profileId + '.xml';
 
     $(linkDom).attr('disabled', 'disabled');
 
