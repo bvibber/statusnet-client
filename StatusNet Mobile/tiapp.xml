@@ -14,4 +14,5 @@
     <statusbar-hidden>false</statusbar-hidden>
     <analytics>true</analytics>
 <guid>cca143fb-473f-4e8c-9bcb-91b02a08e548</guid>
+<analytics>false</analytics>
 </ti:app>
