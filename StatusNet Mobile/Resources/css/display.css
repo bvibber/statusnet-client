@@ -16,19 +16,6 @@ body {
 	background: #222 url(../images/page_bg.jpg) no-repeat top left; 
 }
 
-::-webkit-scrollbar {
-	width: 13px;
-	height: 13px;
-	background-color: #d2d2d2;
-}
-
-::-webkit-scrollbar-thumb:vertical {
-	-webkit-border-image: url(/images/scroll2.png) 10 0 10 0;
-	border-color: transparent;
-	border-width: 13px 0;
-	min-height: 30px;
-}
-
 a {
 	color:#343434;
 	outline: none;
@@ -36,43 +23,6 @@ a {
 
 .rounded {
 	-webkit-border-radius:10px;
-}
-
-#sidebar {
-	background-color: #1c1c1c;
-	float: left;
-	text-align: center;
-	height: 100%;
-	background: url(/images/sidebar_bg.png);
-	margin-right: 4px;
-	width: 65px;
-}
-
-#sidebar ul {
-	padding-top: 10px;
-}
-
-#main_logo {
-	margin-top:10px;
-}
-
-#sidebar img {
-	cursor:pointer;
-	margin-bottom:10px;
-}
-
-#sidebar img:hover {
-	background-image: url(/images/sidebar-button-glow.png);
-	background-repeat: no-repeat;
-}
-
-#sidebar #user_img, #sidebar #public_img {
-	opacity: 0.7;
-}
-
-#sidebar #user_img.opaque, #sidebar #user_img:hover, #sidebar #public_img.opaque, #sidebar #public_img:hover {
-	background-image: none;	
-	opacity: 1;
 }
 
 #profile {
