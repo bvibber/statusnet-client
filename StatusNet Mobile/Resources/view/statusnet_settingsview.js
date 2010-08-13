@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 
-StatusNet.SettingsView = function() {
+StatusNet.SettingsView = function(client) {
 
     var db = StatusNet.getDB();
     this.accounts = StatusNet.Account.listAll(db);
@@ -27,6 +27,7 @@ StatusNet.SettingsView = function() {
     this.lastUsername = '';
     this.lastPassword = '';
     this.lastSite = '';
+    this.client = client;
 };
 
 /**
@@ -83,7 +84,7 @@ StatusNet.SettingsView.prototype.init = function() {
         StatusNet.debug('Saved!');
 
         StatusNet.debug('Switching to timeline...');
-        StatusNet.activeClient = new StatusNet.Client(acct);
+        this.client.initAccountView(acct);
         window.close();
     });
     this.table.addEventListener('delete', function(event) {

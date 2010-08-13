@@ -56,4 +56,4 @@ var db = StatusNet.getDB();
 
 // Find default account, if any, and fire up the client!
 var acct = StatusNet.Account.getDefault(db);
-StatusNet.activeClient = new StatusNet.Client(acct);
+var client = new StatusNet.Client(acct);

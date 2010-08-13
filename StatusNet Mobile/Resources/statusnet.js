@@ -101,16 +101,6 @@ StatusNet.rowCount = function(rs) {
 };
 
 /**
- * Show settings dialog
- * @fixme make sure it's a singleton!
- */
-StatusNet.showSettings = function() {
-    StatusNet.debug('showSettings!');
-    var view = new StatusNet.SettingsView();
-    view.init();
-};
-
-/**
  * Utility function to create a prototype for the subclass
  * that inherits from the prototype of the superclass.
  */

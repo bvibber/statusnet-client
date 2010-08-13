@@ -74,7 +74,7 @@ StatusNet.Client.prototype.init = function() {
     StatusNet.debug("StatusNet.Client.prototype.init - Checking for account...");
     if (!this.account) {
         StatusNet.debug("StatusNet.Client.prototype.init - No account, showing accountView");
-        this.accountView = new StatusNet.SettingsView();
+        this.accountView = new StatusNet.SettingsView(this);
         this.accountView.init();
     } else {
         StatusNet.debug("StatusNet.Client.prototype.init - account is set...");
@@ -295,63 +295,69 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     this.account = acct;
 
-    var that = this;
+    if (!this.mainwin) {
 
-    this.mainwin = Titanium.UI.createWindow({
-        backgroundColor:'#fff',
-        modal: true
-    });
+        var that = this;
 
-    this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
+        this.mainwin = Titanium.UI.createWindow({
+            backgroundColor:'#fff',
+            modal: true
+        });
 
-    var accountsButton = Titanium.UI.createButton({
-        title: "Accounts"
-    });
+        this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
-    accountsButton.addEventListener('click', function() {
-        StatusNet.showSettings();
-    });
+        var accountsButton = Titanium.UI.createButton({
+            title: "Accounts"
+        });
 
-    this.navbar.setLeftNavButton(accountsButton);
+        accountsButton.addEventListener('click', function() {
+            StatusNet.debug('showSettings!');
+            var settingsView = new StatusNet.SettingsView(that);
+            settingsView.init();
+        });
 
-    var updateButton = Titanium.UI.createButton({
-        title: "New",
-        systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
-    });
+        this.navbar.setLeftNavButton(accountsButton);
 
-    updateButton.addEventListener('click', function() {
-        that.newNoticeDialog();
-    });
+        var updateButton = Titanium.UI.createButton({
+            title: "New",
+            systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
+        });
 
-    this.navbar.setRightNavButton(updateButton);
+        updateButton.addEventListener('click', function() {
+            that.newNoticeDialog();
+        });
 
-    var tabinfo = {
-        'public': {deselectedImage: 'images/tabs/public.png', selectedImage: 'images/greenbox.png', name: 'public'},
-        'friends': {deselectedImage: 'images/tabs/friends.png', selectedImage: 'images/greenbox.png', name: 'friends'},
-        'mentions': {deselectedImage: 'images/tabs/mentions.png', selectedImage: 'images/greenbox.png', name: 'mentions'},
-        'profile': {deselectedImage: 'images/tabs/profile.png', selectedImage: 'images/greenbox.png', name: 'user'},
-        'favorites': {deselectedImage: 'images/tabs/favorites.png', selectedImage: 'images/greenbox.png', name: 'favorites'},
-        'inbox': {deselectedImage: 'images/tabs/inbox.png', selectedImage: 'images/greenbox.png', name: 'inbox'},
-        'search': {deselectedImage: 'images/tabs/search.png', selectedImage: 'images/greenbox.png', name: 'search'}
-    };
+        this.navbar.setRightNavButton(updateButton);
 
-    this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, this);
+        var tabinfo = {
+            'public': {deselectedImage: 'images/tabs/public.png', selectedImage: 'images/greenbox.png', name: 'public'},
+            'friends': {deselectedImage: 'images/tabs/friends.png', selectedImage: 'images/greenbox.png', name: 'friends'},
+            'mentions': {deselectedImage: 'images/tabs/mentions.png', selectedImage: 'images/greenbox.png', name: 'mentions'},
+            'profile': {deselectedImage: 'images/tabs/profile.png', selectedImage: 'images/greenbox.png', name: 'user'},
+            'favorites': {deselectedImage: 'images/tabs/favorites.png', selectedImage: 'images/greenbox.png', name: 'favorites'},
+            'inbox': {deselectedImage: 'images/tabs/inbox.png', selectedImage: 'images/greenbox.png', name: 'inbox'},
+            'search': {deselectedImage: 'images/tabs/search.png', selectedImage: 'images/greenbox.png', name: 'search'}
+        };
 
-    this.webview = Titanium.UI.createWebView({
-        top: this.navbar.height,
-        left: 0,
-        right: 0,
-        bottom: this.toolbar.height,
-        scalesPageToFit: false,
-        url: "timeline.html",
-        backgroundColor: 'black'
-    });
+        this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, this);
 
-    this.mainwin.add(this.webview);
+        this.webview = Titanium.UI.createWebView({
+            top: this.navbar.height,
+            left: 0,
+            right: 0,
+            bottom: this.toolbar.height,
+            scalesPageToFit: false,
+            url: "timeline.html",
+            backgroundColor: 'black'
+        });
 
-    this.mainwin.open();
+        this.mainwin.add(this.webview);
 
-    this.toolbar.setSelectedTab(1);
+        setTimeout(function() {
+            that.mainwin.open();
+        }, 1000);
+
+    }
 
     this.switchView('friends');
 
