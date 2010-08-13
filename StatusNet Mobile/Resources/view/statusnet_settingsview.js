@@ -84,7 +84,7 @@ StatusNet.SettingsView.prototype.init = function() {
         StatusNet.debug('Saved!');
 
         StatusNet.debug('Switching to timeline...');
-        this.client.initAccountView(acct);
+        view.client.initAccountView(acct);
         window.close();
     });
     this.table.addEventListener('delete', function(event) {
