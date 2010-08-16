@@ -197,7 +197,7 @@ StatusNet.Platform.createNavBar = function(window) {
         return navbar;
     } else {
         // Emulated!
-        var height = 48;
+        var height = 44;
         var view = Titanium.UI.createView({
             top: 0,
             left: 0,

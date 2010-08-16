@@ -28,6 +28,7 @@ StatusNet.SettingsView = function(client) {
     this.lastPassword = '';
     this.lastSite = '';
     this.client = client;
+    this.rows = [];
 };
 
 /**
@@ -93,6 +94,9 @@ StatusNet.SettingsView.prototype.init = function() {
         StatusNet.debug('Attempting to delete account: ' + acct.username + '@' + acct.getHost());
         acct.deleteAccount();
         cancel.title = 'Done';
+
+        view.rows = view.rows.splice(event.rowData.index, 1);
+
     });
     this.window.add(this.table);
 
@@ -144,16 +148,24 @@ StatusNet.SettingsView.prototype.init = function() {
             height: 'auto',
             acct: "add-stub"
         });
-        this.table.appendRow(row);
+        this.rows.push(row);
+        //this.table.appendRow(row);
 
         // @fixme -- add a way to remove items!
     }
 
     // Now let's fill out the table!
+
     this.showAccounts();
 
+    window.addEventListener('focus', function(event) {
+        view.table.setData(view.rows);
+    });
+
     if (this.accounts.length > 0) {
-        window.open({modal: true});
+        setTimeout(function() {
+            window.open({modal: true});
+        }, 500);
     } else {
         // Leave the main accounts window hidden until later...
         this.showAddAccount();
@@ -317,7 +329,7 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
         //this.showAddAccount();
     } else {
         for (var i = 0; i < this.accounts.length; i++) {
-            this.showAccountRow(this.accounts[i]);
+            this.addAccountRow(this.accounts[i]);
         }
         // crappy temp hack -- single row is hidden on android
         /*
@@ -334,7 +346,7 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
  *
  * @param StatusNet.Account acct
  */
-StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
+StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
     // todo: avatar
     // todo: better formatting
     // todo: secure state
@@ -349,7 +361,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
 
     if (acct.avatar) {
         var avatar = Titanium.UI.createImageView({
-            url: acct.avatar,
+            image: acct.avatar,
             top: 0,
             left: 0,
             width: 56,
@@ -361,7 +373,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     // @fixme the scaling to this resolution doesn't seem to work on Android
     if (acct.siteLogo) {
         var logo = Titanium.UI.createImageView({
-            url: acct.siteLogo,
+            image: acct.siteLogo,
             top: 40,
             left: 40,
             width: 24,
@@ -379,7 +391,8 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     });
     row.add(label);
 
-    this.table.appendRow(row);
+    //this.table.appendRow(row);
+    this.rows.push(row);
     StatusNet.debug('show account row done.');
 };
 
@@ -563,5 +576,5 @@ StatusNet.SettingsView.prototype.saveNewAccount = function() {
     var id = this.workAcct.ensure(StatusNet.getDB());
     this.workAcct.id = id;
     StatusNet.debug("Saved new account with id " + id);
-    this.showAccountRow(this.workAcct);
+    this.addAccountRow(this.workAcct);
 };

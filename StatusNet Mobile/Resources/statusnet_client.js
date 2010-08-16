@@ -295,69 +295,67 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     this.account = acct;
 
-    if (!this.mainwin) {
 
-        var that = this;
+    var that = this;
 
-        this.mainwin = Titanium.UI.createWindow({
-            backgroundColor:'#fff',
-            modal: true
-        });
+    this.mainwin = Titanium.UI.createWindow({
+        backgroundColor:'#fff',
+        modal: true
+    });
 
-        this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
+    this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
-        var accountsButton = Titanium.UI.createButton({
-            title: "Accounts"
-        });
+    var accountsButton = Titanium.UI.createButton({
+        title: "Accounts"
+    });
 
-        accountsButton.addEventListener('click', function() {
-            StatusNet.debug('showSettings!');
-            var settingsView = new StatusNet.SettingsView(that);
-            settingsView.init();
-        });
+    accountsButton.addEventListener('click', function() {
+        that.mainwin.close();
+        StatusNet.debug('showSettings!');
+        var settingsView = new StatusNet.SettingsView(that);
+        settingsView.init();
+    });
 
-        this.navbar.setLeftNavButton(accountsButton);
+    this.navbar.setLeftNavButton(accountsButton);
 
-        var updateButton = Titanium.UI.createButton({
-            title: "New",
-            systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
-        });
+    var updateButton = Titanium.UI.createButton({
+        title: "New",
+        systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
+    });
 
-        updateButton.addEventListener('click', function() {
-            that.newNoticeDialog();
-        });
+    updateButton.addEventListener('click', function() {
+        that.newNoticeDialog();
+    });
 
-        this.navbar.setRightNavButton(updateButton);
+    this.navbar.setRightNavButton(updateButton);
 
-        var tabinfo = {
-            'public': {deselectedImage: 'images/tabs/public.png', selectedImage: 'images/greenbox.png', name: 'public'},
-            'friends': {deselectedImage: 'images/tabs/friends.png', selectedImage: 'images/greenbox.png', name: 'friends'},
-            'mentions': {deselectedImage: 'images/tabs/mentions.png', selectedImage: 'images/greenbox.png', name: 'mentions'},
-            'profile': {deselectedImage: 'images/tabs/profile.png', selectedImage: 'images/greenbox.png', name: 'user'},
-            'favorites': {deselectedImage: 'images/tabs/favorites.png', selectedImage: 'images/greenbox.png', name: 'favorites'},
-            'inbox': {deselectedImage: 'images/tabs/inbox.png', selectedImage: 'images/greenbox.png', name: 'inbox'},
-            'search': {deselectedImage: 'images/tabs/search.png', selectedImage: 'images/greenbox.png', name: 'search'}
-        };
+    var tabinfo = {
+        'public': {deselectedImage: 'images/tabs/public.png', selectedImage: 'images/greenbox.png', name: 'public'},
+        'friends': {deselectedImage: 'images/tabs/friends.png', selectedImage: 'images/greenbox.png', name: 'friends'},
+        'mentions': {deselectedImage: 'images/tabs/mentions.png', selectedImage: 'images/greenbox.png', name: 'mentions'},
+        'profile': {deselectedImage: 'images/tabs/profile.png', selectedImage: 'images/greenbox.png', name: 'user'},
+        'favorites': {deselectedImage: 'images/tabs/favorites.png', selectedImage: 'images/greenbox.png', name: 'favorites'},
+        'inbox': {deselectedImage: 'images/tabs/inbox.png', selectedImage: 'images/greenbox.png', name: 'inbox'},
+        'search': {deselectedImage: 'images/tabs/search.png', selectedImage: 'images/greenbox.png', name: 'search'}
+    };
 
-        this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, this);
+    this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, this);
 
-        this.webview = Titanium.UI.createWebView({
-            top: this.navbar.height,
-            left: 0,
-            right: 0,
-            bottom: this.toolbar.height,
-            scalesPageToFit: false,
-            url: "timeline.html",
-            backgroundColor: 'black'
-        });
+    this.webview = Titanium.UI.createWebView({
+        top: that.navbar.height,
+        left: 0,
+        right: 0,
+        bottom: this.toolbar.height,
+        scalesPageToFit: false,
+        url: "timeline.html",
+        backgroundColor: 'black'
+    });
 
-        this.mainwin.add(this.webview);
+    this.mainwin.add(this.webview);
 
-        setTimeout(function() {
-            that.mainwin.open();
-        }, 1000);
-
-    }
+    setTimeout(function() {
+        that.mainwin.open();
+    }, 1000);
 
     this.switchView('friends');
 

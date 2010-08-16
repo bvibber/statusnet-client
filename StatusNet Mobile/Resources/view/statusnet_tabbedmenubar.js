@@ -23,10 +23,10 @@ StatusNet.TabbedMenuBar = function() {
     this.tabs = [];
     this.selectedTab = 0;
     this.tabGroup = null;
-    this.height = 48;
+    this.height = 49;
 
     this.tabView = Titanium.UI.createView({
-        height: 48,
+        height: 49,
         bottom: 0,
         width: "auto",
         borderRadius: 10
@@ -69,33 +69,11 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
                 var newWin = Titanium.UI.createWindow({
                     height: 0,
                     opacity: 0,
-                    visible: false
+                    visible: false,
+                    navBarHidden: true
                 });
 
-                var navbar = StatusNet.Platform.createNavBar(newWin);
-
-                var accountsButton = Titanium.UI.createButton({
-                    title: "Accounts"
-                });
-
-                accountsButton.addEventListener('click', function() {
-                    StatusNet.showSettings();
-                });
-
-                navbar.setLeftNavButton(accountsButton);
-
-                var updateButton = Titanium.UI.createButton({
-                    title: "New",
-                    systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
-                });
-
-                var that = this;
-
-                updateButton.addEventListener('click', function() {
-                    that.client.newNoticeDialog();
-                });
-
-                navbar.setRightNavButton(updateButton);
+                newWin.hide();
 
                 var newTab = Titanium.UI.createTab({
                     icon: tabInfo[tab].deselectedImage,
@@ -104,7 +82,6 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
                 });
 
                 newTab.name = tabInfo[tab].name;
-                newTab.navbar = navbar;
                 tb.tabGroup.addTab(newTab);
             }
         }
