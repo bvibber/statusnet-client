@@ -74,7 +74,7 @@ StatusNet.Client.prototype.init = function() {
     StatusNet.debug("StatusNet.Client.prototype.init - Checking for account...");
     if (!this.account) {
         StatusNet.debug("StatusNet.Client.prototype.init - No account, showing accountView");
-        this.accountView = new StatusNet.SettingsView();
+        this.accountView = new StatusNet.SettingsView(this);
         this.accountView.init();
     } else {
         StatusNet.debug("StatusNet.Client.prototype.init - account is set...");
@@ -295,6 +295,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     this.account = acct;
 
+
     var that = this;
 
     this.mainwin = Titanium.UI.createWindow({
@@ -309,7 +310,10 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     });
 
     accountsButton.addEventListener('click', function() {
-        StatusNet.showSettings();
+        that.mainwin.close();
+        StatusNet.debug('showSettings!');
+        var settingsView = new StatusNet.SettingsView(that);
+        settingsView.init();
     });
 
     this.navbar.setLeftNavButton(accountsButton);
@@ -338,7 +342,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, this);
 
     this.webview = Titanium.UI.createWebView({
-        top: this.navbar.height,
+        top: that.navbar.height,
         left: 0,
         right: 0,
         bottom: this.toolbar.height,
@@ -349,9 +353,9 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     this.mainwin.add(this.webview);
 
-    this.mainwin.open();
-
-    this.toolbar.setSelectedTab(1);
+    setTimeout(function() {
+        that.mainwin.open();
+    }, 1000);
 
     this.switchView('friends');
 
