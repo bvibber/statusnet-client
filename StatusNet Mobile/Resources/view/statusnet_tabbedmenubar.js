@@ -24,6 +24,8 @@ StatusNet.TabbedMenuBar = function() {
     this.selectedTab = 0;
     this.tabGroup = null;
     this.height = 49;
+    this.overFlowTabs = [];
+    this.overFlowTable = null;
 
     this.tabView = Titanium.UI.createView({
         height: 49,
@@ -38,8 +40,6 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
     this.client = client;
     var tb = new StatusNet.TabbedMenuBar();
     var tab;
-    var overflow = [];
-
     var i = 0;
 
     for (tab in tabInfo) {
@@ -53,18 +53,24 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
                 });
                 tb.tabs.push(minitab);
                 tb.tabView.add(minitab);
-                i++;  
             } else {
-                overflow.push(tab);
-            } 
+                StatusNet.debug("Pushing " + tabInfo[tab].name + " to overflow table");
+
+                var row = Ti.UI.createTableViewRow({
+                    title: tabInfo[tab].name
+                });
+
+                tb.overFlowTabs.push(row);
+            }
+            i++;
         }
     }
-    
-    var moretab = tb.createMiniTab({ 
-        index: 4, 
-        deselectedImage: 'images/tabs/more.png', 
-        selectedImage: 'images/greenbox.png', 
-        name: 'more' 
+
+    var moretab = tb.createMiniTab({
+        index: 4,
+        deselectedImage: 'images/tabs/more.png',
+        selectedImage: 'images/greenbox.png',
+        name: 'more'
     });
     tb.tabs.push(moretab);
     tb.tabView.add(moretab);
@@ -77,10 +83,45 @@ StatusNet.TabbedMenuBar.prototype.setSelectedTab = function(index) {
     this.selectedTab = index;
 
     var moretab = this.tabs[4];
-    
+
     if (index === 4) {
         StatusNet.debug("MORE MORE MORE!");
         moretab.image = moretab.selectedImage;
+
+        var overFlowWin = Titanium.UI.createWindow(
+            {
+                title: "More",
+                modal: true,
+                navBarHidden: true
+            }
+        );
+
+        this.navbar = StatusNet.Platform.createNavBar(overFlowWin);
+
+        var cancelButton = Titanium.UI.createButton({
+            title: "Cancel"
+        });
+
+        cancelButton.addEventListener('click', function() {
+            overFlowWin.close();
+        });
+
+        this.navbar.setLeftNavButton(cancelButton);
+
+        this.overFlowTable = Titanium.UI.createTableView({data: this.overFlowTabs, top: 44});
+
+        overFlowWin.add(this.overFlowTable);
+
+        this.overFlowTable.addEventListener('click', function(event) {
+            Titanium.App.fireEvent('StatusNet_tabSelected', {
+                index: -1,
+                tabName: event.rowData.title
+            });
+            overFlowWin.close();
+        });
+
+        overFlowWin.open();
+
     } else {
         moretab.image = moretab.deselectedImage;
     }
@@ -122,7 +163,7 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
     var that = this;
 
     minitab.addEventListener('click', function()
-    {        
+    {
         that.setSelectedTab(args.index);
     });
 
