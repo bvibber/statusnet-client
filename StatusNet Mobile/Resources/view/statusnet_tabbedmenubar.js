@@ -38,24 +38,36 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
     this.client = client;
     var tb = new StatusNet.TabbedMenuBar();
     var tab;
+    var overflow = [];
 
     var i = 0;
 
     for (tab in tabInfo) {
         if (tabInfo.hasOwnProperty(tab)) {
-            StatusNet.debug("tab found");
-            var minitab = tb.createMiniTab(
-                {
+            if (i < 4) {
+                var minitab = tb.createMiniTab({
                     index: i,
                     deselectedImage: tabInfo[tab].deselectedImage,
                     selectedImage: tabInfo[tab].selectedImage,
                     name: tabInfo[tab].name
                 });
-            tb.tabs.push(minitab);
-            tb.tabView.add(minitab);
-            i++;
+                tb.tabs.push(minitab);
+                tb.tabView.add(minitab);
+                i++;  
+            } else {
+                overflow.push(tab);
+            } 
         }
     }
+    
+    var moretab = tb.createMiniTab({ 
+        index: 4, 
+        deselectedImage: 'images/tabs/more.png', 
+        selectedImage: 'images/greenbox.png', 
+        name: 'more' 
+    });
+    tb.tabs.push(moretab);
+    tb.tabView.add(moretab);
     win.add(tb.tabView);
 
     return tb;
@@ -64,17 +76,25 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
 StatusNet.TabbedMenuBar.prototype.setSelectedTab = function(index) {
     this.selectedTab = index;
 
-    StatusNet.debug("length of minitabs = " + this.tabs.length);
+    var moretab = this.tabs[4];
+    
+    if (index === 4) {
+        StatusNet.debug("MORE MORE MORE!");
+        moretab.image = moretab.selectedImage;
+    } else {
+        moretab.image = moretab.deselectedImage;
+    }
 
-    for (var i = 0; i < this.tabs.length; i++) {
+    for (var i = 0; i < 4; i++) {
         var minitab = this.tabs[i];
         if (i === index) {
+            StatusNet.debug("index = " + index + " name = " + minitab.name);
             minitab.image = minitab.selectedImage;
-            StatusNet.debug("minitab.selectedImage = " + minitab.selectedImage);
+            StatusNet.debug("XXXX minitab.selectedImage = " + minitab.selectedImage);
             Titanium.App.fireEvent('StatusNet_tabSelected', {
                 index: index,
                 tabName: minitab.name
-             });
+            });
         } else {
             StatusNet.debug("minitab.deselectedImage = " + minitab.deselectedImage);
             minitab.image = minitab.deselectedImage;
@@ -102,7 +122,7 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
     var that = this;
 
     minitab.addEventListener('click', function()
-    {
+    {        
         that.setSelectedTab(args.index);
     });
 

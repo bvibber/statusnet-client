@@ -182,79 +182,63 @@ StatusNet.Platform.hasMenu = StatusNet.Platform.isAndroid;
 StatusNet.Platform.createNavBar = function(window) {
 
     var navbar;
-/*
-    if (StatusNet.Platform.hasNavBar()) {
-        // Native navigation bar!
-        navbar = {
-            height: 0,
-            setLeftNavButton: function(button) {
-                window.setLeftNavButton(button);
-            },
-            setRightNavButton: function(button) {
-                window.setRightNavButton(button);
+
+    var height = 44;
+    var view = Titanium.UI.createView({
+        top: 0,
+        left: 0,
+        right: 0,
+        height: height,
+        //backgroundColor: "#bbbfcc" // ?!
+        backgroundImage: "images/bg/navbar.png"
+    });
+    window.add(view);
+
+    var label = Titanium.UI.createLabel({
+        text: window.title,
+        font: {fontSize: height / 2, fontWeight: 'bold'},
+        textAlign: 'center',
+        top: 4,
+        bottom: 4,
+        color: 'white'
+    });
+    view.add(label);
+
+    navbar = {
+        _view: view,
+        _label: label,
+        _left: null,
+        _right: null,
+        height: height,
+        setLeftNavButton: function(button) {
+            if (navbar._left) {
+                navbar._view.remove(navbar._left);
             }
-        };
-        return navbar;
-    } else {
-*/
-        // Emulated!
-        var height = 44;
-        var view = Titanium.UI.createView({
-            top: 0,
-            left: 0,
-            right: 0,
-            height: height,
-            //backgroundColor: "#bbbfcc" // ?!
-            backgroundImage: "images/bg/navbar.png"
-        });
-        window.add(view);
-
-        var label = Titanium.UI.createLabel({
-            text: window.title,
-            font: {fontSize: height / 2, fontWeight: 'bold'},
-            textAlign: 'center',
-            top: 4,
-            bottom: 4,
-            color: 'white'
-        });
-        view.add(label);
-
-        navbar = {
-            _view: view,
-            _label: label,
-            _left: null,
-            _right: null,
-            height: height,
-            setLeftNavButton: function(button) {
-                if (navbar._left) {
-                    navbar._view.remove(navbar._left);
-                }
-                if (button) {
-                    button.left = 4;
-                    button.top = 4;
-                    button.bottom = 4;
-                    button.width = 75;
-                    navbar._view.add(button);
-                }
-                navbar._left = button;
-            },
-            setRightNavButton: function(button) {
-                if (navbar._right) {
-                    navbar._view.remove(navbar._right);
-                }
-                if (button) {
-                    button.right = 4;
-                    button.top = 4;
-                    button.bottom = 4;
-                    button.width = 50;
-                    navbar._view.add(button);
-                }
-                navbar._right = button;
+            if (button) {
+                button.left = 4;
+                button.top = 4;
+                button.bottom = 4;
+                button.width = 75;
+                navbar._view.add(button);
             }
-        };
+            navbar._left = button;
+        },
+        setRightNavButton: function(button) {
+            if (navbar._right) {
+                navbar._view.remove(navbar._right);
+            }
+            if (button) {
+                button.right = 4;
+                button.top = 4;
+                button.bottom = 4;
+                button.width = 50;
+                navbar._view.add(button);
+            }
+            navbar._right = button;
+        }
+    };
 
-        return navbar;
- //   }
+    return navbar;
 };
 
 /**
