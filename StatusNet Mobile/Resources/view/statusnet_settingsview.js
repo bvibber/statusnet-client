@@ -41,14 +41,18 @@ StatusNet.SettingsView.prototype.init = function() {
     var window = this.window = Titanium.UI.createWindow({
         title: 'Accounts',
         backgroundColor: 'black',
-        tabBarHidden: true
+        navBarHidden: true
     });
 
     var view = this;
 
+    this.navbar = StatusNet.Platform.createNavBar(this.window);
+
+
     // Set up our table view...
     this.table = Titanium.UI.createTableView({
-        editable: true
+        editable: true,
+        top: this.navbar.height
     });
     this.table.addEventListener('click', function(event) {
         StatusNet.debug('Got a click event on the table view.');
@@ -100,7 +104,9 @@ StatusNet.SettingsView.prototype.init = function() {
     });
     this.window.add(this.table);
 
-    if (StatusNet.Platform.hasNavBar()) {
+
+
+
         // Create-account button
         var create = Titanium.UI.createButton({
             title: '+'
@@ -108,7 +114,7 @@ StatusNet.SettingsView.prototype.init = function() {
         create.addEventListener('click', function() {
             if (view.table.editing) {
                 view.table.editing = false;
-                view.window.setLeftNavButton(edit);
+                view.navbar.setLeftNavButton(edit);
             }
             // @fixme need a better way to close-modal-and-open-other-modal smoothly
             window.close();
@@ -126,18 +132,18 @@ StatusNet.SettingsView.prototype.init = function() {
             style: Titanium.UI.iPhone.SystemButtonStyle.DONE
         });
         edit.addEventListener('click', function() {
-            view.window.setLeftNavButton(cancel);
+            view.navbar.setLeftNavButton(cancel);
             view.table.editing = true;
         });
         cancel.addEventListener('click', function() {
-            view.window.setLeftNavButton(edit);
+            view.navbar.setLeftNavButton(edit);
             view.table.editing = false;
         });
 
         // ...and plop them onto the tab header.
-        this.window.setLeftNavButton(edit);
-        this.window.setRightNavButton(create);
-
+        this.navbar.setLeftNavButton(edit);
+        this.navbar.setRightNavButton(create);
+/*
     } else {
         // No native navigation bar on Android.
 
@@ -153,7 +159,7 @@ StatusNet.SettingsView.prototype.init = function() {
 
         // @fixme -- add a way to remove items!
     }
-
+*/
     // Now let's fill out the table!
 
     this.showAccounts();
@@ -180,8 +186,12 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     var window = Titanium.UI.createWindow({
         title: "Add Account",
         backgroundColor: StatusNet.Platform.dialogBackground(),
-        layout: 'vertical'
+        layout: 'vertical',
+        navBarHidden: true
     });
+
+    navbar = StatusNet.Platform.createNavBar(window);
+
     window.addEventListener('close', function() {
         // Re-show the main accounts list window
         // @fixme there's got to be a better way to delay until animation's done...
@@ -203,8 +213,6 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
 
     var save = Titanium.UI.createButton({
         title: "Save",
-        width: 'auto',
-        height: 'auto'
     });
     save.addEventListener('click', function() {
         StatusNet.debug('clicked save');
@@ -227,10 +235,9 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         });
     });
 
-    if (StatusNet.Platform.hasNavBar()) {
-        window.setLeftNavButton(cancel);
-        window.setRightNavButton(save);
-    } else {
+        navbar.setLeftNavButton(cancel);
+        navbar.setRightNavButton(save);
+/*
         // Android has no navigation area on tab header;
         // we'll toss a manual label in at the top.
         var label = Titanium.UI.createLabel({
@@ -242,7 +249,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         window.add(label);
 
         // Add the buttons at the bottom later...
-    }
+    */
 
     this.fields = {};
     var fields = {site: {props: {

@@ -39,66 +39,24 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
     var tb = new StatusNet.TabbedMenuBar();
     var tab;
 
-    if (Titanium.Platform.name == 'android') {
-        var i = 0;
+    var i = 0;
 
-        for (tab in tabInfo) {
-            if (tabInfo.hasOwnProperty(tab)) {
-                StatusNet.debug("tab found");
-                var minitab = tb.createMiniTab(
-                    {
-                        index: i,
-                        deselectedImage: tabInfo[tab].deselectedImage,
-                        selectedImage: tabInfo[tab].selectedImage,
-                        name: tabInfo[tab].name
-                    });
-                tb.tabs.push(minitab);
-                tb.tabView.add(minitab);
-                i++;
-            }
-        }
-        win.add(tb.tabView);
-    } else {
-
-        tb.tabGroup = Titanium.UI.createTabGroup();
-
-        for (tab in tabInfo) {
-            if (tabInfo.hasOwnProperty(tab)) {
-                StatusNet.debug("Adding tab to tabGroup...");
-
-                var newWin = Titanium.UI.createWindow({
-                    height: 0,
-                    opacity: 0,
-                    visible: false,
-                    navBarHidden: true
+    for (tab in tabInfo) {
+        if (tabInfo.hasOwnProperty(tab)) {
+            StatusNet.debug("tab found");
+            var minitab = tb.createMiniTab(
+                {
+                    index: i,
+                    deselectedImage: tabInfo[tab].deselectedImage,
+                    selectedImage: tabInfo[tab].selectedImage,
+                    name: tabInfo[tab].name
                 });
-
-                newWin.hide();
-
-                var newTab = Titanium.UI.createTab({
-                    icon: tabInfo[tab].deselectedImage,
-                    title: tabInfo[tab].name,
-                    window: newWin
-                });
-
-                newTab.name = tabInfo[tab].name;
-                tb.tabGroup.addTab(newTab);
-            }
+            tb.tabs.push(minitab);
+            tb.tabView.add(minitab);
+            i++;
         }
-
-        tb.tabGroup.addEventListener('focus', function(event) {
-            if (tb.selectedTab !== event.index) {
-                tb.selectedTab = event.index;
-                Titanium.App.fireEvent('StatusNet_tabSelected', {
-                    index: event.index,
-                    tabName: event.tab.name
-                 });
-            }
-        });
-
-        win.add(tb.tabGroup);
-        tb.tabGroup.open();
     }
+    win.add(tb.tabView);
 
     return tb;
 };
@@ -106,25 +64,21 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
 StatusNet.TabbedMenuBar.prototype.setSelectedTab = function(index) {
     this.selectedTab = index;
 
-    if (Titanium.Platform.name == 'android') {
-        StatusNet.debug("length of minitabs = " + this.tabs.length);
+    StatusNet.debug("length of minitabs = " + this.tabs.length);
 
-        for (var i = 0; i < this.tabs.length; i++) {
-            var minitab = this.tabs[i];
-            if (i === index) {
-                minitab.image = minitab.selectedImage;
-                StatusNet.debug("minitab.selectedImage = " + minitab.selectedImage);
-                Titanium.App.fireEvent('StatusNet_tabSelected', {
-                    index: index,
-                    tabName: minitab.name
-                 });
-            } else {
-                StatusNet.debug("minitab.deselectedImage = " + minitab.deselectedImage);
-                minitab.image = minitab.deselectedImage;
-            }
+    for (var i = 0; i < this.tabs.length; i++) {
+        var minitab = this.tabs[i];
+        if (i === index) {
+            minitab.image = minitab.selectedImage;
+            StatusNet.debug("minitab.selectedImage = " + minitab.selectedImage);
+            Titanium.App.fireEvent('StatusNet_tabSelected', {
+                index: index,
+                tabName: minitab.name
+             });
+        } else {
+            StatusNet.debug("minitab.deselectedImage = " + minitab.deselectedImage);
+            minitab.image = minitab.deselectedImage;
         }
-    } else {
-        this.tabGroup.setActiveTab(index);
     }
 };
 

@@ -295,12 +295,10 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     this.account = acct;
 
-
     var that = this;
 
     this.mainwin = Titanium.UI.createWindow({
-        backgroundColor:'#fff',
-        modal: true
+        backgroundColor:'#fff'
     });
 
     this.navbar = StatusNet.Platform.createNavBar(this.mainwin);

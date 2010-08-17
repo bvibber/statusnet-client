@@ -182,7 +182,7 @@ StatusNet.Platform.hasMenu = StatusNet.Platform.isAndroid;
 StatusNet.Platform.createNavBar = function(window) {
 
     var navbar;
-
+/*
     if (StatusNet.Platform.hasNavBar()) {
         // Native navigation bar!
         navbar = {
@@ -196,6 +196,7 @@ StatusNet.Platform.createNavBar = function(window) {
         };
         return navbar;
     } else {
+*/
         // Emulated!
         var height = 44;
         var view = Titanium.UI.createView({
@@ -232,7 +233,7 @@ StatusNet.Platform.createNavBar = function(window) {
                     button.left = 4;
                     button.top = 4;
                     button.bottom = 4;
-                    button.width = 'auto';
+                    button.width = 75;
                     navbar._view.add(button);
                 }
                 navbar._left = button;
@@ -245,7 +246,7 @@ StatusNet.Platform.createNavBar = function(window) {
                     button.right = 4;
                     button.top = 4;
                     button.bottom = 4;
-                    button.width = 'auto';
+                    button.width = 50;
                     navbar._view.add(button);
                 }
                 navbar._right = button;
@@ -253,7 +254,7 @@ StatusNet.Platform.createNavBar = function(window) {
         };
 
         return navbar;
-    }
+ //   }
 };
 
 /**

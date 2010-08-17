@@ -40,7 +40,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     StatusNet.debug("NewNoticeView.init");
     var that = this;
     var data = this.data;
-    
+
     var margin = 4;
     var buttonHeight = 40;
 
@@ -50,11 +50,14 @@ StatusNet.NewNoticeView.prototype.init = function() {
         backgroundColor: StatusNet.Platform.dialogBackground(),
         layout: 'vertical'
     });
-    var navbar = StatusNet.Platform.createNavBar(window);
+
+    var navbar = StatusNet.Platform.createNavBar(this.window);
 
 	var cancelButton = Titanium.UI.createButton({
-		title: "Cancel"
-	});
+        title: 'Cancel',
+        style: Titanium.UI.iPhone.SystemButtonStyle.DONE
+    });
+
     cancelButton.addEventListener('click', function(event) {
         that.window.close();
     });
@@ -136,7 +139,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         backgroundColor: StatusNet.Platform.dialogBackground(),
         layout: 'vertical'
     });
-    window.add(moreStuff);
+    //window.add(moreStuff);
 
     // Titanium.Media.isCameraSupported is documented as being a function,
     // but it appears to be an int-bool property.
@@ -189,7 +192,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         noticeTextArea.focus();
     });
     window.open({
-        modal: true
+        //modal: true
     });
 
     StatusNet.debug("NewNoticeView.init END");
