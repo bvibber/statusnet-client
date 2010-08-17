@@ -91,11 +91,51 @@ StatusNet.TimelineView.prototype.init = function() {
 
     StatusNet.debug("TimelineView: adding adding activity indicator -- spinner");
 
-    this.act = Titanium.UI.createActivityIndicator();
-    this.act.style = Titanium.UI.iPhone.ActivityIndicatorStyle.PLAIN;
-    this.act.font = {fontFamily:'Helvetica Neue', fontSize:15,fontWeight:'bold'};
-    this.act.color = 'white';
-    this.act.message = 'Loading...';
+    if (StatusNet.Platform.isApple()) {
+        this.act = Titanium.UI.createActivityIndicator();
+        this.act.style = Titanium.UI.iPhone.ActivityIndicatorStyle.PLAIN;
+        this.act.font = {fontFamily:'Helvetica Neue', fontSize:15,fontWeight:'bold'};
+        this.act.color = 'white';
+        this.act.message = 'Loading...';
+    } else {
+        this.act = Titanium.UI.createView({
+            bottom: 49, // just above the emulated tab list...?
+            left: 0,
+            right: 0,
+            height: 32,
+        });
+
+        // Give it a smokey shadow!
+        this.act.add(Titanium.UI.createView({
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundColor: 'black',
+            opacity: 0.5
+        }));
+
+        // And a label...
+        this.act.add(Titanium.UI.createLabel({
+            left: 32,
+            right: 8,
+            top: 4,
+            bottom: 4,
+            title: "Loading...",
+            color: "white"
+        }));
+
+        // And a spinner!
+        this.act.add(Titanium.UI.createImageView({
+            left: 8,
+            top: 8,
+            width: 16,
+            height: 16,
+            image: 'images/loading.gif'
+        }));
+        this.client.mainwin.add(this.act);
+        this.act.hide();
+    }
 
     StatusNet.debug("TimelineView: Finished adding activity indicator");
     
@@ -203,7 +243,9 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-    this.client.mainwin.setToolbar([this.act],{animated:true});
+    if (StatusNet.Platform.isApple()) {
+        this.client.mainwin.setToolbar([this.act],{animated:true});
+    }
     this.act.show();
 };
 
@@ -213,7 +255,9 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
     this.act.hide();
-    this.client.mainwin.setToolbar(null,{animated:true});
+    if (StatusNet.Platform.isApple()) {
+        this.client.mainwin.setToolbar(null,{animated:true});
+    }
 };
 
 /**
