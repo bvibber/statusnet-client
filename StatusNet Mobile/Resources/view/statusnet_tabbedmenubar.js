@@ -30,8 +30,8 @@ StatusNet.TabbedMenuBar = function() {
     this.tabView = Titanium.UI.createView({
         height: 49,
         bottom: 0,
-        width: "auto",
-        borderRadius: 10
+        width: 320, // @todo Figure out how to determine the screen width! 320 for iPhone
+        backgroundColor: 'gray',
     });
 };
 
@@ -157,12 +157,16 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
 
     StatusNet.debug("Going for tab # " + args.index);
 
+    var space = (this.tabView.width - 200) / 6;
+    var left = args.index * (40 + space);
+
     var minitab = Ti.UI.createImageView({
         image:args.deselectedImage,
-        left: args.index * 40, // XXX calculate this better
+        left: left + space,
         height: 40,
         width: 40,
-        backgroundColor: '#7F7F7F'
+        backgroundColor: 'gray',
+        opacity: .5
     });
 
     minitab.index = args.index;
