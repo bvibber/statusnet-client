@@ -42,13 +42,18 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var data = this.data;
 
     var margin = 4;
-    var buttonHeight = 40;
+    var controlStripHeight = 32;
+    var keyboardMargin = 0;
+    if (StatusNet.Platform.isApple()) {
+        // Currently, iPhone doesn't resize the window or our controls
+        // to fit when the on-screen keyboard comes up. To keep it safe,
+        // we're hardcoding the current size of one there. Sigh.
+        keyboardMargin = 216;
+    }
 
-	// @fixme if possible, hide the title bar on Android?
     var window = this.window = Titanium.UI.createWindow({
         title: 'New Notice',
-        backgroundColor: StatusNet.Platform.dialogBackground(),
-        layout: 'vertical'
+        backgroundColor: StatusNet.Platform.dialogBackground()
     });
 
     var navbar = StatusNet.Platform.createNavBar(this.window);
@@ -58,23 +63,24 @@ StatusNet.NewNoticeView.prototype.init = function() {
         //style: Titanium.UI.iPhone.SystemButtonStyle.DONE // for native iPhone navbar only
     });
 
-    cancelButton.addEventListener('click', function(event) {
+    cancelButton.addEventListener('click', function() {
         that.window.close();
     });
-	navbar.setLeftNavButton(cancelButton);
+    navbar.setLeftNavButton(cancelButton);
 
-	var updateButton = Titanium.UI.createButton({
-		title: "Send"
-	});
-    updateButton.addEventListener('click', function(event) {
+    var updateButton = Titanium.UI.createButton({
+        title: "Send"
+    });
+    updateButton.addEventListener('click', function() {
         that.postNotice(noticeTextArea.value);
     });
-	navbar.setRightNavButton(updateButton);
+    navbar.setRightNavButton(updateButton);
 
     var noticeTextArea = Titanium.UI.createTextArea({
+        top: navbar.height + margin,
         left: margin,
         right: margin,
-        height: 160,
+        bottom: keyboardMargin + margin + controlStripHeight,
         value: '',
         font: {fontSize: 16},
         returnKeyType: Titanium.UI.RETURNKEY_SEND
@@ -92,14 +98,15 @@ StatusNet.NewNoticeView.prototype.init = function() {
     }
     window.add(noticeTextArea);
 
-	// Horizontal control strip that should live between the textarea
-	// and the on-screen keyboard...
-	var controlStrip = Titanium.UI.createView({
-		left: margin,
-		right: margin,
-		height: buttonHeight
-	});
-	window.add(controlStrip);
+    // Horizontal control strip that should live between the textarea
+    // and the on-screen keyboard...
+    var controlStrip = Titanium.UI.createView({
+            left: margin,
+            right: margin,
+            bottom: keyboardMargin + margin,
+            height: controlStripHeight
+    });
+    window.add(controlStrip);
 
     var textLimit = this.account.textLimit;
     StatusNet.debug("textlimit = " + textLimit);
@@ -113,84 +120,77 @@ StatusNet.NewNoticeView.prototype.init = function() {
     });
     controlStrip.add(counter);
 
-    // Note: pressing a key doesn't generate a keypress event on
-    // Linux version of Titanium.
     noticeTextArea.addEventListener('change', function(event) {
         counter.text = "" + (textLimit - event.value.length);
         // @fixme change color or display when negative
     });
-
     var moreButton = Titanium.UI.createButton({
         title: 'Options...',
-        top: 2,
+        top: 0,
         left: 0,
-        width: 80, //'auto',
-        height: 32 //'auto'
+        width: 80,
+        height: controlStripHeight
     });
     moreButton.addEventListener('click', function() {
-        noticeTextArea.blur();
+        //noticeTextArea.blur();
+        var options = [];
+        var callbacks = [];
+        if (that.attachment == null) {
+            if (StatusNet.Platform.hasCamera()) {
+                options.push('Take photo');
+                callbacks.push(function() {
+                    Titanium.Media.showCamera({
+                        success: function(event) {
+                            that.addAttachment(event);
+                        },
+                        autohide: true,
+                        animated: true,
+                        saveToPhotoGallery: true
+                    });
+                });
+            }
+
+            options.push('Photo gallery');
+            callbacks.push(function() {
+                Titanium.Media.openPhotoGallery({
+                    success: function(event) {
+                        that.addAttachment(event);
+                    },
+                    autohide: true,
+                    animated: true
+                });
+            });
+        } else {
+            options.push('Remove attachment');
+            callbacks.push(function() {
+                that.attachment = null;
+                // @fixme hide icon
+            });
+        }
+
+        options.push('Cancel');
+        callbacks.push(function() {});
+
+        var dialog = Titanium.UI.createOptionDialog({
+            title: 'Notice options',
+            options: options
+        });
+        dialog.addEventListener('click', function(event) {
+            callbacks[event.index]();
+        });
+        dialog.show();
     });
     controlStrip.add(moreButton);
 
-    var moreStuff = Titanium.UI.createView({
-        left: 0,
-        right: 0,
-        height: 'auto',
-        backgroundColor: StatusNet.Platform.dialogBackground(),
-        layout: 'vertical'
-    });
-    //window.add(moreStuff);
-
-    // Titanium.Media.isCameraSupported is documented as being a function,
-    // but it appears to be an int-bool property.
-    if (Titanium.Media.isCameraSupported) {
-        var cameraButton = Titanium.UI.createButton({
-            title: 'Take photo',
-            top: 4,
-            left: 4,
-            right: 4,
-            height: 32
+    if (StatusNet.Platform.isApple()) {
+        // Setting focus to the textarea doesn't show the keyboard
+        // on Android for some reason. Leave it unfocused there so
+        // the first tap in will set focus and open the keyboard.
+        window.addEventListener('open', function(event) {
+            // set focus to the text entry field
+            noticeTextArea.focus();
         });
-        cameraButton.addEventListener('click', function() {
-            Titanium.Media.showCamera({
-                success: function(event) {
-                    that.addAttachment(event);
-                },
-                autohide: true,
-                animated: true,
-                saveToPhotoGallery: true,
-                allowEditing: true
-            });
-        });
-        moreStuff.add(cameraButton);
     }
-
-    var galleryButton = Titanium.UI.createButton({
-        title: 'Existing photo',
-        top: 4,
-        left: 4,
-        right: 4,
-        height: 32
-    });
-    galleryButton.addEventListener('click', function() {
-        StatusNet.debug('WTF');
-        Titanium.Media.openPhotoGallery({
-            success: function(event) {
-                StatusNet.debug('WTF-amazing');
-                that.addAttachment(event);
-            },
-            autohide: true,
-            animated: true,
-            allowEditing: true
-        });
-        StatusNet.debug('WTF2');
-    });
-    moreStuff.add(galleryButton);
-
-    window.addEventListener('open', function(event) {
-        // set focus to the text entry field
-        noticeTextArea.focus();
-    });
     window.open({
         //modal: true
     });

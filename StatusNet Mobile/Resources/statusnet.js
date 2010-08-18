@@ -174,6 +174,20 @@ StatusNet.Platform = {
             return "#bbbfcc";
         }
         return "#eee"; // ???
+    },
+
+    /**
+     * Check if a camera is available on this system. Hopefully.
+     * @return boolean
+     */
+    hasCamera: function() {
+        if (this.isAndroid()) {
+            // Camera detection is not implemented on Android.
+            // Just assume one exists for now?
+            // https://appcelerator.lighthouseapp.com/projects/32238/tickets/993-titaniummediaiscamerasupported-not-implemented
+            return true;
+        }
+        return Titanium.Media.isCameraSupported;
     }
 };
 StatusNet.Platform.hasNavBar = StatusNet.Platform.isApple;
