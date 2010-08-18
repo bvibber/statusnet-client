@@ -35,9 +35,8 @@ StatusNet.TabbedMenuBar = function() {
     });
 };
 
-StatusNet.createTabbedBar = function(tabInfo, win, client) {
+StatusNet.createTabbedBar = function(tabInfo, win, initialSelection) {
 
-    this.client = client;
     var tb = new StatusNet.TabbedMenuBar();
     var tab;
     var i = 0;
@@ -75,6 +74,10 @@ StatusNet.createTabbedBar = function(tabInfo, win, client) {
     tb.tabs.push(moretab);
     tb.tabView.add(moretab);
     win.add(tb.tabView);
+
+    if (initialSelection) {
+        tb.highlightTab(initialSelection);
+    }
 
     return tb;
 };
@@ -126,18 +129,24 @@ StatusNet.TabbedMenuBar.prototype.setSelectedTab = function(index) {
         moretab.image = moretab.deselectedImage;
     }
 
+    this.highlightTab(index);
+
+    var that = this;
+
+    StatusNet.debug("Tab selection - index = " + index + " name = " + this.tabs[index].name);
+    Titanium.App.fireEvent('StatusNet_tabSelected', {
+        index: index,
+        tabName: that.tabs[index].name
+    });
+
+};
+
+StatusNet.TabbedMenuBar.prototype.highlightTab = function(index) {
     for (var i = 0; i < 4; i++) {
-        var minitab = this.tabs[i];
+        var minitab = this.tabs[i]
         if (i === index) {
-            StatusNet.debug("index = " + index + " name = " + minitab.name);
             minitab.image = minitab.selectedImage;
-            StatusNet.debug("XXXX minitab.selectedImage = " + minitab.selectedImage);
-            Titanium.App.fireEvent('StatusNet_tabSelected', {
-                index: index,
-                tabName: minitab.name
-            });
         } else {
-            StatusNet.debug("minitab.deselectedImage = " + minitab.deselectedImage);
             minitab.image = minitab.deselectedImage;
         }
     }

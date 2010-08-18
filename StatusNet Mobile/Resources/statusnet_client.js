@@ -337,7 +337,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         'search': {deselectedImage: 'images/tabs/search.png', selectedImage: 'images/greenbox.png', name: 'search'}
     };
 
-    this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, this);
+    this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, 1);
 
     this.webview = Titanium.UI.createWebView({
         top: that.navbar.height,

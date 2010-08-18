@@ -347,7 +347,6 @@ StatusNet.Timeline.prototype.trimNotices = function() {
     StatusNet.debug("trimNotices E2Z");
         }
     }
-    rs.close();
     StatusNet.debug("trimNotices DONE");
 };
 
