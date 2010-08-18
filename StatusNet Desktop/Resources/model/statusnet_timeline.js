@@ -310,66 +310,70 @@ StatusNet.Timeline.prototype.trimNotices = function() {
         ")"
     );
 
-    StatusNet.debug("trimNotices A");
-    var rs = this.db.execute(
-        "DELETE FROM entry WHERE notice_id IN " +
-        "(SELECT notice_id FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?)",
-        cutoff.getTime(),
-        this.timeline_name,
-        this.account.id
-    );
-    StatusNet.debug("trimNotices B");
+    try {
+        StatusNet.debug("trimNotices A");
+        var rs = this.db.execute(
+            "DELETE FROM entry WHERE notice_id IN " +
+            "(SELECT notice_id FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?)",
+            cutoff.getTime(),
+            this.timeline_name,
+            this.account.id
+        );
+        StatusNet.debug("trimNotices B");
 
-    rs = this.db.execute(
-        'DELETE FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?',
-        cutoff.getTime(),
-        this.timeline_name,
-        this.account.id
-    );
-    StatusNet.debug("trimNotices C");
+        rs = this.db.execute(
+            'DELETE FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?',
+            cutoff.getTime(),
+            this.timeline_name,
+            this.account.id
+        );
+        StatusNet.debug("trimNotices C");
 
-    // Also keep an absolute maximum of 200 notices per timeline
+        // Also keep an absolute maximum of 200 notices per timeline
 
-    rs = this.db.execute(
-        "SELECT count(*) FROM notice_entry WHERE timeline = ? AND account_id = ?",
-        this.timeline_name,
-        this.account.id
-    );
-    StatusNet.debug("trimNotices D");
+        rs = this.db.execute(
+            "SELECT count(*) FROM notice_entry WHERE timeline = ? AND account_id = ?",
+            this.timeline_name,
+            this.account.id
+        );
+        StatusNet.debug("trimNotices D");
 
-    if (rs.isValidRow()) {
-    StatusNet.debug("trimNotices E1");
+        if (rs.isValidRow()) {
+        StatusNet.debug("trimNotices E1");
 
-        var count = rs.fieldByName("count(*)");
+            var count = rs.fieldByName("count(*)");
+            rs.close();
+            StatusNet.debug("COUNT = " + count);
 
-        StatusNet.debug("COUNT = " + count);
+        StatusNet.debug("trimNotices E2");
+            if (count > 200) {
+        StatusNet.debug("trimNotices E2A");
 
-    StatusNet.debug("trimNotices E2");
-        if (count > 200) {
-    StatusNet.debug("trimNotices E2A");
+                var diff = (count - 200);
 
-            var diff = (count - 200);
+                StatusNet.debug("Row count for " + this.timeline_name + " = " + count + ", overflow = " + diff);
 
-            StatusNet.debug("Row count for " + this.timeline_name + " = " + count + ", overflow = " + diff);
+                var sql = "DELETE FROM entry WHERE notice_id IN " +
+                    "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)";
 
-            var sql = "DELETE FROM entry WHERE notice_id IN " +
-                "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)";
+                rs = this.db.execute(sql,
+                    this.timeline_name,
+                    this.account.id,
+                    diff
+                );
 
-            rs = this.db.execute(sql,
-                this.timeline_name,
-                this.account.id,
-                diff
-            );
-
-            rs = this.db.execute(
-                "DELETE FROM notice_entry WHERE notice_id IN " +
-                "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)",
-                this.timeline_name,
-                this.account.id,
-                diff
-            );
-    StatusNet.debug("trimNotices E2Z");
+                rs = this.db.execute(
+                    "DELETE FROM notice_entry WHERE notice_id IN " +
+                    "(SELECT notice_id FROM notice_entry WHERE timeline = ? AND account_id = ? ORDER BY timestamp ASC LIMIT ?)",
+                    this.timeline_name,
+                    this.account.id,
+                    diff
+                );
+        StatusNet.debug("trimNotices E2Z");
+            }
         }
+    } catch (e) {
+        StatusNet.debug("Caught Exception doing notice trim: " + e);
     }
     StatusNet.debug("trimNotices DONE");
 };
