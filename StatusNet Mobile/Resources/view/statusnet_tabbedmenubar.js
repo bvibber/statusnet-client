@@ -87,6 +87,8 @@ StatusNet.TabbedMenuBar.prototype.setSelectedTab = function(index) {
 
     var moretab = this.tabs[4];
 
+    this.highlightTab(index);
+
     if (index === 4) {
         StatusNet.debug("MORE MORE MORE!");
         moretab.image = moretab.selectedImage;
@@ -126,19 +128,15 @@ StatusNet.TabbedMenuBar.prototype.setSelectedTab = function(index) {
         overFlowWin.open();
 
     } else {
-        moretab.image = moretab.deselectedImage;
+
+        var that = this;
+
+        StatusNet.debug("Tab selection - index = " + index + " name = " + this.tabs[index].name);
+        Titanium.App.fireEvent('StatusNet_tabSelected', {
+            index: index,
+            tabName: that.tabs[index].name
+        });
     }
-
-    this.highlightTab(index);
-
-    var that = this;
-
-    StatusNet.debug("Tab selection - index = " + index + " name = " + this.tabs[index].name);
-    Titanium.App.fireEvent('StatusNet_tabSelected', {
-        index: index,
-        tabName: that.tabs[index].name
-    });
-
 };
 
 StatusNet.TabbedMenuBar.prototype.highlightTab = function(index) {
