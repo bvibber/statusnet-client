@@ -92,41 +92,7 @@ StatusNet.TabbedMenuBar.prototype.setSelectedTab = function(index) {
     if (index === 4) {
         StatusNet.debug("MORE MORE MORE!");
         moretab.image = moretab.selectedImage;
-
-        var overFlowWin = Titanium.UI.createWindow(
-            {
-                title: "More",
-                modal: true,
-                navBarHidden: true
-            }
-        );
-
-        this.navbar = StatusNet.Platform.createNavBar(overFlowWin);
-
-        var cancelButton = Titanium.UI.createButton({
-            title: "Cancel"
-        });
-
-        cancelButton.addEventListener('click', function() {
-            overFlowWin.close();
-        });
-
-        this.navbar.setLeftNavButton(cancelButton);
-
-        this.overFlowTable = Titanium.UI.createTableView({data: this.overFlowTabs, top: 44});
-
-        overFlowWin.add(this.overFlowTable);
-
-        this.overFlowTable.addEventListener('click', function(event) {
-            Titanium.App.fireEvent('StatusNet_tabSelected', {
-                index: -1,
-                tabName: event.rowData.title
-            });
-            overFlowWin.close();
-        });
-
-        overFlowWin.open();
-
+        this.showOverFlowWindow();
     } else {
 
         var that = this;
@@ -137,6 +103,43 @@ StatusNet.TabbedMenuBar.prototype.setSelectedTab = function(index) {
             tabName: that.tabs[index].name
         });
     }
+};
+
+StatusNet.TabbedMenuBar.prototype.showOverFlowWindow = function() {
+
+    var overFlowWin = Titanium.UI.createWindow(
+        {
+            title: "More",
+            navBarHidden: true
+        }
+    );
+
+    var navbar = StatusNet.Platform.createNavBar(overFlowWin);
+
+    var cancelButton = Titanium.UI.createButton({
+        title: "Cancel"
+    });
+
+    cancelButton.addEventListener('click', function() {
+        overFlowWin.close();
+    });
+
+    navbar.setLeftNavButton(cancelButton);
+
+    this.overFlowTable = Titanium.UI.createTableView({data: this.overFlowTabs, top: navbar.height});
+
+    overFlowWin.add(this.overFlowTable);
+
+    this.overFlowTable.addEventListener('click', function(event) {
+        Titanium.App.fireEvent('StatusNet_tabSelected', {
+            index: -1,
+            tabName: event.rowData.title
+        });
+        overFlowWin.close();
+    });
+
+    overFlowWin.open();
+
 };
 
 StatusNet.TabbedMenuBar.prototype.highlightTab = function(index) {
