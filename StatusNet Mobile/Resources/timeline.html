@@ -19,6 +19,7 @@ if (typeof Titanium == "undefined") {
     document.write('Titanium is undefined. Nothing will work in this webview.');
 }
 
+var lastClickTime = Date.now();
 var activeNotice = null;
 var clientAccountUsername = null;
 
@@ -275,7 +276,13 @@ enableNoticeControls = function(noticeDom) {
     });
 
     $notice.bind('click', function(event) {
-        var speed = 200;
+        // delay hack to prevent double event delivery from breaking
+        var minSelfClickDelay = 100;
+        var delay = Date.now() - lastClickTime;
+        Titanium.API.debug('click delay was: ' + delay);
+        if (delay < minSelfClickDelay ) {
+            return;
+        }
         if (activeNotice) {
             $(activeNotice).removeClass('foldout');
             $(activeNotice).find('.links').hide();
@@ -283,10 +290,11 @@ enableNoticeControls = function(noticeDom) {
         if (this === activeNotice) {
             activeNotice = null;
         } else {
-            $(noticeDom).addClass('foldout');
-            $(noticeDom).find('.links').show();
+            $notice.addClass('foldout');
+            $notice.find('.links').show();
             activeNotice = noticeDom;
         }
+        lastClickTime = Date.now();
     });
 
 };
