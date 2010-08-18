@@ -143,7 +143,7 @@ StatusNet.TabbedMenuBar.prototype.showOverFlowWindow = function() {
 };
 
 StatusNet.TabbedMenuBar.prototype.highlightTab = function(index) {
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 5; i++) {
         var minitab = this.tabs[i]
         if (i === index) {
             minitab.image = minitab.selectedImage;
