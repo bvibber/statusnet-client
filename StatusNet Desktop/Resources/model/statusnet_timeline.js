@@ -52,14 +52,38 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
 
     StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
 
+    // We need to add in the namespaces, so the XML parser doesn't blow up on when
+    // reparsing cached entries.
+    var spaces = {
+        "": "http://www.w3.org/2005/Atom",
+        thr: "http://purl.org/syndication/thread/1.0",
+        georss: "http://www.georss.org/georss",
+        activity: "http://activitystrea.ms/spec/1.0/",
+        media: "http://purl.org/syndication/atommedia",
+        poco: "http://portablecontacts.net/spec/1.0",
+        ostatus: "http://ostatus.org/schema/1.0",
+        statusnet: "http://status.net/schema/api/1/"
+    };
+    for (var ns in spaces) {
+        if (spaces.hasOwnProperty(ns)) {
+            var attr = (ns == "") ? 'xmlns' : ('xmlns:' + ns);
+            entry.setAttribute(attr, spaces[ns]);
+        }
+    }
     var xml = StatusNet.Platform.serializeXml(entry);
 
-    // FIXME: We need to add in the namespaces, so the XML parser doesn't blow up on when
-    // reparsing cached entries. This is a sick hack, but it's the only work-around 
-    // I can think of while we wait for Appcelerator to implement setAttribute in 
-    // their mobile DOM implementation.
-
-    var nsXml = xml.replace('<entry>', '<entry xmlns="http://www.w3.org/2005/Atom" xmlns:thr="http://purl.org/syndication/thread/1.0" xmlns:georss="http://www.georss.org/georss" xmlns:activity="http://activitystrea.ms/spec/1.0/" xmlns:media="http://purl.org/syndication/atommedia" xmlns:poco="http://portablecontacts.net/spec/1.0" xmlns:ostatus="http://ostatus.org/schema/1.0" xmlns:statusnet="http://status.net/schema/api/1/">');
+    // As a hack workaround for running on stock iPhone builds where
+    // setAttribute() doesn't work. This won't prevent error messages
+    // spewing on the console during serialization above.
+    var nsXml = xml.replace('<entry>', '<entry ' +
+        'xmlns="http://www.w3.org/2005/Atom" ' +
+        'xmlns:thr="http://purl.org/syndication/thread/1.0" ' +
+        'xmlns:georss="http://www.georss.org/georss" ' +
+        'xmlns:activity="http://activitystrea.ms/spec/1.0/" ' +
+        'xmlns:media="http://purl.org/syndication/atommedia" ' +
+        'xmlns:poco="http://portablecontacts.net/spec/1.0" ' +
+        'xmlns:ostatus="http://ostatus.org/schema/1.0" ' +
+        'xmlns:statusnet="http://status.net/schema/api/1/">');
 
     try {
         rc = this.db.execute(
