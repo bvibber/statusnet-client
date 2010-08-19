@@ -125,11 +125,18 @@ StatusNet.NewNoticeView.prototype.init = function() {
         // @fixme change color or display when negative
     });
     var moreButton = Titanium.UI.createButton({
-        title: 'Options...',
+        title: 'Attach...',
         top: 0,
         left: 0,
         width: 80,
         height: controlStripHeight
+    });
+    var attachInfo = this.attachInfo = Titanium.UI.createLabel({
+        text: '',
+        top: 0,
+        left: 84,
+        right: 40,
+        height: 'auto'
     });
     moreButton.addEventListener('click', function() {
         //noticeTextArea.blur();
@@ -164,7 +171,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
             options.push('Remove attachment');
             callbacks.push(function() {
                 that.attachment = null;
-                // @fixme hide icon
+                that.attachInfo.title = '';
             });
         }
 
@@ -202,14 +209,90 @@ StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
     var image = event.media; // What is this exactly, a blob?
     for (var x in event) {
         if (event.hasOwnProperty(x)) {
-            StatusNet.debug('Camera event.' + x + ' : ' + typeof event[x]);
+            if (x != 'media') {
+                StatusNet.debug('Camera event.' + x + ' : ' + typeof event[x] + ' = ' + event[x]);
+            }
         }
     }
-    StatusNet.debug('Media type: ' + event.mediaType);
-    // @fixme implement attachments ;)
+    StatusNet.debug('media.width = ' + event.media.width);
+    StatusNet.debug('media.height = ' + event.media.height);
+    StatusNet.debug('media.mediaType = ' + event.media.mediaType);
 
-    this.attachment = event.media;
+    var media = event.media; // TiBlob
+
+    // Width and height are passed on the event on Android,
+    // but on the media blob on iPhone. Worse still, on Android
+    // the blob has width/height properties which return 0.
+    var width = (media.width) ? media.width : event.width;
+    var height = (media.height) ? media.height : event.height;
+
+    // Scale images down to this maximum width.
+    // @fixme will this explode on videos etc?
+    var maxSide = 800;
+
+    this.attachment = this.resizePhoto(media, width, height, maxSide);
+    StatusNet.debug('QQQ 1a: ' + typeof this.attachment);
+    StatusNet.debug('QQQ 1b: ' + this.attachment);
+    for (var i in this.attachment) {
+        StatusNet.debug('QQQ 1c: ' + i);
+    }
+    var msg = Math.round(this.attachment.length / 1024) + 'KB ' + this.attachment.mimeType;
+    StatusNet.debug('QQQ 2: ' + msg)
+    this.attachInfo.title = msg;
 };
+
+StatusNet.NewNoticeView.prototype.resizePhoto = function(media, width, height, max) {
+    StatusNet.debug("Source image is " + width + "x" + height);
+
+    var targetWidth = width;
+    var targetHeight = height;
+
+    if (width > height) {
+        if (width > max) {
+            targetWidth = max;
+            targetHeight = Math.round(height * max / width);
+        } else {
+            return media;
+        }
+    } else {
+        if (height > max) {
+            targetHeight = max;
+            targetWidth = Math.round(width * max / height);
+        } else {
+            return media;
+        }
+    }
+
+    StatusNet.debug("Resizing image from " + width + "x" + height +
+                    " to " + targetWidth + "x" + targetHeight);
+    // Resize through an intermediary imageView
+    var imageView = Titanium.UI.createImageView({
+        width: targetWidth,
+        height: targetHeight,
+        image: media
+    });
+
+    // Ye horrible hack!
+    // on Android, the image conversion esplodes.
+    // Try inserting it so it's live...
+    if (StatusNet.Platform.isAndroid()) {
+        this.window.add(imageView);
+    }
+    var converted = imageView.toImage();
+    if (StatusNet.Platform.isAndroid()) {
+        this.window.remove(imageView);
+    }
+    
+    // Then to add insult to injury, on Android it doesn't give us
+    // a TiBlob directly, but rather an event object similar to when
+    // we fetch directly from the camera. Yeah, doesn't make sense
+    // to me either.
+    if (typeof converted.media == "object") {
+        return converted.media;
+    } else {
+        return converted;
+    }
+}
 
 /**
  * Setup post parameters and post the notice
