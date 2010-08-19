@@ -297,6 +297,9 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     var that = this;
 
+    if (this.mainwin) {
+        this.mainwin.close();
+    }
     this.mainwin = Titanium.UI.createWindow({
         backgroundColor:'#fff'
     });
@@ -308,7 +311,6 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     });
 
     accountsButton.addEventListener('click', function() {
-        that.mainwin.close();
         StatusNet.debug('showSettings!');
         var settingsView = new StatusNet.SettingsView(that);
         settingsView.init();

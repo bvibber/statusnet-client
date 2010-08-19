@@ -193,6 +193,28 @@ StatusNet.Platform = {
 StatusNet.Platform.hasNavBar = StatusNet.Platform.isApple;
 StatusNet.Platform.hasMenu = StatusNet.Platform.isAndroid;
 
+StatusNet.Platform.animatedOpen = function(window) {
+    window.close();
+    if (StatusNet.Platform.isApple()) {
+        var h = Titanium.Platform.displayCaps.platformHeight - 20;
+        window.top = h;
+        window.height = h;
+        window.addEventListener('open', function() {
+            var anim = Titanium.UI.createAnimation({
+                top: 0,
+                duration: 500
+            });
+            window.animate(anim);
+        });
+    } else {
+        // On Android, making sure this setting is present will
+        // ensure we've got a heavyweight window, which is enabled
+        // for the back button, and gets a sideways sliding animation.
+        window.fullscreen = window.fullscreen ? window.fullscreen : false;
+    }
+    window.open();
+}
+
 StatusNet.Platform.createNavBar = function(window) {
 
     var navbar;

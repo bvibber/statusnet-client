@@ -64,10 +64,10 @@ StatusNet.SettingsView.prototype.init = function() {
         if (event.rowData.acct == "add-stub") {
             // Special case!
             // @fixme need a better way to close-modal-and-open-other-modal smoothly
-            window.close();
-            setTimeout(function() {
-                view.showAddAccount();
-            }, 500);
+            //window.close();
+            //setTimeout(function() {
+            view.showAddAccount();
+            //}, 500);
             return;
         }
 
@@ -117,10 +117,10 @@ StatusNet.SettingsView.prototype.init = function() {
                 view.navbar.setLeftNavButton(edit);
             }
             // @fixme need a better way to close-modal-and-open-other-modal smoothly
-            window.close();
-            setTimeout(function() {
+            //window.close();
+            //setTimeout(function() {
                 view.showAddAccount();
-            }, 500);
+            //}, 500);
         });
 
         // Edit/cancel buttons for the table view...
@@ -161,17 +161,14 @@ StatusNet.SettingsView.prototype.init = function() {
     }
 */
     // Now let's fill out the table!
-
     this.showAccounts();
-
-    window.addEventListener('focus', function(event) {
-        view.table.setData(view.rows);
-    });
+    view.table.setData(view.rows);
 
     if (this.accounts.length > 0) {
-        setTimeout(function() {
-            window.open({modal: true});
-        }, 500);
+        // We do the slide-up animation manually rather than
+        // doing this as a modal, since that confuses things
+        // when we open another modal later.
+        StatusNet.Platform.animatedOpen(window);
     } else {
         // Leave the main accounts window hidden until later...
         this.showAddAccount();
@@ -187,20 +184,16 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         title: "Add Account",
         backgroundColor: StatusNet.Platform.dialogBackground(),
         layout: 'vertical',
-        navBarHidden: true
+        navBarHidden: true // hack for iphone for now
     });
 
     navbar = StatusNet.Platform.createNavBar(window);
 
     window.addEventListener('close', function() {
-        // Re-show the main accounts list window
-        // @fixme there's got to be a better way to delay until animation's done...
-        // if we don't wait, it crashes or gets confused about who's modal to what.
-        setTimeout(function() {
-            view.window.open({
-                modal: true
-            });
-        }, 500);
+        // Update the views in the list
+        view.table.setData(view.rows);
+        // if the main accounts view wasn't already open...
+        view.window.open();
     });
     var cancel = Titanium.UI.createButton({
         title: "Cancel"
@@ -212,7 +205,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     });
 
     var save = Titanium.UI.createButton({
-        title: "Save",
+        title: "Save"
     });
     save.addEventListener('click', function() {
         StatusNet.debug('clicked save');
@@ -322,9 +315,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         window.add(xview);
     }
 
-    window.open({
-        modal: true
-    });
+    StatusNet.Platform.animatedOpen(window);
 };
 
 /**

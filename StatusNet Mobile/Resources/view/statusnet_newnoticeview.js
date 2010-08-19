@@ -53,7 +53,8 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
     var window = this.window = Titanium.UI.createWindow({
         title: 'New Notice',
-        backgroundColor: StatusNet.Platform.dialogBackground()
+        backgroundColor: StatusNet.Platform.dialogBackground(),
+        navBarHidden: true
     });
 
     var navbar = StatusNet.Platform.createNavBar(this.window);
@@ -201,9 +202,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
             noticeTextArea.focus();
         });
     }
-    window.open({
-        //modal: true
-    });
+    StatusNet.Platform.animatedOpen(window);
 
     StatusNet.debug("NewNoticeView.init END");
 };
