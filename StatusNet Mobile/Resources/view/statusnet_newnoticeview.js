@@ -124,13 +124,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         counter.text = "" + (textLimit - event.value.length);
         // @fixme change color or display when negative
     });
-    var moreButton = Titanium.UI.createButton({
-        title: 'Attach...',
-        top: 0,
-        left: 0,
-        width: 80,
-        height: controlStripHeight
-    });
+
     var attachInfo = this.attachInfo = Titanium.UI.createLabel({
         text: '',
         top: 0,
@@ -138,6 +132,16 @@ StatusNet.NewNoticeView.prototype.init = function() {
         right: 40,
         height: 'auto'
     });
+    controlStrip.add(attachInfo);
+
+    var moreButton = Titanium.UI.createButton({
+        title: 'Attach...',
+        top: 0,
+        left: 0,
+        width: 80,
+        height: controlStripHeight
+    });
+
     moreButton.addEventListener('click', function() {
         //noticeTextArea.blur();
         var options = [];
@@ -170,8 +174,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         } else {
             options.push('Remove attachment');
             callbacks.push(function() {
-                that.attachment = null;
-                that.attachInfo.title = '';
+                that.removeAttachment();
             });
         }
 
@@ -214,11 +217,14 @@ StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
             }
         }
     }
-    StatusNet.debug('media.width = ' + event.media.width);
-    StatusNet.debug('media.height = ' + event.media.height);
-    StatusNet.debug('media.mediaType = ' + event.media.mediaType);
 
     var media = event.media; // TiBlob
+    StatusNet.debug('media.width = ' + media.width);
+    StatusNet.debug('media.height = ' + media.height);
+    StatusNet.debug('media.mediaType = ' + media.mediaType);
+    StatusNet.debug('media.mimeType = ' + media.mimeType);
+    StatusNet.debug('media.length = ' + media.length);
+    StatusNet.debug('media.size = ' + media.size);
 
     // Width and height are passed on the event on Android,
     // but on the media blob on iPhone. Worse still, on Android
@@ -227,50 +233,86 @@ StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
     var height = (media.height) ? media.height : event.height;
 
     // Scale images down to this maximum width.
-    // @fixme will this explode on videos etc?
-    var maxSide = 800;
-
-    this.attachment = this.resizePhoto(media, width, height, maxSide);
-    StatusNet.debug('QQQ 1a: ' + typeof this.attachment);
-    StatusNet.debug('QQQ 1b: ' + this.attachment);
-    for (var i in this.attachment) {
-        StatusNet.debug('QQQ 1c: ' + i);
+    // @fixme resizing has some issues at the moment
+    if (StatusNet.Platform.isApple()) {
+        var maxSide = 800;
+        var out = this.resizePhoto(media, width, height, maxSide);
+        media = out.media;
+        width = out.width;
+        height = out.height;
     }
-    var msg = Math.round(this.attachment.length / 1024) + 'KB ' + this.attachment.mimeType;
-    StatusNet.debug('QQQ 2: ' + msg)
-    this.attachInfo.title = msg;
+
+    StatusNet.debug('media.width = ' + media.width);
+    StatusNet.debug('media.height = ' + media.height);
+    StatusNet.debug('media.mediaType = ' + media.mediaType);
+    StatusNet.debug('media.mimeType = ' + media.mimeType);
+    StatusNet.debug('media.length = ' + media.length);
+    StatusNet.debug('media.size = ' + media.size);
+
+    // iPhone doesn't report back the new image type, but it's JPEG.
+    var type = (media.mimeType ? media.mimeType : 'image/jpeg');
+    var msg = width + 'x' + height + ' ' + this.niceType(type);
+
+    this.attachment = media;
+    this.attachInfo.text = msg;
+    StatusNet.debug('QQQ: ' + msg);
 };
 
+/**
+ * Resize (if necessary) a photo to fit within the given size constraint.
+ *
+ * @param media Titanium.Blob
+ * @param width
+ * @param height
+ * @param max longest side to resize to
+ * 
+ * @return object dictionary with width, height, and media containing a Titanium.Blob
+ *
+ * @access private
+ */
 StatusNet.NewNoticeView.prototype.resizePhoto = function(media, width, height, max) {
     StatusNet.debug("Source image is " + width + "x" + height);
 
+    var orig = {media: media, width: width, height: height};
+    if (StatusNet.Platform.isAndroid()) {
+        // Our resizing gimmick doesn't 100% work on Android yet.
+        // We end up with a PNG, and/or a spew of error messages
+        // about failed type conversions.
+        //
+        // Note that on iPhone we resize ok, but we have no way to
+        // specify the JPEG quality level and end up with a larger
+        // file than necessary.
+        return orig;
+    }
+
     var targetWidth = width;
     var targetHeight = height;
-
     if (width > height) {
         if (width > max) {
             targetWidth = max;
             targetHeight = Math.round(height * max / width);
         } else {
-            return media;
+            return orig;
         }
     } else {
         if (height > max) {
             targetHeight = max;
             targetWidth = Math.round(width * max / height);
         } else {
-            return media;
+            return orig;
         }
     }
 
     StatusNet.debug("Resizing image from " + width + "x" + height +
                     " to " + targetWidth + "x" + targetHeight);
     // Resize through an intermediary imageView
+    StatusNet.debug("QQQQQQQQQQQ 0");
     var imageView = Titanium.UI.createImageView({
         width: targetWidth,
         height: targetHeight,
         image: media
     });
+    StatusNet.debug("QQQQQQQQQQQ A");
 
     // Ye horrible hack!
     // on Android, the image conversion esplodes.
@@ -278,7 +320,9 @@ StatusNet.NewNoticeView.prototype.resizePhoto = function(media, width, height, m
     if (StatusNet.Platform.isAndroid()) {
         this.window.add(imageView);
     }
+    StatusNet.debug("QQQQQQQQQQQ B");
     var converted = imageView.toImage();
+    StatusNet.debug("QQQQQQQQQQQ C");
     if (StatusNet.Platform.isAndroid()) {
         this.window.remove(imageView);
     }
@@ -287,10 +331,51 @@ StatusNet.NewNoticeView.prototype.resizePhoto = function(media, width, height, m
     // a TiBlob directly, but rather an event object similar to when
     // we fetch directly from the camera. Yeah, doesn't make sense
     // to me either.
+    StatusNet.debug("QQQQQQQQQQQ D");
     if (typeof converted.media == "object") {
-        return converted.media;
+        StatusNet.debug("QQQQQQQQQQQ E1");
+        return {
+            media: converted.media,
+            width: converted.width,
+            height: converted.height
+        };
     } else {
-        return converted;
+        StatusNet.debug("QQQQQQQQQQQ E2");
+        return {
+            media: converted,
+            width: converted.width,
+            height: converted.height
+        };
+    }
+}
+
+/**
+ * Clear the current attachment from the form.
+ *
+ * @access private
+ */
+StatusNet.NewNoticeView.prototype.removeAttachment = function()
+{
+    this.attachment = null;
+    this.attachInfo.text = '';
+}
+
+/**
+ * Give a nice legible file type name for given mime type.
+ *
+ * @param string type
+ * @return string
+ * @access private
+ */
+StatusNet.NewNoticeView.prototype.niceType = function(type)
+{
+    // @fixme for video support in future, add some more types
+    var map = {'image/jpeg': 'JPEG',
+               'image/png': 'PNG'};
+    if (map[type]) {
+        return map[type];
+    } else {
+        return type;
     }
 }
 
