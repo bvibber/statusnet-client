@@ -31,7 +31,7 @@ StatusNet.TabbedMenuBar = function() {
         height: 49,
         bottom: 0,
         width: 320, // @todo Figure out how to determine the screen width! 320 for iPhone
-        backgroundColor: 'gray',
+        backgroundImage: 'images/bg/tab_bg.png',
     });
 };
 
@@ -67,8 +67,8 @@ StatusNet.createTabbedBar = function(tabInfo, win, initialSelection) {
 
     var moretab = tb.createMiniTab({
         index: 4,
-        deselectedImage: 'images/tabs/more.png',
-        selectedImage: 'images/greenbox.png',
+        deselectedImage: 'images/tabs/new/more.png',
+        selectedImage: 'images/tabs/new/more_on.png',
         name: 'more'
     });
     tb.tabs.push(moretab);
@@ -165,7 +165,6 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
         left: left + space,
         height: 40,
         width: 40,
-        backgroundColor: 'gray',
         opacity: .5
     });
 
