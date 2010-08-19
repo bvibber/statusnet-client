@@ -164,8 +164,7 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
         image:args.deselectedImage,
         left: left + space,
         height: 40,
-        width: 40,
-        opacity: .5
+        width: 40
     });
 
     minitab.index = args.index;
