@@ -256,7 +256,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
-            StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't update timeline: " + msg);
             that.updateFinished.notify();
         }
     );
@@ -517,17 +517,21 @@ StatusNet.Timeline.prototype.autoRefresh = function() {
  */
 StatusNet.Timeline.prototype.lookupAvatar = function(url, onHit, onMiss) {
 
+    StatusNet.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Timeline.lookupAvatar A - Begin");
+
     var hash;
 
     if (typeof Titanium.Codec == "undefined") {
         // mobile
+        StatusNet.debug("Timeline.lookupAvatar B - Titanium.Codec is undefined (we're on mobile)");
         hash = Titanium.Utils.md5HexDigest(url);
     } else {
         // desktop
+        StatusNet.debug("Timeline.lookupAvatar B - Titanium.Codec is defined (we're on desktop)");
         hash = Titanium.Codec.digestToHex(Titanium.Codec.SHA1, url);
     }
 
-    StatusNet.debug('Avatar hash for ' + url + " == " + hash);
+    StatusNet.debug('Timeline.lookupAvatar C - Avatar hash for ' + url + " == " + hash);
 
     var dot = url.lastIndexOf(".");
 
@@ -537,58 +541,66 @@ StatusNet.Timeline.prototype.lookupAvatar = function(url, onHit, onMiss) {
     }
 
     var extension = url.substr(dot, url.length);
-    var resourcesDir = Titanium.Filesystem.getResourcesDirectory();
+    var resourcesDir = Titanium.Filesystem.resourcesDirectory;
     var separator = Titanium.Filesystem.getSeparator();
     var cacheDirname = resourcesDir + separator + 'avatar_cache';
+
+    StatusNet.debug("Timeline.lookupAvatar D - cacheDirname = " + cacheDirname)
 
     var cacheDir = Titanium.Filesystem.getFile(cacheDirname);
 
     if (!cacheDir.exists()) {
-        StatusNet.debug("lookupAvatar - avatar_cache directory doesn't exist");
+        StatusNet.debug("Timeline.lookupAvatar E - avatar_cache directory doesn't exist");
         cacheDir.createDirectory();
     } else {
-        StatusNet.debug("lookupAvatar - avatar_cache directory already exists");
+        StatusNet.debug("Timeline.lookupAvatar E - avatar_cache directory already exists");
     }
 
     var filename = hash + extension;
-    var filepath = cacheDir + separator + filename;
+    var filepath = cacheDirname + separator + filename;
 
-    StatusNet.debug("lookupAvatar - filepath = " + filepath);
+    StatusNet.debug("Timeline.lookupAvatar F - filepath = " + filepath);
 
     var relativePath = 'avatar_cache/' + filename; // for use in webview
 
     var avatarFile = Titanium.Filesystem.getFile(filepath);
 
-    StatusNet.debug('lookupAvatar - looking up avatar: ' + filepath);
-    if (avatarFile.isFile()) {
-        StatusNet.debug("lookupAvatar - Yay, avatar cache hit");
+    StatusNet.debug('Timeline.lookupAvatar G - looking up avatar: ' + filepath);
+    if (avatarFile.exists()) {
+        StatusNet.debug("Timeline.lookupAvatar H - Yay, avatar cache hit");
         if (onHit) {
             onHit(relativePath);
         }
+        
+        StatusNet.debug("Timeline.lookupAvatar I - returning relative path: " + relativePath);
+        StatusNet.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Timeline.lookupAvatar J - END");
+        
         return relativePath;
     } else {
 
-        StatusNet.debug("lookupAvatar - Avatar cache miss, fetching avatar from web");
+        StatusNet.debug("Timeline.lookupAvatar H - Avatar cache miss, fetching avatar from web");
 
         StatusNet.HttpClient.fetchFile(
             url,
             filepath,
             function() {
-                StatusNet.debug("lookupAvatar - fetched avatar: " + url);
+                StatusNet.debug("Timeline.lookupAvatar I - fetched avatar: " + url);
                 if (onHit) {
                     onHit(relativePath);
                     return relativePath;
                 }
             },
             function(code, e) {
-                StatusNet.debug("lookupAvatar - couldn't fetch: " + url);
-                StatusNet.debug("lookupAvatar - code: " + code + ", exception: " + e);
+                StatusNet.debug("Timeline.lookupAvatar I - couldn't fetch: " + url);
+                StatusNet.debug("Timeline.lookupAvatar I - code: " + code + ", exception: " + e);
             }
         );
 
         if (onMiss) {
             onMiss(url)
         }
+
+        StatusNet.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Timeline.lookupAvatar J - END");
 
         return false;
     }

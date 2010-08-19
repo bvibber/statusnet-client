@@ -166,6 +166,22 @@ StatusNet.TimelineView.prototype.clearTimelineView = function(html) {
 };
 
 StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
+    
+    // XXX Mobile SDK differences alert! Android platform doesn't seem to
+    // return any kind of useable application data directory that can 
+    // used for caching, so we'll only cache avatars on iPhone for now.
+    
+    if (StatusNet.Platform.isApple()) {
+    
+        StatusNet.debug("TimelineView.appendTimelineNotice - checking for cached avatar...");
+    
+        var cachedAvatar = this.client.getActiveTimeline().lookupAvatar(notice.avatar);
+
+        if (cachedAvatar) {
+            notice.avatar = cachedAvatar;
+        }
+    }
+    
     Titanium.App.fireEvent('StatusNet_appendTimelineNotice', {notice: notice});
 };
 
