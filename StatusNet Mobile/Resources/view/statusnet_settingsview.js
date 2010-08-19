@@ -106,7 +106,8 @@ StatusNet.SettingsView.prototype.init = function() {
 
 
 
-
+    if (StatusNet.Platform.isApple()) {
+        // @fixme perhaps just use the native thingy here?
         // Create-account button
         var create = Titanium.UI.createButton({
             title: '+'
@@ -128,8 +129,7 @@ StatusNet.SettingsView.prototype.init = function() {
             title: 'Edit'
         });
         var cancel = Titanium.UI.createButton({
-            title: 'Cancel',
-            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
+            title: 'Cancel'
         });
         edit.addEventListener('click', function() {
             view.navbar.setLeftNavButton(cancel);
@@ -143,7 +143,6 @@ StatusNet.SettingsView.prototype.init = function() {
         // ...and plop them onto the tab header.
         this.navbar.setLeftNavButton(edit);
         this.navbar.setRightNavButton(create);
-/*
     } else {
         // No native navigation bar on Android.
 
@@ -159,7 +158,6 @@ StatusNet.SettingsView.prototype.init = function() {
 
         // @fixme -- add a way to remove items!
     }
-*/
     // Now let's fill out the table!
     this.showAccounts();
     view.table.setData(view.rows);
