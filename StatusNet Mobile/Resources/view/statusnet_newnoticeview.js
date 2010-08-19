@@ -209,28 +209,23 @@ StatusNet.NewNoticeView.prototype.init = function() {
 };
 
 StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
-    var image = event.media; // What is this exactly, a blob?
-    for (var x in event) {
-        if (event.hasOwnProperty(x)) {
-            if (x != 'media') {
-                StatusNet.debug('Camera event.' + x + ' : ' + typeof event[x] + ' = ' + event[x]);
-            }
-        }
-    }
-
     var media = event.media; // TiBlob
+    /*
     StatusNet.debug('media.width = ' + media.width);
     StatusNet.debug('media.height = ' + media.height);
     StatusNet.debug('media.mediaType = ' + media.mediaType);
     StatusNet.debug('media.mimeType = ' + media.mimeType);
     StatusNet.debug('media.length = ' + media.length);
     StatusNet.debug('media.size = ' + media.size);
+    */
 
     // Width and height are passed on the event on Android,
     // but on the media blob on iPhone. Worse still, on Android
     // the blob has width/height properties which return 0.
-    var width = (media.width) ? media.width : event.width;
-    var height = (media.height) ? media.height : event.height;
+    //var width = (media.width) ? media.width : event.width;
+    //var height = (media.height) ? media.height : event.height;
+    var width = (event.width) ? event.width : media.width;
+    var height = (event.height) ? event.height : media.height;
 
     // Scale images down to this maximum width.
     // @fixme resizing has some issues at the moment
@@ -242,12 +237,14 @@ StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
         height = out.height;
     }
 
+    /*
     StatusNet.debug('media.width = ' + media.width);
     StatusNet.debug('media.height = ' + media.height);
     StatusNet.debug('media.mediaType = ' + media.mediaType);
     StatusNet.debug('media.mimeType = ' + media.mimeType);
     StatusNet.debug('media.length = ' + media.length);
     StatusNet.debug('media.size = ' + media.size);
+    */
 
     // iPhone doesn't report back the new image type, but it's JPEG.
     var type = (media.mimeType ? media.mimeType : 'image/jpeg');
