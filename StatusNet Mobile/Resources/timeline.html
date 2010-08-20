@@ -82,6 +82,10 @@ Titanium.App.addEventListener("StatusNet_unblockComplete", function(event) {
     Titanium.API.debug("webview got event: " + JSON.stringify(event));
     $('a.profile_unblock').text('Block').addClass('profile_block').removeAttr('disabled').removeClass('profile_unblock');
 });
+Titanium.App.addEventListener("StatusNet_showEmptyTimelineMsg", function(event) {
+    Titanium.API.debug("webview got event: " + JSON.stringify(event));
+    showEmptyTimeline();
+});
 
 // Default handling for link click events; we'll pass external links on to the app
 // for opening in a separate browser window.
@@ -420,6 +424,15 @@ showProfileHeader = function(user, extended, authorId) {
         Titanium.App.fireEvent("StatusNet_unblock", {userId: user.id});
         return false;
     });
+};
+
+
+/**
+ * Show this if the timeline is empty
+ */
+showEmptyTimeline = function() {
+    $('#notices').empty();
+    $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
 };
 
 </script>

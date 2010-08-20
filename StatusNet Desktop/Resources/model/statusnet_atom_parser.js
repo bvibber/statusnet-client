@@ -128,10 +128,11 @@ StatusNet.debug('noticeFromEntry ENTER');
 var startTime = Date.now();
 
     if (entry.documentElement) {
-        var $entry = $(entry).find('entry');
-        entry = $entry[0];
-    } else {
-        var $entry = $(entry);
+        entry = entry.documentElement;
+        if (typeof entry == "function") {
+            // Workaround bug that exposed this property as a function
+            entry = entry();
+        }
     }
 
     var notice = {};

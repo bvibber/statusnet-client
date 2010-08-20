@@ -31,7 +31,7 @@ StatusNet.TabbedMenuBar = function() {
         height: 49,
         bottom: 0,
         width: 320, // @todo Figure out how to determine the screen width! 320 for iPhone
-        backgroundColor: 'gray',
+        backgroundImage: 'images/bg/tab_bg.png',
     });
 };
 
@@ -67,8 +67,8 @@ StatusNet.createTabbedBar = function(tabInfo, win, initialSelection) {
 
     var moretab = tb.createMiniTab({
         index: 4,
-        deselectedImage: 'images/tabs/more.png',
-        selectedImage: 'images/greenbox.png',
+        deselectedImage: 'images/tabs/new/more.png',
+        selectedImage: 'images/tabs/new/more_on.png',
         name: 'more'
     });
     tb.tabs.push(moretab);
@@ -160,19 +160,31 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
     var space = (this.tabView.width - 200) / 6;
     var left = args.index * (40 + space);
 
+    var selectedImage = args.selectedImage;
+    var deselectedImage = args.deselectedImage;
+    if (StatusNet.Platform.dpi == 240) {
+        // Hack for high-resolution Android systems;
+        // for now manually load the 320-dpi images
+        // for iPhone 4 and let them scale down to fit,
+        // looks nicer than scaling up the 160-dpi
+        // default icons!
+        selectedImage = selectedImage.replace(/\./, '@2x.');
+        deselectedImage = deselectedImage.replace(/\./, '@2x.');
+    }
+
     var minitab = Ti.UI.createImageView({
-        image:args.deselectedImage,
-        left: left + space,
-        height: 40,
-        width: 40,
-        backgroundColor: 'gray',
-        opacity: .5
+        image: deselectedImage,
+        left: Math.round(left + space),
+        height: 30,
+        width: 30,
+        canScale: true,
+        enableZoomControls: false // for Android
     });
 
     minitab.index = args.index;
     minitab.name = args.name;
-    minitab.deselectedImage = args.deselectedImage;
-    minitab.selectedImage = args.selectedImage;
+    minitab.deselectedImage = deselectedImage;
+    minitab.selectedImage = selectedImage;
 
     var that = this;
 
