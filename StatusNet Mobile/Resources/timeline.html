@@ -157,7 +157,7 @@ renderNotice = function(notice, user) {
         html.push('</div>');
     }
     html.push('<div>');
-    html.push('<div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
+    html.push('<div class="date_link">' + humane_date(notice.updated) + '</div>');
     html.push('<a class="author" name="author-' + authorId + '" href="' + authorUri + '" rel="external">' + author + '</a>');
     html.push('<div class="content">'+ notice.content +'</div>');
     html.push('</div>');

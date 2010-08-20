@@ -139,8 +139,10 @@ h1 {
 	font-size: 0.8em;
 }
 
-.notice .date_link a, .notice .context_link a {
+.notice .date_link, .notice .context_link {
 	font-size: 0.8em;
+}
+.notice .date_link a, .notice .context_link a {
 	text-decoration: none;
 }
 
