@@ -56,6 +56,13 @@ StatusNet.NewNoticeView.prototype.init = function() {
         backgroundColor: StatusNet.Platform.dialogBackground(),
         navBarHidden: true
     });
+    if (StatusNet.Platform.isAndroid()) {
+        // If we set this on iPhone, it explodes and fails. :P
+        // Need to set it on Android to force the window to resize to fit
+        // the screen area limited by the software keyboard, since we
+        // can't predict its height.
+        window.windowSoftInputMode = Titanium.UI.Android.SOFT_INPUT_ADJUST_RESIZE;
+    }
 
     var navbar = StatusNet.Platform.createNavBar(this.window);
 
