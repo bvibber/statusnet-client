@@ -261,6 +261,14 @@ StatusNet.TimelineView.prototype.hideSpinner = function() {
 };
 
 /**
+ * Show this if the timeline is empty
+ */
+StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
+    StatusNet.debug('TimelineView.showEmptyTimeline - firing StatusNet_showEmptyTimelineMsg');
+    Titanium.App.fireEvent('StatusNet_showEmptyTimelineMsg');
+};
+
+/**
  * Constructor for a view for a friends timeline
  */
 StatusNet.TimelineViewFriends = function(client) {
