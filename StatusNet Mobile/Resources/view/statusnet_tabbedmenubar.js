@@ -160,17 +160,31 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
     var space = (this.tabView.width - 200) / 6;
     var left = args.index * (40 + space);
 
+    var selectedImage = args.selectedImage;
+    var deselectedImage = args.deselectedImage;
+    if (StatusNet.Platform.dpi == 240) {
+        // Hack for high-resolution Android systems;
+        // for now manually load the 320-dpi images
+        // for iPhone 4 and let them scale down to fit,
+        // looks nicer than scaling up the 160-dpi
+        // default icons!
+        selectedImage = selectedImage.replace(/\./, '@2x.');
+        deselectedImage = deselectedImage.replace(/\./, '@2x.');
+    }
+
     var minitab = Ti.UI.createImageView({
-        image:args.deselectedImage,
-        left: left + space,
-        height: 40,
-        width: 40
+        image: deselectedImage,
+        left: Math.round(left + space),
+        height: 30,
+        width: 30,
+        canScale: true,
+        enableZoomControls: false // for Android
     });
 
     minitab.index = args.index;
     minitab.name = args.name;
-    minitab.deselectedImage = args.deselectedImage;
-    minitab.selectedImage = args.selectedImage;
+    minitab.deselectedImage = deselectedImage;
+    minitab.selectedImage = selectedImage;
 
     var that = this;
 
