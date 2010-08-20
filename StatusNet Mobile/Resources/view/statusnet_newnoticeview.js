@@ -193,7 +193,14 @@ StatusNet.NewNoticeView.prototype.init = function() {
     });
     controlStrip.add(moreButton);
 
+    this.actInd = Titanium.UI.createActivityIndicator();
+    this.actInd.message = 'Sending...';
+
     if (StatusNet.Platform.isApple()) {
+        // iPhone specific activity indicator niceties
+        this.actInd.style = Titanium.UI.iPhone.ActivityIndicatorStyle.BIG;
+
+
         // Setting focus to the textarea doesn't show the keyboard
         // on Android for some reason. Leave it unfocused there so
         // the first tap in will set focus and open the keyboard.
@@ -202,6 +209,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
             noticeTextArea.focus();
         });
     }
+
+    window.add(this.actInd);
+
     StatusNet.Platform.animatedOpen(window);
 
     StatusNet.debug("NewNoticeView.init END");
@@ -261,7 +271,7 @@ StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
  * @param width
  * @param height
  * @param max longest side to resize to
- * 
+ *
  * @return object dictionary with width, height, and media containing a Titanium.Blob
  *
  * @access private
@@ -322,7 +332,7 @@ StatusNet.NewNoticeView.prototype.resizePhoto = function(media, width, height, m
     if (StatusNet.Platform.isAndroid()) {
         this.window.remove(imageView);
     }
-    
+
     // Then to add insult to injury, on Android it doesn't give us
     // a TiBlob directly, but rather an event object similar to when
     // we fetch directly from the camera. Yeah, doesn't make sense
@@ -398,6 +408,8 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
         params.media = this.attachment;
     }
 
+    this.actInd.show();
+
     StatusNet.debug("Sending these post parameters: " + params);
 
     this.account.apiPost(method, params,
@@ -407,6 +419,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
                 StatusNet.debug("Posted notice " + id);
             }
 
+            that.actInd.hide();
             // play notice posted sound
             that.window.close();
 
