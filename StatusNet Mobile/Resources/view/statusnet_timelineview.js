@@ -138,7 +138,7 @@ StatusNet.TimelineView.prototype.init = function() {
     }
 
     StatusNet.debug("TimelineView: Finished adding activity indicator");
-    
+
 };
 
 /**
@@ -231,7 +231,7 @@ StatusNet.TimelineView.prototype.localAuthor = function(uri) {
 StatusNet.TimelineView.prototype.showHeader = function () {
     var title = this.title.replace("{name}", this.client.account.username)
                            .replace("{site}", this.client.account.getHost());
-                           
+
     this.client.setMainWindowTitle(title);
 
     //$("#header").html("<h1></h1>");
@@ -266,6 +266,53 @@ StatusNet.TimelineView.prototype.hideSpinner = function() {
 StatusNet.TimelineView.prototype.showEmptyTimeline = function() {
     StatusNet.debug('TimelineView.showEmptyTimeline - firing StatusNet_showEmptyTimelineMsg');
     Titanium.App.fireEvent('StatusNet_showEmptyTimelineMsg');
+};
+
+/**
+ * Show a confirm dialog
+ *
+ * XXX: I probably made this too complicated
+ *
+ * @param string    msg             the msg to display
+ * @param function  onConfirm       what to do if the user confirms
+ * @param function  onCanceldo      this if the user cancels
+ * @param string    confirmTitle    title of the confirm button
+ * @param string    cancelTitle     title of the cancel button
+ */
+StatusNet.TimelineView.prototype.showConfirmDialog = function(msg, onConfirm, onCancel, confirmTitle, cancelTitle)
+{
+    if (!confirmTitle) {
+        confirmTitle = 'Yes';
+    }
+
+    if (!cancelTitle) {
+        cancelTitle = 'No';
+    }
+
+    var confirmDialog = Titanium.UI.createOptionDialog({
+        options: [confirmTitle, cancelTitle],
+        destructive: 0,
+        cancel: 1
+    });
+
+    if (msg) {
+        confirmDialog.title = msg;
+    }
+
+    confirmDialog.addEventListener('click', function(e)
+    {
+        if (e.index == 0) {
+            if (onConfirm) {
+                onConfirm();
+            }
+        } else {
+            if (onCancel) {
+                onCancel();
+            }
+        }
+    });
+
+    confirmDialog.show();
 };
 
 /**

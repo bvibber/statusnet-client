@@ -141,7 +141,19 @@ StatusNet.Client.prototype.initInternalListeners = function() {
 
     Ti.App.addEventListener('StatusNet_deleteNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
-        that.deleteNotice(event.noticeId);
+
+        // Delete dialog looks better on Android with a confirm message,
+        // but it looks better on iPhone without one
+
+        if (StatusNet.Platform.isAndroid()) {
+            that.getActiveView().showConfirmDialog('Really delete notice?', function() {
+                that.deleteNotice(event.noticeId);
+            }, null, 'Yes', 'No');
+        } else {
+            that.getActiveView().showConfirmDialog(null, function() {
+                that.deleteNotice(event.noticeId);
+            }, null, 'Delete Notice', 'Cancel');
+        }
     });
 
     Ti.App.addEventListener('StatusNet_tabSelected', function(event) {
@@ -403,16 +415,11 @@ StatusNet.Client.prototype.deleteNotice = function(noticeId) {
     this.account.apiPost(method, params,
         function(status, response) {
             StatusNet.debug("Deleted notice " + noticeId);
-            // @fixme show some kind of output
-            //StatusNet.Infobar.flashMessage("Deleted notice " + noticeId);
+            StatusNet.Infobar.flashMessage("Deleted notice " + noticeId);
             Titanium.App.fireEvent('StatusNet_deleteNoticeComplete', {noticeId: noticeId});
-            alert("Deleted notice " + noticeId);
             that.timeline.decacheNotice(noticeId);
-            that.view.removeNotice(noticeId);
          },
          function(status, response) {
-             //$(linkDom).removeAttr('disabled');
-            // @fixme send a notification back to the timeline?
              var msg = $(response).find('error').text();
              if (msg) {
                  StatusNet.debug("Error deleting notice " + noticeId + " - " + msg);
