@@ -287,19 +287,6 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     });
     window.add(this.fields.status);
 
-    if (!StatusNet.Platform.hasNavBar()) {
-        // No native nav bar for our save/cancel buttons?
-        // Put them in the dialog area.
-        var xview = Titanium.UI.createView();
-        save.left = 10;
-        save.width = 100;
-        cancel.width = 100;
-        cancel.left = 120;
-        xview.add(save);
-        xview.add(cancel);
-        window.add(xview);
-    }
-
     StatusNet.Platform.animatedOpen(window);
 };
 
