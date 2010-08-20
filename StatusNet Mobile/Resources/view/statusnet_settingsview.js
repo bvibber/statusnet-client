@@ -21,7 +21,7 @@
 StatusNet.SettingsView = function(client) {
 
     var db = StatusNet.getDB();
-    this.accounts = StatusNet.Account.listAll(db);
+    this.accounts = [];
     this.workAcct = null;
     this.updateTimeout = null;
     this.lastUsername = '';
@@ -106,7 +106,8 @@ StatusNet.SettingsView.prototype.init = function() {
 
 
 
-
+    if (StatusNet.Platform.isApple()) {
+        // @fixme perhaps just use the native thingy here?
         // Create-account button
         var create = Titanium.UI.createButton({
             title: '+'
@@ -128,8 +129,7 @@ StatusNet.SettingsView.prototype.init = function() {
             title: 'Edit'
         });
         var cancel = Titanium.UI.createButton({
-            title: 'Cancel',
-            style: Titanium.UI.iPhone.SystemButtonStyle.DONE
+            title: 'Cancel'
         });
         edit.addEventListener('click', function() {
             view.navbar.setLeftNavButton(cancel);
@@ -143,26 +143,10 @@ StatusNet.SettingsView.prototype.init = function() {
         // ...and plop them onto the tab header.
         this.navbar.setLeftNavButton(edit);
         this.navbar.setRightNavButton(create);
-/*
-    } else {
-        // No native navigation bar on Android.
-
-        // Stick an 'add account' item at the top of the list, similar to
-        // the default Android browser's bookmarks list.
-        var row = Titanium.UI.createTableViewRow({
-            title: 'Add account...',
-            height: 'auto',
-            acct: "add-stub"
-        });
-        this.rows.push(row);
-        //this.table.appendRow(row);
-
-        // @fixme -- add a way to remove items!
     }
-*/
+
     // Now let's fill out the table!
-    this.showAccounts();
-    view.table.setData(view.rows);
+    view.showAccounts();
 
     if (this.accounts.length > 0) {
         // We do the slide-up animation manually rather than
@@ -190,10 +174,11 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     navbar = StatusNet.Platform.createNavBar(window);
 
     window.addEventListener('close', function() {
-        // Update the views in the list
-        view.table.setData(view.rows);
         // if the main accounts view wasn't already open...
         view.window.open();
+
+        // Update the views in the list
+        view.showAccounts();
     });
     var cancel = Titanium.UI.createButton({
         title: "Cancel"
@@ -323,19 +308,27 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
  */
 StatusNet.SettingsView.prototype.showAccounts = function() {
     StatusNet.debug('SettingsView.showAccounts');
-    if (this.accounts.length == 0) {
-        //this.showAddAccount();
-    } else {
-        for (var i = 0; i < this.accounts.length; i++) {
-            this.addAccountRow(this.accounts[i]);
-        }
-        // crappy temp hack -- single row is hidden on android
-        /*
-        if (android && this.accounts.length == 1) {
-            this.table.appendRow({});
-        }
-        */
+
+    this.accounts = StatusNet.Account.listAll(db);
+    this.rows = [];
+    for (var i = 0; i < this.accounts.length; i++) {
+        this.addAccountRow(this.accounts[i]);
     }
+
+    if (StatusNet.Platform.isAndroid()) {
+        // No native navigation bar on Android.
+
+        // Stick an 'add account' item at the top of the list, similar to
+        // the default Android browser's bookmarks list.
+        var row = Titanium.UI.createTableViewRow({
+            title: 'Add account...',
+            height: 'auto',
+            acct: "add-stub"
+        });
+        this.rows.push(row);
+    }
+
+    this.table.setData(this.rows);
 };
 
 /**
@@ -392,7 +385,31 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
     });
     row.add(label);
 
-    //this.table.appendRow(row);
+    if (StatusNet.Platform.isAndroid()) {
+        var that = this;
+
+        // There's no native tableview editing system on Android.
+        // Set up a long-click handler to give a delete option.
+        StatusNet.Platform.setupLongClick(row, function() {
+            var dialog = Titanium.UI.createOptionDialog({
+                destructive: 0,
+                cancel: 1,
+                options: ['Delete account', 'Cancel'],
+                title: title + ' options'
+            });
+            dialog.addEventListener('click', function(event) {
+                if (event.index == 0) {
+                    StatusNet.debug('Attempting to delete account: ' + acct.username + '@' + acct.getHost());
+                    acct.deleteAccount();
+                    that.showAccounts();
+                } else {
+                    StatusNet.debug('Account delete canceled.');
+                }
+            });
+            dialog.show();
+        });
+    }
+
     this.rows.push(row);
     StatusNet.debug('show account row done.');
 };

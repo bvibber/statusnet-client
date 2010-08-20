@@ -298,3 +298,63 @@ if (typeof Titanium.XML.serializeToString == "function") {
      */
     StatusNet.Platform.serializeXml = Titanium.XML.serializeToString;
 }
+
+StatusNet.Platform.setupLongClick = function(view, callback)
+{
+    var timer = null;
+    var startEvent = null;
+    var touchTimeout = 2000; // Hold for 2 seconds.
+
+    // Hrmmmm in this multitouch world is this gonna cut it?
+    view.addEventListener('touchstart', function(event) {
+        StatusNet.debug('startEvent is: ' + startEvent);
+        StatusNet.debug('timer is: ' + timer);
+        if (startEvent) {
+            // uhhhhhh?
+            StatusNet.debug('long click restarted during run?...');
+            /*
+            clearTimeout(timer);
+            timer = null;
+            startEvent = null;
+            return true;
+            */
+           return true;
+        }
+
+        startEvent = event;
+        timer = setTimeout(function() {
+            StatusNet.debug('long click triggered!');
+            timer = null;
+            startEvent = null;
+            callback.call(view, {
+                globalPoint: event.globalPoint,
+                source: event.source,
+                type: 'longclick',
+                x: event.x,
+                y: event.y
+            });
+            startEvent = null;
+        }, touchTimeout);
+
+        StatusNet.debug('long click timer started...');
+        return true;
+    });
+    view.addEventListener('touchcancel', function(event) {
+        if (startEvent) {
+            StatusNet.debug('long click canceled.');
+            clearTimeout(timer);
+            timer = null;
+            startEvent = null;
+        }
+        return true;
+    });
+    view.addEventListener('touchend', function(event) {
+        if (startEvent) {
+            StatusNet.debug('long click ended early');
+            clearTimeout(timer);
+            timer = null;
+            startEvent = null;
+        }
+        return true;
+    });
+}
