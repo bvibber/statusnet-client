@@ -363,19 +363,22 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
             top: 0,
             left: 0,
             width: 56,
-            height: 56
+            height: 56,
+            canScale: true, // for Android
+            enableZoomControls: false // for Android
         });
         row.add(avatar);
     }
 
-    // @fixme the scaling to this resolution doesn't seem to work on Android
     if (acct.siteLogo) {
         var logo = Titanium.UI.createImageView({
             image: acct.siteLogo,
             top: 40,
             left: 40,
             width: 24,
-            height: 24
+            height: 24,
+            canScale: true, // for Android
+            enableZoomControls: false // for Android
         });
         row.add(logo);
     }
