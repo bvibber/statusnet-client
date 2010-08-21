@@ -55,35 +55,19 @@ StatusNet.SettingsView.prototype.init = function() {
         top: this.navbar.height
     });
     this.table.addEventListener('click', function(event) {
-        StatusNet.debug('Got a click event on the table view.');
         // Selected an account
-        StatusNet.debug('QQQ: event: ' + event);
-        StatusNet.debug('QQQ: event.rowData: ' + event.rowData);
-        StatusNet.debug('QQQ: event.rowData.acct: ' + event.rowData.acct);
 
         if (event.rowData.acct == "add-stub") {
             // Special case!
-            // @fixme need a better way to close-modal-and-open-other-modal smoothly
-            //window.close();
-            //setTimeout(function() {
             view.showAddAccount();
-            //}, 500);
             return;
         }
 
-        StatusNet.debug('QQQ: event.rowData.acct.id: ' + event.rowData.acct.id);
-
-        //var acct = event.rowData.acct;
-        var x = event.rowData.acct;
-        //var acct = new StatusNet.Account(x.username, x.password, x.apiroot);
-        var acct = StatusNet.Account.getById(x.id);
-
         // hack -- on Android, we don't seem to get the original object back
         // but only have its properties, so all the methods are missing.
-        StatusNet.debug('QQQ: acct.username: ' + acct.username);
-        StatusNet.debug('QQQ: acct.ensure: ' + acct.ensure);
-        StatusNet.debug('QQQ: acct.getHost: ' + acct.getHost);
-        StatusNet.debug('QQQ: acct.getHost(): ' + acct.getHost());
+        var x = event.rowData.acct;
+        var acct = StatusNet.Account.getById(x.id);
+
         StatusNet.debug('Attempting to select account: ' + acct.username + '@' + acct.getHost());
         acct.setDefault(StatusNet.getDB());
         StatusNet.debug('Saved!');
@@ -132,17 +116,16 @@ StatusNet.SettingsView.prototype.init = function() {
             title: 'Cancel'
         });
         edit.addEventListener('click', function() {
-            view.navbar.setLeftNavButton(cancel);
+            view.navbar.setRightNavButton(cancel);
             view.table.editing = true;
         });
         cancel.addEventListener('click', function() {
-            view.navbar.setLeftNavButton(edit);
+            view.navbar.setRightNavButton(edit);
             view.table.editing = false;
         });
 
         // ...and plop them onto the tab header.
-        this.navbar.setLeftNavButton(edit);
-        this.navbar.setRightNavButton(create);
+        this.navbar.setRightNavButton(edit);
     }
 
     // Now let's fill out the table!
@@ -302,18 +285,44 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
         this.addAccountRow(this.accounts[i]);
     }
 
-    if (StatusNet.Platform.isAndroid()) {
-        // No native navigation bar on Android.
+    // Stick an 'add account' item at the top of the list, similar to
+    // the default Android browser's bookmarks list.
+    var row = Titanium.UI.createTableViewRow({
+        height: 64,
+        acct: "add-stub"
+    });
 
-        // Stick an 'add account' item at the top of the list, similar to
-        // the default Android browser's bookmarks list.
-        var row = Titanium.UI.createTableViewRow({
-            title: 'Add account...',
-            height: 'auto',
-            acct: "add-stub"
-        });
-        this.rows.push(row);
+    var variant = '';
+    if (StatusNet.Platform.isAndroid()) {
+        if (StatusNet.Platform.dpi == 240) {
+            variant = '-android-high';
+        } else {
+            variant = '-android-medium';
+        }
     }
+    var avatar = Titanium.UI.createImageView({
+        image: 'images/settings/add-account' + variant + '.png',
+        top: 8,
+        left: 8,
+        width: 48,
+        height: 48,
+        canScale: true, // for Android
+        enableZoomControls: false // for Android
+    });
+    row.add(avatar);
+
+    var label = Titanium.UI.createLabel({
+        text: 'Add account...',
+        left: 80,
+        top: 0,
+        bottom: 0,
+        right: 0,
+        font: {
+            fontSize: 18
+        }
+    });
+    row.add(label);
+    this.rows.push(row);
 
     this.table.setData(this.rows);
 };
@@ -368,7 +377,11 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
         left: 80,
         top: 0,
         bottom: 0,
-        right: 0
+        right: 0,
+        font: {
+            fontWeight: acct.is_default ? 'bold' : 'normal',
+            fontSize: 18
+        }
     });
     row.add(label);
 
