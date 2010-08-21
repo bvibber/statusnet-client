@@ -176,7 +176,7 @@ renderNotice = function(notice, user) {
         authorId = user.id;
         authorUri = user.link;
     } else {
-        avatar = notice.avatar;
+        avatar = (notice.cachedAvatar) ? notice.cachedAvatar : notice.avatar;
         author = notice.author;
         authorId = notice.authorId;
         auuthorUri = notice.authorUri;

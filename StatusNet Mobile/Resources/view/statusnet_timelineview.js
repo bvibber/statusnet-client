@@ -171,14 +171,14 @@ StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
     // return any kind of useable application data directory that can 
     // used for caching, so we'll only cache avatars on iPhone for now.
     
-    if (StatusNet.Platform.isApple()) {
+    if (StatusNet.Platform.isAndroid()) {
     
-        StatusNet.debug("TimelineView.appendTimelineNotice - checking for cached avatar...");
+        StatusNet.debug("TimelineView.appendTimelineNotice - checking for cached version of avatar: " + notice.avatar);
     
         var cachedAvatar = this.client.getActiveTimeline().lookupAvatar(notice.avatar);
 
         if (cachedAvatar) {
-            notice.avatar = cachedAvatar;
+            notice.cachedAvatar = cachedAvatar;
         }
     }
     
