@@ -318,9 +318,35 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
-    var accountsButton = Titanium.UI.createButton({
-        title: "Accounts"
+    var accountsButton = Titanium.UI.createView({
+        width: 240,
+        height: 44
     });
+    if (acct.avatar) {
+        var selfAvatar = Titanium.UI.createImageView({
+            image: acct.avatar,
+            width: 40,
+            height: 40,
+            top: 2,
+            left: 0,
+            canScale: true,
+            enableZoomControl: false
+        });
+        accountsButton.add(selfAvatar);
+    }
+    var selfLabel = Titanium.UI.createLabel({
+        text: acct.username + '@' + acct.getHost(),
+        left: 44,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        color: "white",
+        font: {
+            fontSize: 18
+        },
+        minimumFontSize: 8
+    });
+    accountsButton.add(selfLabel);
 
     accountsButton.addEventListener('click', function() {
         StatusNet.debug('showSettings!');

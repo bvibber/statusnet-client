@@ -254,7 +254,9 @@ StatusNet.Platform.createNavBar = function(window) {
                 button.left = 4;
                 button.top = 4;
                 button.bottom = 4;
-                button.width = 75;
+                if (!button.width) {
+                    button.width = 75;
+                }
                 navbar._view.add(button);
             }
             navbar._left = button;
@@ -267,7 +269,9 @@ StatusNet.Platform.createNavBar = function(window) {
                 button.right = 4;
                 button.top = 4;
                 button.bottom = 4;
-                button.width = 50;
+                if (!button.width) {
+                    button.width = 50;
+                }
                 navbar._view.add(button);
             }
             navbar._right = button;
