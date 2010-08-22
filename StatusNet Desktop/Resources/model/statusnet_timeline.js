@@ -162,40 +162,46 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
 
 /**
  * Add a notice to the Timeline if it's not already in it. Also
- * adds it to the notice cache.
+ * adds it to the notice cache, and notifies the view to display it.
  *
  * @param DOM     entry              the Atom entry form of the notice
  * @param boolean prepend            whether to add it to the beginning of end of
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications) {
-StatusNet.debug('Timeline.addNotice enter:');
-    var notice = StatusNet.AtomParser.noticeFromEntry(entry);
+StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications, callback) {
+    StatusNet.debug('Timeline.addNotice enter:');
+    var that = this;
+    StatusNet.AtomParser.asyncParse(entry, function(notice) {
 
-    // Dedupe here?
-    for (i = 0; i < this._notices.length; i++) {
-        if (this._notices[i].id === notice.id) {
-            StatusNet.debug("skipping duplicate notice: " + notice.id);
-            return;
+        // Dedupe here?
+        for (i = 0; i < that._notices.length; i++) {
+            if (that._notices[i].id === notice.id) {
+                StatusNet.debug("skipping duplicate notice: " + notice.id);
+                return;
+            }
         }
-    }
 
-    if (notice.id !== undefined) {
-        if (this.cacheable()) {
-            StatusNet.debug("encached notice: " + notice.id);
-            this.encacheNotice(notice.id, entry);
+        if (notice.id !== undefined) {
+            if (that.cacheable()) {
+                StatusNet.debug("encached notice: " + notice.id);
+                that.encacheNotice(notice.id, entry);
+            }
         }
-    }
 
-    StatusNet.debug("addNotice - finished encaching notice");
+        StatusNet.debug("addNotice - finished encaching notice");
 
-    if (prepend) {
-        this._notices.unshift(notice);
-        this.noticeAdded.notify({notice: notice, notifications: notifications});
-    } else {
-        this._notices.push(notice);
-    }
-StatusNet.debug('Timeline.addNotice DONE.');
+        if (prepend) {
+            that._notices.unshift(notice);
+            that.noticeAdded.notify({notice: notice, notifications: notifications});
+        } else {
+            that._notices.push(notice);
+        }
+
+        if (callback) {
+            callback.call(notice, notice);
+        }
+        StatusNet.debug('Timeline.addNotice DONE.');
+    });
 };
 
 /**
@@ -224,23 +230,27 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             });
             StatusNet.debug('Timeline.update finished entry push loop.');
 
-            entries.reverse(); // keep correct notice order
+            // Start with the most recent, so the user can scroll down and read
+            // while we work if parsing/display is slow.
+            entries.reverse();
 
-            StatusNet.debug('Timeline.update starting addNotice loop:');
-            for (var i = 0; i < entries.length; i++) {
-                StatusNet.debug('Timeline.update starting addNotice loop ' + i);
+            for (var i = 0; i < entries.length - 1; i++) {
                 that.addNotice(entries[i], true, notifications);
+            }
+            if (entries.length > 0) {
+                that.addNotice(entries[entries.length - 1], true, notifications, function() {
+                    that.updateFinished.notify({notice_count: entries.length});
+
+                    if (onFinish) {
+                        onFinish(entries.length);
+                    }
+                    StatusNet.debug('Timeline.update calling finishedFetch...');
+                    that.finishedFetch(entries.length);
+                    StatusNet.debug('Timeline.update DONE.');
+                });
             }
             StatusNet.debug('Timeline.update finished addNotice loop.');
 
-            that.updateFinished.notify({notice_count: entries.length});
-
-            if (onFinish) {
-                onFinish(entries.length);
-            }
-            StatusNet.debug('Timeline.update calling finishedFetch...');
-            that.finishedFetch(entries.length);
-            StatusNet.debug('Timeline.update DONE.');
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);

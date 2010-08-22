@@ -70,6 +70,9 @@ StatusNet.Client.prototype.refresh = function() {
 StatusNet.Client.prototype.init = function() {
     StatusNet.debug("Client init");
     var client = this;
+    
+    StatusNet.debug("StatusNet.Client.prototype.init - Setting up bg parser...");
+    StatusNet.AtomParser.prepBackgroundParse();
 
     StatusNet.debug("StatusNet.Client.prototype.init - Checking for account...");
     if (!this.account) {

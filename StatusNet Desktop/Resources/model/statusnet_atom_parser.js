@@ -117,6 +117,57 @@ if (typeof Titanium.Statusnet != "undefined") {
     }
 }
 
+StatusNet.AtomParser.prepBackgroundParse = function()
+{
+    var window = Titanium.UI.createWindow({
+        url: 'statusnet_background_parser.js'
+    });
+    window.open();
+}
+
+/**
+ * Pass XML source for an individual entry or whole feed to background thread
+ * for parsing; each found notice will be passed back to the onEntry callback
+ * along with its XML string source. The onComplete callback is then called
+ * once the batch is complete.
+ *
+ * @param xmlString source XML for a feed or entry
+ * @param onEntry function(notice, xmlString)
+ * @param onComplete function()
+ */
+StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onComplete) {
+    // Ok, this is... fun. :)
+    // We can't send live objects like DOM nodes or callbacks across JS contexts,
+    // so we have to pass the source XML string into the parser's queue and let
+    // it post back to this context so we can call the callbacks.
+    Titanium.App.fireEvent('StatusNet.AtomParser.asyncParse', {entry: entry, callback: callback});
+    
+    var entryKey = 'StatusNet.background.entry' + Math.random();
+    var feedKey = 'StatusNet.background.feed' + Math.random();
+
+    Titanium.App.addEventListener(feedKey, function(event) {
+        // Triggered in main context for each entry...
+        if (onEntry) {
+            onEntry.call(event.notice, event.xmlString);
+        }
+    });
+
+    Titanium.App.addEventListener(feedKey, function(event) {
+        // Triggered in main context after the processing is complete...
+        // Clean up, and call our callback.
+        Titanium.App.removeEventListener(entryKey);
+        Titanium.App.removeEventListener(feedKey);
+        if (onComplete) {
+            onComplete.call();
+        }
+    });
+
+    Titanium.App.fireEvent('StatusNet.background.process', {
+        xmlString: xmlString,
+        entryKey: entryKey,
+        feedKey: feedKey
+    });
+};
 
 /**
  * Class method for generating a notice from an Atom entry
@@ -136,8 +187,6 @@ var startTime = Date.now();
     }
 
     var notice = {};
-
-Titanium.API.info('noticeFromEntry CHECKPOINT A: ' + (Date.now() - startTime) + 'ms');
 
     // STUFF IN THE <entry>
     var idRegexp = /(\d)+$/;
