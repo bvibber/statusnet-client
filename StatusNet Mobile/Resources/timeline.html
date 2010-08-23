@@ -27,6 +27,7 @@ var notices = [];
 
 // App-wide event registration, whee!
 Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
+    notices = [];
     activeNotice = null;
     clientAccountUsername = event.clientAccountUsername;
     $('#header').empty();
@@ -37,6 +38,7 @@ Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
 // str manip stolen from humane.js
 function strtotime(date_str) {
 	var time = ('' + date_str).replace(/-/g,"/").replace(/[TZ]/g," ");
+	Titanium.API.debug('date string... ' + date_str + ' -> ' + time + ' -> ' + (new Date(time).getTime()));
 	return new Date(time).getTime();
 }
 
@@ -49,12 +51,14 @@ function strtotime(date_str) {
 function findNextNewerNotice(notice) {
     var candidate = null, candidateTS = null;
     var targetTS = strtotime(notice.updated);
+    Titanium.API.debug('COMPARE: ' + targetTS + ' <- ' + notice.updated + " (this)");
     for (var i = 1; i < notices.length; i++) {
-        var thisTS = strtotime(notices[i].date);
-        if (thisTS < targetTS) {
+        var thisTS = strtotime(notices[i].updated);
+        Titanium.API.debug('COMPARE: ' + thisTS + ' <- ' + notices[i].updated);
+        if (thisTS <= targetTS) {
             continue;
         }
-        if (candidate && thisTS > candidateTS) {
+        if (candidate && thisTS < candidateTS) {
             continue;
         }
         candidate = notices[i];
@@ -66,11 +70,13 @@ function findNextNewerNotice(notice) {
 var insertNoticeHandler = function(event) {
     var notice = objectOrJson(event.notice);
     var html = renderNotice(notice);
-    var nextOldest = findNextNewerNotice(notice.id);
-    if (nextOldest) {
-        $(html).insertAfter("#notice-" + nextOldest.id);
+    var next = findNextNewerNotice(notice);
+    if (next) {
+        $(html).insertAfter("#notice-" + next.id);
+        Titanium.API.debug("QQQQQQQQ: have next; appending this: " + notice.id + " " + notice.updated + " after existing " + next.id + " " + next.updated);
     } else {
         $("#notices").prepend(html);
+        Titanium.API.debug("QQQQQQQQ: no next; prepending to top: " + notice.id + " " + notice.updated);
     }
     notices.push(notice);
     enableNoticeControls(document.getElementById('notice-' + notice.id));
@@ -248,6 +254,10 @@ renderNotice = function(notice, user) {
 enableNoticeControls = function(noticeDom) {
     var $notice = $(noticeDom);
     var name = $notice.attr('name');
+    if (!name) {
+        Titanium.API.debug('ARGH! got bogus name in enableNoticeControls');
+        return false;
+    }
     var noticeId = name.substring(7); // notice-
 
     name = $notice.find('a.author').attr('name');
@@ -468,11 +478,16 @@ showProfileHeader = function(user, extended, authorId) {
 };
 
 
+resetTimeline = function() {
+    notices = [];
+    $('#notices').empty();
+};
+
 /**
  * Show this if the timeline is empty
  */
 showEmptyTimeline = function() {
-    $('#notices').empty();
+    resetTimeline();
     $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
 };
 
