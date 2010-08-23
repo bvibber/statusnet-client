@@ -35,6 +35,7 @@ StatusNet.Client = function(_account) {
     }
 
     this.account = _account;
+    this.webViewReady = false;
 
     this.init();
 
@@ -70,9 +71,6 @@ StatusNet.Client.prototype.refresh = function() {
 StatusNet.Client.prototype.init = function() {
     StatusNet.debug("Client init");
     var client = this;
-    
-    StatusNet.debug("StatusNet.Client.prototype.init - Setting up bg parser...");
-    StatusNet.AtomParser.prepBackgroundParse();
 
     StatusNet.debug("StatusNet.Client.prototype.init - Checking for account...");
     if (!this.account) {
@@ -97,8 +95,11 @@ StatusNet.Client.prototype.init = function() {
             StatusNet.debug("Done checking out the shake.");
         });
 
-        client.initInternalListeners();
-        client.initAccountView(this.account);
+        // Set up communications between the core code and the
+        // timeline view WebView... once it's set up on the
+        // receive end, we'll continue.
+        this.initInternalListeners();
+        this.initAccountView(this.account);
     }
 };
 
@@ -110,6 +111,7 @@ StatusNet.Client.prototype.initInternalListeners = function() {
 
     Ti.App.addEventListener('StatusNet_timelineReady', function(event) {
         StatusNet.debug('YAY GOT StatusNet_timelineReady EVENT! ' + event);
+        that.webViewReady = true;
     });
 
     Ti.App.addEventListener('StatusNet_externalLink', function(event) {
@@ -312,22 +314,19 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
     var that = this;
 
-    if (this.mainwin) {
-        this.mainwin.close();
-    }
-    this.mainwin = Titanium.UI.createWindow({
-        backgroundColor:'#fff'
-    });
+    if (!this.mainwin) {
+        this.mainwin = Titanium.UI.createWindow({
+            backgroundColor:'#fff',
+            navBarHidden: true
+        });
 
-    this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
+        this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
-    var accountsButton = Titanium.UI.createView({
-        width: 240,
-        height: 44
-    });
-    if (acct.avatar) {
-        var selfAvatar = Titanium.UI.createImageView({
-            image: acct.avatar,
+        var accountsButton = Titanium.UI.createView({
+            width: 240,
+            height: 44
+        });
+        var selfAvatar = this.selfAvatar = Titanium.UI.createImageView({
             width: 40,
             height: 40,
             top: 2,
@@ -336,73 +335,88 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
             enableZoomControl: false
         });
         accountsButton.add(selfAvatar);
+        var selfLabel = this.selfLabel = Titanium.UI.createLabel({
+            left: 44,
+            right: 0,
+            top: 0,
+            bottom: 0,
+            color: "white",
+            font: {
+                fontSize: 18
+            },
+            minimumFontSize: 8
+        });
+        accountsButton.add(selfLabel);
+
+        this.setAccountLabel();
+
+        accountsButton.addEventListener('click', function() {
+            StatusNet.debug('showSettings!');
+            var settingsView = new StatusNet.SettingsView(that);
+            settingsView.init();
+        });
+
+        this.navbar.setLeftNavButton(accountsButton);
+
+        var updateButton = Titanium.UI.createButton({
+            title: "New",
+            systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
+        });
+
+        updateButton.addEventListener('click', function() {
+            that.newNoticeDialog();
+        });
+
+        this.navbar.setRightNavButton(updateButton);
+
+        var tabinfo = {
+            'public': {deselectedImage: 'images/tabs/new/public.png', selectedImage: 'images/tabs/new/public_on.png', name: 'public'},
+            'friends': {deselectedImage: 'images/tabs/new/friends.png', selectedImage: 'images/tabs/new/friends_on.png', name: 'friends'},
+            'mentions': {deselectedImage: 'images/tabs/new/mentions.png', selectedImage: 'images/tabs/new/mentions_on.png', name: 'mentions'},
+            'profile': {deselectedImage: 'images/tabs/new/profile.png', selectedImage: 'images/tabs/new/profile_on.png', name: 'user'},
+            'favorites': {deselectedImage: 'images/tabs/new/favorites.png', selectedImage: 'images/tabs/new/favorites_on.png', name: 'favorites'},
+            'inbox': {deselectedImage: 'images/tabs/new/inbox.png', selectedImage: 'images/tabs/new/inbox_on.png', name: 'inbox'},
+            'search': {deselectedImage: 'images/tabs/new/search.png', selectedImage: 'images/tabs/new/search_on.png', name: 'search'}
+        };
+
+        this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, 1);
+
+        this.webview = Titanium.UI.createWebView({
+            top: that.navbar.height,
+            left: 0,
+            right: 0,
+            bottom: this.toolbar.height,
+            scalesPageToFit: false,
+            url: "timeline.html",
+            backgroundColor: 'black'
+        });
+        this.mainwin.add(this.webview);
+
+        // Prep a listener for when the webview has loaded, so we know it's
+        // safe to start work...
+        this.webViewReady = false;
+        var onReady = function() {
+            Titanium.App.removeEventListener('StatusNet_timelineReady', onReady);
+            that.webViewReady = true;
+            that.switchView('friends');
+            StatusNet.debug('initAccountView (delayed) done.');
+        };
+        Titanium.App.addEventListener('StatusNet_timelineReady', onReady);
+
+        this.mainwin.open();
+        StatusNet.debug('initAccountView delaying to wait for timeline...');
+    } else {
+        this.setAccountLabel();
+        this.switchView('friends');
+        StatusNet.debug('initAccountView DONE!');
     }
-    var selfLabel = Titanium.UI.createLabel({
-        text: acct.username + '@' + acct.getHost(),
-        left: 44,
-        right: 0,
-        top: 0,
-        bottom: 0,
-        color: "white",
-        font: {
-            fontSize: 18
-        },
-        minimumFontSize: 8
-    });
-    accountsButton.add(selfLabel);
 
-    accountsButton.addEventListener('click', function() {
-        StatusNet.debug('showSettings!');
-        var settingsView = new StatusNet.SettingsView(that);
-        settingsView.init();
-    });
-
-    this.navbar.setLeftNavButton(accountsButton);
-
-    var updateButton = Titanium.UI.createButton({
-        title: "New",
-        systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
-    });
-
-    updateButton.addEventListener('click', function() {
-        that.newNoticeDialog();
-    });
-
-    this.navbar.setRightNavButton(updateButton);
-
-    var tabinfo = {
-        'public': {deselectedImage: 'images/tabs/new/public.png', selectedImage: 'images/tabs/new/public_on.png', name: 'public'},
-        'friends': {deselectedImage: 'images/tabs/new/friends.png', selectedImage: 'images/tabs/new/friends_on.png', name: 'friends'},
-        'mentions': {deselectedImage: 'images/tabs/new/mentions.png', selectedImage: 'images/tabs/new/mentions_on.png', name: 'mentions'},
-        'profile': {deselectedImage: 'images/tabs/new/profile.png', selectedImage: 'images/tabs/new/profile_on.png', name: 'user'},
-        'favorites': {deselectedImage: 'images/tabs/new/favorites.png', selectedImage: 'images/tabs/new/favorites_on.png', name: 'favorites'},
-        'inbox': {deselectedImage: 'images/tabs/new/inbox.png', selectedImage: 'images/tabs/new/inbox_on.png', name: 'inbox'},
-        'search': {deselectedImage: 'images/tabs/new/search.png', selectedImage: 'images/tabs/new/search_on.png', name: 'search'}
-    };
-
-    this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, 1);
-
-    this.webview = Titanium.UI.createWebView({
-        top: that.navbar.height,
-        left: 0,
-        right: 0,
-        bottom: this.toolbar.height,
-        scalesPageToFit: false,
-        url: "timeline.html",
-        backgroundColor: 'black'
-    });
-
-    this.mainwin.add(this.webview);
-
-    setTimeout(function() {
-        that.mainwin.open();
-    }, 1000);
-
-    this.switchView('friends');
-
-    StatusNet.debug('initAccountView done.');
 };
 
+StatusNet.Client.prototype.setAccountLabel = function() {
+    this.selfAvatar.image = this.account.avatar;
+    this.selfLabel.text = this.account.username + '@' + this.account.getHost();
+}
 
 /**
  * Show notice input dialog

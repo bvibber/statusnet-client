@@ -50,6 +50,8 @@ for (var i = 0; i < sources.length; i++) {
 // this sets the background color of the master UIView (when there are no windows/tab groups on it)
 Titanium.UI.setBackgroundColor('#000');
 
+StatusNet.debug("Setting up background parser context...");
+StatusNet.AtomParser.prepBackgroundParse();
 
 // Initialize database
 var db = StatusNet.getDB();

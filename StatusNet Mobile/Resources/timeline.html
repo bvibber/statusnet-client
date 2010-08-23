@@ -38,7 +38,7 @@ Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
 // str manip stolen from humane.js
 function strtotime(date_str) {
 	var time = ('' + date_str).replace(/-/g,"/").replace(/[TZ]/g," ");
-	Titanium.API.debug('date string... ' + date_str + ' -> ' + time + ' -> ' + (new Date(time).getTime()));
+	//Titanium.API.debug('date string... ' + date_str + ' -> ' + time + ' -> ' + (new Date(time).getTime()));
 	return new Date(time).getTime();
 }
 
@@ -51,10 +51,8 @@ function strtotime(date_str) {
 function findNextNewerNotice(notice) {
     var candidate = null, candidateTS = null;
     var targetTS = strtotime(notice.updated);
-    Titanium.API.debug('COMPARE: ' + targetTS + ' <- ' + notice.updated + " (this)");
     for (var i = 1; i < notices.length; i++) {
         var thisTS = strtotime(notices[i].updated);
-        Titanium.API.debug('COMPARE: ' + thisTS + ' <- ' + notices[i].updated);
         if (thisTS <= targetTS) {
             continue;
         }
@@ -73,10 +71,10 @@ var insertNoticeHandler = function(event) {
     var next = findNextNewerNotice(notice);
     if (next) {
         $(html).insertAfter("#notice-" + next.id);
-        Titanium.API.debug("QQQQQQQQ: have next; appending this: " + notice.id + " " + notice.updated + " after existing " + next.id + " " + next.updated);
+        //Titanium.API.debug("QQQQQQQQ: have next; appending this: " + notice.id + " " + notice.updated + " after existing " + next.id + " " + next.updated);
     } else {
         $("#notices").prepend(html);
-        Titanium.API.debug("QQQQQQQQ: no next; prepending to top: " + notice.id + " " + notice.updated);
+        //Titanium.API.debug("QQQQQQQQ: no next; prepending to top: " + notice.id + " " + notice.updated);
     }
     notices.push(notice);
     enableNoticeControls(document.getElementById('notice-' + notice.id));

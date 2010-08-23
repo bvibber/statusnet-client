@@ -471,9 +471,12 @@ StatusNet.Timeline.prototype.loadCachedNotices = function() {
 
     StatusNet.debug("Account ID = " + this.account.id);
     StatusNet.debug("Timeline name = " + this.timeline_name);
+    var count = 20;
 
     var sql = "SELECT * FROM notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id " +
-        "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? ORDER BY notice_entry.notice_id";
+        "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? " +
+        "ORDER BY notice_entry.notice_id DESC " +
+        "LIMIT " + count;
 
     StatusNet.debug("Timeline.getNotices A");
 
