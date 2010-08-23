@@ -17,6 +17,7 @@
  */
 
 Titanium.include('statusnet.js');
+Titanium.include('heyQuery.js');
 Titanium.include('model/statusnet_atom_parser.js');
 
 /**
@@ -31,6 +32,7 @@ Titanium.App.addEventListener('StatusNet.background.process', function(event) {
     var onSuccess = event.onSuccess;
     var onFail = event.onFail;
 
+    StatusNet.debug('Parsing: ' + xmlString);
     var dom = StatusNet.Platform.parseXml(xmlString);
     var root = dom.documentElement;
     // hack for iPhone, sigh
@@ -40,24 +42,27 @@ Titanium.App.addEventListener('StatusNet.background.process', function(event) {
 
     if (root.nodeName == 'entry') {
         var notice = StatusNet.AtomParser.noticeFromEntry(root);
+        notice.xmlString = xmlString;
         StatusNet.debug('Background parser firing onNotice for singleton');
         Titanium.App.fireEvent(onEntry, {
-            notice: notice,
-            xmlString: xmlString,
+            notice: notice
         });
     } else if (root.nodeName == 'feed') {
-        var entries = [];
         $(root).find('feed > entry').each(function() {
-            entries.push(this);
+            var notice = StatusNet.AtomParser.noticeFromEntry(this);
+            if (StatusNet.Platform.serializeXml !== undefined) {
+                notice.xmlString = StatusNet.Platform.serializeXml(this);
+            }
+
             StatusNet.debug('Background parser firing onNotice in a feed');
             Titanium.App.fireEvent(onEntry, {
-                notice: StatusNet.AtomParser.noticeFromEntry(this),
-                xmlString: StatusNet.Platform.serializeXml(this)
+                notice: notice
             });
         });
     } else {
-        StatusNet.debug('Background parser firing onFail, got unknown XML');
-        Titanium.App.fireEvent(onFail, {});
+        var msg = "Expected feed or entry, got " + root.nodeName;
+        StatusNet.debug('Background parser firing onFail, got unknown XML: ' + msg);
+        Titanium.App.fireEvent(onFail, {msg: msg});
         return;
     }
 

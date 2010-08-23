@@ -7,8 +7,8 @@ StatusNet.HttpClient = {};
  * must be in the url, as part of the path or query string.
  *
  * @param string   url         the URL
- * @param callable onSuccess   callback function called after successful HTTP fetch: function(status, response)
- * @param callable onError     callback function called if there's an HTTP error: function(status, response)
+ * @param callable onSuccess   callback function called after successful HTTP fetch: function(status, responseXML, responseText)
+ * @param callable onError     callback function called if there's an HTTP error: function(status, responseXML, responseText)
  * @param mixed    data        any POST data, as either raw string or dictionary of key-value pairs; values that are blobs will be uploaded as attachments
  * @param String   username    optional username for HTTP Basic Auth
  * @param String   password    optional password for HTTP Basic Auth
@@ -35,7 +35,11 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
             var responseXML;
             if (this.responseXML == null) {
-                responseXML = StatusNet.Platform.parseXml(this.responseText);
+                try {
+                    responseXML = StatusNet.Platform.parseXml(this.responseText);
+                } catch (e) {
+                    responseXML = null;
+                }
             } else {
                 responseXML = this.responseXML;
             }
@@ -44,14 +48,14 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
             if (this.status == 200) {
                 StatusNet.debug("webRequest: calling onSuccess");
-                onSuccess(this.status, responseXML);
+                onSuccess(this.status, responseXML, this.responseText);
 
                 StatusNet.debug("webRequest: after onSuccess");
 
             } else {
                 StatusNet.debug("webRequest: calling onError");
 
-                onError(this.status, responseXML);
+                onError(this.status, responseXML, this.responseText);
             }
             StatusNet.debug("webRequest: done with onload.");
         };

@@ -132,40 +132,67 @@ StatusNet.AtomParser.prepBackgroundParse = function()
  * once the batch is complete.
  *
  * @param xmlString source XML for a feed or entry
- * @param onEntry function(notice, xmlString)
- * @param onComplete function()
+ * @param onEntry function(notice) called for each individual entry. Source XML is saved into notice.xmlString
+ * @param onSuccess function() called after completion, even if there are no notices
+ * @param onFail function() called on parse error
  */
-StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onComplete) {
+StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onSuccess, onFail) {
+    if (typeof xmlString != "string") {
+        var msg = "FAIL: non-string passed to StatusNet.AtomParser.backgroundParse!";
+        StatusNet.debug(msg);
+        throw msg;
+    }
+
     // Ok, this is... fun. :)
     // We can't send live objects like DOM nodes or callbacks across JS contexts,
     // so we have to pass the source XML string into the parser's queue and let
     // it post back to this context so we can call the callbacks.
-    Titanium.App.fireEvent('StatusNet.AtomParser.asyncParse', {entry: entry, callback: callback});
     
-    var entryKey = 'StatusNet.background.entry' + Math.random();
-    var feedKey = 'StatusNet.background.feed' + Math.random();
+    var key = Math.random();
+    var entryKey = 'SN.backgroundParse.entry' + key;
+    var successKey = 'SN.backgroundParse.success' + key;
+    var failKey = 'SN.backgroundParse.fail' + key;
 
-    Titanium.App.addEventListener(feedKey, function(event) {
-        // Triggered in main context for each entry...
+    var cleanupCallbacks;
+
+    var entryCallback = function(event) {
+        // Triggered in main context for each entry from bg context...
         if (onEntry) {
-            onEntry.call(event.notice, event.xmlString);
+            StatusNet.debug("Returned event: " + event);
+            StatusNet.debug("Returned event: " + event.notice);
+            onEntry.call(event.notice, event.notice);
         }
-    });
-
-    Titanium.App.addEventListener(feedKey, function(event) {
+    };
+    var successCallback = function(event) {
         // Triggered in main context after the processing is complete...
-        // Clean up, and call our callback.
-        Titanium.App.removeEventListener(entryKey);
-        Titanium.App.removeEventListener(feedKey);
-        if (onComplete) {
-            onComplete.call();
+        cleanupCallbacks();
+        if (onSuccess) {
+            onSuccess.call();
         }
-    });
+    };
+    var failCallback = function(event) {
+        // Triggered in main context if XML parsing failed...
+        cleanupCallbacks();
+        if (onFail) {
+            onFail.call(event.msg);
+        }
+    };
+
+    Titanium.App.addEventListener(entryKey, entryCallback);
+    Titanium.App.addEventListener(successKey, successCallback);
+    Titanium.App.addEventListener(failKey, failCallback);
+
+    cleanupCallbacks = function() {
+        Titanium.App.removeEventListener(entryKey, entryCallback);
+        Titanium.App.removeEventListener(successKey, successCallback);
+        Titanium.App.removeEventListener(failKey, failCallback);
+    };
 
     Titanium.App.fireEvent('StatusNet.background.process', {
         xmlString: xmlString,
-        entryKey: entryKey,
-        feedKey: feedKey
+        onEntry: entryKey,
+        onSuccess: successKey,
+        onFail: failKey
     });
 };
 

@@ -45,37 +45,42 @@ StatusNet.Timeline = function(client) {
  * @param DOM    entry          XML Atom entry for the notice
  */
 StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
-    if (typeof StatusNet.Platform.serializeXml != "function") {
-        StatusNet.debug("Timeline.encacheNotice() skipped - no XML serializer");
-        return;
-    }
-
-    StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
-
-    // We need to add in the namespaces, so the XML parser doesn't blow up on when
-    // reparsing cached entries.
-    var spaces = {
-        "": "http://www.w3.org/2005/Atom",
-        thr: "http://purl.org/syndication/thread/1.0",
-        georss: "http://www.georss.org/georss",
-        activity: "http://activitystrea.ms/spec/1.0/",
-        media: "http://purl.org/syndication/atommedia",
-        poco: "http://portablecontacts.net/spec/1.0",
-        ostatus: "http://ostatus.org/schema/1.0",
-        statusnet: "http://status.net/schema/api/1/"
-    };
-    for (var ns in spaces) {
-        if (spaces.hasOwnProperty(ns)) {
-            var attr = (ns == "") ? 'xmlns' : ('xmlns:' + ns);
-            entry.setAttribute(attr, spaces[ns]);
+    var xml;
+    if (typeof entry == "string") {
+        xml = entry;
+    } else {
+        if (typeof StatusNet.Platform.serializeXml != "function") {
+            StatusNet.debug("Timeline.encacheNotice() skipped - no XML serializer");
+            return;
         }
+
+        StatusNet.debug("Timeline.encacheNotice() - encaching notice:" + noticeId + ", timeline= " + this.timeline_name + ", account=" + this.client.account.id);
+
+        // We need to add in the namespaces, so the XML parser doesn't blow up on when
+        // reparsing cached entries.
+        var spaces = {
+            "": "http://www.w3.org/2005/Atom",
+            thr: "http://purl.org/syndication/thread/1.0",
+            georss: "http://www.georss.org/georss",
+            activity: "http://activitystrea.ms/spec/1.0/",
+            media: "http://purl.org/syndication/atommedia",
+            poco: "http://portablecontacts.net/spec/1.0",
+            ostatus: "http://ostatus.org/schema/1.0",
+            statusnet: "http://status.net/schema/api/1/"
+        };
+        for (var ns in spaces) {
+            if (spaces.hasOwnProperty(ns)) {
+                var attr = (ns == "") ? 'xmlns' : ('xmlns:' + ns);
+                entry.setAttribute(attr, spaces[ns]);
+            }
+        }
+        xml = StatusNet.Platform.serializeXml(entry);
     }
-    var xml = StatusNet.Platform.serializeXml(entry);
 
     // As a hack workaround for running on stock iPhone builds where
     // setAttribute() doesn't work. This won't prevent error messages
     // spewing on the console during serialization above.
-    var nsXml = xml.replace('<entry>', '<entry ' +
+    xml = xml.replace('<entry>', '<entry ' +
         'xmlns="http://www.w3.org/2005/Atom" ' +
         'xmlns:thr="http://purl.org/syndication/thread/1.0" ' +
         'xmlns:georss="http://www.georss.org/georss" ' +
@@ -89,7 +94,7 @@ StatusNet.Timeline.prototype.encacheNotice = function(noticeId, entry) {
         rc = this.db.execute(
             "INSERT OR REPLACE INTO entry (notice_id, atom_entry) VALUES (?, ?)",
             noticeId,
-            nsXml
+            xml
         );
 
         rc = this.db.execute(
@@ -164,44 +169,41 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  * Add a notice to the Timeline if it's not already in it. Also
  * adds it to the notice cache, and notifies the view to display it.
  *
- * @param DOM     entry              the Atom entry form of the notice
+ * @param object  notice              the parsed form of the notice as a dict
  * @param boolean prepend            whether to add it to the beginning of end of
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(entry, prepend, notifications, callback) {
+StatusNet.Timeline.prototype.addNotice = function(notice, prepend, notifications) {
     StatusNet.debug('Timeline.addNotice enter:');
-    var that = this;
-    StatusNet.AtomParser.asyncParse(entry, function(notice) {
+    if (notice === null || typeof notice !== "object") {
+        throw "Invalid notice passed to addNotice.";
+    }
 
-        // Dedupe here?
-        for (i = 0; i < that._notices.length; i++) {
-            if (that._notices[i].id === notice.id) {
-                StatusNet.debug("skipping duplicate notice: " + notice.id);
-                return;
-            }
+    // Dedupe here?
+    for (i = 0; i < this._notices.length; i++) {
+        if (this._notices[i].id === notice.id) {
+            StatusNet.debug("skipping duplicate notice: " + notice.id);
+            return;
         }
+    }
 
-        if (notice.id !== undefined) {
-            if (that.cacheable()) {
-                StatusNet.debug("encached notice: " + notice.id);
-                that.encacheNotice(notice.id, entry);
-            }
+    if (notice.id !== undefined && notice.xmlString !== undefined) {
+        if (this.cacheable()) {
+            StatusNet.debug("encached notice: " + notice.id);
+            this.encacheNotice(notice.id, notice.xmlString);
         }
+    }
 
-        StatusNet.debug("addNotice - finished encaching notice");
+    StatusNet.debug("addNotice - finished encaching notice");
 
-        if (prepend) {
-            that._notices.unshift(notice);
-            that.noticeAdded.notify({notice: notice, notifications: notifications});
-        } else {
-            that._notices.push(notice);
-        }
+    if (prepend) {
+        this._notices.unshift(notice);
+        this.noticeAdded.notify({notice: notice, notifications: notifications});
+    } else {
+        this._notices.push(notice);
+    }
 
-        if (callback) {
-            callback.call(notice, notice);
-        }
-        StatusNet.debug('Timeline.addNotice DONE.');
-    });
+    StatusNet.debug('Timeline.addNotice DONE.');
 };
 
 /**
@@ -219,38 +221,36 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
 
     this.account.apiGet(this.getUrl(),
 
-        function(status, data) {
+        function(status, data, responseText) {
             StatusNet.debug('Timeline.update GOT DATA:');
 
             var entries = [];
+            var entryCount = 0;
+            StatusNet.AtomParser.backgroundParse(responseText, function(notice) {
+                // notice
+                StatusNet.debug('Got notice: ' + notice);
+                StatusNet.debug('Got notice.id: ' + notice.id);
+                that.addNotice(notice, true, notifications);
+                entryCount++;
+            },
+            function() {
+                // success!
+                that.updateFinished.notify({notice_count: entryCount});
 
-            $(data).find('feed > entry').each(function() {
-                StatusNet.debug('Timeline.update: found an entry: ' + this);
-                entries.push(this);
+                if (onFinish) {
+                    onFinish(entryCount);
+                }
+                StatusNet.debug('Timeline.update calling finishedFetch...');
+                that.finishedFetch(entryCount);
+                StatusNet.debug('Timeline.update DONE.');
+            },
+            function() {
+                // if parse failure
+                msg = 'Invalid response from server.';
+                StatusNet.debug("Something went wrong retrieving timeline: " + msg);
+                StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
+                that.updateFinished.notify();
             });
-            StatusNet.debug('Timeline.update finished entry push loop.');
-
-            // Start with the most recent, so the user can scroll down and read
-            // while we work if parsing/display is slow.
-            entries.reverse();
-
-            for (var i = 0; i < entries.length - 1; i++) {
-                that.addNotice(entries[i], true, notifications);
-            }
-            if (entries.length > 0) {
-                that.addNotice(entries[entries.length - 1], true, notifications, function() {
-                    that.updateFinished.notify({notice_count: entries.length});
-
-                    if (onFinish) {
-                        onFinish(entries.length);
-                    }
-                    StatusNet.debug('Timeline.update calling finishedFetch...');
-                    that.finishedFetch(entries.length);
-                    StatusNet.debug('Timeline.update DONE.');
-                });
-            }
-            StatusNet.debug('Timeline.update finished addNotice loop.');
-
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
@@ -459,11 +459,13 @@ StatusNet.Timeline.prototype.finishedFetch = function(notice_count) {
 };
 
 /**
+ * Loads and triggers display of cached notices on this timeline.
  * Accessor for notices
  *
  * @return Array an array of notices
  */
 StatusNet.Timeline.prototype.getNotices = function() {
+    var that = this;
 
     StatusNet.debug("Account ID = " + this.account.id);
     StatusNet.debug("Timeline name = " + this.timeline_name);
@@ -484,9 +486,11 @@ StatusNet.Timeline.prototype.getNotices = function() {
         StatusNet.debug("Timeline.getNotices B1");
         StatusNet.debug("Valid row found");
         xmlEntry = rs.fieldByName('atom_entry');
-        entry = StatusNet.Platform.parseXml(xmlEntry);
-        var notice = StatusNet.AtomParser.noticeFromEntry(entry);
-        this._notices.unshift(notice);
+        StatusNet.AtomParser.backgroundParse(xmlEntry, function(notice) {
+            StatusNet.debug('that is: ' + that);
+            StatusNet.debug('that.addNotice is: ' + that.addNotice);
+            that.addNotice(notice);
+        });
         rs.next();
     }
     StatusNet.debug("Timeline.getNotices C");
