@@ -201,6 +201,7 @@ StatusNet.Timeline.prototype.addNotice = function(notice, prepend, notifications
         this.noticeAdded.notify({notice: notice, notifications: notifications});
     } else {
         this._notices.push(notice);
+        this.noticeAdded.notify({notice: notice, notifications: notifications});
     }
 
     StatusNet.debug('Timeline.addNotice DONE.');
@@ -487,8 +488,6 @@ StatusNet.Timeline.prototype.getNotices = function() {
         StatusNet.debug("Valid row found");
         xmlEntry = rs.fieldByName('atom_entry');
         StatusNet.AtomParser.backgroundParse(xmlEntry, function(notice) {
-            StatusNet.debug('that is: ' + that);
-            StatusNet.debug('that.addNotice is: ' + that.addNotice);
             that.addNotice(notice);
         });
         rs.next();

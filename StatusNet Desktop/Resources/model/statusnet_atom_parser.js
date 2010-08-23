@@ -120,7 +120,8 @@ if (typeof Titanium.Statusnet != "undefined") {
 StatusNet.AtomParser.prepBackgroundParse = function()
 {
     var window = Titanium.UI.createWindow({
-        url: 'statusnet_background_parser.js'
+        url: 'statusnet_background_parser.js',
+        zIndex: -100
     });
     window.open();
 }

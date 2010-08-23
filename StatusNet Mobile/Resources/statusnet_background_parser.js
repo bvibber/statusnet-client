@@ -32,7 +32,7 @@ Titanium.App.addEventListener('StatusNet.background.process', function(event) {
     var onSuccess = event.onSuccess;
     var onFail = event.onFail;
 
-    StatusNet.debug('Parsing: ' + xmlString);
+    //StatusNet.debug('Parsing: ' + xmlString);
     var dom = StatusNet.Platform.parseXml(xmlString);
     var root = dom.documentElement;
     // hack for iPhone, sigh

@@ -55,7 +55,7 @@ StatusNet.TimelineView = function(client) {
             StatusNet.debug("TimelineView got updateFinished event!");
             that.hideSpinner();
             StatusNet.debug("TimelineView showing:");
-            that.show();
+            //that.show();
 
             StatusNet.debug("TimelineView checking for total number of notices")
             var notices = that.client.timeline.getNotices();
@@ -72,8 +72,7 @@ StatusNet.TimelineView = function(client) {
         function(args) {
             StatusNet.debug("TimelineView got noticeAdded event!");
             if (args) {
-                StatusNet.debug("FIXME: implement TimelineView.showNewNotice");
-                //that.showNewNotice(args.notice);
+                that.appendTimelineNotice(args.notice);
             } else {
                 StatusNet.debug("noticeAdded event with no args!");
             }
