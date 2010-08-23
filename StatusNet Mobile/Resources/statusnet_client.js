@@ -433,7 +433,7 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
         that.view.showHeader();
         that.view.showSpinner();
         that.timeline.update(function() {
-            that.view.show();
+            that.view.hideSpinner();
         });
         StatusNet.debug('ALL DONE waiting');
     });
