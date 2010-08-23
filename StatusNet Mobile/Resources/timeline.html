@@ -58,7 +58,7 @@ function findNextNewerNotice(notice) {
         if (thisTS <= targetTS) {
             continue;
         }
-        if (candidate && thisTS < candidateTS) {
+        if (candidate && thisTS > candidateTS) {
             continue;
         }
         candidate = notices[i];
