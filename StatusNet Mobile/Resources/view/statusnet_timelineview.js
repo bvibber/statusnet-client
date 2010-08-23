@@ -91,6 +91,7 @@ StatusNet.TimelineView.prototype.init = function() {
 
     StatusNet.debug("TimelineView: adding adding activity indicator -- spinner");
 
+    /*
     if (StatusNet.Platform.isApple()) {
         this.act = Titanium.UI.createActivityIndicator();
         this.act.style = Titanium.UI.iPhone.ActivityIndicatorStyle.PLAIN;
@@ -98,6 +99,7 @@ StatusNet.TimelineView.prototype.init = function() {
         this.act.color = 'white';
         this.act.message = 'Loading...';
     } else {
+    */
         this.act = Titanium.UI.createView({
             bottom: 49, // just above the emulated tab list...?
             left: 0,
@@ -121,7 +123,7 @@ StatusNet.TimelineView.prototype.init = function() {
             right: 8,
             top: 4,
             bottom: 4,
-            title: "Loading...",
+            text: "Loading...",
             color: "white"
         }));
 
@@ -135,7 +137,7 @@ StatusNet.TimelineView.prototype.init = function() {
         }));
         this.client.mainwin.add(this.act);
         this.act.hide();
-    }
+    //}
 
     StatusNet.debug("TimelineView: Finished adding activity indicator");
 
