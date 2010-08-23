@@ -236,6 +236,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             },
             function() {
                 // success!
+                StatusNet.debug('Timeline.update success!');
                 that.updateFinished.notify({notice_count: entryCount});
 
                 if (onFinish) {
@@ -465,7 +466,7 @@ StatusNet.Timeline.prototype.finishedFetch = function(notice_count) {
  *
  * @return Array an array of notices
  */
-StatusNet.Timeline.prototype.getNotices = function() {
+StatusNet.Timeline.prototype.loadCachedNotices = function() {
     var that = this;
 
     StatusNet.debug("Account ID = " + this.account.id);

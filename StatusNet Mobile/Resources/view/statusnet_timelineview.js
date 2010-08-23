@@ -58,7 +58,8 @@ StatusNet.TimelineView = function(client) {
             //that.show();
 
             StatusNet.debug("TimelineView checking for total number of notices")
-            var notices = that.client.timeline.getNotices();
+            /*var notices = that.client.timeline.getNotices();*/
+            var notices = that.client.timeline._notices;
             if (notices.length == 0) {
                 StatusNet.debug("TimelineView: no notices found");
                 that.clearTimelineView({title: 'No notices in this timeline yet.'});
@@ -147,20 +148,10 @@ StatusNet.TimelineView.prototype.init = function() {
 StatusNet.TimelineView.prototype.show = function() {
 
     this.showHeader();
-    var notices = this.client.timeline.getNotices();
-
-    // clear old notices
-    // @todo be a little nicer; no need to clear if we just changed one thing
-    //Titanium.App.fireEvent('updateTimeline', {html: '<p>Loading...</p>'});
     this.clearTimelineView();
+    this.client.timeline.loadCachedNotices();
 
-    if (notices.length > 0) {
-    StatusNet.debug("TimelineView.show G: " + notices.length + " notice(s)");
-        for (i = 0; i < notices.length; i++) {
-            this.appendTimelineNotice(notices[i]);
-        }
-    }
-
+    // Err?
     this.hideSpinner();
 };
 

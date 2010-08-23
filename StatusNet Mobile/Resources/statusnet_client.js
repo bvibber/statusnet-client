@@ -89,7 +89,7 @@ StatusNet.Client.prototype.init = function() {
                 StatusNet.debug("Triggering update for shake gesture...");
                 client.timeline.update(function() {
                     StatusNet.debug("Updated, gonna show:");
-                    client.view.show();
+                    //client.view.show();
                     StatusNet.debug("Updated and done showing.");
                 });
                 StatusNet.debug("Started an update, waiting...");

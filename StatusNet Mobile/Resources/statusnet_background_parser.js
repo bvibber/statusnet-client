@@ -25,7 +25,7 @@ Titanium.include('model/statusnet_atom_parser.js');
  * JavaScript context.
  */
 Titanium.App.addEventListener('StatusNet.background.process', function(event) {
-    StatusNet.debug('Background parser entered!');
+    //StatusNet.debug('Background parser entered!');
 
     var xmlString = event.xmlString;
     var onEntry = event.onEntry;
@@ -43,7 +43,7 @@ Titanium.App.addEventListener('StatusNet.background.process', function(event) {
     if (root.nodeName == 'entry') {
         var notice = StatusNet.AtomParser.noticeFromEntry(root);
         notice.xmlString = xmlString;
-        StatusNet.debug('Background parser firing onNotice for singleton');
+        //StatusNet.debug('Background parser firing onNotice for singleton');
         Titanium.App.fireEvent(onEntry, {
             notice: notice
         });
@@ -54,7 +54,7 @@ Titanium.App.addEventListener('StatusNet.background.process', function(event) {
                 notice.xmlString = StatusNet.Platform.serializeXml(this);
             }
 
-            StatusNet.debug('Background parser firing onNotice in a feed');
+            //StatusNet.debug('Background parser firing onNotice in a feed');
             Titanium.App.fireEvent(onEntry, {
                 notice: notice
             });

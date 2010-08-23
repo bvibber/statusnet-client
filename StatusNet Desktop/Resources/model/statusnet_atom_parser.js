@@ -119,6 +119,10 @@ if (typeof Titanium.Statusnet != "undefined") {
 
 StatusNet.AtomParser.prepBackgroundParse = function()
 {
+    // We need to create another window to put our parsing
+    // context into; this'll run on another thread, so can
+    // run parsing while the UI thread is working. It'll
+    // post events back to the main thread to display.
     var window = Titanium.UI.createWindow({
         url: 'statusnet_background_parser.js',
         zIndex: -100
@@ -159,8 +163,6 @@ StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onSuccess, o
     var entryCallback = function(event) {
         // Triggered in main context for each entry from bg context...
         if (onEntry) {
-            StatusNet.debug("Returned event: " + event);
-            StatusNet.debug("Returned event: " + event.notice);
             onEntry.call(event.notice, event.notice);
         }
     };

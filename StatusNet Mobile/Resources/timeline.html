@@ -23,6 +23,7 @@ if (typeof Titanium == "undefined") {
 var lastClickTime = Date.now();
 var activeNotice = null;
 var clientAccountUsername = null;
+var notices = [];
 
 // App-wide event registration, whee!
 Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
@@ -32,16 +33,53 @@ Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
     $("#notices").html(event.html);
     $("#body").scroll(0);
 });
-Titanium.App.addEventListener("StatusNet_prependTimelineNotice", function(event) {
+
+// str manip stolen from humane.js
+function strtotime(date_str) {
+	var time = ('' + date_str).replace(/-/g,"/").replace(/[TZ]/g," ");
+	return new Date(time).getTime();
+}
+
+/**
+ * Find the next-newer notice in our timeline after the given one, if any
+ *
+ * @param notice
+ * @return mixed Notice or null
+ */
+function findNextNewerNotice(notice) {
+    var candidate = null, candidateTS = null;
+    var targetTS = strtotime(notice.updated);
+    for (var i = 1; i < notices.length; i++) {
+        var thisTS = strtotime(notices[i].date);
+        if (thisTS < targetTS) {
+            continue;
+        }
+        if (candidate && thisTS > candidateTS) {
+            continue;
+        }
+        candidate = notices[i];
+        candidateTS = thisTS;
+    }
+    return candidate;
+}
+
+var insertNoticeHandler = function(event) {
     var notice = objectOrJson(event.notice);
-    $("#notices").prepend(renderNotice(notice));
+    var html = renderNotice(notice);
+    var nextOldest = findNextNewerNotice(notice.id);
+    if (nextOldest) {
+        $(html).insertAfter("#notice-" + nextOldest.id);
+    } else {
+        $("#notices").prepend(html);
+    }
+    notices.push(notice);
     enableNoticeControls(document.getElementById('notice-' + notice.id));
-});
-Titanium.App.addEventListener("StatusNet_appendTimelineNotice", function(event) {
-    var notice = objectOrJson(event.notice);
-    $("#notices").append(renderNotice(notice));
-    enableNoticeControls(document.getElementById('notice-' + notice.id));
-});
+};
+
+Titanium.App.addEventListener("StatusNet_prependTimelineNotice", insertNoticeHandler);
+Titanium.App.addEventListener("StatusNet_appendTimelineNotice", insertNoticeHandler);
+
+
 Titanium.App.addEventListener("StatusNet_appendUserTimelineNotice", function(event) {
     var notice = objectOrJson(event.notice);
     var user = objectOrJson(event.user);
@@ -117,6 +155,7 @@ function objectOrJson(obj) {
  * Put together the HTML for a single notice
  *
  * @param object notice the notice
+ * @return string HTML
  */
 renderNotice = function(notice, user) {
 
