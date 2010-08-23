@@ -8,14 +8,14 @@
 <body>
 <div id="header"></div>
 <div id="notices">
-<img class="spinner" src="images/loading.gif">
-<img class="preload" src="images/notice_bg.png" style="position:absolute; top: -64px"><!-- offscreen preloader of background image -->
+    <img alt="Spinner" class="spinner" src="images/loading.gif">
+<img alt="Notice background" class="preload" src="images/notice_bg.png" style="position:absolute; top: -64px"><!-- offscreen preloader of background image -->
 </div>
 
-<script src="binding.js"></script><!-- hack for initialization bug on Android -->
-<script src="lib/jquery-1.4.2.min.js"></script>
-<script src="lib/humane.js"></script>
-<script>
+<script type="text/javascript" src="binding.js"></script><!-- hack for initialization bug on Android -->
+<script type="text/javascript" src="lib/jquery-1.4.2.min.js"></script>
+<script type="text/javascript"  src="lib/humane.js"></script>
+<script type="text/javascript">
 if (typeof Titanium == "undefined") {
     document.write('Titanium is undefined. Nothing will work in this webview.');
 }
@@ -83,7 +83,11 @@ var insertNoticeHandler = function(event) {
 Titanium.App.addEventListener("StatusNet_prependTimelineNotice", insertNoticeHandler);
 Titanium.App.addEventListener("StatusNet_appendTimelineNotice", insertNoticeHandler);
 
-
+Titanium.App.addEventListener("StatusNet_appendDirectMessage", function(event) {
+    var dm = objectOrJson(event.dm);
+    $("#notices").append(renderDirectMessage(dm));
+    enableDirectMessageControls(document.getElementById('direct_message-' + dm.id));
+})
 Titanium.App.addEventListener("StatusNet_appendUserTimelineNotice", function(event) {
     var notice = objectOrJson(event.notice);
     var user = objectOrJson(event.user);
@@ -129,6 +133,9 @@ Titanium.App.addEventListener("StatusNet_unblockComplete", function(event) {
 Titanium.App.addEventListener("StatusNet_showEmptyTimelineMsg", function(event) {
     Titanium.API.debug("webview got event: " + JSON.stringify(event));
     showEmptyTimeline();
+});
+Titanium.App.addEventListener("StatusNet_directMessageComplete", function(event) {
+    Titanium.API.debug("webview got event: " + JSON.stringify(event)); $('a.profile_direct_message').removeAttr('disabled');
 });
 
 // Default handling for link click events; we'll pass external links on to the app
@@ -352,6 +359,40 @@ enableNoticeControls = function(noticeDom) {
 
 };
 
+renderDirectMessage = function(dm) {
+
+    var html = [];
+
+    var avatar = dm.avatar;
+    var author = dm.author;
+
+    html.push('<div class="notice" id="direct_message-' + dm.id +'">');
+    html.push('   <div class="avatar"><a href="' + dm.authorUri + '"><img src="' + avatar + '"/></a></div>');
+    html.push('   <div><a class="author" name="author" href="' +  dm.authorUri + '">' + author + '</a>');
+    html.push('   <div class="content">'+ dm.content +'</div>');
+    html.push('   </div><div class="date_link"><a href="' + dm.link + '" rel="external" title="View this message in browser">' + humane_date(dm.updated) + '</a></div>');
+    html.push('<div class="notice_links">');
+    html.push('<button class="direct_message_reply">Reply</button>');
+    html.push('</div></div>');
+    html.push('<div class="clear"></div>');
+
+    return html.join('');
+};
+
+enableDirectMessageControls = function(dmDom) {
+
+    var dmAuthor = $(dmDom).find('a.author').text();
+    var uri = $(dmDom).find('div a.author').attr('href');
+
+    var that = this;
+
+    // Direct message reply
+    $(dmDom).delegate('button.direct_message_reply', 'click', function(event) {
+      Titanium.App.fireEvent("StatusNet_replyToDirectMessage", {author: dmAuthor});
+      return false;
+    });
+};
+
 /**
  * Show profile information header for a user
  */
@@ -473,6 +514,19 @@ showProfileHeader = function(user, extended, authorId) {
         Titanium.App.fireEvent("StatusNet_unblock", {userId: user.id});
         return false;
     });
+
+    $('a.profile_unblock').live('click', function(event) {
+        $('a.profile_unblock').attr('disabled', 'disabled');
+        Titanium.App.fireEvent("StatusNet_unblock", {userId: user.id});
+        return false;
+    });
+
+    $('a.profile_direct_message').live('click', function(event) {
+        $('a.profile_direct_message').attr('disabled', 'disabled');
+        Titanium.App.fireEvent("StatusNet_replyToDirectMessage", {author: user.username});
+        return false;
+    });
+
 };
 
 
