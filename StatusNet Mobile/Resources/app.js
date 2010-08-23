@@ -43,7 +43,6 @@ var sources = ['statusnet.js',
                'view/statusnet_timelineview_inbox.js',
 
                'statusnet_client.js',
-               'parsetest.js',
 
                'heyQuery.js'];
 
