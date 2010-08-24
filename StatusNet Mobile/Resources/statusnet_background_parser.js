@@ -71,4 +71,4 @@ Titanium.App.addEventListener('StatusNet.background.process', function(event) {
 });
 
 StatusNet.debug('Background parser is open and ready to go.');
-
+Titanium.App.fireEvent('StatusNet.background.ready', {});
