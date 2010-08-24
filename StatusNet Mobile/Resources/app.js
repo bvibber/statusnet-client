@@ -51,11 +51,11 @@ for (var i = 0; i < sources.length; i++) {
 Titanium.UI.setBackgroundColor('#000');
 
 StatusNet.debug("Setting up background parser context...");
-StatusNet.AtomParser.prepBackgroundParse();
+StatusNet.AtomParser.prepBackgroundParse(function() {
+    // Initialize database
+    var db = StatusNet.getDB();
 
-// Initialize database
-var db = StatusNet.getDB();
-
-// Find default account, if any, and fire up the client!
-var acct = StatusNet.Account.getDefault(db);
-var client = new StatusNet.Client(acct);
+    // Find default account, if any, and fire up the client!
+    var acct = StatusNet.Account.getDefault(db);
+    var client = new StatusNet.Client(acct);
+});
