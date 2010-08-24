@@ -34,7 +34,7 @@ StatusNet.AtomParser = function() {};
  */
 StatusNet.AtomParser.mapOverElements = function(parent, map) {
     var source = parent.nodeName;
-    var matches = StatusNet.AtomParser.mapOverElementsHelper(parent, map);
+    var matches = StatusNet.AtomParser.mapOverElementsHelper(parent, map, source);
     var last = matches.length;
     for (var i = 0; i < last; i++) {
         var match = matches[i];
@@ -46,7 +46,7 @@ StatusNet.AtomParser.mapOverElements = function(parent, map) {
  * Inner loop to pull the matching nodes...
  * ...this is very slow on Android.
  */
-StatusNet.AtomParser.mapOverElementsHelper = function(parent, map) {
+StatusNet.AtomParser.mapOverElementsHelper = function(parent, map, source) {
     var matches = [];
     var list = parent.childNodes;
     var last = list.length;
@@ -179,6 +179,8 @@ var startTime = Date.now();
             entry = entry();
         }
     }
+
+    var children = entry.childNodes;
 
     var notice = {};
 
