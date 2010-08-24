@@ -111,57 +111,22 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
 };
 
 /**
- * Add a notice to the Timeline if it's not already in it.
- *
- * XXX: Override so user timelines do not get cached. Not
- * sure how else to handle at the moment since atom entries in
- * user timelines are different than they are in other timelines.
- * We may need a special cache facility just for user atom
- * entries. --Z
- *
- * @param DOM     entry             the Atom entry form of the notice
- * @param boolean prepend           whether to add it to the beginning of end of
- *                                  the timeline's notices array
- */
-StatusNet.TimelineUser.prototype.addNotice = function(entry, prepend) {
-
-    var notice = StatusNet.AtomParser.noticeFromEntry(entry);
-
-    // dedupe here?
-    for (i = 0; i < this._notices.length; i++) {
-        if (this._notices[i].id === notice.id) {
-            StatusNet.debug("skipping duplicate notice: " + notice.id);
-            return;
-        }
-    }
-
-    if (prepend) {
-        this._notices.unshift(notice);
-        this.noticeAdded.notify({notice: notice});
-    } else {
-        this._notices.push(notice);
-    }
-
-};
-
-/**
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
-StatusNet.TimelineUser.prototype.update = function(onFinish) {
-
-    StatusNet.debug("TimelineUser.update()");
+StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
+    StatusNet.debug('Timeline.update ENTERED');
 
     this.updateStart.notify();
+
+    StatusNet.debug('Timeline.update called updateStart.notify');
 
     var that = this;
 
     this.account.apiGet(this.getUrl(),
 
-        function(status, data) {
-
-            StatusNet.debug('Fetched ' + that.getUrl());
-            StatusNet.debug('HTTP client returned: ' + data);
+        function(status, data, responseText) {
+            StatusNet.debug('Timeline.update GOT DATA:');
 
             // @todo How we get author info will need to change when we
             // update output to match the latest Activity Streams spec
@@ -169,31 +134,41 @@ StatusNet.TimelineUser.prototype.update = function(onFinish) {
             that.user = StatusNet.AtomParser.userFromSubject(subject);
 
             var entries = [];
+            var entryCount = 0;
+            StatusNet.AtomParser.backgroundParse(responseText, function(notice) {
+                // notice
+                StatusNet.debug('Got notice: ' + notice);
+                StatusNet.debug('Got notice.id: ' + notice.id);
+                that.addNotice(notice, true, notifications);
+                entryCount++;
+            },
+            function() {
+                // success!
+                StatusNet.debug('Timeline.update success!');
+                that.updateFinished.notify({notice_count: entryCount});
 
-            $(data).find('feed > entry').each(function() {
-                StatusNet.debug('TimelineUser.update: found an entry.');
-                entries.push(this);
+                if (onFinish) {
+                    onFinish(entryCount);
+                }
+                StatusNet.debug('Timeline.update calling finishedFetch...');
+                that.finishedFetch(entryCount);
+                StatusNet.debug('Timeline.update DONE.');
+            },
+            function() {
+                // if parse failure
+                msg = 'Invalid response from server.';
+                StatusNet.debug("Something went wrong retrieving timeline: " + msg);
+                StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
+                that.updateFinished.notify();
             });
-
-            entries.reverse(); // keep correct notice order
-
-            for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i], true);
-            }
-
-            that.updateFinished.notify({notice_count: entries.length});
-
-            if (onFinish) {
-                onFinish(entries.length);
-            }
-            that.finishedFetch(entries.length);
         },
         function(client, msg) {
-            StatusNet.debug("Something went wrong retrieving user timeline: " + msg);
-            StatusNet.Infobar.flashMessage("Couldn't get user timeline: " + msg);
+            StatusNet.debug("Something went wrong retrieving timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
             that.updateFinished.notify();
         }
     );
+    StatusNet.debug('Timeline.update EXITED: waiting for data return.');
 
 };
 

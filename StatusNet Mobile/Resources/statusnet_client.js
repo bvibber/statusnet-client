@@ -293,10 +293,14 @@ StatusNet.Client.prototype.switchUserTimeline = function(id) {
 
     var that = this;
 
+    Titanium.App.fireEvent('StatusNet_setTimeline', {
+        html: '',
+        clientAccountUsername: this.account.username
+    });
+
     this.timeline.update(
         function() {
             that.view.showHeader();
-            that.view.show();
         },
         false
     );

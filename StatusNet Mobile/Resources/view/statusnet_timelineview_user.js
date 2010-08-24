@@ -28,33 +28,10 @@ StatusNet.TimelineViewUser = function(client) {
 // Make StatusNet.TimelineViewUser inherit TimelineView's prototype
 StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
 
-/**
- * Render the HTML display of a user timeline
- *
- */
-StatusNet.TimelineViewUser.prototype.show = function () {
-    this.showHeader();
-    var notices = this.client.timeline.getNotices();
-
-    // clear old notices
-    // @todo be a little nicer; no need to clear if we just changed one thing
-    //Titanium.App.fireEvent('updateTimeline', {html: '<p>Loading...</p>'});
-    this.clearTimelineView();
-
-    if (notices.length > 0) {
-    StatusNet.debug("TimelineViewUser.show GGG: " + notices.length + " notice(s)");
-        for (i = 0; i < notices.length; i++) {
-            this.appendUserTimelineNotice(notices[i]);
-        }
-    }
-
-    this.hideSpinner();
-};
-
-StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
+StatusNet.TimelineViewUser.prototype.appendTimelineNotice = function(notice) {
     var user = this.client.getActiveTimeline().getUser();
     Titanium.App.fireEvent('StatusNet_appendUserTimelineNotice', {notice: notice, user: user});
-}
+};
 
 /**
  * Show profile information header for this user

@@ -163,11 +163,11 @@ StatusNet.TimelineView.prototype.clearTimelineView = function(html) {
         html: html,
         clientAccountUsername: this.client.account.username
     });
-}
+};
 
 StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
     Titanium.App.fireEvent('StatusNet_appendTimelineNotice', {notice: notice});
-}
+};
 
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
     StatusNet.debug('Stubbed TimelineView.notifyNewNotice');
