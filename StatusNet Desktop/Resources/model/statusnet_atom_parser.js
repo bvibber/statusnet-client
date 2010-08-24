@@ -23,6 +23,83 @@
 StatusNet.AtomParser = function() {};
 
 /**
+ * Class method for generating a notice obj from an Direct Message Atom entry
+ *
+ * @param DOM entry the atom entry representing the DM
+ *
+ */
+StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
+
+    if (entry.documentElement) {
+        entry = entry.documentElement;
+        if (typeof entry == "function") {
+            // Workaround bug that exposed this property as a function
+            entry = entry();
+        }
+    }
+
+    var notice = {};
+
+    var idRegexp = /(\d)+$/;
+
+    var simpleNode = function(match) {
+        notice[match.name] = match.text;
+    }
+
+    StatusNet.AtomParser.mapOverElements(entry, {
+        'id': function(match) {
+            var searchId = match.text;
+            if (searchId.substr(0, 4) == 'tag:') {
+                var result = searchId.match(idRegexp);
+                if (result) {
+                    notice.id = result[0];
+                }
+            }
+        },
+        'title': function(match) {
+            notice.title = match.text;
+
+            // XXX: This is horrible, but until we improve the feed, this is the best
+            // handle to the author's nick we have
+            var result = match.text.substr(12).match(/\w+\b/);
+
+            if (result) {
+                notice.nickname = result[0];
+            }
+        },
+        'content': simpleNode,
+        'author': function(match) {
+            StatusNet.AtomParser.mapOverElements(match.node, {
+                'name':  function(match) {
+                    notice.author = match.text;
+                },
+                'homepage': function(match2) {
+                    notice.authorUri = match2.text;
+                }
+            });
+        },
+        'published': simpleNode,
+        'updated': function(match) {
+            var updated = match.text;
+
+            // knock off the millisecs to make the date string work with humane.js
+            notice.updated = updated.substring(0, 19);
+        },
+        'link': function(match) {
+            var rel = match.attributes['rel'];
+            var type = match.attributes['type'];
+            if (rel == 'alternate') {
+                notice.link = match.attributes['href'];
+            } else if (rel == 'image' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
+                notice.avatar = match.attributes['href'];
+            }
+        }
+    });
+
+    return notice;
+};
+
+/**
  * Iterate over all direct children of the given DOM node, calling functions from a map
  * based on the element's node name. This is used because doing a bunch of individual selector
  * lookups for every element we need is hella slow on mobile; iterating directly over the
@@ -33,8 +110,7 @@ StatusNet.AtomParser = function() {};
  * @access private
  */
 StatusNet.AtomParser.mapOverElements = function(parent, map) {
-    var source = parent.nodeName;
-    var matches = StatusNet.AtomParser.mapOverElementsHelper(parent, map, source);
+    var matches = StatusNet.AtomParser.mapOverElementsHelper(parent, map);
     var last = matches.length;
     for (var i = 0; i < last; i++) {
         var match = matches[i];
@@ -46,7 +122,7 @@ StatusNet.AtomParser.mapOverElements = function(parent, map) {
  * Inner loop to pull the matching nodes...
  * ...this is very slow on Android.
  */
-StatusNet.AtomParser.mapOverElementsHelper = function(parent, map, source) {
+StatusNet.AtomParser.mapOverElementsHelper = function(parent, map) {
     var matches = [];
     var list = parent.childNodes;
     var last = list.length;
@@ -116,7 +192,7 @@ StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onSuccess, o
     // We can't send live objects like DOM nodes or callbacks across JS contexts,
     // so we have to pass the source XML string into the parser's queue and let
     // it post back to this context so we can call the callbacks.
-
+    
     var key = Math.random();
     var entryKey = 'SN.backgroundParse.entry' + key;
     var successKey = 'SN.backgroundParse.success' + key;
@@ -180,8 +256,6 @@ var startTime = Date.now();
         }
     }
 
-    var children = entry.childNodes;
-
     var notice = {};
 
     // STUFF IN THE <entry>
@@ -212,24 +286,12 @@ var startTime = Date.now();
         },
         'published': simpleNode,
         'updated': function(match) {
-
             var updated = match.text;
 
             // knock off the millisecs to make the date string work with humane.js
             notice.updated = updated.substring(0, 19);
         },
-        'title': function(match) {
-
-            notice.title = match.text;
-
-            // XXX: This is horrible, but until we improve the DM feed, this is the best
-            // handle to the author's nick we have
-            var result = match.text.substr(12).match(/\w+\b/);
-
-            if (result) {
-                notice.nickname = result[0];
-            }
-        },
+        'title': simpleNode,
         'content': simpleNode, // @fixme this should actually handle more complex cases, as there may be different data types
         'source': function(match) {
             // atom:source (not the source client, eh) - this might not be in the feed
@@ -283,13 +345,9 @@ var startTime = Date.now();
                 if (!notice.avatar) {
                     notice.avatar = match.attributes['href'];
                 }
-            // for DMs
-            } else if (rel == 'image' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
-                notice.avatar = match.attributes['href'];
             }
         },
         'georss:point': function(match) {
-
             // @fixme comma is also a valid separator
             var gArray = match.text.split(' ');
             notice.lat = gArray[0];
