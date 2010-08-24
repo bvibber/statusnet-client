@@ -279,7 +279,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
 StatusNet.SettingsView.prototype.showAccounts = function() {
     StatusNet.debug('SettingsView.showAccounts');
 
-    this.accounts = StatusNet.Account.listAll(db);
+    this.accounts = StatusNet.Account.listAll(StatusNet.getDB());
     this.rows = [];
     for (var i = 0; i < this.accounts.length; i++) {
         this.addAccountRow(this.accounts[i]);
