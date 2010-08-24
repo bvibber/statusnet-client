@@ -30,71 +30,31 @@ StatusNet.AtomParser = function() {};
  */
 StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
 
-    if (entry.documentElement) {
-        entry = entry.documentElement;
-        if (typeof entry == "function") {
-            // Workaround bug that exposed this property as a function
-            entry = entry();
-        }
-    }
-
     var notice = {};
 
-    var idRegexp = /(\d)+$/;
+    notice.id = $(entry).find('id');
+    notice.title = $(entry).find('title').text();
 
-    var simpleNode = function(match) {
-        notice[match.name] = match.text;
+    // XXX: This is horrible, but until we improve the feed, this is the best
+    // handle to the author's nick we have
+    var result = notice.title.substr(12).match(/\w+\b/);
+
+    if (result) {
+        notice.nickname = result[0];
     }
 
-    StatusNet.AtomParser.mapOverElements(entry, {
-        'id': function(match) {
-            var searchId = match.text;
-            if (searchId.substr(0, 4) == 'tag:') {
-                var result = searchId.match(idRegexp);
-                if (result) {
-                    notice.id = result[0];
-                }
-            }
-        },
-        'title': function(match) {
-            notice.title = match.text;
+    notice.content = $(entry).find('content').text();
+    notice.author = $(entry).find('author name').text();
+    notice.homepage = $(entry).find('author uri').text();
 
-            // XXX: This is horrible, but until we improve the feed, this is the best
-            // handle to the author's nick we have
-            var result = match.text.substr(12).match(/\w+\b/);
+    notice.published = $(entry).find('published').text();
+    var updated = $(entry).find('updated').text();
 
-            if (result) {
-                notice.nickname = result[0];
-            }
-        },
-        'content': simpleNode,
-        'author': function(match) {
-            StatusNet.AtomParser.mapOverElements(match.node, {
-                'name':  function(match) {
-                    notice.author = match.text;
-                },
-                'homepage': function(match2) {
-                    notice.authorUri = match2.text;
-                }
-            });
-        },
-        'published': simpleNode,
-        'updated': function(match) {
-            var updated = match.text;
+    // knock off the millisecs to make the date string work with humane.js
+    notice.updated = updated.substring(0, 19);
 
-            // knock off the millisecs to make the date string work with humane.js
-            notice.updated = updated.substring(0, 19);
-        },
-        'link': function(match) {
-            var rel = match.attributes['rel'];
-            var type = match.attributes['type'];
-            if (rel == 'alternate') {
-                notice.link = match.attributes['href'];
-            } else if (rel == 'image' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
-                notice.avatar = match.attributes['href'];
-            }
-        }
-    });
+    notice.link = $(entry).find('link[rel=alternate]').attr('href');
+    notice.avatar = $(entry).find('link[rel=image]').attr('href');
 
     return notice;
 };
@@ -331,7 +291,7 @@ var startTime = Date.now();
                         notice.avatar = match2.attributes['href'];
                     }
                 }
-            });
+            });        
         },
         'link': function(match) {
             var rel = match.attributes['rel'];

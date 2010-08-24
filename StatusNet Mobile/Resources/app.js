@@ -30,20 +30,16 @@ var sources = ['statusnet.js',
                'model/statusnet_rsd.js',
                'model/statusnet_timeline_friends.js',
                'model/statusnet_atom_parser.js',
-               'model/statusnet_timeline_inbox.js',
 
                'view/statusnet_newnoticeview.js',
-               'view/statusnet_directmessageview.js',
                'view/statusnet_sidebar.js',
                'view/statusnet_infobar.js',
                'view/statusnet_tabbedmenubar.js',
                'view/statusnet_timelineview.js',
                'view/statusnet_timelineview_user.js',
                'view/statusnet_settingsview.js',
-               'view/statusnet_timelineview_inbox.js',
 
                'statusnet_client.js',
-               'parsetest.js',
 
                'heyQuery.js'];
 
@@ -63,6 +59,3 @@ var db = StatusNet.getDB();
 // Find default account, if any, and fire up the client!
 var acct = StatusNet.Account.getDefault(db);
 var client = new StatusNet.Client(acct);
-
-
-//StatusNet.parseTest();

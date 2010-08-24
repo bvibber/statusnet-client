@@ -17,18 +17,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /**
  * Constructor for inbox timeline model
  */
 StatusNet.TimelineInbox = function(client) {
-
-    if (client) {
-        StatusNet.debug('StatusNet.TimelineInbox - client is defined');
-    } else {
-        StatusNet.debug('StatusNet.TimelineInbox - client is NOT defined');
-    }
-
     StatusNet.Timeline.call(this, client);
 
     this.timeline_name = 'inbox';
@@ -39,6 +31,35 @@ StatusNet.TimelineInbox = function(client) {
 
 // Make StatusNet.TimelineInbox inherit Timeline's prototype
 StatusNet.TimelineInbox.prototype = heir(StatusNet.Timeline.prototype);
+
+/**
+ * Add a notice to the Timeline if it's not already in it. Also
+ * adds it to the notice cache.
+ *
+ * @param DOM     entry    the Atom entry form of the notice
+ * @param boolean prepend  whether to add it to the beginning of end of
+ *
+ */
+StatusNet.TimelineInbox.prototype.addNotice = function(entry, prepend) {
+
+    var notice = StatusNet.AtomParser.noticeFromDMEntry(entry);
+
+    // Dedupe here?
+    for (i = 0; i < this._notices.length; i++) {
+        if (this._notices[i].id === notices.id) {
+            StatusNet.debug("skipping duplicate notice: " + notice.id);
+            return;
+        }
+    }
+
+    if (prepend) {
+        this._notices.unshift(notice);
+        this.client.view.showNewNotice(notice);
+    } else {
+        this._notices.push(notice);
+    }
+
+};
 
 /**
  * Don't cache this timeline (yet)
@@ -54,44 +75,7 @@ StatusNet.TimelineInbox.prototype.autoRefresh = function() {
 	return false;
 };
 
-/**
- * Add a notice to the Timeline if it's not already in it. Also
- * adds it to the notice cache.
- *
- * @param DOM     entry    the Atom entry form of the notice
- * @param boolean prepend  whether to add it to the beginning of end of
- *
- */
-StatusNet.TimelineInbox.prototype.addNotice = function(entry, prepend, notifications) {
-StatusNet.debug('TimelineInbox.addNotice enter:');
 
-    var notice = StatusNet.AtomParser.noticeFromDMEntry(entry);
-
-    // Dedupe here?
-    for (i = 0; i < this._notices.length; i++) {
-        if (this._notices[i].id === notice.id) {
-            StatusNet.debug("TimelineInbox.addNotice - skipping duplicate notice: " + notice.id);
-            return;
-        }
-    }
-
-    if (notice.id !== undefined) {
-        if (this.cacheable()) {
-            StatusNet.debug("TimelineInbox.addNotice - encached notice: " + notice.id);
-            this.encacheNotice(notice.id, entry);
-        }
-    }
-
-    StatusNet.debug("TimelineInbox.addNotice - finished encaching notice");
-
-    if (prepend) {
-        this._notices.unshift(notice);
-        this.noticeAdded.notify({notice: notice, notifications: notifications});
-    } else {
-        this._notices.push(notice);
-    }
-StatusNet.debug('TimelineInbox.addNotice DONE.');
-};
 
 
 

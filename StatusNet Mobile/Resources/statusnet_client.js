@@ -58,10 +58,6 @@ StatusNet.Client.prototype.getActiveView = function() {
     return this.view;
 };
 
-StatusNet.Client.prototype.getServer = function() {
-    return this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
-};
-
 /**
  * Reload timeline notices
  */
@@ -195,16 +191,6 @@ StatusNet.Client.prototype.initInternalListeners = function() {
         StatusNet.debug('Event: ' + event);
         that.unblock(event.userId, function() {
             Titanium.App.fireEvent('StatusNet_unblockComplete', {user: event.userId});
-        });
-    });
-
-    Ti.App.addEventListener('StatusNet_replyToDirectMessage', function(event) {
-        that.directMessageDialog(event.author, function(msg) {
-            StatusNet.Infobar.flashMessage(msg);
-            Titanium.App.fireEvent('StatusNet_directMessageComplete', {author: event.author});
-        },
-        function(msg) {
-            StatusNet.Infobar.flashMessage(msg);
         });
     });
 };
@@ -450,20 +436,6 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
             that.view.hideSpinner();
         });
         StatusNet.debug('ALL DONE waiting');
-    });
-    view.init();
-};
-
-/**
- * Show a dialog for sending a direct msg
- */
-StatusNet.Client.prototype.directMessageDialog = function(author, onSuccess, onFailure) {
-    StatusNet.debug("StatusNet.Client.directMessageDialog - begin");
-    var view = new StatusNet.directMessageView({
-        account: this.account,
-        author: author,
-        onSucess: onSuccess,
-        onFailure: onFailure
     });
     view.init();
 };
