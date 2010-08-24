@@ -127,11 +127,10 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
     }
 };
 
-StatusNet.HttpClient.fetchFile = function(url, filename, onSuccess, onError) {
+StatusNet.HttpClient.fetchFile = function(url, file, onSuccess, onError) {
 
     try {
 
-        var file = Titanium.Filesystem.getFile(filename);
         var client = Titanium.Network.createHTTPClient();
 
         if (Titanium.Network.online == false) {
@@ -142,11 +141,13 @@ StatusNet.HttpClient.fetchFile = function(url, filename, onSuccess, onError) {
 
         client.onreadystatechange = function() {
             if (client.readyState == 4) {
-                if (file.write(client.responseData)) {
-                    StatusNet.debug("HttpClient.fetchFile - saved file: " + file);
+                // XXX: write() always returns false on iPhone 1.4.1 SDK. Works Okay on Android.
+                file.write(client.responseData) 
+                if (file.exists()) {
+                    StatusNet.debug("HttpClient.fetchFile - saved file: " + file.nativePath);
                     onSuccess(client.status);
                 } else {
-                    StatusNet.debug("HttpClient.fetchFile - could not save file: " + file);
+                    StatusNet.debug("HttpClient.fetchFile - could not save file: " + file.nativePath);
                 }
             }
         };
