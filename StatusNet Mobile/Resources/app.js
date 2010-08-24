@@ -63,3 +63,5 @@ var db = StatusNet.getDB();
 var acct = StatusNet.Account.getDefault(db);
 var client = new StatusNet.Client(acct);
 
+
+//StatusNet.parseTest();
