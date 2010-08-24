@@ -98,7 +98,6 @@ StatusNet.Client.prototype.init = function() {
         // Set up communications between the core code and the
         // timeline view WebView... once it's set up on the
         // receive end, we'll continue.
-        this.initInternalListeners();
         this.initAccountView(this.account);
     }
 };
@@ -315,6 +314,10 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
     var that = this;
 
     if (!this.mainwin) {
+        // Set up global event listeners, which we'll need to talk to
+        // the other contexts for the timeline and with the tabbed bar.
+        this.initInternalListeners();
+
         this.mainwin = Titanium.UI.createWindow({
             backgroundColor:'#fff',
             navBarHidden: true
