@@ -51,7 +51,7 @@ StatusNet.TimelineViewUser.prototype.show = function () {
     this.hideSpinner();
 };
 
-StatusNet.TimelineView.prototype.appendUserTimelineNotice = function(notice) {
+StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
     var user = this.client.getActiveTimeline().getUser();
     Titanium.App.fireEvent('StatusNet_appendUserTimelineNotice', {notice: notice, user: user});
 }
