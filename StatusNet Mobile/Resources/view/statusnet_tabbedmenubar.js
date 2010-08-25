@@ -23,15 +23,24 @@ StatusNet.TabbedMenuBar = function() {
     this.tabs = [];
     this.selectedTab = 0;
     this.tabGroup = null;
+
+    // For icon-wrapping purposes, plan to fit within the smallest available
+    // screen dimension; when the screen rotates we might flip from landscape
+    // to portrait and don't want to be surprised.
+    // @fixme recheck this dynamically when changing orientation
+    this.width = Math.min(Titanium.Platform.displayCaps.platformWidth,
+                          Titanium.Platform.displayCaps.platformHeight);
     this.height = 49;
+
     this.overFlowTabs = [];
     this.overFlowTable = null;
 
     this.tabView = Titanium.UI.createView({
-        height: 49,
+        height: this.height,
         bottom: 0,
-        width: 320, // @todo Figure out how to determine the screen width! 320 for iPhone
-        backgroundImage: 'images/bg/tab_bg.png',
+        left: 0,
+        right: 0,
+        backgroundImage: 'images/bg/tab_bg.png'
     });
 };
 
@@ -157,7 +166,7 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
 
     StatusNet.debug("Going for tab # " + args.index);
 
-    var space = (this.tabView.width - 200) / 6;
+    var space = (this.width - 200) / 6;
     var left = args.index * (40 + space);
 
     var selectedImage = args.selectedImage;
