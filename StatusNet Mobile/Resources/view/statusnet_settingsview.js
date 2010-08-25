@@ -169,7 +169,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     cancel.addEventListener('click', function() {
         StatusNet.debug('clicked cancel');
         window.close();
-        this.fields = null;
+        view.fields = null;
     });
 
     var save = Titanium.UI.createButton({
@@ -570,12 +570,13 @@ StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onErro
         StatusNet.debug('bizbax 11');
         // Try RSD discovery!
         this.fields.status.text = "Finding secure server...";
+        var that = this;
         StatusNet.RSD.discoverTwitterApi('https://' + site + '/rsd.xml', function(apiroot) {
             StatusNet.debug('bizbax 12');
             onSuccess(new StatusNet.Account(username, password, apiroot));
         }, function() {
             StatusNet.debug('bizbax 13');
-            this.fields.status.text = "Finding non-secured server...";
+            that.fields.status.text = "Finding non-secured server...";
             StatusNet.RSD.discoverTwitterApi('http://' + site + '/rsd.xml', function(apiroot) {
                 StatusNet.debug('bizbax 14');
                 onSuccess(new StatusNet.Account(username, password, apiroot));
