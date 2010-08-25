@@ -331,7 +331,9 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
         var accountsButton = Titanium.UI.createView({
             width: 240,
-            height: 44
+            height: 44,
+            left: 0,
+            top: 0
         });
         var selfAvatar = this.selfAvatar = Titanium.UI.createImageView({
             width: 40,
@@ -363,7 +365,8 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
             settingsView.init();
         });
 
-        this.navbar.setLeftNavButton(accountsButton);
+        //this.navbar.setLeftNavButton(accountsButton);
+        this.navbar.view.add(accountsButton);
 
         var updateButton = Titanium.UI.createButton({
             title: "New",

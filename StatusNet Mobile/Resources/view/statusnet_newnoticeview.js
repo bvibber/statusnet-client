@@ -68,9 +68,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
     var navbar = StatusNet.Platform.createNavBar(this.window);
 
-	var cancelButton = Titanium.UI.createButton({
-        title: 'Cancel'
-        //style: Titanium.UI.iPhone.SystemButtonStyle.DONE // for native iPhone navbar only
+    var cancelButton = Titanium.UI.createButton({
+        title: 'Cancel',
+        style: Titanium.UI.iPhone.SystemButtonStyle.DONE // for native iPhone navbar only
     });
 
     cancelButton.addEventListener('click', function() {

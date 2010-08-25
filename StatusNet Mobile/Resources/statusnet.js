@@ -219,24 +219,30 @@ StatusNet.Platform.animatedOpen = function(window) {
     window.open();
 }
 
-StatusNet.Platform.createNavBar = function(window) {
-
-    var navbar;
+if (StatusNet.Platform.isApple()) {
+    StatusNet.Platform.createNavBar = function(window) {
 
     var height = 44;
-    var view = Titanium.UI.createView({
+    var fontSize = 18;
+    var spacer = Titanium.UI.createButton({
+        systemButton: Titanium.UI.iPhone.SystemButton.FLEXIBLE_SPACE
+    });
+
+    var view = Titanium.UI.createToolbar({
         top: 0,
         left: 0,
         right: 0,
         height: height,
-        //backgroundColor: "#bbbfcc" // ?!
-        backgroundImage: "images/bg/navbar.png"
+        borderTop: false,
+        borderBottom: true,
+        barColor: '#444',
+        items: [spacer]
     });
     window.add(view);
 
     var label = Titanium.UI.createLabel({
         text: window.title,
-        font: {fontSize: height / 2, fontWeight: 'bold'},
+        font: {fontSize: fontSize, fontWeight: 'bold'},
         textAlign: 'center',
         top: 4,
         bottom: 4,
@@ -244,46 +250,110 @@ StatusNet.Platform.createNavBar = function(window) {
     });
     view.add(label);
 
-    navbar = {
-        _view: view,
+    var navbar = {
+        view: view,
         _label: label,
         _left: null,
         _right: null,
         height: height,
         setLeftNavButton: function(button) {
-            if (navbar._left) {
-                navbar._view.remove(navbar._left);
-            }
-            if (button) {
-                button.left = 4;
-                button.top = 4;
-                button.bottom = 4;
-                if (!button.width) {
-                    button.width = 75;
-                }
-                navbar._view.add(button);
-            }
+            navbar.tweakStyle(button);
             navbar._left = button;
+            navbar.updateItems();
         },
         setRightNavButton: function(button) {
-            if (navbar._right) {
-                navbar._view.remove(navbar._right);
-            }
-            if (button) {
-                button.right = 4;
-                button.top = 4;
-                button.bottom = 4;
-                if (!button.width) {
-                    button.width = 50;
-                }
-                navbar._view.add(button);
-            }
+            navbar.tweakStyle(button);
             navbar._right = button;
+            navbar.updateItems();
+        },
+        tweakStyle: function(button) {
+            if (!button.style) {
+                button.style = Titanium.UI.iPhone.SystemButtonStyle.BORDERED;
+            }
+        },
+        updateItems: function() {
+            var items = [];
+            if (navbar._left) {
+                items.push(navbar._left);
+            }
+            items.push(spacer);
+            if (navbar._right) {
+                items.push(navbar._right);
+            }
+            navbar.view.items = items;
         }
     };
 
     return navbar;
 };
+
+} else {
+    StatusNet.Platform.createNavBar = function(window) {
+
+        var height = 44;
+        var fontSize = 18;
+
+        var view = Titanium.UI.createView({
+            top: 0,
+            left: 0,
+            right: 0,
+            height: height,
+            backgroundColor: "#444",
+            backgroundImage: "images/bg/navbar.png"
+        });
+        window.add(view);
+
+        var label = Titanium.UI.createLabel({
+            text: window.title,
+            font: {fontSize: height / 2, fontWeight: 'bold'},
+            textAlign: 'center',
+            top: 4,
+            bottom: 4,
+            color: 'white'
+        });
+        view.add(label);
+
+        var navbar = {
+            view: view,
+            _label: label,
+            _left: null,
+            _right: null,
+            height: height,
+            setLeftNavButton: function(button) {
+                if (navbar._left) {
+                    navbar.view.remove(navbar._left);
+                }
+                if (button) {
+                    button.left = 4;
+                    button.top = 4;
+                    button.bottom = 4;
+                    if (!button.width) {
+                        button.width = 75;
+                    }
+                    navbar.view.add(button);
+                }
+                navbar._left = button;
+            },
+            setRightNavButton: function(button) {
+                if (navbar._right) {
+                    navbar.view.remove(navbar._right);
+                }
+                if (button) {
+                    button.right = 4;
+                    button.top = 4;
+                    button.bottom = 4;
+                    if (!button.width) {
+                        button.width = 50;
+                    }
+                    navbar.view.add(button);
+                }
+                navbar._right = button;
+            }
+        };
+
+        return navbar;
+    };
+}
 
 /**
  * Wrapper for platform-specific XML parser.
