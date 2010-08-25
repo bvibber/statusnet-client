@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ti:app xmlns:ti="http://ti.appcelerator.org">
-<id>net.status.tablet</id>
+<id>net.status.client.tablet</id>
 <name>StatusNet Tablet</name>
 <version>1.0</version>
-<publisher>brion</publisher>
+<publisher>StatusNet, Inc.</publisher>
 <url>http://status.net/</url>
-<description>No description provided</description>
-<copyright>2010 by brion</copyright>
-<icon>default_app_logo.png</icon>
+<description>StatusNet Mobile for iPad</description>
+<copyright>StatusNet, Inc.</copyright>
+<icon>logo.png</icon>
     <persistent-wifi>false</persistent-wifi>
     <prerendered-icon>false</prerendered-icon>
     <statusbar-style>default</statusbar-style>
