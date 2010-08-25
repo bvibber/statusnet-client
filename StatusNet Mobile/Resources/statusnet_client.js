@@ -341,7 +341,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
             top: 2,
             left: 0,
             canScale: true,
-            enableZoomControl: false
+            enableZoomControls: false
         });
         accountsButton.add(selfAvatar);
         var selfLabel = this.selfLabel = Titanium.UI.createLabel({

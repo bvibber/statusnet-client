@@ -23,15 +23,24 @@ StatusNet.TabbedMenuBar = function() {
     this.tabs = [];
     this.selectedTab = 0;
     this.tabGroup = null;
+
+    // For icon-wrapping purposes, plan to fit within the smallest available
+    // screen dimension; when the screen rotates we might flip from landscape
+    // to portrait and don't want to be surprised.
+    // @fixme recheck this dynamically when changing orientation
+    this.width = Math.min(Titanium.Platform.displayCaps.platformWidth,
+                          Titanium.Platform.displayCaps.platformHeight);
     this.height = 49;
+
     this.overFlowTabs = [];
     this.overFlowTable = null;
 
     this.tabView = Titanium.UI.createView({
-        height: 49,
+        height: this.height,
         bottom: 0,
-        width: 320, // @todo Figure out how to determine the screen width! 320 for iPhone
-        backgroundImage: 'images/bg/tab_bg.png',
+        left: 0,
+        right: 0,
+        backgroundImage: 'images/bg/tab_bg.png'
     });
 };
 
@@ -51,7 +60,6 @@ StatusNet.createTabbedBar = function(tabInfo, win, initialSelection) {
                     name: tabInfo[tab].name
                 });
                 tb.tabs.push(minitab);
-                tb.tabView.add(minitab);
             } else {
                 StatusNet.debug("Pushing " + tabInfo[tab].name + " to overflow table");
 
@@ -72,7 +80,6 @@ StatusNet.createTabbedBar = function(tabInfo, win, initialSelection) {
         name: 'more'
     });
     tb.tabs.push(moretab);
-    tb.tabView.add(moretab);
     win.add(tb.tabView);
 
     if (initialSelection) {
@@ -157,7 +164,11 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
 
     StatusNet.debug("Going for tab # " + args.index);
 
-    var space = (this.tabView.width - 200) / 6;
+    var cellSize = 48; // touch target size in logical coords
+    var iconSize = 30; // icon size in logical coords
+    var padding = (cellSize - iconSize) / 2; // spacing on each side of icon
+
+    var space = (this.width - 200) / 6;
     var left = args.index * (40 + space);
 
     var selectedImage = args.selectedImage;
@@ -175,21 +186,34 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
     var minitab = Ti.UI.createImageView({
         image: deselectedImage,
         left: Math.round(left + space),
+        top: padding,
         height: 30,
         width: 30,
         canScale: true,
         enableZoomControls: false // for Android
     });
+    this.tabView.add(minitab);
 
     minitab.index = args.index;
     minitab.name = args.name;
     minitab.deselectedImage = deselectedImage;
     minitab.selectedImage = selectedImage;
 
-    var that = this;
+    // Make a larger touch target over and around the icon
+    // so it's easier to hit it with our fat hu-man fingers.
+    //
+    // Using a label instead of generic View due to bug on Android:
+    // https://appcelerator.lighthouseapp.com/projects/32238/tickets/1625-events-attached-to-a-view-not-working-in-android
+    var touchTarget = Ti.UI.createLabel({
+        left: Math.round(left + space) - padding,
+        top: 0,
+        height: cellSize,
+        width: cellSize
+    });
+    this.tabView.add(touchTarget);
 
-    minitab.addEventListener('click', function()
-    {
+    var that = this;
+    touchTarget.addEventListener('click', function() {
         that.setSelectedTab(args.index);
     });
 
