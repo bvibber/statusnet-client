@@ -166,7 +166,12 @@ StatusNet.TimelineView.prototype.clearTimelineView = function(html) {
 };
 
 StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
-    Titanium.App.fireEvent('StatusNet_appendTimelineNotice', {notice: notice});
+
+    this.client.getActiveTimeline().lookupAvatar(notice.avatar, function(filename) {
+        notice.avatar = filename;
+        Titanium.App.fireEvent('StatusNet_appendTimelineNotice', {notice: notice});
+    });
+    
 };
 
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {

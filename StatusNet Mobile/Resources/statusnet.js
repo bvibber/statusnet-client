@@ -159,6 +159,10 @@ StatusNet.Platform = {
         return Titanium.Platform.osname == "android";
     },
 
+    isMobile: function() {
+        return (StatusNet.Platform.isApple() || StatusNet.Platform.isAndroid());
+    },
+
     /**
      * Returns an appropriate background color for dialog box-style screens
      * on the current platform.
