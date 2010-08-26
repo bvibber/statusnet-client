@@ -54,7 +54,11 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var window = this.window = Titanium.UI.createWindow({
         title: 'New Notice',
         backgroundColor: StatusNet.Platform.dialogBackground(),
-        navBarHidden: true
+        navBarHidden: true,
+        // Needed to work around Android bug with camera/gallery callbacks
+        // and heavyweight windows; it won't send the callbacks direct to
+        // our main context, so we need to run them from there.
+        url: 'statusnet_photo_helper.js'
     });
     if (StatusNet.Platform.isAndroid()) {
         // If we set this on iPhone, it explodes and fails. :P
@@ -152,33 +156,63 @@ StatusNet.NewNoticeView.prototype.init = function() {
         height: controlStripHeight
     });
 
+    // Due to a bug on Android with heavyweight window contexts, we need
+    // to run the actual showCamera etc from another context.
+    // This sets up the event listeners in our main context to communicate
+    // with the window's mini context which only has the camera code.
+    var photoEvent = 'StatusNet.newnotice.photoReceived';
+    var photoListener = function(event) {
+        if (event.status == 'success') {
+            // Read in the temporary file...
+            var tempFile = Titanium.Filesystem.getFile(event.filename);
+            StatusNet.debug('XXX: filename: ' + event.filename);
+            StatusNet.debug('XXX: file: ' + tempFile);
+            StatusNet.debug('XXX: file.exists: ' + tempFile.exists);
+            StatusNet.debug('XXX: file.size: ' + tempFile.size);
+
+            var media = tempFile.read();
+            StatusNet.debug('XXX: media.size: ' + media.size);
+            StatusNet.debug('XXX: media.length: ' + media.length);
+            //tempFile.deleteFile();
+
+            // And attach it!
+            that.addAttachment(media);
+        } else if (event.status == 'cancel') {
+            StatusNet.debug('Photo attachment canceled.');
+        } else if (event.status == 'error') {
+            StatusNet.debug('Photo attachment failed: ' + event.msg);
+            alert(event.msg);
+        } else {
+            StatusNet.debug('Got unexpected event from photo helper.');
+        }
+    }
+    Titanium.App.addEventListener(photoEvent, photoListener);
+    window.addEventListener('close', function() {
+       Titanium.App.removeEventListener(photoEvent, photoListener);
+    });
+
     moreButton.addEventListener('click', function() {
         //noticeTextArea.blur();
         var options = [];
         var callbacks = [];
         if (that.attachment == null) {
+
+
             if (StatusNet.Platform.hasCamera()) {
                 options.push('Take photo');
                 callbacks.push(function() {
-                    Titanium.Media.showCamera({
-                        success: function(event) {
-                            that.addAttachment(event);
-                        },
-                        autohide: true,
-                        animated: true,
-                        saveToPhotoGallery: true
+                    Titanium.App.fireEvent('StatusNet.newnotice.photo', {
+                        source: 'camera',
+                        callbackEvent: photoEvent
                     });
                 });
             }
 
             options.push('Photo gallery');
             callbacks.push(function() {
-                Titanium.Media.openPhotoGallery({
-                    success: function(event) {
-                        that.addAttachment(event);
-                    },
-                    autohide: true,
-                    animated: true
+                Titanium.App.fireEvent('StatusNet.newnotice.photo', {
+                    source: 'gallery',
+                    callbackEvent: photoEvent
                 });
             });
         } else {
@@ -226,7 +260,16 @@ StatusNet.NewNoticeView.prototype.init = function() {
     StatusNet.debug("NewNoticeView.init END");
 };
 
-StatusNet.NewNoticeView.prototype.addAttachment = function(event) {
+StatusNet.NewNoticeView.prototype.addAttachment = function(media) {
+    this.attachment = media;
+    var size = (StatusNet.Platform.isApple() ? media.size : media.length);
+    StatusNet.debug('SIZE IS: ' + size);
+    var msg = Math.round(size / 1024) + ' KB';
+    this.attachInfo.text = msg;
+    StatusNet.debug('QQQ: ' + msg);
+    return;
+
+
     var media = event.media; // TiBlob
     /*
     StatusNet.debug('media.width = ' + media.width);
