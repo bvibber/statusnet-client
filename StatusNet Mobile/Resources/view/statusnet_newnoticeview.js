@@ -197,23 +197,16 @@ StatusNet.NewNoticeView.prototype.init = function() {
         var callbacks = [];
         if (that.attachment == null) {
 
-
             if (StatusNet.Platform.hasCamera()) {
                 options.push('Take photo');
                 callbacks.push(function() {
-                    Titanium.App.fireEvent('StatusNet.newnotice.photo', {
-                        source: 'camera',
-                        callbackEvent: photoEvent
-                    });
+                    that.openAttachment('camera');
                 });
             }
 
             options.push('Photo gallery');
             callbacks.push(function() {
-                Titanium.App.fireEvent('StatusNet.newnotice.photo', {
-                    source: 'gallery',
-                    callbackEvent: photoEvent
-                });
+                that.openAttachment('gallery');
             });
         } else {
             options.push('Remove attachment');
@@ -258,6 +251,18 @@ StatusNet.NewNoticeView.prototype.init = function() {
     StatusNet.Platform.animatedOpen(window);
 
     StatusNet.debug("NewNoticeView.init END");
+};
+
+StatusNet.NewNoticeView.prototype.openAttachment = function(source)
+{
+    if (StatusNet.Platform.isAndroid() && !Ti.Filesystem.isExternalStoragePresent) {
+        alert('SD card is missing or unmounted. Check card and try again.');
+    } else {
+        Titanium.App.fireEvent('StatusNet.newnotice.photo', {
+            source: source,
+            callbackEvent: 'StatusNet.newnotice.photoReceived'
+        });
+    }
 };
 
 StatusNet.NewNoticeView.prototype.addAttachment = function(media) {
