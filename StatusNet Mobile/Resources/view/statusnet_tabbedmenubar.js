@@ -179,8 +179,8 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
         // for iPhone 4 and let them scale down to fit,
         // looks nicer than scaling up the 160-dpi
         // default icons!
-        selectedImage = selectedImage.replace(/\./, '@2x.');
-        deselectedImage = deselectedImage.replace(/\./, '@2x.');
+        selectedImage = selectedImage.replace(/\./, '240.');
+        deselectedImage = deselectedImage.replace(/\./, '240.');
     }
 
     var minitab = Ti.UI.createImageView({
