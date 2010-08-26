@@ -213,41 +213,63 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     */
 
     this.fields = {};
-    var fields = {site: {props: {
-                    hintText: "Server",
-                    returnKeyType:Titanium.UI.RETURNKEY_NEXT,
-                    keyboardType: Titanium.UI.KEYBOARD_URL,
-                    autocapitalization: Titanium.UI.TEXT_AUTOCAPITALIZATION_NONE,
-                    autocorrect: false
-                  }},
-                  username: {props: {
-                    hintText: "Username",
-                    returnKeyType: Titanium.UI.RETURNKEY_NEXT,
-                    keyboardType: Titanium.UI.KEYBOARD_EMAIL,
-                    autocapitalization: Titanium.UI.TEXT_AUTOCAPITALIZATION_NONE,
-                    autocorrect: false
-                  }},
-                  password: {props: {
-                    hintText: "Password",
-                    passwordMask:true,
-                    autocapitalization: Titanium.UI.TEXT_AUTOCAPITALIZATION_NONE,
-                    autocorrect: false, // we need to add this explicitly for Android, or it'll "suggest" your password to you!
-                    keyboardType: Titanium.UI.KEYBOARD_EMAIL, // we need to specify *this* or the autocorrect setting doesn't get set on the actual field for Android?!
-                    returnKeyType:Titanium.UI.RETURNKEY_DONE
-                  }}};
+    var commonProps = {
+        left: 8,
+        right: 8,
+        height: StatusNet.Platform.isAndroid() ? 'auto' : 32, // argghhhhh auto doesn't work on iphone
+        borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED,
+        autocapitalization: Titanium.UI.TEXT_AUTOCAPITALIZATION_NONE,
+        autocorrect: false
+    };
+    var fields = {
+        site: {
+            label: "Server",
+            props: {
+                hintText: "example.status.net",
+                returnKeyType:Titanium.UI.RETURNKEY_NEXT,
+                keyboardType: Titanium.UI.KEYBOARD_URL
+            }
+        },
+        username: {
+            label: "Username",
+            props: {
+                hintText: "user",
+                returnKeyType: Titanium.UI.RETURNKEY_NEXT,
+                keyboardType: Titanium.UI.KEYBOARD_EMAIL
+            }
+        },
+        password: {
+            label: "Password",
+            props: {
+                hintText: "Required",
+                passwordMask:true,
+                keyboardType: Titanium.UI.KEYBOARD_EMAIL, // we need to specify *this* or the autocorrect setting doesn't get set on the actual field for Android?!
+                returnKeyType:Titanium.UI.RETURNKEY_DONE
+            }
+        }
+    };
     for (var i in fields) {
         if (fields.hasOwnProperty(i)) {
-            var props = {
+            var field = fields[i];
+            var props = {};
+            var slurp = function(source) {
+                for (var j in source) {
+                    if (source.hasOwnProperty(j)) {
+                        props[j] = source[j];
+                    }
+                }
+            };
+            slurp(commonProps);
+            slurp(field.props);
+
+            var label = Titanium.UI.createLabel({
                 left: 8,
                 right: 8,
-                height: StatusNet.Platform.isAndroid() ? 'auto' : 32, // argghhhhh auto doesn't work on iphone
-                borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED
-            };
-            for (var j in fields[i].props) {
-                if (fields[i].props.hasOwnProperty(j)) {
-                    props[j] = fields[i].props[j];
-                }
-            }
+                height: 'auto',
+                text: field.label
+            });
+            window.add(label);
+
             var text = Titanium.UI.createTextField(props);
             window.add(text);
 
