@@ -354,7 +354,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
             font: {
                 fontSize: 18
             },
-            minimumFontSize: 8
+            minimumFontSize: 8 // This has no effect on Android; we have a hack in setAccountLabel below.
         });
         accountsButton.add(selfLabel);
 
@@ -426,7 +426,23 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
 StatusNet.Client.prototype.setAccountLabel = function() {
     this.selfAvatar.image = this.account.avatar;
-    this.selfLabel.text = this.account.username + '@' + this.account.getHost();
+
+    var label = this.account.username + '@' + this.account.getHost();
+    this.selfLabel.text = label;
+
+    // Horrible hack!
+    // https://appcelerator.lighthouseapp.com/projects/32238/tickets/1618-label-property-minimumfontsize-not-implemented-on-android
+    if (StatusNet.Platform.isAndroid()) {
+        var baseSize = 18;
+        var max = 20;
+        var fontSize = baseSize;
+        if (label.length > max) {
+            fontSize = (baseSize * max / label.length);
+        }
+        // Note the below takes no effect:
+        //this.selfLabel.font.fontSize = fontSize;
+        this.selfLabel.font = {fontSize: fontSize};
+    }
 }
 
 /**
