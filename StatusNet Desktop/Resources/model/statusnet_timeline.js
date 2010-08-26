@@ -397,8 +397,8 @@ StatusNet.Timeline.prototype.trimAvatarCache = function() {
 
     var MAX_AVATARS = 200; // @todo Make this configurable
 
-    var appDir = Titanium.Filesystem.applicationDataDirectory;
-    var cacheDir = Titanium.Filesystem.getFile(appDir, 'avatar_cache');
+    var appDirName = Titanium.Filesystem.applicationDataDirectory;
+    var cacheDir = Titanium.Filesystem.getFile(appDirName, 'avatar_cache');
     var dirList = cacheDir.getDirectoryListing();
 
     var avatars = [];
@@ -407,24 +407,22 @@ StatusNet.Timeline.prototype.trimAvatarCache = function() {
         StatusNet.debug("trimAvatarCache - avatar cache directory has " + dirList.length + " files. Max is " + MAX_AVATARS);
         if (dirList.length > MAX_AVATARS) {
 
+            var avatarFile;
+
             // Make a list of avatar files and their modification times
             for (i = 0; i < dirList.length; i++) {
 
-                // FIXME: Sorting by mod time doesn't work on mobile yet
-                var avatarFile =  Titanium.Filesystem.getFile(dirList[i]);
-                var timestamp = 0;
-
-                // XXX: Calling modificationTimesteamp() on mobile doesn't work in 1.4.1
-                if (!StatusNet.Platform.isMobile()) {
-                    timestamp = avatarFile.modificationTimestamp();
-                }
+                avatarFile = Titanium.Filesystem.getFile(appDirName, 'avatar_cache', dirList[i]);
 
                 var avatar = {
-                    "filename": avatarFile.toString(),
-                    "timestamp": timestamp
+                    "filename": dirList[i],
+                    "timestamp": avatarFile.modificationTimestamp()
                 };
                 avatars.push(avatar);
             }
+
+            // XXX NOTE: This sort does not currently work on iPhone because modificationTimestamp()
+            // always returns 1 instead of a date.
 
             // Sort by timestamp - ascending
             avatars.sort(function(a, b) {
@@ -436,10 +434,13 @@ StatusNet.Timeline.prototype.trimAvatarCache = function() {
             StatusNet.debug("trimAvatarCache - avatar cache has " + overflow + " too many avatars, trimming...");
 
             for (i = 0; i < overflow; i++) {
-                if (Titanium.Filesystem.getFile(avatars[i].filename).deleteFile()) {
-                    StatusNet.debug("trimAvatarCache - deleted " + avatars[i].filename);
-                } else {
-                    StatusNet.debug("trimAvatarCache - couldn't delete " + avatars[i].filename);
+                avatarFile = Titanium.Filesystem.getFile(appDirName, 'avatar_cache', avatars[i].filename);
+                if (avatarFile.exists()) {
+                    if (avatarFile.deleteFile()) {
+                        StatusNet.debug("trimAvatarCache - deleted " + avatars[i].filename);
+                    } else {
+                        StatusNet.debug("trimAvatarCache - couldn't delete " + avatars[i].filename);
+                    }
                 }
             }
             StatusNet.debug("trimAvatarCache - done trimming avatars.")
@@ -596,6 +597,15 @@ StatusNet.Timeline.prototype.lookupAvatar = function(url, onHit, onMiss) {
     } else {
 
         StatusNet.debug("Timeline.lookupAvatar H - Avatar cache miss, fetching avatar from web");
+
+        // Make sure there's space available on the device before fetching
+        if (!cacheDir.spaceAvailable()) {
+            StatusNet.debug("No space available! Can't cache avatar.");
+            if (onMiss) {
+                onMiss(url);
+            }
+            return false;
+        }
 
         StatusNet.HttpClient.fetchFile(
             url,
