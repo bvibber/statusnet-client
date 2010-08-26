@@ -323,7 +323,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         this.initInternalListeners();
 
         this.mainwin = Titanium.UI.createWindow({
-            backgroundColor:'#fff',
+            backgroundColor: 'black',
             navBarHidden: true,
             exitOnClose: true // for Android back button
         });
