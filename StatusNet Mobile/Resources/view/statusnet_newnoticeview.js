@@ -43,6 +43,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
     var margin = 4;
     var controlStripHeight = 32;
+    var topMargin = 0;
     var keyboardMargin = 0;
     if (StatusNet.Platform.isApple()) {
         // Currently, iPhone doesn't resize the window or our controls
@@ -54,7 +55,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var window = this.window = Titanium.UI.createWindow({
         title: 'New Notice',
         backgroundColor: StatusNet.Platform.dialogBackground(),
-        navBarHidden: true,
+        // Need to set this value to trigger a heavyweight window... needed
+        // to make back button and soft input mode work correctly.
+        navBarHidden: false,
         // Needed to work around Android bug with camera/gallery callbacks
         // and heavyweight windows; it won't send the callbacks direct to
         // our main context, so we need to run them from there.
@@ -70,17 +73,12 @@ StatusNet.NewNoticeView.prototype.init = function() {
             Ti.UI.Android.SOFT_INPUT_STATE_VISIBLE;
     }
 
-    var navbar = StatusNet.Platform.createNavBar(this.window);
-
     var cancelButton = Titanium.UI.createButton({
-        title: 'Cancel',
-        style: Titanium.UI.iPhone.SystemButtonStyle.DONE // for native iPhone navbar only
+        title: 'Cancel'
     });
-
     cancelButton.addEventListener('click', function() {
         that.window.close();
     });
-    navbar.setLeftNavButton(cancelButton);
 
     var updateButton = Titanium.UI.createButton({
         title: "Send"
@@ -88,10 +86,46 @@ StatusNet.NewNoticeView.prototype.init = function() {
     updateButton.addEventListener('click', function() {
         that.postNotice(noticeTextArea.value);
     });
-    navbar.setRightNavButton(updateButton);
+
+    if (StatusNet.Platform.isApple()) {
+        // Use iPhone-style navbar (as a toolbar under our management)
+        var navbar = StatusNet.Platform.createNavBar(this.window);
+        cancelButton.style = Titanium.UI.iPhone.SystemButtonStyle.DONE; // is this right?
+        navbar.setLeftNavButton(cancelButton);
+        navbar.setRightNavButton(updateButton);
+        topMargin = navbar.height;
+    } else {
+        // Make the dialog look more Android-y... Use native title bar,
+        // and put the send/cancel buttons at the bottom.
+        // @fixme use proper layout manager
+        var buttonHeight = 40;
+        var buttonBar = Titanium.UI.createView({
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: buttonHeight + margin * 2,
+            backgroundColor: '#aaa'
+        });
+        window.add(buttonBar);
+
+        var screenWidth = Titanium.Platform.displayCaps.platformWidth;
+        updateButton.left = margin;
+        updateButton.right = (screenWidth + margin) / 2;
+        updateButton.top = margin;
+        updateButton.bottom = margin;
+        buttonBar.add(updateButton);
+
+        cancelButton.left = (screenWidth + margin) / 2;
+        cancelButton.right = margin;
+        cancelButton.bottom = margin;
+        cancelButton.top = margin;
+        buttonBar.add(cancelButton);
+
+        keyboardMargin += buttonHeight + margin * 2;
+    }
 
     var noticeTextArea = Titanium.UI.createTextArea({
-        top: navbar.height + margin,
+        top: topMargin + margin,
         left: margin,
         right: margin,
         bottom: keyboardMargin + margin + controlStripHeight,
@@ -235,16 +269,15 @@ StatusNet.NewNoticeView.prototype.init = function() {
     if (StatusNet.Platform.isApple()) {
         // iPhone specific activity indicator niceties
         this.actInd.style = Titanium.UI.iPhone.ActivityIndicatorStyle.BIG;
-
-
-        // Setting focus to the textarea doesn't show the keyboard
-        // on Android for some reason. Leave it unfocused there so
-        // the first tap in will set focus and open the keyboard.
-        window.addEventListener('open', function(event) {
-            // set focus to the text entry field
-            noticeTextArea.focus();
-        });
     }
+
+
+    // Note that on Android, actually triggering the keyboard
+    // requires our other settings above.
+    window.addEventListener('open', function(event) {
+        // set focus to the text entry field
+        noticeTextArea.focus();
+    });
 
     window.add(this.actInd);
 
