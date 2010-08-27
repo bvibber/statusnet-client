@@ -298,7 +298,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         text: "",
         height: StatusNet.Platform.isAndroid() ? 'auto' : 32
     });
-    window.add(this.fields.status);
+    workArea.add(this.fields.status);
 
     StatusNet.Platform.setInitialFocus(window, this.fields.site);
     StatusNet.Platform.animatedOpen(window);
