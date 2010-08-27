@@ -200,15 +200,16 @@ StatusNet.Platform.hasMenu = StatusNet.Platform.isAndroid;
 StatusNet.Platform.animatedOpen = function(window) {
     window.close();
     if (StatusNet.Platform.isApple()) {
-        var h = Titanium.Platform.displayCaps.platformHeight - 20;
-        window.top = h;
-        window.height = h;
+        var screenHeight = Titanium.Platform.displayCaps.platformHeight;
+        var pushDown = Ti.UI.create2DMatrix().translate(0, screenHeight);
+        window.transform = pushDown;
+
+        var pushUp = Ti.UI.create2DMatrix(); //pushDown.invert();
         window.addEventListener('open', function() {
-            var anim = Titanium.UI.createAnimation({
-                top: 0,
+            window.animate({
+                transform: pushUp,
                 duration: 500
             });
-            window.animate(anim);
         });
     } else {
         // On Android, making sure this setting is present will
@@ -441,4 +442,34 @@ StatusNet.Platform.setupLongClick = function(view, callback)
         }
         return true;
     });
+}
+
+StatusNet.Platform.setInitialFocus = function(window, control)
+{
+    if (StatusNet.Platform.isAndroid()) {
+        // If we set this on iPhone, it explodes and fails. :P
+        // Need to set it on Android to force the window to size to fit
+        // the screen area limited by the software keyboard, since we
+        // can't predict its height.
+        window.windowSoftInputMode =
+            Ti.UI.Android.SOFT_INPUT_ADJUST_RESIZE +
+            Ti.UI.Android.SOFT_INPUT_STATE_VISIBLE;
+
+        window.addEventListener('open', function() {
+            // set focus to the text entry field
+            control.focus();
+        });
+    } else {
+        window.addEventListener('open', function() {
+            // Wait a quarter second to start to give our
+            // open-window animation a chance to go. When
+            // it's around halfway we'll start opening the
+            // keyboard.
+            setTimeout(function() {
+                // set focus to the text entry field and
+                // start opening the on-screen keyboard
+                control.focus();
+            }, 220);
+        });
+    }
 }

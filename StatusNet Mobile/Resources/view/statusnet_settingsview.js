@@ -153,7 +153,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         navBarHidden: true // hack for iphone for now
     });
 
-    navbar = StatusNet.Platform.createNavBar(window);
+    var navbar = StatusNet.Platform.createNavBar(window);
 
     window.addEventListener('close', function() {
         // if the main accounts view wasn't already open...
@@ -296,10 +296,13 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
 
     this.fields.status = Titanium.UI.createLabel({
         text: "",
+        left: 8,
+        right: 8,
         height: StatusNet.Platform.isAndroid() ? 'auto' : 32
     });
-    window.add(this.fields.status);
+    workArea.add(this.fields.status);
 
+    StatusNet.Platform.setInitialFocus(window, this.fields.site);
     StatusNet.Platform.animatedOpen(window);
 };
 
