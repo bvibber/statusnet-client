@@ -407,22 +407,21 @@ StatusNet.Timeline.prototype.trimAvatarCache = function() {
         StatusNet.debug("trimAvatarCache - avatar cache directory has " + dirList.length + " files. Max is " + MAX_AVATARS);
         if (dirList.length > MAX_AVATARS) {
 
-            var avatarFile;
+            var avatarFile, modts;
 
             // Make a list of avatar files and their modification times
             for (i = 0; i < dirList.length; i++) {
 
                 avatarFile = Titanium.Filesystem.getFile(appDirName, 'avatar_cache', dirList[i]);
+                modts = avatarFile.modificationTimestamp();
 
                 var avatar = {
                     "filename": dirList[i],
-                    "timestamp": avatarFile.modificationTimestamp()
+                    // XXX: modificationTimestamp returns a Date obj on iPhone and a long on Android
+                    "timestamp": (typeof modts == "object") ? modts.getTime() : modts
                 };
                 avatars.push(avatar);
             }
-
-            // XXX NOTE: This sort does not currently work on iPhone because modificationTimestamp()
-            // always returns 1 instead of a date.
 
             // Sort by timestamp - ascending
             avatars.sort(function(a, b) {
