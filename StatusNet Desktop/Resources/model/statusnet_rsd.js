@@ -44,3 +44,61 @@ StatusNet.RSD.discoverTwitterApi = function(url, onSuccess, onError) {
     );
 };
 
+/**
+ * Find the RSD URL from the given web page...
+ */
+StatusNet.RSD.discover = function(url, onSuccess, onError) {
+    StatusNet.HttpClient.webRequest(url,
+        function(status, xml, text) {
+            var rsd, dom;
+            if (status >= 400) {
+                StatusNet.debug("Can't find RSD; bad HTTP response: " + status);
+                onError();
+            }
+            if (xml) {
+                rsd = StatusNet.RSD.findRSD(xml);
+                if (rsd) {
+                    StatusNet.debug("RSD URL is at " + url);
+                    onSuccess(rsd);
+                } else {
+                    StatusNet.debug("Didn't find an RSD URL reference.");
+                    onError();
+                }
+            } else {
+                // Not valid XHTML? Well crap!
+                // In theory we could probably pull in a webview or something
+                // since there's not a native HTML parser available, but...
+                // that just sounds annoying.
+                //
+                // For now we're going to be EVIL.
+                var linker = /<link[^>]*>/g
+                var matches;
+                while ((matches = linker.exec(text)) != null) {
+                    var link = matches[0];
+                    StatusNet.debug("link: " + link);
+                    if (link.substr(link.length - 2, 1) != '/') {
+                        link = link.substr(0, link.length - 2) + '/>';
+                    }
+                    try {
+                        dom = StatusNet.Platform.parseXml(link);
+                    } catch (e) {
+                        continue;
+                    }
+                    rsd = StatusNet.RSD.findRSD(dom);
+                    if (rsd) {
+                        StatusNet.debug("RSD URL is at " + url);
+                        onSuccess(rsd);
+                        return;
+                    }
+                }
+                StatusNet.debug("No RSD link found.");
+                onError();
+            }
+        },
+        onError
+    );
+};
+
+StatusNet.RSD.findRSD = function(xml, onSuccess, onError) {
+    return $("link[rel=EditURI]", xml).attr("href");
+}

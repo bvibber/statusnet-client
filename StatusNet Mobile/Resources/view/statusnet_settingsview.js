@@ -467,65 +467,44 @@ StatusNet.SettingsView.prototype.cancelUpdateTimeout = function() {
  */
 StatusNet.SettingsView.prototype.verifyAccount = function(onSuccess, onError) {
     var that = this;
-    StatusNet.debug('yadda 1');
-    this.cancelUpdateTimeout();
-    StatusNet.debug('yadda 2');
     this.discoverNewAccount(function(acct) {
-        StatusNet.debug('yadda 3');
         StatusNet.debug("Discovered... found: " + acct);
-        StatusNet.debug("Previous was: " + that.workAcct);
-        if (acct.equals(that.workAcct)) {
-            StatusNet.debug('yadda 4');
-            // No change.
-            StatusNet.debug("No change!");
-            that.fields.status.text = "No change.";
-        } else {
-            StatusNet.debug('yadda 5');
-            StatusNet.debug("New acct");
-            that.fields.status.text = "Testing login...";
 
-            that.workAcct = acct;
-            //$("#new-save").attr("disabled", "disabled");
-            //$("#new-avatar").attr("src", "images/icon_processing.gif");
+        that.workAcct = acct;
+        that.fields.status.text = "Testing login...";
 
-            that.workAcct.apiGet('account/verify_credentials.xml', function(status, xml) {
-                StatusNet.debug("got xml: " + xml);
+        acct.apiGet('account/verify_credentials.xml', function(status, xml) {
+            that.fields.status.text = "Login confirmed.";
 
-                that.fields.status.text = "Login confirmed.";
-                that.xml = xml;
+            that.workAcct.avatar = $(xml).find('user > profile_image_url').text();
 
-                that.workAcct.avatar  = $(xml).find('user > profile_image_url').text();
+            // get site specific configuration info
+            that.workAcct.apiGet('statusnet/config.xml', function(status, xml) {
+                that.workAcct.textLimit = $(xml).find('site > textlimit').text();
+                that.workAcct.siteLogo = $(xml).find('site > logo').text();
 
-                /*
-                // @fixme replace avatar update code for mobile...
-                StatusNet.debug(that.workAcct.avatar);
-                */
-                //$("#new-avatar").attr("src", that.workAcct.avatar);
-                //$("#new-save").removeAttr("disabled");
+                // finally call our success
+                onSuccess();
 
-                // get site specific configuration info
-                that.workAcct.apiGet('statusnet/config.xml', function(status, xml) {
-                    StatusNet.debug("Loaded statusnet/config.xml");
-                    that.workAcct.textLimit = $(xml).find('site > textlimit').text();
-                    that.workAcct.siteLogo = $(xml).find('site > logo').text();
-
-                    // finally call our success
-                    onSuccess();
-
-                }, function(status) {
-                    StatusNet.debug("Couldn't load statusnet/config.xml for site.");
-                    onError();
-                });
-
-            }, function(status) {
-                that.fields.status.text = "Bad nickname or password.";
-                StatusNet.debug("We failed to load account info");
-                //$("#new-avatar").attr("src", "images/default-avatar-stream.png");
+            }, function(status, msg) {
+                that.fields.status.text = "No site config; bad server version?";
+                StatusNet.debug("Failed to load site config: HTTP response " +
+                    status + ": " + msg);
                 onError();
             });
-        }
+
+        }, function(status, msg) {
+            if (status == 401) {
+                // Bad auth
+                that.fields.status.text = "Bad nickname or password.";
+            } else {
+                that.fields.status.text = "HTTP error " + status;
+            }
+            StatusNet.debug("We failed to load account info: HTTP response " +
+                status + ": " + msg);
+            onError();
+        });
     }, function() {
-        StatusNet.debug('yadda 99');
         that.fields.status.text = "Could not verify site.";
         StatusNet.debug("Bogus acct");
         that.workAcct = null;
@@ -533,7 +512,6 @@ StatusNet.SettingsView.prototype.verifyAccount = function(onSuccess, onError) {
         //$("#new-save").attr("disabled", "disabled");
         //$("#new-avatar").attr("src", "images/default-avatar-stream.png");
     });
-    StatusNet.debug("yadda: the end");
 };
 
 /**
@@ -544,73 +522,53 @@ StatusNet.SettingsView.prototype.verifyAccount = function(onSuccess, onError) {
  * @param onError function()
  */
 StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onError) {
-    StatusNet.debug('bizbax 1');
     var username = this.fields.username.value;
     var password = this.fields.password.value;
     var site = this.fields.site.value;
-    StatusNet.debug('bizbax 2');
 
-    if (this.workAcct != null &&
-        username == this.lastUsername &&
-        password == this.lastPassword &&
-        site == this.lastSite) {
-        StatusNet.debug('bizbax 3');
-
-        onSuccess(this.workAcct);
-        StatusNet.debug('bizbax 4');
-        return;
-    }
-    StatusNet.debug('bizbax 5');
-    this.lastUsername = username;
-    this.lastPassword = password;
-    this.lastSite = site;
     if (username == '' || password == '' || site == '') {
-        StatusNet.debug('bizbax 6');
         onError();
-        StatusNet.debug('bizbax 7');
         return;
     }
 
-    StatusNet.debug('bizbax 8');
-
+    var that = this;
     var url;
 
+    var foundAPI = function(apiroot) {
+        that.fields.status.text = "Found " + apiroot;
+        onSuccess(new StatusNet.Account(username, password, apiroot));
+    };
+
     if (site.substr(0, 7) == 'http://' || site.substr(0, 8) == 'https://') {
-        StatusNet.debug('bizbax 9');
         url = site;
-        if (url.substr(url.length - 1, 1) != '/') {
-            url += '/';
+        if (url.substr(url.length - 4, 4) == '/api') {
+            url = url + '/';
         }
-        onSuccess(new StatusNet.Account(username, password, url));
+        if (url.substr(url.length - 5, 5) == '/api/') {
+            // Looks like we've been given an API base URL... use it!
+            onSuccess(new StatusNet.Account(username, password, url));
+        } else {
+            // Not sure what we've got, so try discovery...
+            StatusNet.RSD.discover(url, function(rsd) {
+                StatusNet.RSD.discoverTwitterApi(rsd, foundAPI, onError);
+            }, onError);
+        }
     } else if (site == 'twitter.com') {
-        StatusNet.debug('bizbax 10');
         // Special case Twitter...
         // but it probably ain't super great as we do SN-specific stuff!
         url = 'https://twitter.com/';
         onSuccess(new StatusNet.Account(username, password, url));
     } else {
-        StatusNet.debug('bizbax 11');
+        // Looks like a bare hostname. Try its root page as HTTPS and HTTP...
         // Try RSD discovery!
         this.fields.status.text = "Finding secure server...";
-        var that = this;
-        StatusNet.RSD.discoverTwitterApi('https://' + site + '/rsd.xml', function(apiroot) {
-            StatusNet.debug('bizbax 12');
-            onSuccess(new StatusNet.Account(username, password, apiroot));
-        }, function() {
-            StatusNet.debug('bizbax 13');
+        var rsd = 'https://' + site + '/rsd.xml';
+        StatusNet.RSD.discoverTwitterApi(rsd, foundAPI, function() {
             that.fields.status.text = "Finding non-secured server...";
-            StatusNet.RSD.discoverTwitterApi('http://' + site + '/rsd.xml', function(apiroot) {
-                StatusNet.debug('bizbax 14');
-                onSuccess(new StatusNet.Account(username, password, apiroot));
-            }, function() {
-                // nothin' :(
-                StatusNet.debug('bizbax 15');
-                onError();
-            });
+            var rsd = 'http://' + site + '/rsd.xml';
+            StatusNet.RSD.discoverTwitterApi(rsd, foundAPI, onError);
         });
-        StatusNet.debug('bizbax 16');
     }
-    StatusNet.debug('bizbax 99');
 };
 
 StatusNet.SettingsView.prototype.saveNewAccount = function() {
