@@ -29,19 +29,31 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
         client.onload = function() {
 
-            StatusNet.debug("webRequest: in onload, before parse " + this.status);
+            StatusNet.debug("XYZ webRequest: in onload, before parse " + this.status);
 
-            StatusNet.debug(Titanium.version);
-
-            var responseXML;
-            if (this.responseXML == null) {
-                try {
-                    responseXML = StatusNet.Platform.parseXml(this.responseText);
-                } catch (e) {
-                    responseXML = null;
+            var responseXML = null;
+            var type = client.getResponseHeader('Content-Type');
+            if (/^[^\/]+\/(.+\+)?xml(;|$)/.test(type) && type != 'application/vnd.wap.xhtml+xml') {
+                // Don't check the responseXML property until we've confirmed
+                // this is supposed to be an XML fetch, or it'll throw an
+                // exception on iPhone.
+                //
+                // Also skipping the wap/xhtml which our mobileprofile currently
+                // sends to things it thinks are iphones... there's not currently
+                // a good guarantee of correctness. Sigh.
+                StatusNet.debug("XML? " + type);
+                responseXML = this.responseXML;
+                if (responseXML == null) {
+                    StatusNet.debug("Trying a manual XML parse...");
+                    try {
+                        responseXML = StatusNet.Platform.parseXml(this.responseText);
+                    } catch (e) {
+                        responseXML = null;
+                    }
                 }
             } else {
-                responseXML = this.responseXML;
+                StatusNet.debug("Not XML? " + type);
+                responseXML = null;
             }
 
             StatusNet.debug("webRequest: after parse, before onSuccess");
@@ -103,7 +115,7 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
                 // @fixme Desktop vs Mobile auth differences HTTPClient hack
                 // setRequestHeader must be called between open() and send()
                 var auth = 'Basic ' + Titanium.Utils.base64encode(username + ':' + password);
-                StatusNet.debug("webRequest: Authorization: " + auth);
+                //StatusNet.debug("webRequest: Authorization: " + auth);
                 client.setRequestHeader('Authorization', auth);
             }
         }
