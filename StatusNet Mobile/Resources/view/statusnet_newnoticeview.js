@@ -89,7 +89,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
     if (StatusNet.Platform.isApple()) {
         // Use iPhone-style navbar (as a toolbar under our management)
-        var navbar = StatusNet.Platform.createNavBar(this.window);
+        var navbar = StatusNet.Platform.createNavBar(window);
         cancelButton.style = Titanium.UI.iPhone.SystemButtonStyle.DONE; // is this right?
         navbar.setLeftNavButton(cancelButton);
         navbar.setRightNavButton(updateButton);

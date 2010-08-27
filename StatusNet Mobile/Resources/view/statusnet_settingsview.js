@@ -150,7 +150,6 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     var window = Titanium.UI.createWindow({
         title: "Add Account",
         backgroundColor: StatusNet.Platform.dialogBackground(),
-        layout: 'vertical',
         navBarHidden: true // hack for iphone for now
     });
 
@@ -212,6 +211,15 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         // Add the buttons at the bottom later...
     */
 
+    var workArea = Titanium.UI.createView({
+        top: navbar.height,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        layout: 'vertical'
+    });
+    window.add(workArea);
+
     this.fields = {};
     var commonProps = {
         left: 8,
@@ -268,10 +276,10 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
                 height: 'auto',
                 text: field.label
             });
-            window.add(label);
+            workArea.add(label);
 
             var text = Titanium.UI.createTextField(props);
-            window.add(text);
+            workArea.add(text);
 
             this.fields[i] = text;
         }

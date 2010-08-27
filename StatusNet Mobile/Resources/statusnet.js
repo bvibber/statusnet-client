@@ -240,15 +240,21 @@ if (StatusNet.Platform.isApple()) {
     });
     window.add(view);
 
-    var label = Titanium.UI.createLabel({
-        text: window.title,
-        font: {fontSize: fontSize, fontWeight: 'bold'},
-        textAlign: 'center',
-        top: 4,
-        bottom: 4,
-        color: 'white'
-    });
-    view.add(label);
+    var label = null;
+    var title = window.title;
+    if (title != '') {
+        label = Titanium.UI.createLabel({
+            text: title,
+            font: {fontSize: fontSize, fontWeight: 'bold'},
+            textAlign: 'center',
+            top: 4,
+            height: height - 8,
+            left: 60,
+            right: 60,
+            color: 'white'
+        });
+        window.add(label);
+    }
 
     var navbar = {
         view: view,
