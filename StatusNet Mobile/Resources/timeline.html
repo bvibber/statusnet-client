@@ -272,13 +272,13 @@ enableNoticeControls = function(noticeDom) {
     // with click event handlers to display timelines within the client
     //if (this.localAuthor(uri)) {
 
-        $notice.find('div a.author').attr('href', "#");
+        //$notice.find('div a.author').attr('href', "#");
         $notice.find('div a.author').bind('click', function(event) {
             Titanium.App.fireEvent("StatusNet_switchUserTimeline", {authorId: authorId});
             return false;
         });
 
-        $notice.find('div.avatar a').attr('href', "#");
+        //$notice.find('div.avatar a').attr('href', "#");
         $notice.find('div.avatar').bind('click', function(event) {
             Titanium.App.fireEvent("StatusNet_switchUserTimeline", {authorId: authorId});
             return false;
@@ -317,7 +317,7 @@ enableNoticeControls = function(noticeDom) {
     $notice.find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');
         //if (that.localAuthor(href)) {
-            $(this).attr('href', '#');
+            //$(this).attr('href', '#');
             $(this).click(function() {
                 var idRegexp = /(\d)+$/;
                 result = href.match(idRegexp);
