@@ -296,6 +296,8 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
 
     this.fields.status = Titanium.UI.createLabel({
         text: "",
+        left: 8,
+        right: 8,
         height: StatusNet.Platform.isAndroid() ? 'auto' : 32
     });
     workArea.add(this.fields.status);
