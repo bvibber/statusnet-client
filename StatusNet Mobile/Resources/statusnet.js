@@ -443,3 +443,33 @@ StatusNet.Platform.setupLongClick = function(view, callback)
         return true;
     });
 }
+
+StatusNet.Platform.setInitialFocus = function(window, control)
+{
+    if (StatusNet.Platform.isAndroid()) {
+        // If we set this on iPhone, it explodes and fails. :P
+        // Need to set it on Android to force the window to size to fit
+        // the screen area limited by the software keyboard, since we
+        // can't predict its height.
+        window.windowSoftInputMode =
+            Ti.UI.Android.SOFT_INPUT_ADJUST_RESIZE +
+            Ti.UI.Android.SOFT_INPUT_STATE_VISIBLE;
+
+        window.addEventListener('open', function() {
+            // set focus to the text entry field
+            control.focus();
+        });
+    } else {
+        window.addEventListener('open', function() {
+            // Wait a quarter second to start to give our
+            // open-window animation a chance to go. When
+            // it's around halfway we'll start opening the
+            // keyboard.
+            setTimeout(function() {
+                // set focus to the text entry field and
+                // start opening the on-screen keyboard
+                control.focus();
+            }, 220);
+        });
+    }
+}

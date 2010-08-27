@@ -63,15 +63,6 @@ StatusNet.NewNoticeView.prototype.init = function() {
         // our main context, so we need to run them from there.
         url: 'statusnet_photo_helper.js'
     });
-    if (StatusNet.Platform.isAndroid()) {
-        // If we set this on iPhone, it explodes and fails. :P
-        // Need to set it on Android to force the window to size to fit
-        // the screen area limited by the software keyboard, since we
-        // can't predict its height.
-        window.windowSoftInputMode =
-            Ti.UI.Android.SOFT_INPUT_ADJUST_RESIZE +
-            Ti.UI.Android.SOFT_INPUT_STATE_VISIBLE;
-    }
 
     var cancelButton = Titanium.UI.createButton({
         title: 'Cancel'
@@ -271,16 +262,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
         this.actInd.style = Titanium.UI.iPhone.ActivityIndicatorStyle.BIG;
     }
 
-
-    // Note that on Android, actually triggering the keyboard
-    // requires our other settings above.
-    window.addEventListener('open', function(event) {
-        // set focus to the text entry field
-        noticeTextArea.focus();
-    });
-
     window.add(this.actInd);
 
+    StatusNet.Platform.setInitialFocus(window, noticeTextArea);
     StatusNet.Platform.animatedOpen(window);
 
     StatusNet.debug("NewNoticeView.init END");
