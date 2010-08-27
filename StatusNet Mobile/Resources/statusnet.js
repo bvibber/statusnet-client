@@ -200,15 +200,16 @@ StatusNet.Platform.hasMenu = StatusNet.Platform.isAndroid;
 StatusNet.Platform.animatedOpen = function(window) {
     window.close();
     if (StatusNet.Platform.isApple()) {
-        var h = Titanium.Platform.displayCaps.platformHeight - 20;
-        window.top = h;
-        window.height = h;
+        var screenHeight = Titanium.Platform.displayCaps.platformHeight;
+        var pushDown = Ti.UI.create2DMatrix().translate(0, screenHeight);
+        window.transform = pushDown;
+
+        var pushUp = Ti.UI.create2DMatrix(); //pushDown.invert();
         window.addEventListener('open', function() {
-            var anim = Titanium.UI.createAnimation({
-                top: 0,
+            window.animate({
+                transform: pushUp,
                 duration: 500
             });
-            window.animate(anim);
         });
     } else {
         // On Android, making sure this setting is present will
