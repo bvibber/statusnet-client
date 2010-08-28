@@ -29,7 +29,7 @@ var notices = [];
 Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
     notices = [];
     activeNotice = null;
-    account = event.account;
+    account = objectOrJson(event.account);
     $('#header').empty();
     $("#notices").html(event.html);
     $("#body").scroll(0);
