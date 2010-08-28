@@ -156,11 +156,17 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
     var navbar = StatusNet.Platform.createNavBar(window);
 
     window.addEventListener('close', function() {
+        StatusNet.debug("WTF: closing new dialog...");
+
+        StatusNet.debug("WTF: updating accounts list...");
+        // Update the views in the list
+        view.showAccounts();
+
+        StatusNet.debug("WTF: (re)opening accounts list window...");
         // if the main accounts view wasn't already open...
         view.window.open();
 
-        // Update the views in the list
-        view.showAccounts();
+        StatusNet.debug("WTF: done?");
     });
     var cancel = Titanium.UI.createButton({
         title: "Cancel"
