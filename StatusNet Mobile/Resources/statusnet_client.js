@@ -403,8 +403,11 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         // safe to start work...
         this.webViewReady = false;
         var onReady = function() {
+            StatusNet.debug('initAccountView (delayed) triggered!');
             Titanium.App.removeEventListener('StatusNet_timelineReady', onReady);
+            StatusNet.debug('initAccountView (delayed) removed listener');
             that.webViewReady = true;
+            StatusNet.debug('initAccountView triggering timeline setup...');
             that.switchView('friends');
             StatusNet.debug('initAccountView (delayed) done.');
         };
