@@ -223,6 +223,10 @@ StatusNet.Platform.nativeNotifications = function() {
     return false;
 };
 
+StatusNet.Platform.isMobile = function() {
+    return false;
+};
+
 /**
  * Wrapper for platform-specific XML parser.
  *

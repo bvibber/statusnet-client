@@ -173,7 +173,7 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  * @param boolean prepend            whether to add it to the beginning of end of
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(notice, prepend, notifications) {
+StatusNet.Timeline.prototype.addNotice = function(notice, prepend, notifications, skipCache) {
     StatusNet.debug('Timeline.addNotice enter:');
     if (notice === null || typeof notice !== "object") {
         throw "Invalid notice passed to addNotice.";
@@ -188,7 +188,7 @@ StatusNet.Timeline.prototype.addNotice = function(notice, prepend, notifications
     }
 
     if (notice.id !== undefined && notice.xmlString !== undefined) {
-        if (this.cacheable()) {
+        if (this.cacheable() && !skipCache) {
             StatusNet.debug("encached notice: " + notice.id);
             this.encacheNotice(notice.id, notice.xmlString);
         }
@@ -227,14 +227,15 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
 
             var entries = [];
             var entryCount = 0;
-            StatusNet.AtomParser.backgroundParse(responseText, function(notice) {
+
+            var onEntry = function(notice, skipCache) {
                 // notice
                 StatusNet.debug('Got notice: ' + notice);
                 StatusNet.debug('Got notice.id: ' + notice.id);
-                that.addNotice(notice, true, notifications);
+                that.addNotice(notice, true, notifications, skipCache);
                 entryCount++;
-            },
-            function() {
+            };
+            var onSuccess = function() {
                 // success!
                 StatusNet.debug('Timeline.update success!');
                 that.updateFinished.notify({notice_count: entryCount});
@@ -245,14 +246,21 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
                 StatusNet.debug('Timeline.update calling finishedFetch...');
                 that.finishedFetch(entryCount);
                 StatusNet.debug('Timeline.update DONE.');
-            },
-            function() {
+            };
+            var onFailure = function(msg) {
                 // if parse failure
-                msg = 'Invalid response from server.';
                 StatusNet.debug("Something went wrong retrieving timeline: " + msg);
                 StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
                 that.updateFinished.notify();
-            });
+            };
+
+            // @todo Background processing for Desktop
+            if (StatusNet.Platform.isMobile()) {
+                StatusNet.AtomParser.backgroundParse(responseText, onEntry, onSuccess, onFailure);
+            } else {
+                StatusNet.debug("gonna parse this");
+                StatusNet.AtomParser.parse(responseText, onEntry, onSuccess, onFailure);
+            }
         },
         function(client, msg) {
             StatusNet.debug("Something went wrong retrieving timeline: " + msg);
@@ -280,7 +288,7 @@ StatusNet.Timeline.prototype.getUrl = function() {
     var lastId = 0;
 
     if (rs.isValidRow()) {
-        lastId = rs.fieldByName('last_id');
+      lastId = rs.fieldByName('last_id');
     }
 
     rs.close();
@@ -445,9 +453,18 @@ StatusNet.Timeline.prototype.loadCachedNotices = function() {
         StatusNet.debug("Timeline.getNotices B1");
         StatusNet.debug("Valid row found");
         xmlEntry = rs.fieldByName('atom_entry');
-        StatusNet.AtomParser.backgroundParse(xmlEntry, function(notice) {
-            that.addNotice(notice);
-        });
+
+        // @todo Add background parsing to Desktop
+        if (StatusNet.Platform.isMobile()) {
+            StatusNet.AtomParser.backgroundParse(xmlEntry, function(notice) {
+                that.addNotice(notice, false, false, true);
+            });
+        } else {
+            StatusNet.AtomParser.parse(xmlEntry, function(notice) {
+                that.addNotice(notice, false, false, true);
+            });
+        }
+
         rs.next();
     }
     StatusNet.debug("Timeline.getNotices C");

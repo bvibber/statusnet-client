@@ -73,10 +73,10 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     var html = [];
     var avatar;
 
-    var cachedAvatar = StatusNet.AvatarCache.lookupAvatar(notice.avatar, null,  null);
+    var cachedAvatar = this.client.getActiveTimeline().lookupAvatar(notice.avatar);
 
     if (cachedAvatar) {
-        avatar = cachedAvatar;
+        avatar = 'file:///' + cachedAvatar;
     } else {
         StatusNet.debug("cachedAvatar - is false");
         avatar = notice.avatar;
@@ -142,9 +142,9 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
  */
 StatusNet.TimelineView.prototype.show = function(notices) {
 
-    StatusNet.debug("StatusNet.TimelineView.show() - getting notices");
+    StatusNet.debug("StatusNet.TimelineView.show() - loading cached notices");
 
-    var notices = this.client.getActiveTimeline().getNotices();
+    var notices = this.client.getActiveTimeline().loadCachedNotices();
 
     StatusNet.debug("got notices");
 
@@ -217,8 +217,8 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
             StatusNet.debug("notifyNewNotice - we got a non-relative URL. Bummer.");
             notification.setIcon("app://logo.png");
         } else {
-            StatusNet.debug("Setting icon to app://" + avatarUrl);
-            notification.setIcon("app://" + avatarUrl);
+            StatusNet.debug("Setting icon to file:///" + avatarUrl);
+            notification.setIcon("file:///" + avatarUrl);
         }
 
         notification.setDelay(5000);

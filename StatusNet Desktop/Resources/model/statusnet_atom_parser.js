@@ -157,7 +157,7 @@ StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onSuccess, o
     // We can't send live objects like DOM nodes or callbacks across JS contexts,
     // so we have to pass the source XML string into the parser's queue and let
     // it post back to this context so we can call the callbacks.
-    
+
     var key = Math.random();
     var entryKey = 'SN.backgroundParse.entry' + key;
     var successKey = 'SN.backgroundParse.success' + key;
@@ -202,6 +202,56 @@ StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onSuccess, o
         onSuccess: successKey,
         onFail: failKey
     });
+};
+
+/**
+ * Pass XML source for an individual entry to be parsed immediately; each found notice
+ * will be passed back to the onEntry callback along with its XML string source.
+ * The onComplete callback is then called once the batch is complete.
+ *
+ * @param xmlString source XML for a feed or entry
+ * @param onEntry function(notice) called for each individual entry. Source XML is saved into notice.xmlString
+ * @param onSuccess function() called after completion, even if there are no notices
+ * @param onFail function() called on parse error
+ */
+StatusNet.AtomParser.parse = function(xmlString, onEntry, onSuccess, onFail) {
+    StatusNet.debug('StatusNet.AtomParser.parse entered!');
+
+    //StatusNet.debug('Parsing: ' + xmlString);
+    var dom = StatusNet.Platform.parseXml(xmlString);
+    var root = dom.documentElement;
+
+    if (root.nodeName == 'entry') {
+        StatusNet.debug("StatusNet.AtomParser.parse - parsing entry: " + xmlString);
+
+        var notice = StatusNet.AtomParser.noticeFromEntry(root);
+        notice.xmlString = xmlString;
+        StatusNet.debug('StatusNet.AtomParser.parse - call onNotice for singleton');
+        onEntry(notice);
+    } else if (root.nodeName == 'feed') {
+
+        StatusNet.debug("StatusNet.AtomParser.parse - parsing feed");
+
+        // Note: for Desktop, .find() doesn't see 'feed' at this point, just entries
+        $(root).find('entry').each(function() {
+            StatusNet.debug("found entry -- parsing and calling onEntry");
+            var notice = StatusNet.AtomParser.noticeFromEntry(this);
+            notice.xmlString = StatusNet.Platform.serializeXml(this);
+            onEntry(notice);
+        });
+    } else {
+        StatusNet.debug('StatusNet.AtomParser.parse - got unknown XML: ' + msg);
+        if (onFail) {
+            var msg = "Expected feed or entry, got " + root.nodeName;
+            onFail(msg);
+        }
+        return;
+    }
+
+    if (onSuccess) {
+        StatusNet.debug('StatusNet.AtomParser.parse - calling onSuccess()');
+        onSuccess();
+    }
 };
 
 /**
@@ -296,7 +346,7 @@ var startTime = Date.now();
                         notice.avatar = match2.attributes['href'];
                     }
                 }
-            });        
+            });
         },
         'link': function(match) {
             var rel = match.attributes['rel'];
