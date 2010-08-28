@@ -161,7 +161,10 @@ StatusNet.TimelineView.prototype.clearTimelineView = function(html) {
     if (!html) html = '';
     Titanium.App.fireEvent('StatusNet_setTimeline', {
         html: html,
-        clientAccountUsername: this.client.account.username
+        account: {
+            username: this.client.account.username,
+            apiroot: this.client.account.apiroot
+        }
     });
 };
 

@@ -20,16 +20,16 @@ if (typeof Titanium == "undefined") {
     document.write('Titanium is undefined. Nothing will work in this webview.');
 }
 
+var account = {};
 var lastClickTime = Date.now();
 var activeNotice = null;
-var clientAccountUsername = null;
 var notices = [];
 
 // App-wide event registration, whee!
 Titanium.App.addEventListener("StatusNet_setTimeline", function(event) {
     notices = [];
     activeNotice = null;
-    clientAccountUsername = event.clientAccountUsername;
+    account = event.account;
     $('#header').empty();
     $("#notices").html(event.html);
     $("#body").scroll(0);
@@ -178,7 +178,7 @@ renderNotice = function(notice, user) {
         avatar = notice.avatar;
         author = notice.author;
         authorId = notice.authorId;
-        auuthorUri = notice.authorUri;
+        authorUri = notice.authorUri;
     }
 
     var classes = ['notice'];
@@ -232,7 +232,7 @@ renderNotice = function(notice, user) {
     }
 
     // @fixme use URI or id or somthing?
-    if (author === clientAccountUsername) {
+    if (author === account.username) {
         html.push(' <button class="notice_delete">Delete</a>')
     } else {
         if (notice.repeated === "false") {
@@ -268,7 +268,7 @@ enableNoticeControls = function(noticeDom) {
 
     // Override links to external web view of the notice timelines
     // with click event handlers to display timelines within the client
-    //if (this.localAuthor(uri)) {
+    if (isLocalAuthor(uri)) {
 
         //$notice.find('div a.author').attr('href', "#");
         $notice.find('div a.author').bind('click', function(event) {
@@ -281,7 +281,7 @@ enableNoticeControls = function(noticeDom) {
             Titanium.App.fireEvent("StatusNet_switchUserTimeline", {authorId: authorId});
             return false;
         });
-    //}
+    }
 
 
     // Note -- using delegate rather than bind so that buttons that change
@@ -314,7 +314,7 @@ enableNoticeControls = function(noticeDom) {
     // Override external web links to local users in-content
     $notice.find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');
-        //if (that.localAuthor(href)) {
+        if (isLocalAuthor(href)) {
             //$(this).attr('href', '#');
             $(this).click(function() {
                 var idRegexp = /(\d)+$/;
@@ -324,7 +324,7 @@ enableNoticeControls = function(noticeDom) {
                     return false;
                 }
             });
-        //}
+        }
     });
 
     $notice.bind('click', function(event) {
@@ -356,7 +356,7 @@ enableNoticeControls = function(noticeDom) {
  */
 showProfileHeader = function(user, extended, authorId) {
     Titanium.API.debug("showProfileInfo()");
-    Titanium.API.debug("showProfileInfo() - clientAccountUsername = " + clientAccountUsername);
+    Titanium.API.debug("showProfileInfo() - account.username = " + account.username);
 
     $('#header').empty();
 
@@ -368,7 +368,7 @@ showProfileHeader = function(user, extended, authorId) {
     if (extended) {
         Titanium.API.debug("showProfileInfo() - found extended");
 
-        if (authorId !== null && user.username !== clientAccountUsername) {
+        if (authorId !== null && user.username !== account.username) {
 
             Titanium.API.debug("showProfileInfo() - checkpoint gar");
 
@@ -429,7 +429,7 @@ showProfileHeader = function(user, extended, authorId) {
         html.push('<dt>Subscribers</dt>');
         html.push('<dd>' + extended.followers_cnt + '</dd>');
 
-        if (user.username === clientAccountUsername) {
+        if (user.username === account.username) {
             html.push('<dt><a href="#" class="profile_subscriptions">Subscriptions</a></dt>');
         } else {
             html.push('<dt>Subscriptions</dt>');
@@ -486,6 +486,17 @@ resetTimeline = function() {
 showEmptyTimeline = function() {
     resetTimeline();
     $('#notices').append('<div id="empty_timeline">No notices in this timeline yet.</div>');
+};
+
+isLocalAuthor = function(uri) {
+    // Isolate domain name from URI paths and compare
+    var path = uri.split('/');
+    var serverPath = account.apiroot.split('/');
+
+    if (path[2] === serverPath[2]) {
+        return true;
+    }
+    return false;
 };
 
 </script>

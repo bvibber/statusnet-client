@@ -290,13 +290,9 @@ StatusNet.Client.prototype.switchUserTimeline = function(id) {
 
     this.view = new StatusNet.TimelineViewUser(this);
     this.view.init();
+    this.view.clearTimelineView();
 
     var that = this;
-
-    Titanium.App.fireEvent('StatusNet_setTimeline', {
-        html: '',
-        clientAccountUsername: this.account.username
-    });
 
     this.timeline.update(
         function() {
