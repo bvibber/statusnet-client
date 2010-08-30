@@ -387,7 +387,6 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
 
     if (acct.avatar) {
         var avatar = Titanium.UI.createImageView({
-            image: acct.avatar,
             top: 0,
             left: 0,
             width: 56,
@@ -396,11 +395,15 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
             enableZoomControls: false // for Android
         });
         row.add(avatar);
+        StatusNet.AvatarCache.lookupAvatar(acct.avatar, function(path) {
+            avatar.image = path;
+        }, function(url) {
+            avatar.image = url;
+        });
     }
 
     if (acct.siteLogo) {
         var logo = Titanium.UI.createImageView({
-            image: acct.siteLogo,
             top: 40,
             left: 40,
             width: 24,
@@ -409,6 +412,11 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
             enableZoomControls: false // for Android
         });
         row.add(logo);
+        StatusNet.AvatarCache.lookupAvatar(acct.siteLogo, function(path) {
+            logo.image = path;
+        }, function(url) {
+            logo.image = url;
+        });
     }
 
     var label = Titanium.UI.createLabel({

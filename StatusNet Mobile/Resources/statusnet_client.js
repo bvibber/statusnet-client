@@ -424,7 +424,18 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 };
 
 StatusNet.Client.prototype.setAccountLabel = function() {
-    this.selfAvatar.image = this.account.avatar;
+    var avatar = this.selfAvatar;
+    if (this.account.avatar) {
+        StatusNet.AvatarCache.lookupAvatar(this.account.avatar, function(path) {
+            // Cached! Load image from local storage.
+            avatar.image = path;
+        }, function(url) {
+            // Cache unavailable or full; fetch direct.
+            avatar.image = url;
+        });
+    } else {
+        avatar.image = null;
+    }
 
     var label = this.account.username + '@' + this.account.getHost();
     this.selfLabel.text = label;
