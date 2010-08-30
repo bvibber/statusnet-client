@@ -48,6 +48,7 @@ $LAB
     .script("model/statusnet_timeline_search.js")
     .script("model/statusnet_timeline_subscriptions.js")
     .script('model/statusnet_atom_parser.js')
+    .script('model/statusnet_avatarcache.js')
     .script("lib/humane.js")
     .wait(function(){
 

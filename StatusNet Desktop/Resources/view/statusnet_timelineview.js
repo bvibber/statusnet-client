@@ -73,7 +73,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
     var html = [];
     var avatar;
 
-    var cachedAvatar = this.timeline.lookupAvatar(notice.avatar, null,  null);
+    var cachedAvatar = StatusNet.AvatarCache.lookupAvatar(notice.avatar, null,  null);
 
     if (cachedAvatar) {
         avatar = cachedAvatar;
@@ -209,7 +209,7 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
 
     StatusNet.debug('notifyNewNotice - looking up avatar: ' + notice.avatar);
 
-    this.timeline.lookupAvatar(notice.avatar, function(avatarUrl) {
+    StatusNet.AvatarCache.lookupAvatar(notice.avatar, function(avatarUrl) {
         StatusNet.debug('notifyNewNotice - finished looking up avatar');
 
         if (avatarUrl.match(/^http/)) {
