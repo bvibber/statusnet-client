@@ -62,7 +62,7 @@ StatusNet.TimelineView = function(client) {
             var notices = that.client.timeline._notices;
             if (notices.length == 0) {
                 StatusNet.debug("TimelineView: no notices found");
-                that.clearTimelineView({title: 'No notices in this timeline yet.'});
+                that.showEmptyTimeline();
             }
             StatusNet.debug("TimelineView - there are " + notices.length + " notices in timeline");
             StatusNet.debug("TimelineView updateFinished DONE");
