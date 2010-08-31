@@ -70,13 +70,15 @@ StatusNet.TimelineView = function(client, showNotifications) {
  */
 StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
+    StatusNet.debug("TimelineView.renderNotice - Entered.");
+
     var html = [];
     var avatar;
 
-    var cachedAvatar = this.client.getActiveTimeline().lookupAvatar(notice.avatar);
+    var cachedAvatarPath = StatusNet.AvatarCache.lookupAvatar(notice.avatar);
 
-    if (cachedAvatar) {
-        avatar = 'file:///' + cachedAvatar;
+    if (cachedAvatarPath) {
+        avatar = 'file:///' + cachedAvatarPath; // Need to turn native path into a URL
     } else {
         StatusNet.debug("cachedAvatar - is false");
         avatar = notice.avatar;
@@ -132,6 +134,8 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     html.push('</div></div>');
     html.push('<div class="clear"></div>');
+
+    StatusNet.debug("TimelineView.renderNotice - exiting");
 
     return html.join('');
 };
@@ -209,25 +213,31 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
 
     StatusNet.debug('notifyNewNotice - looking up avatar: ' + notice.avatar);
 
-    StatusNet.AvatarCache.lookupAvatar(notice.avatar, function(avatarUrl) {
-        StatusNet.debug('notifyNewNotice - finished looking up avatar');
+    StatusNet.AvatarCache.lookupAvatar(notice.avatar,
+        function(relativePath) {
+            StatusNet.debug('notifyNewNotice - finished looking up avatar');
 
-        if (avatarUrl.match(/^http/)) {
-            // if it's a full URL it means the avatar isn't cached for some reason
-            StatusNet.debug("notifyNewNotice - we got a non-relative URL. Bummer.");
+            if (relativePath.match(/^(http|file)/)) {
+                // if it's a full URL it means the avatar isn't cached for some reason
+                StatusNet.debug("notifyNewNotice - we got a non-relative URL. Bummer.");
+                notification.setIcon("app://logo.png");
+            } else {
+                StatusNet.debug("Setting icon to app://" + relativePath);
+                notification.setIcon("app://" + relativePath);
+            }
+
+            notification.setDelay(5000);
+            notification.setCallback(function () {
+            // @todo Bring the app window back to focus / on top
+                StatusNet.debug("i've been clicked");
+            });
+            notification.show();
+        },
+        function(avatarUrl) {
             notification.setIcon("app://logo.png");
-        } else {
-            StatusNet.debug("Setting icon to file:///" + avatarUrl);
-            notification.setIcon("file:///" + avatarUrl);
-        }
-
-        notification.setDelay(5000);
-        notification.setCallback(function () {
-        // @todo Bring the app window back to focus / on top
-            StatusNet.debug("i've been clicked");
-        });
-        notification.show();
-    });
+        },
+        true
+    );
 };
 
 /**

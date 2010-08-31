@@ -22,41 +22,113 @@
 StatusNet.AvatarCache = {};
 
 /**
+ * @return Titanium.Filesystem.File the cache directory for avatars
+ */
+StatusNet.AvatarCache.getCacheDirectory = function() {
+
+    var appDirName, cacheDir;
+
+    if (StatusNet.Platform.isMobile()) {
+        appDirName = Titanium.Filesystem.applicationDataDirectory;
+        cacheDir = Titanium.Filesystem.getFile(appDirName + 'avatar_cache');
+    } else {
+
+        // XXX: Technically we should noto be using the application resources directory
+        // for caching our avatar files, however, Titanium notifications cannot resolve
+        // file:/// URLs currently. So we need to give them app:// URLs, which refer to
+        // the application resources directory. The resources directory is theoretically
+        // read-only, even though it's not really. But we have not guarantee that it will
+        // stay writable going forward.
+
+        //appDirName = Titanium.Filesystem.getApplicationDataDirectory().nativePath();
+
+        var rdir = Titanium.Filesystem.getResourcesDirectory();
+        var separator = Titanium.Filesystem.getSeparator();
+        cacheDir = Titanium.Filesystem.getFile(rdir + separator + 'avatar_cache');
+    }
+
+    return cacheDir;
+};
+
+/**
+ * On Mobile, we get a bare filename, but on Desktop we have a complete filepath.
+ * This returns the full filepath, regardless of platform.
+ */
+StatusNet.AvatarCache.getAvatarFile = function(filename) {
+
+    var avatarFile;
+
+    var cacheDir = StatusNet.AvatarCache.getCacheDirectory();
+
+    if (StatusNet.Platform.isMobile()) {
+        avatarFile = Titanium.Filesystem.getFile(cacheDir.nativePath, filename);
+    } else {
+        var separator = Titanium.Filesystem.getSeparator();
+        avatarFile = Titanium.Filesystem.getFile(cacheDir + separator + filename);
+    }
+
+    return avatarFile;
+};
+
+/**
+ * Abstract away the difference between nativePath on the various platforms
+ */
+StatusNet.AvatarCache.getAvatarNativePath = function(file) {
+
+    // XXX: nativePath is a function on Desktop and a property on Mobile
+    return (typeof file.nativePath == "function") ? file.nativePath() : file.nativePath;
+};
+
+/**
+ * Abstract away the difference between timestamp formats on Mobile(s) and Desktop. We get
+ * a Date obj on Android and a property on iPhone and Desktop
+ */
+StatusNet.AvatarCache.getAvatarTimestamp = function(file) {
+    var modts = file.modificationTimestamp();
+    return (typeof modts == "object") ? modts.getTime() : modts;
+};
+
+/**
+ * We can use a better hashing function on Desktop
+ */
+StatusNet.AvatarCache.getAvatarHash = function(url) {
+    var hash;
+    if (StatusNet.Platform.isMobile()) {
+        hash = Titanium.Utils.md5HexDigest(url);
+    } else {
+        // desktop
+        hash = Titanium.Codec.digestToHex(Titanium.Codec.SHA1, url);
+    }
+    return hash;
+};
+
+/**
  * Clean up the avatar cache
  */
 StatusNet.AvatarCache.trimAvatarCache = function() {
 
     var MAX_AVATARS = 200; // @todo Make this configurable
 
-    var appDirName = Titanium.Filesystem.applicationDataDirectory;
-    var cacheDir = Titanium.Filesystem.getFile(appDirName, 'avatar_cache');
-    var dirList = cacheDir.getDirectoryListing();
+    var dirList = StatusNet.AvatarCache.getCacheDirectory().getDirectoryListing();
 
     var avatars = [];
 
     if (dirList) {
+
         StatusNet.debug("trimAvatarCache - avatar cache directory has " + dirList.length + " files. Max is " + MAX_AVATARS);
+
         if (dirList.length > MAX_AVATARS) {
 
-            var avatarFile, modts;
+            var avatarFile;
 
-            // Make a list of avatar files and their modification times
             for (i = 0; i < dirList.length; i++) {
-
-                avatarFile = Titanium.Filesystem.getFile(appDirName, 'avatar_cache', dirList[i]);
-                modts = avatarFile.modificationTimestamp();
-
-                var avatar = {
-                    "filename": dirList[i],
-                    // XXX: modificationTimestamp returns a Date obj on iPhone and a long on Android
-                    "timestamp": (typeof modts == "object") ? modts.getTime() : modts
-                };
-                avatars.push(avatar);
+                avatarFile = StatusNet.AvatarCache.getAvatarFile(dirList[i]);
+                avatars.push(avatarFile);
             }
 
             // Sort by timestamp - ascending
             avatars.sort(function(a, b) {
-                return a.timestamp - b.timestamp;
+                return StatusNet.AvatarCache.getAvatarTimestamp(a) - StatusNet.AvatarCache.getAvatarTimestamp(b);
             });
 
             var overflow = dirList.length - MAX_AVATARS;
@@ -64,15 +136,18 @@ StatusNet.AvatarCache.trimAvatarCache = function() {
             StatusNet.debug("trimAvatarCache - avatar cache has " + overflow + " too many avatars, trimming...");
 
             for (i = 0; i < overflow; i++) {
-                avatarFile = Titanium.Filesystem.getFile(appDirName, 'avatar_cache', avatars[i].filename);
-                if (avatarFile.exists()) {
-                    if (avatarFile.deleteFile()) {
-                        StatusNet.debug("trimAvatarCache - deleted " + avatars[i].filename);
+                if (avatars[i].exists()) {
+
+                    var nativePath = StatusNet.AvatarCache.getAvatarNativePath(avatars[i]);
+
+                    if (avatars[i].deleteFile()) {
+                        StatusNet.debug("trimAvatarCache - deleted " + nativePath);
                     } else {
-                        StatusNet.debug("trimAvatarCache - couldn't delete " + avatars[i].filename);
+                        StatusNet.debug("trimAvatarCache - couldn't delete " + nativePath);
                     }
                 }
             }
+
             StatusNet.debug("trimAvatarCache - done trimming avatars.")
         } else {
             StatusNet.debug("trimAvatarCache - No need to trim avatar cache yet.");
@@ -85,23 +160,13 @@ StatusNet.AvatarCache.trimAvatarCache = function() {
  * Lookup avatar in our avatar cache.
  *
  */
-StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss) {
+StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss, relative) {
 
     StatusNet.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX AvatarCache.lookupAvatar A - Begin");
 
-    var hash;
+    var hash = StatusNet.AvatarCache.getAvatarHash(url);
 
-    if (typeof Titanium.Codec == "undefined") {
-        // mobile
-        StatusNet.debug("AvatarCache.lookupAvatar B - Titanium.Codec is undefined (we're on mobile)");
-        hash = Titanium.Utils.md5HexDigest(url);
-    } else {
-        // desktop
-        StatusNet.debug("AvatarCache.lookupAvatar B - Titanium.Codec is defined (we're on desktop)");
-        hash = Titanium.Codec.digestToHex(Titanium.Codec.SHA1, url);
-    }
-
-    StatusNet.debug('AvatarCache.lookupAvatar C - Avatar hash for ' + url + " == " + hash);
+    StatusNet.debug('AvatarCache.lookupAvatar B - Avatar hash for ' + url + " == " + hash);
 
     var dot = url.lastIndexOf(".");
 
@@ -112,20 +177,15 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss) {
 
     var extension = url.substr(dot, url.length);
 
-    var appDirName = Titanium.Filesystem.applicationDataDirectory;
-    var cacheDirName = 'avatar_cache';
-
-    var cacheDir = Titanium.Filesystem.getFile(appDirName, cacheDirName);
-
-    StatusNet.debug("AvatarCache.lookupAvatar D - cacheDir = " + cacheDir.nativePath);
+    var cacheDir = StatusNet.AvatarCache.getCacheDirectory();
 
     if (!cacheDir.exists()) {
-        StatusNet.debug("AvatarCache.lookupAvatar E - avatar cache directory doesn't exist, creating.");
+        StatusNet.debug("AvatarCache.lookupAvatar C - avatar cache directory doesn't exist, creating.");
         cacheDir.createDirectory(); // XXX: always seems to return false on mobile SDK 1.4.1
         if (cacheDir.exists()) {
-            StatusNet.debug("AvatarCache.lookupAvatar E1 - successfully created cache directory");
+            StatusNet.debug("AvatarCache.lookupAvatar D - successfully created cache directory");
         } else {
-            StatusNet.debug("AvatarCache.lookupAvatar E1 - Could not create cache directory");
+            StatusNet.debug("AvatarCache.lookupAvatar D - Could not create cache directory");
         }
     } else {
         StatusNet.debug("AvatarCache.lookupAvatar E - avatar cache directory already exists");
@@ -135,20 +195,26 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss) {
 
     StatusNet.debug("AvatarCache.lookupAvatar F - filename = " + filename);
 
-    var avatarFile = Titanium.Filesystem.getFile(appDirName, cacheDirName, filename);
+    var avatarFile = StatusNet.AvatarCache.getAvatarFile(filename);
+    var nativePath = StatusNet.AvatarCache.getAvatarNativePath(avatarFile);
+    var relativePath = 'avatar_cache/' + filename;
 
-    StatusNet.debug('AvatarCache.lookupAvatar G - looking up avatar: ' + avatarFile.nativePath);
+    StatusNet.debug('AvatarCache.lookupAvatar G - looking up avatar: ' + nativePath);
 
     if (avatarFile.exists()) {
         StatusNet.debug("AvatarCache.lookupAvatar H - Yay, avatar cache hit");
         if (onHit) {
-            onHit(avatarFile.nativePath);
+            if (relative) {
+                onHit(relativePath);
+            } else {
+                onHit(nativePath);
+            }
         }
 
-        StatusNet.debug("AvatarCache.lookupAvatar I - returning native path: " + avatarFile.nativePath);
+        StatusNet.debug("AvatarCache.lookupAvatar I - returning native path: " + nativePath);
         StatusNet.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX AvatarCache.lookupAvatar J - END");
 
-        return avatarFile.nativePath;
+        return (relative) ? relativePath : nativePath;
     } else {
 
         StatusNet.debug("AvatarCache.lookupAvatar H - Avatar cache miss, fetching avatar from web");
@@ -168,8 +234,13 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss) {
             function() {
                 StatusNet.debug("AvatarCache.lookupAvatar I - fetched avatar: " + url);
                 if (onHit) {
-                    onHit(avatarFile.nativePath);
-                    return avatarFile.nativePath;
+                    if (relative) {
+                        onHit(relativePath);
+                        return relativePath
+                    } else {
+                        onHit(nativePath);
+                        return nativePath;
+                    }
                 }
             },
             function(code, e) {
