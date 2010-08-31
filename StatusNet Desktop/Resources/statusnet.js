@@ -246,3 +246,13 @@ StatusNet.Platform.parseXml = function(str) {
 StatusNet.Platform.serializeXml = function(node) {
     return (new XMLSerializer()).serializeToString(node);
 }
+
+/**
+ * Wrapper for platform-specific Base-64 encoding.
+ * Mysteriously this is in a different module on
+ * Titanium Desktop and Titanium Mobile... and
+ * has a different name too! Seriously?
+ */
+StatusNet.Platform.base64encode = function(data) {
+    return Titanium.Codec.encodeBase64(data);
+}
