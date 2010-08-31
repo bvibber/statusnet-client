@@ -30,7 +30,7 @@ StatusNet.AvatarCache.getCacheDirectory = function() {
 
     if (StatusNet.Platform.isMobile()) {
         appDirName = Titanium.Filesystem.applicationDataDirectory;
-        cacheDir = Titanium.Filesystem.getFile(appDirName + 'avatar_cache');
+        cacheDir = Titanium.Filesystem.getFile(appDirName, 'avatar_cache');
     } else {
 
         // XXX: Technically we should noto be using the application resources directory

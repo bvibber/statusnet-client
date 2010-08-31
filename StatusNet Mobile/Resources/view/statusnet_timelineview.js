@@ -170,11 +170,16 @@ StatusNet.TimelineView.prototype.clearTimelineView = function(html) {
 
 StatusNet.TimelineView.prototype.appendTimelineNotice = function(notice) {
 
-    StatusNet.AvatarCache.lookupAvatar(notice.avatar, function(filename) {
-        notice.avatar = filename;
-        Titanium.App.fireEvent('StatusNet_appendTimelineNotice', {notice: notice});
-    });
-    
+    StatusNet.AvatarCache.lookupAvatar(notice.avatar,
+        function(filename) {
+            notice.avatar = filename;
+            Titanium.App.fireEvent('StatusNet_appendTimelineNotice', {notice: notice});
+        },
+        function(url) {
+            Titanium.App.fireEvent('StatusNet_appendTimelineNotice', {notice: notice});
+        }
+    );
+
 };
 
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
