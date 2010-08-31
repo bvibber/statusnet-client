@@ -395,11 +395,16 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
             enableZoomControls: false // for Android
         });
         row.add(avatar);
-        StatusNet.AvatarCache.lookupAvatar(acct.avatar, function(path) {
-            avatar.image = path;
-        }, function(url) {
-            avatar.image = url;
-        });
+        if (StatusNet.Platform.isAndroid()) {
+            StatusNet.AvatarCache.lookupAvatar(acct.avatar, function(path) {
+                avatar.image = path;
+            }, function(url) {
+                avatar.image = url;
+            });
+        } else {
+            // https://appcelerator.lighthouseapp.com/projects/32238-titanium-mobile/tickets/1680-ios-regression-imageview-loaded-from-local-file-no-longer-scales-in-current-git-build
+            avatar.image = acct.avatar;
+        }
     }
 
     if (acct.siteLogo) {
@@ -412,11 +417,16 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
             enableZoomControls: false // for Android
         });
         row.add(logo);
-        StatusNet.AvatarCache.lookupAvatar(acct.siteLogo, function(path) {
-            logo.image = path;
-        }, function(url) {
-            logo.image = url;
-        });
+        if (StatusNet.Platform.isAndroid()) {
+            StatusNet.AvatarCache.lookupAvatar(acct.siteLogo, function(path) {
+                logo.image = path;
+            }, function(url) {
+                logo.image = url;
+            });
+        } else {
+            // https://appcelerator.lighthouseapp.com/projects/32238-titanium-mobile/tickets/1680-ios-regression-imageview-loaded-from-local-file-no-longer-scales-in-current-git-build
+            logo.image = acct.siteLogo;
+        }
     }
 
     var label = Titanium.UI.createLabel({

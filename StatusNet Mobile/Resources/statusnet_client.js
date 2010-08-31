@@ -426,13 +426,18 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 StatusNet.Client.prototype.setAccountLabel = function() {
     var avatar = this.selfAvatar;
     if (this.account.avatar) {
-        StatusNet.AvatarCache.lookupAvatar(this.account.avatar, function(path) {
-            // Cached! Load image from local storage.
-            avatar.image = path;
-        }, function(url) {
-            // Cache unavailable or full; fetch direct.
-            avatar.image = url;
-        });
+        if (StatusNet.Platform.isAndroid()) {
+            StatusNet.AvatarCache.lookupAvatar(this.account.avatar, function(path) {
+                // Cached! Load image from local storage.
+                avatar.image = path;
+            }, function(url) {
+                // Cache unavailable or full; fetch direct.
+                avatar.image = url;
+            });
+        } else {
+            // https://appcelerator.lighthouseapp.com/projects/32238-titanium-mobile/tickets/1680-ios-regression-imageview-loaded-from-local-file-no-longer-scales-in-current-git-build
+            avatar.image = this.account.avatar;
+        }
     } else {
         avatar.image = null;
     }
