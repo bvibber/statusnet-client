@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for search timeline model
  */
@@ -110,41 +111,6 @@ StatusNet.TimelineSearch.prototype.update = function(onFinish) {
     if (onFinish) {
         onFinish();
     }
-};
-
-/**
- * Add a notice to the Timeline if it's not already in it.
- *
- * XXX: Override so search timelines do not get cached. Not
- * sure how else to handle at the moment since atom entries in
- * search timelines are different than they are in other timelines.
- * We may need a special cache facility just for search atom
- * entries. --Z
- *
- * @param DOM     entry    the Atom entry form of the notice
- * @param boolean prepend  whether to add it to the beginning of end of
- *                         the timeline's notices array
- *
- */
-StatusNet.TimelineSearch.prototype.addNotice = function(entry, prepend) {
-
-    var notice = StatusNet.AtomParser.noticeFromEntry(entry);
-
-    // dedupe here?
-    for (i = 0; i < this._notices.length; i++) {
-        if (this._notices[i].id === notices.id) {
-            StatusNet.debug("skipping duplicate notice: " + notice.id);
-            return;
-        }
-    }
-
-    if (prepend) {
-        this._notices.unshift(notice);
-        this.client.view.showNewNotice(notice);
-    } else {
-        this._notices.push(notice);
-    }
-
 };
 
 /**

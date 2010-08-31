@@ -23,43 +23,6 @@
 StatusNet.AtomParser = function() {};
 
 /**
- * Class method for generating a notice obj from an Direct Message Atom entry
- *
- * @param DOM entry the atom entry representing the DM
- *
- */
-StatusNet.AtomParser.noticeFromDMEntry = function(entry) {
-
-    var notice = {};
-
-    notice.id = $(entry).find('id');
-    notice.title = $(entry).find('title').text();
-
-    // XXX: This is horrible, but until we improve the feed, this is the best
-    // handle to the author's nick we have
-    var result = notice.title.substr(12).match(/\w+\b/);
-
-    if (result) {
-        notice.nickname = result[0];
-    }
-
-    notice.content = $(entry).find('content').text();
-    notice.author = $(entry).find('author name').text();
-    notice.homepage = $(entry).find('author uri').text();
-
-    notice.published = $(entry).find('published').text();
-    var updated = $(entry).find('updated').text();
-
-    // knock off the millisecs to make the date string work with humane.js
-    notice.updated = updated.substring(0, 19);
-
-    notice.link = $(entry).find('link[rel=alternate]').attr('href');
-    notice.avatar = $(entry).find('link[rel=image]').attr('href');
-
-    return notice;
-};
-
-/**
  * Iterate over all direct children of the given DOM node, calling functions from a map
  * based on the element's node name. This is used because doing a bunch of individual selector
  * lookups for every element we need is hella slow on mobile; iterating directly over the
@@ -282,6 +245,7 @@ var startTime = Date.now();
     StatusNet.AtomParser.mapOverElements(entry, {
         'id': function(match) {
             // XXX: Special case for search Atom entries
+            notice.id = match.text;
             var searchId = match.text;
             if (searchId.substr(0, 4) == 'tag:') {
                 var result = searchId.match(idRegexp);
@@ -306,7 +270,17 @@ var startTime = Date.now();
             // knock off the millisecs to make the date string work with humane.js
             notice.updated = updated.substring(0, 19);
         },
-        'title': simpleNode,
+        'title': function(match) {
+            notice.title = match.text;
+
+            // XXX: This is horrible, but until we improve the feed, this is the best
+            // handle to the author's nick we have for direct messages
+            var result = notice.title.substr(12).match(/\w+\b/);
+
+            if (result) {
+                notice.nickname = result[0];
+            }
+        },
         'content': simpleNode, // @fixme this should actually handle more complex cases, as there may be different data types
         'source': function(match) {
             // atom:source (not the source client, eh) - this might not be in the feed
@@ -357,6 +331,11 @@ var startTime = Date.now();
                 notice.contextLink = match.attributes['href'];
             } else if (rel == 'related' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
                 // XXX: Special case for search Atom entries
+                if (!notice.avatar) {
+                    notice.avatar = match.attributes['href'];
+                }
+            } else if (rel == 'image' && (type == 'image/png' || type == 'image/jpeg' || type == 'image/gif')) {
+                // XXX: Special case for DM Atom entries
                 if (!notice.avatar) {
                     notice.avatar = match.attributes['href'];
                 }
