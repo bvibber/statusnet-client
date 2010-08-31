@@ -94,30 +94,20 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
         }
 
         if (username && password) {
-            // @fixme Desktop vs Mobile auth differences HTTPClient hack
+            // On Desktop, HTTPClient.setBasicCredentials is implemented, as is
+            // taking username and password parameters on open. However, it
+            // fails intermittently on Mac OS X 10.5, possibly due to a bug in
+            // the system version of libcurl when reusing connections.
             //
-            // Titanium Mobile 1.3.0 seems to lack the ability to do HTTP basic auth
-            // on its HTTPClient implementation. The setBasicCredentials method
-            // claims to exist (typeof client.setBasicCredentials == 'function') however
-            // calling it triggers an "invalid method 'setBasicCredentials:'" error.
-            // The method is also not listed in the documentation for Mobile, nor do I see
-            // it in the source code for the proxy object.
+            // On Mobile/Android, username/password can be pulled from the URI,
+            // though this is against spec for XMLHTTPRequest. setBasicCredentials
+            // is not implemented.
             //
-            // Moreover, the Titanium.Utils namespace, which contains the base 64 utility
-            // functions, isn't present on Desktop. So for now, we'll check for that and
-            // use the manual way assuming it's mobile. Seriously, can't the core libs be
-            // synchronized better?
-            StatusNet.debug("webRequest: Titanium.Utils is: " + typeof Titanium.Utils);
-            StatusNet.debug("webRequest: client.setBasicCredentials is: " + typeof client.setBasicCredentials);
-            if (typeof Titanium.Utils == "undefined") {
-                client.setBasicCredentials(username, password);
-            } else {
-                // @fixme Desktop vs Mobile auth differences HTTPClient hack
-                // setRequestHeader must be called between open() and send()
-                var auth = 'Basic ' + Titanium.Utils.base64encode(username + ':' + password);
-                //StatusNet.debug("webRequest: Authorization: " + auth);
-                client.setRequestHeader('Authorization', auth);
-            }
+            // On Mobile/iPhone, no authentication is implemented that I can see.
+            //
+            // Note: setRequestHeader must be called between open() and send()
+            var auth = 'Basic ' + StatusNet.Platform.base64encode(username + ':' + password);
+            client.setRequestHeader('Authorization', auth);
         }
 
         if (data) {

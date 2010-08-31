@@ -473,3 +473,13 @@ StatusNet.Platform.setInitialFocus = function(window, control)
         });
     }
 }
+
+/**
+ * Wrapper for platform-specific Base-64 encoding.
+ * Mysteriously this is in a different module on
+ * Titanium Desktop and Titanium Mobile... and
+ * has a different name too! Seriously?
+ */
+StatusNet.Platform.base64encode = function(data) {
+    return Titanium.Utils.base64encode(data);
+}
