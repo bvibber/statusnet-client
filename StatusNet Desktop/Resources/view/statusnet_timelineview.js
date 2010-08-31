@@ -55,7 +55,7 @@ StatusNet.TimelineView = function(client, showNotifications) {
     this.timeline.noticeAdded.attach(
         function(args) {
             if (args) {
-                that.showNewNotice(args.notice);
+                that.showNewNotice(args.notice, args.append);
             } else {
                 StatusNet.debug("noticeAdded event with no args!");
             }
@@ -163,7 +163,7 @@ StatusNet.TimelineView.prototype.show = function(notices) {
             html.push(this.renderNotice(notices[i]));
         }
 
-        $('#notices').append(html.join(''));
+        $('#notices').prepend(html.join(''));
 
         var that = this;
 
@@ -182,7 +182,7 @@ StatusNet.TimelineView.prototype.show = function(notices) {
 
 StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
     StatusNet.debug("prepending notice " + notice.id);
-    $('#notices').prepend(this.renderNotice(notice));
+    $('#notices').append(this.renderNotice(notice));
     var notice = $('#notices > div.notice:first').get(0);
     this.enableNoticeControls(notice);
     $('#notices > div.notice:first').hide();

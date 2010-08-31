@@ -140,7 +140,7 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
                 // notice
                 StatusNet.debug('Got notice: ' + notice);
                 StatusNet.debug('Got notice.id: ' + notice.id);
-                that.addNotice(notice, true, notifications, skipCache);
+                that.addNotice(notice, false, notifications, skipCache);
                 entryCount++;
             };
             var onSuccess = function() {
