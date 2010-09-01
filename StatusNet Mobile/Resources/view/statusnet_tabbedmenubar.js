@@ -64,7 +64,8 @@ StatusNet.createTabbedBar = function(tabInfo, win, initialSelection) {
                 StatusNet.debug("Pushing " + tabInfo[tab].name + " to overflow table");
 
                 var row = Ti.UI.createTableViewRow({
-                    title: tabInfo[tab].name
+                    title: tabInfo[tab].name,
+                    leftImage: tabInfo[tab].deselectedImage
                 });
 
                 tb.overFlowTabs.push(row);
