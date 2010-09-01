@@ -128,7 +128,7 @@ StatusNet.TabbedMenuBar.prototype.showOverFlowWindow = function() {
     });
 
     cancelButton.addEventListener('click', function() {
-        overFlowWin.close();
+        StatusNet.Platform.animatedClose(overFlowWin);
     });
 
     navbar.setLeftNavButton(cancelButton);
@@ -142,10 +142,10 @@ StatusNet.TabbedMenuBar.prototype.showOverFlowWindow = function() {
             index: -1,
             tabName: event.rowData.title
         });
-        overFlowWin.close();
+        StatusNet.Platform.animatedClose(overFlowWin);
     });
 
-    overFlowWin.open();
+    StatusNet.Platform.animatedOpen(overFlowWin);
 
 };
 
