@@ -83,14 +83,21 @@ StatusNet.SettingsView.prototype.init = function() {
         var acct = event.rowData.acct;
         StatusNet.debug('Attempting to delete account: ' + acct.username + '@' + acct.getHost());
         acct.deleteAccount();
-        cancel.title = 'Done';
 
         view.rows = view.rows.splice(event.rowData.index, 1);
 
     });
     this.window.add(this.table);
 
-
+    // And a cancel for account selection.
+    // @fixme don't show this if we're running on first view!
+    var cancel = Titanium.UI.createButton({
+        title: 'Cancel'
+    });
+    cancel.addEventListener('click', function() {
+        StatusNet.Platform.animatedClose(window);
+    });
+    this.navbar.setLeftNavButton(cancel);
 
     if (StatusNet.Platform.isApple()) {
         // @fixme perhaps just use the native thingy here?
@@ -110,18 +117,18 @@ StatusNet.SettingsView.prototype.init = function() {
             //}, 500);
         });
 
-        // Edit/cancel buttons for the table view...
+        // Edit/done buttons for the table view...
         var edit = Titanium.UI.createButton({
             title: 'Edit'
         });
-        var cancel = Titanium.UI.createButton({
-            title: 'Cancel'
+        var done = Titanium.UI.createButton({
+            title: 'Done'
         });
         edit.addEventListener('click', function() {
-            view.navbar.setRightNavButton(cancel);
+            view.navbar.setRightNavButton(done);
             view.table.editing = true;
         });
-        cancel.addEventListener('click', function() {
+        done.addEventListener('click', function() {
             view.navbar.setRightNavButton(edit);
             view.table.editing = false;
         });
