@@ -297,7 +297,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
             options: options
         });
         dialog.addEventListener('click', function(event) {
-            callbacks[event.index]();
+            if (event.index !== undefined && callbacks[event.index] !== undefined) {
+                callbacks[event.index]();
+            }
         });
         dialog.show();
     });
