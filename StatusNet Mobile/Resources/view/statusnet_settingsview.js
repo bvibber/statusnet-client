@@ -324,6 +324,7 @@ StatusNet.SettingsView.prototype.showAccounts = function() {
     // the default Android browser's bookmarks list.
     var row = Titanium.UI.createTableViewRow({
         height: 64,
+        editable: false,
         acct: "add-stub"
     });
 
