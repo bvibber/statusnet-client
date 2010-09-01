@@ -225,6 +225,24 @@ StatusNet.Platform.animatedOpen = function(window) {
     window.open();
 }
 
+StatusNet.Platform.animatedClose = function(window) {
+    if (StatusNet.Platform.isApple()) {
+        var screenHeight = Titanium.Platform.displayCaps.platformHeight;
+        var pushUp = Ti.UI.create2DMatrix();
+        var pushDown = Ti.UI.create2DMatrix().translate(0, screenHeight);
+
+        window.transform = pushUp;
+        window.animate({
+            transform: pushDown,
+            duration: 500
+        }, function() {
+            window.close();
+        });
+    } else {
+        window.close();
+    }
+}
+
 if (StatusNet.Platform.isApple()) {
     StatusNet.Platform.createNavBar = function(window) {
 

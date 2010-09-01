@@ -117,14 +117,14 @@ StatusNet.NewNoticeView.prototype.init = function() {
         title: 'Cancel'
     });
     cancelButton.addEventListener('click', function() {
-        that.window.close();
+        that.close();
     });
 
     var updateButton = Titanium.UI.createButton({
         title: "Send"
     });
     updateButton.addEventListener('click', function() {
-        that.postNotice(noticeTextArea.value);
+        that.postNotice(that.noticeTextArea.value);
     });
 
     if (StatusNet.Platform.isApple()) {
@@ -164,7 +164,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         keyboardMargin += buttonHeight + margin * 2;
     }
 
-    var noticeTextArea = Titanium.UI.createTextArea({
+    var noticeTextArea = this.noticeTextArea = Titanium.UI.createTextArea({
         top: topMargin + margin,
         left: margin,
         right: margin,
@@ -543,8 +543,8 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
             }
 
             that.actInd.hide();
-            // play notice posted sound
-            that.window.close();
+            // @todo play notice posted sound
+            that.close();
 
             // Tell the client we've got something fun to do!
             that.sent.notify();
@@ -556,7 +556,13 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
             } else {
                 StatusNet.debug("Error posting notice - " + status + " - " + response);
             }
-            that.window.close();
+            that.close();
         }
     );
+}
+
+StatusNet.NewNoticeView.prototype.close = function()
+{
+    this.noticeTextArea.blur(); // close keyboard
+    StatusNet.Platform.animatedClose(this.window);
 }

@@ -74,7 +74,7 @@ StatusNet.SettingsView.prototype.init = function() {
 
         StatusNet.debug('Switching to timeline...');
         view.client.initAccountView(acct);
-        window.close();
+        StatusNet.Platform.animatedClose(window);
     });
     this.table.addEventListener('delete', function(event) {
         // deleted a row
@@ -153,6 +153,19 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         navBarHidden: true // hack for iphone for now
     });
 
+    var doClose = function() {
+        // Hide keyboard...
+        for (var i in view.fields) {
+            if (view.fields.hasOwnProperty(i)) {
+                var field = view.fields[i];
+                if (typeof field.blur == 'function') {
+                    field.blur();
+                }
+            }
+        }
+        StatusNet.Platform.animatedClose(window);
+        view.fields = null;
+    };
     var navbar = StatusNet.Platform.createNavBar(window);
 
     window.addEventListener('close', function() {
@@ -172,9 +185,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         title: "Cancel"
     });
     cancel.addEventListener('click', function() {
-        StatusNet.debug('clicked cancel');
-        window.close();
-        view.fields = null;
+        doClose();
     });
 
     var save = Titanium.UI.createButton({
@@ -188,11 +199,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
             if (view.workAcct != null) {
                 // @fixme separate the 'update state' and 'save' actions better
                 view.saveNewAccount();
-                StatusNet.debug('save click: saved');
-                window.close();
-                StatusNet.debug('hide: closed');
-                view.fields = null;
-                StatusNet.debug('hide: killed fields');
+                doClose();
             }
         },
         function() {
@@ -201,21 +208,8 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         });
     });
 
-        navbar.setLeftNavButton(cancel);
-        navbar.setRightNavButton(save);
-/*
-        // Android has no navigation area on tab header;
-        // we'll toss a manual label in at the top.
-        var label = Titanium.UI.createLabel({
-            text: "Add Account",
-            width: 'auto',
-            height: 'auto',
-            font: {fontSize: '30'}
-        });
-        window.add(label);
-
-        // Add the buttons at the bottom later...
-    */
+    navbar.setLeftNavButton(cancel);
+    navbar.setRightNavButton(save);
 
     var workArea = Titanium.UI.createView({
         top: navbar.height,
