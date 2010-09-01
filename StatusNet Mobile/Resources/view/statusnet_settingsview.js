@@ -435,7 +435,8 @@ StatusNet.SettingsView.prototype.addAccountRow = function(acct) {
         font: {
             fontWeight: acct.is_default ? 'bold' : 'normal',
             fontSize: 18
-        }
+        },
+        minimumFontSize: 8
     });
     row.add(label);
 
