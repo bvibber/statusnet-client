@@ -72,9 +72,11 @@ StatusNet.SettingsView.prototype.init = function() {
         acct.setDefault(StatusNet.getDB());
         StatusNet.debug('Saved!');
 
+        // Start closing the current window...
+        StatusNet.Platform.animatedClose(window);
+
         StatusNet.debug('Switching to timeline...');
         view.client.initAccountView(acct);
-        StatusNet.Platform.animatedClose(window);
     });
     this.table.addEventListener('delete', function(event) {
         // deleted a row
