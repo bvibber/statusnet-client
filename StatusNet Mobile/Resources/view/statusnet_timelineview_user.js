@@ -29,7 +29,16 @@ StatusNet.TimelineViewUser = function(client) {
 StatusNet.TimelineViewUser.prototype = heir(StatusNet.TimelineView.prototype);
 
 StatusNet.TimelineViewUser.prototype.appendTimelineNotice = function(notice) {
-    var user = this.client.getActiveTimeline().getUser();
+
+    var timeline = this.client.getActiveTimeline();
+    var user;
+
+    // XXX: Sometimes this seems to get called when the timeline is set to
+    // something other than a StatusNet.TimelineUser timeline
+    if (typeof timeline == "StatusNet.TimelineUser") {
+        user = timeline.getUser();
+    }
+
     Titanium.App.fireEvent('StatusNet_appendUserTimelineNotice', {notice: notice, user: user});
 };
 
