@@ -45,24 +45,73 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var controlStripHeight = 32;
     var topMargin = 0;
     var keyboardMargin = 0;
-    if (StatusNet.Platform.isApple()) {
-        // Currently, iPhone doesn't resize the window or our controls
-        // to fit when the on-screen keyboard comes up. To keep it safe,
-        // we're hardcoding the current size of one there. Sigh.
-        keyboardMargin = 216;
-    }
 
-    var window = this.window = Titanium.UI.createWindow({
-        title: 'New Notice',
-        backgroundColor: StatusNet.Platform.dialogBackground(),
-        // Need to set this value to trigger a heavyweight window... needed
-        // to make back button and soft input mode work correctly.
-        navBarHidden: false,
-        // Needed to work around Android bug with camera/gallery callbacks
-        // and heavyweight windows; it won't send the callbacks direct to
-        // our main context, so we need to run them from there.
-        url: 'statusnet_photo_helper.js'
-    });
+    var window;
+    if (StatusNet.Platform.isTablet()) {
+        // Crappy hack for iPad, since native form sheet isn't working for
+        // us right now for some reason; comes up fullscreen. It's ok in
+        // isolation though, will need to find a minimal test case.
+
+        // Add a transparent window to darken the background...
+        // this won't animate along with the rest.
+        var glassy = Titanium.UI.createWindow({
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'black',
+            opacity: 0.5,
+            navBarHidden: true
+        });
+        glassy.open();
+
+        // Now the main window, which will animate up...
+        this.window = Titanium.UI.createWindow({
+           navBarHidden: false,
+           url: 'statusnet_photo_helper.js'
+        });
+        this.window.addEventListener('close', function() {
+            glassy.close();
+        });
+
+        // And a fake window as a view within that of the proper
+        // size for a form sheet.
+        window = Titanium.UI.createView({
+           title: 'New Notice',
+           width: 620,
+           height: 540,
+           backgroundColor: StatusNet.Platform.dialogBackground()
+        });
+        if (Ti.Platform.displayCaps.platformWidth > Ti.Platform.displayCaps.platformHeight) {
+            // Landscape mode? Force to top to give more keyboard space.
+            // @fixme detect orientation change and move...
+            window.top = 0;
+            keyboardMargin = 140;
+        } else {
+            // Bump it up a little from centered in portrait, but there's room.
+            window.top = 120;
+        }
+        this.window.add(window);
+    } else {
+        // Nice regular window. :D
+        window = this.window = Titanium.UI.createWindow({
+            title: 'New Notice',
+            backgroundColor: StatusNet.Platform.dialogBackground(),
+            // Need to set this value to trigger a heavyweight window... needed
+            // to make back button and soft input mode work correctly.
+            navBarHidden: false,
+            // Needed to work around Android bug with camera/gallery callbacks
+            // and heavyweight windows; it won't send the callbacks direct to
+            // our main context, so we need to run them from there.
+            url: 'statusnet_photo_helper.js'
+        });
+        if (StatusNet.Platform.isApple()) {
+            // Currently, iPhone doesn't resize the window or our controls
+            // to fit when the on-screen keyboard comes up. To keep it safe,
+            // we're hardcoding the current size of one there. Sigh.
+            keyboardMargin = 216;
+        }
+    }
 
     var cancelButton = Titanium.UI.createButton({
         title: 'Cancel'
@@ -264,8 +313,8 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
     window.add(this.actInd);
 
-    StatusNet.Platform.setInitialFocus(window, noticeTextArea);
-    StatusNet.Platform.animatedOpen(window);
+    StatusNet.Platform.setInitialFocus(this.window, noticeTextArea);
+    StatusNet.Platform.animatedOpen(this.window);
 
     StatusNet.debug("NewNoticeView.init END");
 };

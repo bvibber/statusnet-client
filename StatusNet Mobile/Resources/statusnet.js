@@ -163,6 +163,11 @@ StatusNet.Platform = {
         return (StatusNet.Platform.isApple() || StatusNet.Platform.isAndroid());
     },
 
+    // @fixme add Android tablet detection
+    isTablet: function() {
+        return Titanium.Platform.osname == "ipad";
+    },
+
     /**
      * Returns an appropriate background color for dialog box-style screens
      * on the current platform.
