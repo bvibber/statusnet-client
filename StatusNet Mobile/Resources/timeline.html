@@ -65,17 +65,28 @@ function findNextNewerNotice(notice) {
     return candidate;
 }
 
+function gotNotice(id) {
+    for (var i = 0; i < notices.length; i++) {
+        if (notices.id == id) {
+            return true;
+        }
+    }
+    return false;
+}
+
 var insertNoticeHandler = function(event) {
     var notice = objectOrJson(event.notice);
-    var html = renderNotice(notice);
-    var next = findNextNewerNotice(notice);
-    if (next) {
-        $(html).insertAfter("#notice-" + next.id);
-    } else {
-        $("#notices").prepend(html);
+    if (!gotNotice(notice.id)) {
+        var html = renderNotice(notice);
+        var next = findNextNewerNotice(notice);
+        if (next) {
+            $(html).insertAfter("#notice-" + next.id);
+        } else {
+            $("#notices").prepend(html);
+        }
+        notices.push(notice);
+        enableNoticeControls(document.getElementById('notice-' + notice.id));
     }
-    notices.push(notice);
-    enableNoticeControls(document.getElementById('notice-' + notice.id));
 };
 
 Titanium.App.addEventListener("StatusNet_prependTimelineNotice", insertNoticeHandler);
