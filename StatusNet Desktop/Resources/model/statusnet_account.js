@@ -51,10 +51,13 @@ StatusNet.Account.getDefault = function(db) {
         if (row.isValidRow()) {
             StatusNet.debug('found an account');
             var acct = StatusNet.Account.fromRow(row);
+            /*
             // @FIXME UI-specific code needs to be moved!
+            // Commented out as it's breaking things on Android now :P
             if (typeof Titanium.Desktop != "undefined") {
                 $('ul.nav li#nav_timeline_profile > img').attr('src', acct.avatar);
             }
+            */
             row.close();
             return acct;
         } else {
