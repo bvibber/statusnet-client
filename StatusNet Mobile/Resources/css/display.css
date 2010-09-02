@@ -98,6 +98,7 @@ h1 {
 	-webkit-border-top-left-radius: 0px;
 	-webkit-border-bottom-right-radius: 0px;
 	-webkit-box-shadow: 2px 2px 2px #222;
+        overflow-x: hidden;
 }
 
 .notice[class~=foldout] {
