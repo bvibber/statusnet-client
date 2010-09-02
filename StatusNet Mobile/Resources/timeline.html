@@ -140,6 +140,15 @@ Titanium.App.addEventListener("StatusNet_showEmptyTimelineMsg", function(event) 
     showEmptyTimeline();
 });
 
+// Update relative timestamps when resuming app from sleep
+Titanium.App.addEventListener("resume", function(event) {
+    Titanium.API.debug("webview got event: " + JSON.stringify(event));
+    for (var i = 0; i < notices.length; i++) {
+        var notice = notices[i];
+        $('#notice-' + notice.id + ' .date_link').text(humane_date(notice.updated) + "!");
+    }
+});
+
 // Default handling for link click events; we'll pass external links on to the app
 // for opening in a separate browser window.
 $("#notices").delegate("a", "click", function(event) {
