@@ -202,17 +202,27 @@ StatusNet.Platform = {
 StatusNet.Platform.hasNavBar = StatusNet.Platform.isApple;
 StatusNet.Platform.hasMenu = StatusNet.Platform.isAndroid;
 
-StatusNet.Platform.animatedOpen = function(window) {
+StatusNet.Platform.prepAnimation = function(dir) {
+    var screenHeight = Titanium.Platform.displayCaps.platformHeight;
+    var inPosition = Ti.UI.create2DMatrix();
+    if (dir == 'up') {
+        var downBelow = Ti.UI.create2DMatrix().translate(0, screenHeight);
+        return {start: downBelow, end: inPosition};
+    } else if (dir == 'down') {
+        var upTop = Ti.UI.create2DMatrix().translate(0, -screenHeight);
+        return {start: upTop, end: inPosition};
+    }
+}
+
+StatusNet.Platform.animatedOpen = function(window, dir) {
     window.close();
     if (StatusNet.Platform.isApple()) {
-        var screenHeight = Titanium.Platform.displayCaps.platformHeight;
-        var pushDown = Ti.UI.create2DMatrix().translate(0, screenHeight);
-        window.transform = pushDown;
+        var states = StatusNet.Platform.prepAnimation(dir || 'up');
+        window.transform = states.start;
 
-        var pushUp = Ti.UI.create2DMatrix(); //pushDown.invert();
         window.addEventListener('open', function() {
             window.animate({
-                transform: pushUp,
+                transform: states.end,
                 duration: 500
             });
         });
@@ -225,15 +235,13 @@ StatusNet.Platform.animatedOpen = function(window) {
     window.open();
 }
 
-StatusNet.Platform.animatedClose = function(window) {
+StatusNet.Platform.animatedClose = function(window, dir) {
     if (StatusNet.Platform.isApple()) {
-        var screenHeight = Titanium.Platform.displayCaps.platformHeight;
-        var pushUp = Ti.UI.create2DMatrix();
-        var pushDown = Ti.UI.create2DMatrix().translate(0, screenHeight);
+        var states = StatusNet.Platform.prepAnimation(dir || 'up');
 
-        window.transform = pushUp;
+        window.transform = states.end;
         window.animate({
-            transform: pushDown,
+            transform: states.start,
             duration: 500
         }, function() {
             window.close();

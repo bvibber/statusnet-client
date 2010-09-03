@@ -73,7 +73,7 @@ StatusNet.SettingsView.prototype.init = function() {
         StatusNet.debug('Saved!');
 
         // Start closing the current window...
-        StatusNet.Platform.animatedClose(window);
+        view.close();
 
         StatusNet.debug('Switching to timeline...');
         view.client.initAccountView(acct);
@@ -95,7 +95,7 @@ StatusNet.SettingsView.prototype.init = function() {
         title: 'Cancel'
     });
     cancel.addEventListener('click', function() {
-        StatusNet.Platform.animatedClose(window);
+        view.close();
     });
     this.navbar.setLeftNavButton(cancel);
 
@@ -144,7 +144,7 @@ StatusNet.SettingsView.prototype.init = function() {
         // We do the slide-up animation manually rather than
         // doing this as a modal, since that confuses things
         // when we open another modal later.
-        StatusNet.Platform.animatedOpen(window);
+        StatusNet.Platform.animatedOpen(window, 'down');
     } else {
         // Leave the main accounts window hidden until later...
         this.showAddAccount();
@@ -617,3 +617,7 @@ StatusNet.SettingsView.prototype.saveNewAccount = function() {
     StatusNet.debug("Saved new account with id " + id);
     this.addAccountRow(this.workAcct);
 };
+
+StatusNet.SettingsView.prototype.close = function() {
+   StatusNet.Platform.animatedClose(this.window, 'down');
+}
