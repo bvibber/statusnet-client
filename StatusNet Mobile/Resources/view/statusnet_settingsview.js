@@ -40,20 +40,22 @@ StatusNet.SettingsView.prototype.init = function() {
 
     var window = this.window = Titanium.UI.createWindow({
         title: 'Accounts',
-        backgroundColor: 'black',
         navBarHidden: true
     });
 
     var view = this;
 
-    this.navbar = StatusNet.Platform.createNavBar(this.window);
-
-
+    // Stack the toolbar above the table view; this'll make our animation awesomer.
     // Set up our table view...
     this.table = Titanium.UI.createTableView({
         editable: true,
-        top: this.navbar.height
+        top: 44, //this.navbar.height
+        zIndex: 100
     });
+    this.window.add(this.table);
+
+    this.navbar = StatusNet.Platform.createNavBar(this.window);
+
     this.table.addEventListener('click', function(event) {
         // Selected an account
 
@@ -87,7 +89,6 @@ StatusNet.SettingsView.prototype.init = function() {
         view.rows = view.rows.splice(event.rowData.index, 1);
 
     });
-    this.window.add(this.table);
 
     // And a cancel for account selection.
     // @fixme don't show this if we're running on first view!
@@ -144,7 +145,7 @@ StatusNet.SettingsView.prototype.init = function() {
         // We do the slide-up animation manually rather than
         // doing this as a modal, since that confuses things
         // when we open another modal later.
-        StatusNet.Platform.animatedOpen(window, 'down');
+        this.open();
     } else {
         // Leave the main accounts window hidden until later...
         this.showAddAccount();
@@ -618,6 +619,10 @@ StatusNet.SettingsView.prototype.saveNewAccount = function() {
     this.addAccountRow(this.workAcct);
 };
 
+StatusNet.SettingsView.prototype.open = function() {
+    StatusNet.Platform.animatedOpen(this.window, 'down', this.table);
+}
+
 StatusNet.SettingsView.prototype.close = function() {
-   StatusNet.Platform.animatedClose(this.window, 'down');
+    StatusNet.Platform.animatedClose(this.window, 'down', this.table);
 }

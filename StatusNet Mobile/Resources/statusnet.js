@@ -214,14 +214,15 @@ StatusNet.Platform.prepAnimation = function(dir) {
     }
 }
 
-StatusNet.Platform.animatedOpen = function(window, dir) {
+StatusNet.Platform.animatedOpen = function(window, dir, target) {
     window.close();
     if (StatusNet.Platform.isApple()) {
+        target = target || window;
         var states = StatusNet.Platform.prepAnimation(dir || 'up');
-        window.transform = states.start;
+        target.transform = states.start;
 
         window.addEventListener('open', function() {
-            window.animate({
+            target.animate({
                 transform: states.end,
                 duration: 500
             });
@@ -235,12 +236,13 @@ StatusNet.Platform.animatedOpen = function(window, dir) {
     window.open();
 }
 
-StatusNet.Platform.animatedClose = function(window, dir) {
+StatusNet.Platform.animatedClose = function(window, dir, target) {
     if (StatusNet.Platform.isApple()) {
+        target = target || window;
         var states = StatusNet.Platform.prepAnimation(dir || 'up');
 
-        window.transform = states.end;
-        window.animate({
+        target.transform = states.end;
+        target.animate({
             transform: states.start,
             duration: 500
         }, function() {
@@ -268,7 +270,8 @@ if (StatusNet.Platform.isApple()) {
         borderTop: false,
         borderBottom: true,
         barColor: '#444',
-        items: [spacer]
+        items: [spacer],
+        zIndex: 200
     });
     window.add(view);
 
