@@ -200,6 +200,7 @@ renderNotice = function(notice, user) {
         authorId = notice.authorId;
         authorUri = notice.authorUri;
     }
+    var isSelf = author == account.username && isLocalAuthor(authorUri);
 
     var classes = ['notice'];
 
@@ -213,6 +214,10 @@ renderNotice = function(notice, user) {
 
     if (notice.repeat_of) {
         classes.push('notice-repeat');
+    }
+
+    if (isSelf) {
+        classes.push('notice-self');
     }
 
     html.push('<div class="' + classes.join(" ") + '" id="notice-' + notice.id +'" name="notice-' + notice.id +'">');
@@ -251,8 +256,7 @@ renderNotice = function(notice, user) {
         html.push(' <button class="notice_fave">Fave</button>')
     }
 
-    // @fixme use URI or id or somthing?
-    if (author === account.username) {
+    if (isSelf) {
         html.push(' <button class="notice_delete">Delete</a>')
     } else {
         if (notice.repeated === "false") {

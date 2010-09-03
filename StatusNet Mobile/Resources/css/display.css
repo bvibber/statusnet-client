@@ -111,6 +111,11 @@ h1 {
 	margin:5px 0 5px 10px;
 }
 
+.notice-self .avatar {
+	float:left;
+	margin:5px 10px 5px 0;
+}
+
 .notice .avatar img {
 	width: 64px;
 	height: 64px;
