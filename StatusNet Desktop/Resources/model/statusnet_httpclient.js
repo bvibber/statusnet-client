@@ -144,12 +144,15 @@ StatusNet.HttpClient.fetchFile = function(url, file, onSuccess, onError) {
         client.onreadystatechange = function() {
             if (client.readyState == 4) {
                 // XXX: write() always returns false on iPhone 1.4.1 SDK. Works Okay on Android.
-                file.write(client.responseData) 
+                file.write(client.responseData)
+
+                var nativePath = StatusNet.AvatarCache.getAvatarNativePath(file);
+
                 if (file.exists()) {
-                    StatusNet.debug("HttpClient.fetchFile - saved file: " + file.nativePath);
+                    StatusNet.debug("HttpClient.fetchFile - saved file: " + nativePath);
                     onSuccess(client.status);
                 } else {
-                    StatusNet.debug("HttpClient.fetchFile - could not save file: " + file.nativePath);
+                    StatusNet.debug("HttpClient.fetchFile - could not save file: " + nativePath);
                 }
             }
         };
