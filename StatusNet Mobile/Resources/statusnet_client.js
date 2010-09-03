@@ -60,6 +60,10 @@ StatusNet.Client.prototype.getActiveView = function() {
     return this.view;
 };
 
+StatusNet.Client.prototype.getServer = function() {
+    return this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
+};
+
 /**
  * Reload timeline notices
  */
@@ -381,8 +385,8 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
             'friends': {deselectedImage: 'images/tabs/new/friends.png', selectedImage: 'images/tabs/new/friends_on.png', name: 'friends'},
             'mentions': {deselectedImage: 'images/tabs/new/mentions.png', selectedImage: 'images/tabs/new/mentions_on.png', name: 'mentions'},
             'profile': {deselectedImage: 'images/tabs/new/profile.png', selectedImage: 'images/tabs/new/profile_on.png', name: 'user'},
-            'favorites': {deselectedImage: 'images/tabs/new/favorites.png', selectedImage: 'images/tabs/new/favorites_on.png', name: 'favorites'}
-           // 'inbox': {deselectedImage: 'images/tabs/new/inbox.png', selectedImage: 'images/tabs/new/inbox_on.png', name: 'inbox'},
+            'favorites': {deselectedImage: 'images/tabs/new/favorites.png', selectedImage: 'images/tabs/new/favorites_on.png', name: 'favorites'},
+            'inbox': {deselectedImage: 'images/tabs/new/inbox.png', selectedImage: 'images/tabs/new/inbox_on.png', name: 'inbox'}
            // 'search': {deselectedImage: 'images/tabs/new/search.png', selectedImage: 'images/tabs/new/search_on.png', name: 'search'}
         };
 
