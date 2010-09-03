@@ -28,6 +28,8 @@ StatusNet.Client = function(_account) {
 
     this.account = _account;
 
+    this.updateAccountAvatar();
+
     this.timeline = new StatusNet.TimelineFriends(this);
     this.view = new StatusNet.TimelineViewFriends(this);
 
@@ -72,6 +74,10 @@ StatusNet.Client = function(_account) {
         },
         60000
     );
+};
+
+StatusNet.Client.prototype.updateAccountAvatar = function() {
+    $('ul.nav li#nav_timeline_profile > img').attr('src', this.account.avatar);
 };
 
 StatusNet.Client.prototype.getActiveTimeline = function() {
