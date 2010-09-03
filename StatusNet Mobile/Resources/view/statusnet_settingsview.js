@@ -58,7 +58,8 @@ StatusNet.SettingsView.prototype.init = function() {
     });
     this.window.add(this.table);
 
-    this.navbar = StatusNet.Platform.createNavBar(this.window);
+    // @fixme drop the duped title if we can figure out why it doesn't come through
+    this.navbar = StatusNet.Platform.createNavBar(this.window, 'Accounts');
 
     this.table.addEventListener('click', function(event) {
         // Selected an account
@@ -180,7 +181,8 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         StatusNet.Platform.animatedClose(window);
         view.fields = null;
     };
-    var navbar = StatusNet.Platform.createNavBar(window);
+    // @fixme drop the duped title if we can figure out why it doesn't come through
+    var navbar = StatusNet.Platform.createNavBar(window, 'Add Account');
 
     window.addEventListener('close', function() {
         StatusNet.debug("WTF: closing new dialog...");

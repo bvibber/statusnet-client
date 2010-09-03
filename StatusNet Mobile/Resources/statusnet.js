@@ -254,7 +254,7 @@ StatusNet.Platform.animatedClose = function(window, dir, target) {
 }
 
 if (StatusNet.Platform.isApple()) {
-    StatusNet.Platform.createNavBar = function(window) {
+    StatusNet.Platform.createNavBar = function(window, title) {
 
     var height = 44;
     var fontSize = 18;
@@ -276,7 +276,7 @@ if (StatusNet.Platform.isApple()) {
     window.add(view);
 
     var label = null;
-    var title = window.title;
+    title = title || window.title;
     if (title != '') {
         label = Titanium.UI.createLabel({
             text: title,
@@ -286,7 +286,8 @@ if (StatusNet.Platform.isApple()) {
             height: height - 8,
             left: 60,
             right: 60,
-            color: 'white'
+            color: 'white',
+            zIndex: 201
         });
         window.add(label);
     }
@@ -329,7 +330,7 @@ if (StatusNet.Platform.isApple()) {
 };
 
 } else {
-    StatusNet.Platform.createNavBar = function(window) {
+    StatusNet.Platform.createNavBar = function(window, title) {
 
         var height = 44;
         var fontSize = 18;
@@ -344,8 +345,9 @@ if (StatusNet.Platform.isApple()) {
         });
         window.add(view);
 
+        title = title || window.title;
         var label = Titanium.UI.createLabel({
-            text: window.title,
+            text: title,
             font: {fontSize: height / 2, fontWeight: 'bold'},
             textAlign: 'center',
             top: 4,
