@@ -37,16 +37,24 @@ StatusNet.TimelineViewInbox.prototype = heir(StatusNet.TimelineView.prototype);
 StatusNet.TimelineViewInbox.prototype.renderNotice = function(notice) {
 
     var html = [];
+    var avatar;
 
-    var avatar = notice.avatar;
+    var cachedAvatarPath = StatusNet.AvatarCache.lookupAvatar(notice.avatar);
+
+    if (cachedAvatarPath) {
+        avatar = 'file:///' + cachedAvatarPath; // Need to turn native path into a URL
+    } else {
+        avatar = notice.avatar;
+    }
+
     var author = notice.author;
 
     // XXX: Argh! There must be a better way
     var authorUri = this.client.server + notice.nickname;
 
-    html.push('<div class="notice" name="notice-' + notice.id +'">');
+    html.push('<div class="notice" id="notice-' + notice.id +'">');
     html.push('   <div class="avatar"><a href="' + notice.authorUri + '"><img src="' + avatar + '"/></a></div>');
-    html.push('   <div><a class="author" name="author" href="' +  notice.authorUri + '">' + author + '</a>');
+    html.push('   <div><a class="author" name="author" href="' +  notice.authorUri + '">' + notice.nickname + '</a>');
     html.push('   <div class="content">'+ notice.content +'</div>');
     html.push('   </div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this message in browser">' + humane_date(notice.updated) + '</a></div>');
     html.push('<div class="notice_links"><a href="#" class="notice_reply">Reply</a>');
@@ -56,16 +64,13 @@ StatusNet.TimelineViewInbox.prototype.renderNotice = function(notice) {
     return html.join('');
 };
 
-StatusNet.TimelineViewInbox.prototype.enableNoticeControls = function(noticeDom) {
-
-    var noticeAuthor = $(noticeDom).find('a.author').text();
-    var uri = $(noticeDom).find('div a.author').attr('href');
+StatusNet.TimelineViewInbox.prototype.enableNoticeControls = function(noticeDom, notice) {
 
     var that = this;
 
     // Direct message reply
     $(noticeDom).find('a.notice_reply').bind('click', function(event) {
-        that.client.directMessageDialog(noticeAuthor,
+        that.client.directMessageDialog(notice.nickname,
             function(msg) {
                 StatusNet.Infobar.flashMessage(msg);
             },

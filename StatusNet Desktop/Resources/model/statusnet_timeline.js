@@ -170,10 +170,9 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  * adds it to the notice cache, and notifies the view to display it.
  *
  * @param object  notice              the parsed form of the notice as a dict
- * @param boolean prepend            whether to add it to the beginning of end of
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(notice, prepend, notifications, skipCache) {
+StatusNet.Timeline.prototype.addNotice = function(notice) {
     StatusNet.debug('Timeline.addNotice enter:');
     if (notice === null || typeof notice !== "object") {
         throw "Invalid notice passed to addNotice.";
@@ -188,7 +187,7 @@ StatusNet.Timeline.prototype.addNotice = function(notice, prepend, notifications
     }
 
     if (notice.id !== undefined && notice.xmlString !== undefined) {
-        if (this.cacheable() && !skipCache) {
+        if (this.cacheable()) {
             StatusNet.debug("encached notice: " + notice.id);
             this.encacheNotice(notice.id, notice.xmlString);
         }
@@ -196,13 +195,8 @@ StatusNet.Timeline.prototype.addNotice = function(notice, prepend, notifications
 
     StatusNet.debug("addNotice - finished encaching notice");
 
-    if (prepend) {
-        this._notices.unshift(notice);
-        this.noticeAdded.notify({notice: notice, notifications: notifications});
-    } else {
-        this._notices.push(notice);
-        this.noticeAdded.notify({notice: notice, notifications: notifications});
-    }
+    this._notices.push(notice);
+    this.noticeAdded.notify({notice: notice});
 
     StatusNet.debug('Timeline.addNotice DONE.');
 };
@@ -228,11 +222,11 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             var entries = [];
             var entryCount = 0;
 
-            var onEntry = function(notice, skipCache) {
+            var onEntry = function(notice) {
                 // notice
                 StatusNet.debug('Got notice: ' + notice);
                 StatusNet.debug('Got notice.id: ' + notice.id);
-                that.addNotice(notice, true, notifications, skipCache);
+                that.addNotice(notice);
                 entryCount++;
             };
             var onSuccess = function() {
@@ -422,6 +416,10 @@ StatusNet.Timeline.prototype.finishedFetch = function(notice_count) {
     StatusNet.AvatarCache.trimAvatarCache();
 };
 
+StatusNet.Timeline.prototype.getNotices = function() {
+    return this._notices;
+};
+
 /**
  * Loads and triggers display of cached notices on this timeline.
  * Accessor for notices
@@ -457,11 +455,11 @@ StatusNet.Timeline.prototype.loadCachedNotices = function() {
         // @todo Add background parsing to Desktop
         if (StatusNet.Platform.isMobile()) {
             StatusNet.AtomParser.backgroundParse(xmlEntry, function(notice) {
-                that.addNotice(notice, false, false, true);
+                that.addNotice(notice);
             });
         } else {
             StatusNet.AtomParser.parse(xmlEntry, function(notice) {
-                that.addNotice(notice, false, false, true);
+                that.addNotice(notice);
             });
         }
 
@@ -480,7 +478,7 @@ StatusNet.Timeline.prototype.loadCachedNotices = function() {
  */
 StatusNet.Timeline.prototype.autoRefresh = function() {
     return true;
-}
+};
 
 /**
  * Constructor for mentions timeline model

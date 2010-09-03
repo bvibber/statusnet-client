@@ -300,6 +300,8 @@ var startTime = Date.now();
                     var result = notice.authorUri.match(idRegexp);
                     if (result) {
                         notice.authorId = result[0];
+                    } else {
+                        StatusNet.debug("KKKKKKKKKKKKKKKKKKKKKKKKKKKK authorId " + notice.authorId);
                     }
                 },
                 'statusnet:profile_info': function(match2) {

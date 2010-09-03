@@ -234,7 +234,7 @@ StatusNet.TimelineViewUser.prototype.renderNotice = function(notice) {
         classes.push('notice-repeat');
     }
 
-    html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
+    html.push('<div class="' + classes.join(" ") + '" id="notice-' + notice.id +'">');
 
     html.push('   <div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + author + '</a>');
     html.push('   <div class="content">'+ notice.content +'</div>');

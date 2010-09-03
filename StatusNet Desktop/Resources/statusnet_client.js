@@ -159,6 +159,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     // @todo save scroll state
     $("#body").scrollTop(0);
 
+    StatusNet.debug("UPDATE ZZZZZZZZZZZZZZZZZZZZZ");
     this.timeline.update(function() {
         that.timeline.noticeAdded.attach(
             function(args) {
@@ -396,7 +397,7 @@ StatusNet.Client.prototype.directMessageDialog = function(nickname, onSuccess, o
     win.onError = onError;
 
     if (nickname) {
-        win.setTitle('New Direct Message To: ' + nickname);
+        win.setTitle('New Direct Message to: ' + nickname);
         win.nickname = nickname;
     }
 
