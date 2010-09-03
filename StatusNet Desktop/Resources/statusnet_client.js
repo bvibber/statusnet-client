@@ -81,10 +81,12 @@ StatusNet.Client.prototype.updateAccountAvatar = function() {
 };
 
 StatusNet.Client.prototype.getActiveTimeline = function() {
+    StatusNet.debug("StatusNet.Client.getActiveTimeline - START");
     if (this.timeline) {
+        StatusNet.debug("Client.getActiveTimeline() - timeline seems to be there: " + typeof timeline);
         return this.timeline;
     } else {
-        StatusNet.debug("Client.getActiveTimeline() - null timeline, help!");
+        StatusNet.debug("Client.getActiveTimeline() - no timeline, help!");
     }
 };
 
