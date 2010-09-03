@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
 /**
  * Constructor for user timeline model
  */
@@ -114,7 +115,7 @@ StatusNet.TimelineUser.prototype.getExtendedInfo = function(onFinish, authorId) 
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * timeline and notifies the view the model has changed.
  */
-StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
+StatusNet.TimelineUser.prototype.update = function(onFinish) {
     StatusNet.debug('Timeline.update ENTERED');
 
     this.updateStart.notify();
@@ -136,11 +137,15 @@ StatusNet.TimelineUser.prototype.update = function(onFinish, notifications) {
             var entries = [];
             var entryCount = 0;
 
-            var onEntry = function(notice, skipCache) {
+            var onEntry = function(notice) {
                 // notice
                 StatusNet.debug('Got notice: ' + notice);
                 StatusNet.debug('Got notice.id: ' + notice.id);
-                that.addNotice(notice, false, notifications, skipCache);
+
+                // splice in the authorUri for user entries
+                notice.authorUri = that.user.link;
+
+                that.addNotice(notice);
                 entryCount++;
             };
             var onSuccess = function() {

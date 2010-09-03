@@ -190,6 +190,11 @@ StatusNet.Event.prototype.notify = function(args) {
     }
 };
 
+// str manip stolen from humane.js
+StatusNet.strtotime = function(date_str) {
+	var time = ('' + date_str).replace(/-/g,"/").replace(/[TZ]/g," ");
+	return new Date(time).getTime();
+}
 
 StatusNet.Platform = {};
 
@@ -256,3 +261,4 @@ StatusNet.Platform.serializeXml = function(node) {
 StatusNet.Platform.base64encode = function(data) {
     return Titanium.Codec.encodeBase64(data);
 }
+

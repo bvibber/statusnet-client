@@ -55,7 +55,7 @@ StatusNet.TimelineView = function(client, showNotifications) {
     this.timeline.noticeAdded.attach(
         function(args) {
             if (args) {
-                that.showNewNotice(args.notice, args.append);
+                that.insertNotice(args.notice);
             } else {
                 StatusNet.debug("noticeAdded event with no args!");
             }
@@ -77,15 +77,15 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
 
     var cachedAvatarPath = StatusNet.AvatarCache.lookupAvatar(notice.avatar);
 
+    StatusNet.debug("TimelineView.renderNotice - A.");
+
     if (cachedAvatarPath) {
         avatar = 'file:///' + cachedAvatarPath; // Need to turn native path into a URL
     } else {
         StatusNet.debug("cachedAvatar - is false");
         avatar = notice.avatar;
     }
-
-    var author = notice.author;
-    var authorId = notice.authorId
+    StatusNet.debug("TimelineView.renderNotice - B.");
 
     var classes = ['notice'];
 
@@ -101,10 +101,13 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
         classes.push('notice-repeat');
     }
 
-    html.push('<div class="' + classes.join(" ") + '" name="notice-' + notice.id +'">');
+    StatusNet.debug("TimelineView.renderNotice - C.");
+
+
+    html.push('<div class="' + classes.join(" ") + '" id="notice-' + notice.id +'" " name="notice-' + notice.id + '">');
     html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
     html.push('</div>');
-    html.push('<div><a class="author" name="author-' + authorId + '" href="' + notice.authorUri + '" rel="external">' + notice.author + '</a>');
+    html.push('<div><a class="author" name="author-' + notice.authorId + '" href="' + notice.authorUri + '" rel="external">' + notice.author + '</a>');
     html.push('<div class="content">'+ notice.content +'</div>');
     html.push('</div><div class="date_link"><a href="' + notice.link + '" rel="external" title="View this notice in browser">' + humane_date(notice.updated) + '</a></div>');
     if (notice.source) {
@@ -131,6 +134,7 @@ StatusNet.TimelineView.prototype.renderNotice = function(notice) {
             html.push(' <a href="#" class="notice_repeat">Repeat</a>');
         }
     }
+    StatusNet.debug("TimelineView.renderNotice - D.");
 
     html.push('</div></div>');
     html.push('<div class="clear"></div>');
@@ -150,43 +154,81 @@ StatusNet.TimelineView.prototype.show = function(notices) {
 
     var notices = this.client.getActiveTimeline().loadCachedNotices();
 
-    StatusNet.debug("got notices");
+    StatusNet.debug("StatusNet.TimelineView.show() - got " + notices.length + " notices");
 
     $('#notices').empty();
 
     if (notices.length > 0) {
 
         StatusNet.debug("showing notice");
-        var html = [];
 
         for (i = 0; i < notices.length; i++) {
-            html.push(this.renderNotice(notices[i]));
+            this.insertNotice(notices[i]);
         }
-
-        $('#notices').prepend(html.join(''));
-
-        var that = this;
-
-        StatusNet.debug("enabling notice controls");
-
-        $('#notices div.notice').each(function() {
-            that.enableNoticeControls(this);
-        });
-
     }
-
-    $('.notice a').attr('rel', 'external');
 
     StatusNet.debug("StatusNet.TimelineView.show() - finished showing notices");
 };
 
-StatusNet.TimelineView.prototype.showNewNotice = function(notice) {
-    StatusNet.debug("prepending notice " + notice.id);
-    $('#notices').append(this.renderNotice(notice));
-    var notice = $('#notices > div.notice:first').get(0);
-    this.enableNoticeControls(notice);
-    $('#notices > div.notice:first').hide();
-    $('#notices > div.notice:first').fadeIn("slow");
+/**
+ * Find the next-newer notice in our timeline after the given one, if any
+ *
+ * @param notice
+ * @return mixed Notice or null
+ */
+StatusNet.TimelineView.prototype.findNextNewerNotice = function(notice) {
+    StatusNet.debug("StatusNet.TimelineView.prototype.findNextNewerNotice - A");
+    var notices = this.client.getActiveTimeline().getNotices();
+    StatusNet.debug("StatusNet.TimelineView.prototype.findNextNewerNotice - B");
+
+    var candidate = null;
+    var candidateTS = null;
+    StatusNet.debug("StatusNet.TimelineView.prototype.findNextNewerNotice - B1 - notice.updated = " + notice.updated);
+
+    var targetTS = StatusNet.strtotime(notice.updated);
+    StatusNet.debug("StatusNet.TimelineView.prototype.findNextNewerNotice - B2 - targetTS = " + targetTS);
+
+    StatusNet.debug("StatusNet.TimelineView.prototype.findNextNewerNotice - C");
+
+    for (var i = 0; i < notices.length; i++) {
+        var thisTS = StatusNet.strtotime(notices[i].updated);
+        if (thisTS <= targetTS) {
+            continue;
+        }
+        if (candidate && thisTS > candidateTS) {
+            continue;
+        }
+        candidate = notices[i];
+        candidateTS = thisTS;
+    }
+    StatusNet.debug("StatusNet.TimelineView.prototype.findNextNewerNotice - D");
+
+    return candidate;
+};
+
+StatusNet.TimelineView.prototype.insertNotice = function(notice) {
+    StatusNet.debug("StatusNet.TimelineView.prototype.insertNotice - A");
+    var html = this.renderNotice(notice);
+    StatusNet.debug("StatusNet.TimelineView.prototype.insertNotice - B");
+
+    var next = this.findNextNewerNotice(notice);
+    StatusNet.debug("StatusNet.TimelineView.prototype.insertNotice - C");
+
+    if (next) {
+        StatusNet.debug("StatusNet.TimelineView.prototype.insertNotice - D");
+        $(html).insertAfter("#notice-" + next.id);
+    } else {
+        $("#notices").prepend(html);
+    }
+
+    var noticeDom = $("#notice-" + notice.id);
+    noticeDom.hide();
+    noticeDom.fadeIn("slow");
+
+    StatusNet.debug("StatusNet.TimelineView.prototype.insertNotice - E");
+
+    this.enableNoticeControls(noticeDom, notice);
+
 };
 
 StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
@@ -251,6 +293,9 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
  */
 StatusNet.TimelineView.prototype.isLocal = function(uri) {
 
+    if (!uri) {
+        StatusNet.debug("GARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR uri is blank");
+    }
     // Isolate domain name from URI paths and compare
     var path = uri.split('/');
     var serverPath = this.client.server.split('/');
@@ -261,38 +306,38 @@ StatusNet.TimelineView.prototype.isLocal = function(uri) {
     return false;
 };
 
-StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
+StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom, notice) {
 
-    var name = $(noticeDom).attr('name');
-    var noticeId = name.substring(7); // notice-
+StatusNet.debug(JSON.stringify(notice));
 
-    name = $(noticeDom).find('a.author').attr('name');
-    var authorId = name.substring(7); // author-
-    var noticeAuthor = $(noticeDom).find('a.author').text();
-    var uri = $(noticeDom).find('div a.author').attr('href');
+StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - A notice id: " + notice.id);
 
     var that = this;
 
     // Override links to external web view of the notice timelines
     // with click event handlers to display timelines within the client
-    if (this.isLocal(uri)) {
+
+    StatusNet.debug("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM notice.authorUri = " + notice.authorUri);
+
+    if (this.isLocal(notice.authorUri)) {
 
         $(noticeDom).find('div a.author').attr('href', "#");
         $(noticeDom).find('div a.author').bind('click', function(event) {
-            StatusNet.debug("Switching timeline to user " + authorId);
-            that.client.switchUserTimeline(authorId);
+            StatusNet.debug("Switching timeline to user " + notice.authorId);
+            that.client.switchUserTimeline(notice.authorId);
         });
 
         $(noticeDom).find('div.avatar a').attr('href', "#");
         $(noticeDom).find('div.avatar img').bind('click', function(event) {
-            StatusNet.debug("Switching timeline to user " + authorId);
-            that.client.switchUserTimeline(authorId);
+            StatusNet.debug("Switching timeline to user " + notice.authorId);
+            that.client.switchUserTimeline(notice.authorId);
         });
     }
+    StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - C");
 
     // Reply
     $(noticeDom).find('a.notice_reply').bind('click', function(event) {
-        that.client.newNoticeDialog(noticeId, noticeAuthor,
+        that.client.newNoticeDialog(notice.id, notice.author,
             function(msg) {
                 StatusNet.Infobar.flashMessage(msg);
             },
@@ -300,42 +345,50 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
                 StatusNet.Infobar.flashMessage(msg);
             });
         });
+        StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - D");
 
     // Delete notice
     $(noticeDom).find('a.notice_delete').bind('click', function(event) {
         var r = confirm("Delete notice?");
         if (r) {
-            that.client.deleteNotice(noticeId, this);
+            that.client.deleteNotice(notice.id, this);
         }
     });
+    StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - E");
 
     // Fave notice
     $(noticeDom).find('a.notice_fave').toggle(
         function(event) {
-            that.client.faveNotice(noticeId, this);
+            that.client.faveNotice(notice.id, this);
         },
         function(event) {
-            that.client.unFaveNotice(noticeId, this);
+            that.client.unFaveNotice(notice.id, this);
         }
     );
+    StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - F");
 
     $(noticeDom).find('a.notice_unfave').toggle(
         function(event) {
-            that.client.unFaveNotice(noticeId, this);
+            that.client.unFaveNotice(notice.id, this);
         },
         function(event) {
-            that.client.faveNotice(noticeId, this);
+            that.client.faveNotice(notice.id, this);
         }
     );
+    StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - G");
 
     // Repeat
     $(noticeDom).find('a.notice_repeat').bind('click', function(event) {
-        that.client.repeatNotice(noticeId, this);
+        that.client.repeatNotice(notice.id, this);
     });
+    StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - H");
 
     // Override external web links to local users and groups in-content
     $(noticeDom).find('div.content span.vcard a').each(function() {
         var href = $(this).attr('href');
+
+        StatusNet.debug("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ href = "+ href);
+
         if (that.isLocal(href)) {
             $(this).attr('href', '#');
             // group
@@ -356,6 +409,8 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
         }
     });
 
+    StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - I");
+
     // Override external web links to tags
     $(noticeDom).find("div.content span.tag a").each(function() {
         $(this).attr('href', '#');
@@ -364,6 +419,8 @@ StatusNet.TimelineView.prototype.enableNoticeControls = function(noticeDom) {
             that.client.showTagTimeline($(this).text().replace(/\W/, ''));
         });
     });
+
+    StatusNet.debug("ZZZZZZZZZZZZZZZZZ enableNoticeControls - J - END");
 
     $('div.content a', noticeDom).attr('rel', 'external');
 };

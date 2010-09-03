@@ -17,6 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 /**
  * Constructor for group timeline model
  */
@@ -42,48 +43,67 @@ StatusNet.TimelineGroup.prototype = heir(StatusNet.Timeline.prototype);
  * Update the timeline.  Does a fetch of the Atom feed for the appropriate
  * group timeline and notifies the view the model has changed.
  */
-StatusNet.TimelineGroup.prototype.update = function(onFinish) {
-
-    StatusNet.debug("TimelineGroup.update()");
+ StatusNet.TimelineGroup.prototype.update = function(onFinish) {
+    StatusNet.debug('Timeline.update ENTERED');
 
     this.updateStart.notify();
+
+    StatusNet.debug('Timeline.update called updateStart.notify');
 
     var that = this;
 
     this.account.apiGet(this.getUrl(),
 
-        function(status, data) {
+        function(status, data, responseText) {
+            StatusNet.debug('TimelineGroup.update GOT DATA:');
 
-            StatusNet.debug('Fetched ' + that.getUrl());
-            StatusNet.debug('HTTP client returned: ' + data);
-
+            // @todo How we get author info will need to change when we
+            // update output to match the latest Activity Streams spec
             that.group = StatusNet.AtomParser.getGroup(data);
 
             var entries = [];
+            var entryCount = 0;
 
-            $(data).find('feed > entry').each(function() {
-                StatusNet.debug('TimelineGroup.update: found an entry.');
-                entries.push(this);
-            });
+            var onEntry = function(notice) {
+                // notice
+                StatusNet.debug('Got notice: ' + notice);
+                StatusNet.debug('Got notice.id: ' + notice.id);
+                that.addNotice(notice);
+                entryCount++;
+            };
+            var onSuccess = function() {
+                // success!
+                StatusNet.debug('TimelineGroup.update success!');
+                that.updateFinished.notify({notice_count: entryCount});
 
-            entries.reverse(); // keep correct notice order
+                if (onFinish) {
+                    onFinish(entryCount);
+                }
+                StatusNet.debug('TimelineGroup.update calling finishedFetch...');
+                that.finishedFetch(entryCount);
+                StatusNet.debug('TimelineGroup.update DONE.');
+            };
+            var onFailure = function(msg) {
+                // if parse failure
+                StatusNet.debug("Something went wrong retrieving timeline: " + msg);
+                StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
+                that.updateFinished.notify();
+            };
 
-            for (var i = 0; i < entries.length; i++) {
-                that.addNotice(entries[i]);
+            // @todo Background processing for Desktop
+            if (StatusNet.Platform.isMobile()) {
+                StatusNet.AtomParser.backgroundParse(responseText, onEntry, onSuccess, onFailure);
+            } else {
+                StatusNet.debug("gonna parse this");
+                StatusNet.AtomParser.parse(responseText, onEntry, onSuccess, onFailure);
             }
-
-            that.updateFinished.notify({notice_count: entries.length});
-
-            if (onFinish) {
-                onFinish(entries.length);
-            }
-            that.finishedFetch(entries.length);
         },
         function(client, msg) {
-            StatusNet.debug("Something went wrong retrieving group timeline: " + msg);
-            StatusNet.Infobar.flashMessage("Couldn't get group timeline: " + msg);
+            StatusNet.debug("Something went wrong retrieving timeline: " + msg);
+            StatusNet.Infobar.flashMessage("Couldn't update timeline: " + msg);
+            that.updateFinished.notify();
         }
     );
+    StatusNet.debug('Timeline.update EXITED: waiting for data return.');
 
 };
-
