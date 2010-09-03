@@ -704,14 +704,14 @@ StatusNet.Client.prototype.unsubscribe = function(profileId, onSuccess)
                 onSuccess();
             }
         },
-        function(client, responseText) {
-            var msg = $(response).find('error').text();
+        function(status, responseText) {
+            var msg = $(responseText).find('error').text();
             if (msg) {
                 StatusNet.debug("Error unsubscribing from profile " + profileId + " - " + msg);
                 StatusNet.Infobar.flashMessage("Error unsubscribing from profile " + profileId + " - " + msg);
             } else {
-                StatusNet.debug("Error unsubscribing from profile " + profileId + " - " + status + " - " + response);
-                StatusNet.Infobar.flashMessage("Error unsubscribing from profile " + profileId + " - " + status + " - " + response);
+                StatusNet.debug("Error unsubscribing from profile " + profileId + " - " + status + " - " + responseText);
+                StatusNet.Infobar.flashMessage("Error unsubscribing from profile " + profileId + " - " + status + " - " + responseText);
             }
         }
     );

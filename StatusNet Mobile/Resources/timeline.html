@@ -67,7 +67,8 @@ function findNextNewerNotice(notice) {
 
 function gotNotice(id) {
     for (var i = 0; i < notices.length; i++) {
-        if (notices.id == id) {
+        if (notices[i].id == id) {
+            Titanium.API.error("Ignoring display of already-shown notice id " + id);
             return true;
         }
     }
