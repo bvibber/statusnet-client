@@ -146,7 +146,7 @@ Titanium.App.addEventListener("resume", function(event) {
     Titanium.API.debug("webview got event: " + JSON.stringify(event));
     for (var i = 0; i < notices.length; i++) {
         var notice = notices[i];
-        $('#notice-' + notice.id + ' .date_link').text(humane_date(notice.updated) + "!");
+        $('#notice-' + notice.id + ' .date_link').text(humane_date(notice.updated));
     }
 });
 
