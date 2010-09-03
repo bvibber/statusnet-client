@@ -162,7 +162,12 @@ StatusNet.AvatarCache.trimAvatarCache = function() {
  */
 StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss, relative) {
 
+    StatusNet.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX AvatarCache.lookupAvatar A - Begin");
+
     var hash = StatusNet.AvatarCache.getAvatarHash(url);
+
+    StatusNet.debug('AvatarCache.lookupAvatar B - Avatar hash for ' + url + " == " + hash);
+
     var dot = url.lastIndexOf(".");
 
     if (dot == -1 ) {
@@ -175,20 +180,29 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss, relative) {
     var cacheDir = StatusNet.AvatarCache.getCacheDirectory();
 
     if (!cacheDir.exists()) {
+        StatusNet.debug("AvatarCache.lookupAvatar C - avatar cache directory doesn't exist, creating.");
         cacheDir.createDirectory(); // XXX: always seems to return false on mobile SDK 1.4.1
         if (cacheDir.exists()) {
-            StatusNet.debug("AvatarCache.lookupAvatar - successfully created cache directory");
+            StatusNet.debug("AvatarCache.lookupAvatar D - successfully created cache directory");
         } else {
-            StatusNet.debug("AvatarCache.lookupAvatar - Could not create cache directory");
+            StatusNet.debug("AvatarCache.lookupAvatar D - Could not create cache directory");
         }
+    } else {
+        StatusNet.debug("AvatarCache.lookupAvatar E - avatar cache directory already exists");
     }
 
     var filename = hash + extension;
+
+    StatusNet.debug("AvatarCache.lookupAvatar F - filename = " + filename);
+
     var avatarFile = StatusNet.AvatarCache.getAvatarFile(filename);
     var nativePath = StatusNet.AvatarCache.getAvatarNativePath(avatarFile);
     var relativePath = 'avatar_cache/' + filename;
 
+    StatusNet.debug('AvatarCache.lookupAvatar G - looking up avatar: ' + nativePath);
+
     if (avatarFile.exists()) {
+        StatusNet.debug("AvatarCache.lookupAvatar H - Yay, avatar cache hit");
         if (onHit) {
             if (relative) {
                 onHit(relativePath);
@@ -197,9 +211,13 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss, relative) {
             }
         }
 
+        StatusNet.debug("AvatarCache.lookupAvatar I - returning native path: " + nativePath);
+        StatusNet.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX AvatarCache.lookupAvatar J - END");
 
         return (relative) ? relativePath : nativePath;
     } else {
+
+        StatusNet.debug("AvatarCache.lookupAvatar H - Avatar cache miss, fetching avatar from web");
 
         // Make sure there's space available on the device before fetching
         if (!cacheDir.spaceAvailable()) {
@@ -214,6 +232,7 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss, relative) {
             url,
             avatarFile,
             function() {
+                StatusNet.debug("AvatarCache.lookupAvatar I - fetched avatar: " + url);
                 if (onHit) {
                     if (relative) {
                         onHit(relativePath);
@@ -225,15 +244,17 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss, relative) {
                 }
             },
             function(code, e) {
-                StatusNet.debug("AvatarCache.lookupAvatar - couldn't fetch: " + url);
-                StatusNet.debug("AvatarCache.lookupAvatar - code: " + code + ", exception: " + e);
+                StatusNet.debug("AvatarCache.lookupAvatar I - couldn't fetch: " + url);
+                StatusNet.debug("AvatarCache.lookupAvatar I - code: " + code + ", exception: " + e);
             }
         );
 
         if (onMiss) {
             onMiss(url)
         }
-ß
+
+        StatusNet.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX AvatarCache.lookupAvatar J - END");
+
         return false;
     }
 };
