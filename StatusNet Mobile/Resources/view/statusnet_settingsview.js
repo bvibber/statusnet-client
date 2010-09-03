@@ -29,6 +29,8 @@ StatusNet.SettingsView = function(client) {
     this.lastSite = '';
     this.client = client;
     this.rows = [];
+
+    this.onClose = new StatusNet.Event();
 };
 
 /**
@@ -37,13 +39,15 @@ StatusNet.SettingsView = function(client) {
  */
 StatusNet.SettingsView.prototype.init = function() {
     StatusNet.debug('SettingsView.init');
+    var view = this;
 
     var window = this.window = Titanium.UI.createWindow({
         title: 'Accounts',
         navBarHidden: true
     });
-
-    var view = this;
+    window.addEventListener('close', function() {
+        view.onClose.notify();
+    });
 
     // Stack the toolbar above the table view; this'll make our animation awesomer.
     // Set up our table view...

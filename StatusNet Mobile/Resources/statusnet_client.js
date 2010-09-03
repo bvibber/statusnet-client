@@ -36,6 +36,8 @@ StatusNet.Client = function(_account) {
 
     this.account = _account;
     this.webViewReady = false;
+    this.newNoticeView = null;
+    this.accountView = null;
 
     this.init();
 
@@ -75,8 +77,7 @@ StatusNet.Client.prototype.init = function() {
     StatusNet.debug("StatusNet.Client.prototype.init - Checking for account...");
     if (!this.account) {
         StatusNet.debug("StatusNet.Client.prototype.init - No account, showing accountView");
-        this.accountView = new StatusNet.SettingsView(this);
-        this.accountView.init();
+        this.showSettingsView();
     } else {
         StatusNet.debug("StatusNet.Client.prototype.init - account is set...");
 
@@ -358,8 +359,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
 
         accountsButton.addEventListener('click', function() {
             StatusNet.debug('showSettings!');
-            var settingsView = new StatusNet.SettingsView(that);
-            settingsView.init();
+            that.showSettingsView();
         });
 
         //this.navbar.setLeftNavButton(accountsButton);
@@ -464,22 +464,27 @@ StatusNet.Client.prototype.setAccountLabel = function() {
  * Show notice input dialog
  */
 StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername) {
-    var that = this;
-    var view = new StatusNet.NewNoticeView({
-        replyToId: replyToId,
-        replyToUsername: replyToUsername
-    });
-    view.sent.attach(function() {
-        // @fixme load just the posted message, and prepend it
-        StatusNet.debug('gonna re-load');
-        that.view.showHeader();
-        that.view.showSpinner();
-        that.timeline.update(function() {
-            that.view.hideSpinner();
+    if (!this.newNoticeView) {
+        var view = this.newNoticeView = new StatusNet.NewNoticeView({
+            replyToId: replyToId,
+            replyToUsername: replyToUsername
         });
-        StatusNet.debug('ALL DONE waiting');
-    });
-    view.init();
+        var that = this;
+        view.sent.attach(function() {
+            // @fixme load just the posted message, and prepend it
+            StatusNet.debug('gonna re-load');
+            that.view.showHeader();
+            that.view.showSpinner();
+            that.timeline.update(function() {
+                that.view.hideSpinner();
+            });
+            StatusNet.debug('ALL DONE waiting');
+        });
+        view.onClose.attach(function() {
+            that.newNoticeView = null;
+        });
+        view.init();
+    }
 };
 
 /**
@@ -791,3 +796,15 @@ StatusNet.Client.prototype.unblock = function(profileId, onSuccess)
         }
     );
 };
+
+StatusNet.Client.prototype.showSettingsView = function()
+{
+    if (!this.accountView) {
+        var view = this.accountView = new StatusNet.SettingsView(this);
+        var that = this;
+        view.onClose.attach(function() {
+            that.accountView = null;
+        });
+        view.init();
+    }
+}

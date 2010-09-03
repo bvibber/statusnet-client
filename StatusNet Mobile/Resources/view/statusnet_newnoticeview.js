@@ -30,6 +30,7 @@ StatusNet.NewNoticeView = function(data) {
     this.account = StatusNet.Account.getDefault(db);
 
     this.sent = new StatusNet.Event();
+    this.onClose = new StatusNet.Event();
 }
 
 /**
@@ -112,6 +113,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
             keyboardMargin = 216;
         }
     }
+    this.window.addEventListener('close', function() {
+        that.onClose.notify();
+    });
 
     var cancelButton = Titanium.UI.createButton({
         title: 'Cancel'
