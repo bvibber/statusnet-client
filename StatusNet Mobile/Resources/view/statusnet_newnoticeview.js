@@ -41,7 +41,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var that = this;
     var data = this.data;
 
-    var margin = 4;
+    var margin = StatusNet.Platform.isAndroid() ? 4 : 0;
     var controlStripHeight = 32;
     var topMargin = 0;
     var keyboardMargin = 0;
@@ -130,7 +130,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     if (StatusNet.Platform.isApple()) {
         // Use iPhone-style navbar (as a toolbar under our management)
         var navbar = StatusNet.Platform.createNavBar(window);
-        cancelButton.style = Titanium.UI.iPhone.SystemButtonStyle.DONE; // is this right?
+        updateButton.style = Titanium.UI.iPhone.SystemButtonStyle.DONE;
         navbar.setLeftNavButton(cancelButton);
         navbar.setRightNavButton(updateButton);
         topMargin = navbar.height;
@@ -259,6 +259,12 @@ StatusNet.NewNoticeView.prototype.init = function() {
         } else {
             StatusNet.debug('Got unexpected event from photo helper.');
         }
+        if (that.afterPhotoCallback !== undefined) {
+            var cb = that.afterPhotoCallback;
+            that.afterPhotoCallback = null;
+            cb();
+        }
+
     }
     Titanium.App.addEventListener(photoEvent, photoListener);
     window.addEventListener('close', function() {
@@ -266,36 +272,49 @@ StatusNet.NewNoticeView.prototype.init = function() {
     });
 
     moreButton.addEventListener('click', function() {
-        //noticeTextArea.blur();
         var options = [];
         var callbacks = [];
+        var destructive = -1;
         if (that.attachment == null) {
 
             if (StatusNet.Platform.hasCamera()) {
                 options.push('Take photo');
                 callbacks.push(function() {
-                    that.openAttachment('camera');
+                    that.openAttachment('camera', function() {
+                        that.focus();
+                    });
                 });
             }
 
             options.push('Photo gallery');
             callbacks.push(function() {
-                that.openAttachment('gallery');
+                that.openAttachment('gallery', function() {
+                    that.focus();
+                });
             });
         } else {
-            options.push('Remove attachment');
+            destructive = options.length;
+            options.push('Remove');
             callbacks.push(function() {
                 that.removeAttachment();
+                that.focus();
             });
         }
 
+        var cancel = options.length;
         options.push('Cancel');
-        callbacks.push(function() {});
+        callbacks.push(function() {
+            that.focus();
+        });
 
         var dialog = Titanium.UI.createOptionDialog({
-            title: 'Notice options',
-            options: options
+            title: 'Attachment',
+            options: options,
+            cancel: cancel
         });
+        if (destructive > -1) {
+            dialog.destructive = destructive;
+        }
         dialog.addEventListener('click', function(event) {
             if (event.index !== undefined && callbacks[event.index] !== undefined) {
                 callbacks[event.index]();
@@ -321,11 +340,12 @@ StatusNet.NewNoticeView.prototype.init = function() {
     StatusNet.debug("NewNoticeView.init END");
 };
 
-StatusNet.NewNoticeView.prototype.openAttachment = function(source)
+StatusNet.NewNoticeView.prototype.openAttachment = function(source, callback)
 {
     if (StatusNet.Platform.isAndroid() && !Ti.Filesystem.isExternalStoragePresent) {
         alert('SD card is missing or unmounted. Check card and try again.');
     } else {
+        this.afterPhotoCallback = callback;
         Titanium.App.fireEvent('StatusNet.newnotice.photo', {
             source: source,
             callbackEvent: 'StatusNet.newnotice.photoReceived'
@@ -567,4 +587,9 @@ StatusNet.NewNoticeView.prototype.close = function()
 {
     this.noticeTextArea.blur(); // close keyboard
     StatusNet.Platform.animatedClose(this.window);
+}
+
+StatusNet.NewNoticeView.prototype.focus = function()
+{
+    this.noticeTextArea.focus(); // open keyboard
 }
