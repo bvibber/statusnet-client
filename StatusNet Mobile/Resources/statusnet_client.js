@@ -197,7 +197,14 @@ StatusNet.Client.prototype.initInternalListeners = function() {
             Titanium.App.fireEvent('StatusNet_unblockComplete', {user: event.userId});
         });
     });
+
+    Ti.App.addEventListener('StatusNet_sendDirectMessage', function(event) {
+        StatusNet.debug('Event: ' + event);
+        that.directMessageDialog(event.recipient);
+    });
 };
+
+
 
 /**
  * Switch the view to a specified timeline
@@ -488,6 +495,27 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
             that.newNoticeView = null;
         });
         view.init();
+    }
+};
+
+/**
+ * Show a dialog for sending a direct msg
+ */
+StatusNet.Client.prototype.directMessageDialog = function(recipient, onSuccess, onFailure) {
+    if (!this.newDirectMessageView) {
+
+        var newDirectMessageView = new StatusNet.directMessageView({
+            account: this.account,
+            recipient: recipient,
+        });
+
+        var that = this;
+        newDirectMessageView.sent.attach(function(args) {
+            StatusNet.Infobar.flashMessage(args.msg);
+            that.newDirectMessageView = null;
+        });
+
+        newDirectMessageView.init();
     }
 };
 
