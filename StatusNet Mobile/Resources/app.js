@@ -41,6 +41,7 @@ var sources = ['statusnet.js',
                'view/statusnet_timelineview_user.js',
                'view/statusnet_timelineview_inbox.js',
                'view/statusnet_settingsview.js',
+               'view/statusnet_directmessageview.js',
 
                'statusnet_client.js',
 
