@@ -53,7 +53,7 @@ Titanium.App.addEventListener('StatusNet.newnotice.photo', function(e) {
             // so we're sticking it in a global in this context;
             // it should be deleted when the window closes, or
             // we fetch up another file.
-            tmpFile = Titanium.Filesystem.createTempFile();
+            var tmpFile = Titanium.Filesystem.createTempFile();
             Titanium.API.info('AAA: tmpFile: ' + tmpFile);
 
             // Warning: this fails on Android prior to commit f2eca06

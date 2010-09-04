@@ -68,8 +68,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
         // Now the main window, which will animate up...
         this.window = Titanium.UI.createWindow({
-           navBarHidden: false,
-           url: 'statusnet_photo_helper.js'
+           navBarHidden: false
         });
         this.window.addEventListener('close', function() {
             glassy.close();
@@ -100,12 +99,14 @@ StatusNet.NewNoticeView.prototype.init = function() {
             backgroundColor: StatusNet.Platform.dialogBackground(),
             // Need to set this value to trigger a heavyweight window... needed
             // to make back button and soft input mode work correctly.
-            navBarHidden: false,
+            navBarHidden: false
+        });
+        if (StatusNet.Platform.isAndroid()) {
             // Needed to work around Android bug with camera/gallery callbacks
             // and heavyweight windows; it won't send the callbacks direct to
             // our main context, so we need to run them from there.
-            url: 'statusnet_photo_helper.js'
-        });
+            window.url = 'statusnet_photo_helper.js';
+        }
         if (StatusNet.Platform.isApple()) {
             // Currently, iPhone doesn't resize the window or our controls
             // to fit when the on-screen keyboard comes up. To keep it safe,
@@ -235,47 +236,6 @@ StatusNet.NewNoticeView.prototype.init = function() {
         height: controlStripHeight
     });
 
-    // Due to a bug on Android with heavyweight window contexts, we need
-    // to run the actual showCamera etc from another context.
-    // This sets up the event listeners in our main context to communicate
-    // with the window's mini context which only has the camera code.
-    var photoEvent = 'StatusNet.newnotice.photoReceived';
-    var photoListener = function(event) {
-        if (event.status == 'success') {
-            // Read in the temporary file...
-            var tempFile = Titanium.Filesystem.getFile(event.filename);
-            StatusNet.debug('XXX: filename: ' + event.filename);
-            StatusNet.debug('XXX: file: ' + tempFile);
-            StatusNet.debug('XXX: file.exists: ' + tempFile.exists);
-            StatusNet.debug('XXX: file.size: ' + tempFile.size);
-
-            var media = tempFile.read();
-            StatusNet.debug('XXX: media.size: ' + media.size);
-            StatusNet.debug('XXX: media.length: ' + media.length);
-            //tempFile.deleteFile();
-
-            // And attach it!
-            that.addAttachment(media);
-        } else if (event.status == 'cancel') {
-            StatusNet.debug('Photo attachment canceled.');
-        } else if (event.status == 'error') {
-            StatusNet.debug('Photo attachment failed: ' + event.msg);
-            alert(event.msg);
-        } else {
-            StatusNet.debug('Got unexpected event from photo helper.');
-        }
-        if (that.afterPhotoCallback !== undefined) {
-            var cb = that.afterPhotoCallback;
-            that.afterPhotoCallback = null;
-            cb();
-        }
-
-    }
-    Titanium.App.addEventListener(photoEvent, photoListener);
-    window.addEventListener('close', function() {
-       Titanium.App.removeEventListener(photoEvent, photoListener);
-    });
-
     moreButton.addEventListener('click', function() {
         var options = [];
         var callbacks = [];
@@ -347,15 +307,107 @@ StatusNet.NewNoticeView.prototype.init = function() {
 
 StatusNet.NewNoticeView.prototype.openAttachment = function(source, callback)
 {
-    if (StatusNet.Platform.isAndroid() && !Ti.Filesystem.isExternalStoragePresent) {
-        alert('SD card is missing or unmounted. Check card and try again.');
-    } else {
-        this.afterPhotoCallback = callback;
-        Titanium.App.fireEvent('StatusNet.newnotice.photo', {
-            source: source,
-            callbackEvent: 'StatusNet.newnotice.photoReceived'
-        });
+    if (StatusNet.Platform.isAndroid()) {
+        if (!Ti.Filesystem.isExternalStoragePresent) {
+            alert('SD card is missing or unmounted. Check card and try again.');
+            return;
+        }
     }
+    var that = this;
+    this.getPhoto(source, function(event) {
+        if (event.status == 'success') {
+            StatusNet.debug('Photo attachment ok!');
+            that.addAttachment(event.media);
+        } else if (event.status == 'cancel') {
+            StatusNet.debug('Photo attachment canceled.');
+        } else if (event.status == 'error') {
+            StatusNet.debug('Photo attachment failed: ' + event.msg);
+            alert('Photo fetch failed: ' + event.msg);
+        } else {
+            StatusNet.debug('Got unexpected event from photo helper.');
+        }
+        callback(event);
+    });
+};
+
+StatusNet.NewNoticeView.prototype.getPhoto = function(source, callback)
+{
+    if (StatusNet.Platform.isAndroid()) {
+        this.getPhotoHack(source, callback);
+    } else {
+        this.getPhotoNative(source, callback);
+    }
+}
+
+StatusNet.NewNoticeView.prototype.getPhotoNative = function(source, callback)
+{
+    var trigger;
+    if (source == 'camera') {
+        trigger = Titanium.Media.showCamera;
+    } else if (source == 'gallery') {
+        trigger = Titanium.Media.openPhotoGallery;
+    } else {
+        Titanium.API.error("Unrecognized camera source. wtf!");
+        alert("Bad photo source event. This is a bug!")
+    }
+    trigger({
+        success: function(event) {
+            callback({
+                status: 'success',
+                media: event.media
+            });
+        },
+        cancel: function(event) {
+            callback({
+                status: 'cancel'
+            });
+        },
+        error: function(event) {
+            callback({
+                status: 'error',
+                media: event.msg
+            });
+        },
+        autohide: true,
+        animated: true
+    });
+};
+
+StatusNet.NewNoticeView.prototype.getPhotoHack = function(source, callback)
+{
+    // Due to a bug on Android with heavyweight window contexts, we need
+    // to run the actual showCamera etc from another context.
+    // This sets up the event listeners in our main context to communicate
+    // with the window's mini context which only has the camera code.
+    var that = this;
+    var photoEvent = 'StatusNet.newnotice.photoReceived' + Math.random();
+    var photoListener = function(event) {
+        Titanium.App.removeEventListener(photoEvent, photoListener);
+        if (event.status == 'success') {
+            // Read in the temporary file...
+            StatusNet.debug('Reading temp file: ' + event.filename);
+            var tempFile = Titanium.Filesystem.getFile(event.filename);
+            event.media = tempFile.read();
+            StatusNet.debug('Media size/length: ' + event.media.length + ' ' + event.media.size);
+
+            // We can't delete the file just yet; it seems that File.read() doesn't
+            // actually read data, but returns a special magic blob that's backed
+            // by the file, without warning. When the file changes, the blob changes.
+            //
+            //   WTF?
+            //
+            // https://appcelerator.lighthouseapp.com/projects/32238/tickets/1735-blob-data-returned-from-fileread-becomes-empty-when-the-file-is-deleted
+            that.window.addEventListener('close', function() {
+                tempFile.deleteFile();
+            });
+        }
+        callback(event);
+    };
+    Titanium.App.addEventListener(photoEvent, photoListener);
+    Titanium.App.fireEvent('StatusNet.newnotice.photo', {
+        source: source,
+        callbackEvent: photoEvent
+    });
 };
 
 StatusNet.NewNoticeView.prototype.addAttachment = function(media) {
