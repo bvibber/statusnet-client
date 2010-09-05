@@ -13,7 +13,7 @@ body, * {
 body {
 	margin: 0px;
 	color: #fff;
-	background: #222 url(../images/page_bg.jpg) no-repeat top left; 
+	background: #222 url(../images/page_bg.jpg) no-repeat top left;
 }
 
 a {
@@ -92,7 +92,8 @@ h1 {
 	margin: 3px 4px 10px 4px;
 	padding:5px;
 	color: #000;
-	background: url(../images/notice_bg.png);
+        background: rgba(255, 255, 255, 0.75);
+        /*background: #cccccc;*/
 	border: 1px solid #000;
 	border-color: transparent;
 	-webkit-border-radius:10px;
@@ -202,14 +203,14 @@ a#new_notice {
 	-webkit-border-radius: 6px;
 	text-shadow: 0px 1px 0px #000;
 	-webkit-box-shadow: 1px 1px 1px #ccc;
-} 
+}
 
 a#new_notice:hover {
 	background: #b3b3b3;
 	color: #000;
 	text-shadow: 0px 1px 0px #ccc;
 	-webkit-box-shadow: 1px 1px 1px #000;
-} 
+}
 
 .notice_links {
 	clear: left;
@@ -236,14 +237,14 @@ a#new_notice:hover {
 	-webkit-border-radius: 6px;
 	text-shadow: 0px 1px 0px #000;
 	-webkit-box-shadow: 1px 1px 1px #dcdcdc;
-} 
+}
 
 .notice_links[class~=foldout] a {
 	background: #b3b3b3;
 	color: #000;
 	text-shadow: 0px 1px 0px #ccc;
 	-webkit-box-shadow: 1px 1px 1px #111;
-} 
+}
 */
 
 #empty_timeline {
@@ -252,7 +253,7 @@ a#new_notice:hover {
 }
 
 #profile_panel {
-	position: relative;	
+	position: relative;
 	margin: 5px 4px 6px 4px;
 	padding: 0px 0px 0px;
 	height: auto;
@@ -376,7 +377,7 @@ a#new_notice:hover {
 	-webkit-border-radius: 6px;
 	text-shadow: 0px 1px 0px #000;
 	-webkit-box-shadow: 1px 1px 1px #dcdcdc;
-} 
+}
 
 #notices #profile_panel #profile_action_links a {
 	margin-bottom: 8px;
