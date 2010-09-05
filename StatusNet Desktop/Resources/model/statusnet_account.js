@@ -77,9 +77,12 @@ StatusNet.Account.getById = function(id) {
             StatusNet.debug('found an account for id ' + id);
             var acct = StatusNet.Account.fromRow(row);
             // @FIXME UI-specific code needs to be moved!
+            // Do not uncomment this, it breaks on Android now.
+            /*
             if (typeof Titanium.Desktop != "undefined") {
                 $('ul.nav li#nav_timeline_profile > img').attr('src', acct.avatar);
             }
+            */
             row.close();
             return acct;
         } else {
