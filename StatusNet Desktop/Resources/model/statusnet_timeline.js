@@ -173,7 +173,7 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  *
  */
 StatusNet.Timeline.prototype.addNotice = function(notice) {
-    StatusNet.debug('Timeline.addNotice enter:');
+    //StatusNet.debug('Timeline.addNotice enter:');
     if (notice === null || typeof notice !== "object") {
         throw "Invalid notice passed to addNotice.";
     }
@@ -193,12 +193,12 @@ StatusNet.Timeline.prototype.addNotice = function(notice) {
         }
     }
 
-    StatusNet.debug("addNotice - finished encaching notice");
+    //StatusNet.debug("addNotice - finished encaching notice");
 
     this._notices.push(notice);
     this.noticeAdded.notify({notice: notice});
 
-    StatusNet.debug('Timeline.addNotice DONE.');
+    //StatusNet.debug('Timeline.addNotice DONE.');
 };
 
 /**
@@ -224,8 +224,8 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
 
             var onEntry = function(notice) {
                 // notice
-                StatusNet.debug('Got notice: ' + notice);
-                StatusNet.debug('Got notice.id: ' + notice.id);
+                //StatusNet.debug('Got notice: ' + notice);
+                //StatusNet.debug('Got notice.id: ' + notice.id);
                 that.addNotice(notice);
                 entryCount++;
             };
@@ -237,7 +237,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
                 if (onFinish) {
                     onFinish(entryCount);
                 }
-                StatusNet.debug('Timeline.update calling finishedFetch...');
+                //StatusNet.debug('Timeline.update calling finishedFetch...');
                 that.finishedFetch(entryCount);
                 StatusNet.debug('Timeline.update DONE.');
             };
@@ -325,7 +325,6 @@ StatusNet.Timeline.prototype.trimNotices = function() {
     );
 
     try {
-        StatusNet.debug("trimNotices A");
         var rs = this.db.execute(
             "DELETE FROM entry WHERE notice_id IN " +
             "(SELECT notice_id FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?)",
@@ -333,7 +332,6 @@ StatusNet.Timeline.prototype.trimNotices = function() {
             this.timeline_name,
             this.account.id
         );
-        StatusNet.debug("trimNotices B");
 
         rs = this.db.execute(
             'DELETE FROM notice_entry WHERE timestamp < ? AND timeline = ? AND account_id = ?',
@@ -341,7 +339,6 @@ StatusNet.Timeline.prototype.trimNotices = function() {
             this.timeline_name,
             this.account.id
         );
-        StatusNet.debug("trimNotices C");
 
         // Also keep an absolute maximum of 200 notices per timeline
 
@@ -350,19 +347,13 @@ StatusNet.Timeline.prototype.trimNotices = function() {
             this.timeline_name,
             this.account.id
         );
-        StatusNet.debug("trimNotices D");
 
         if (rs.isValidRow()) {
-        StatusNet.debug("trimNotices E1");
-
             var count = rs.fieldByName("count(*)");
             rs.close();
             StatusNet.debug("COUNT = " + count);
 
-        StatusNet.debug("trimNotices E2");
             if (count > 200) {
-        StatusNet.debug("trimNotices E2A");
-
                 var diff = (count - 200);
 
                 StatusNet.debug("Row count for " + this.timeline_name + " = " + count + ", overflow = " + diff);
@@ -383,7 +374,6 @@ StatusNet.Timeline.prototype.trimNotices = function() {
                     this.account.id,
                     diff
                 );
-        StatusNet.debug("trimNotices E2Z");
             }
         }
     } catch (e) {
@@ -433,24 +423,20 @@ StatusNet.Timeline.prototype.loadCachedNotices = function() {
     StatusNet.debug("Timeline name = " + this.timeline_name);
     var count = 20;
 
+    // @fixme grab count + 1 so we know if there's more to fetch
     var sql = "SELECT * FROM notice_entry JOIN entry ON notice_entry.notice_id = entry.notice_id " +
         "WHERE notice_entry.account_id = ? AND notice_entry.timeline = ? " +
         "ORDER BY notice_entry.notice_id DESC " +
         "LIMIT " + count;
 
-    StatusNet.debug("Timeline.getNotices A");
-
     var rs = this.db.execute(sql,
         this.account.id,
         this.timeline_name
     );
-
-    StatusNet.debug("Timeline.getNotices B");
+    var n = StatusNet.rowCount(rs);
 
     while (rs.isValidRow()) {
-        StatusNet.debug("Timeline.getNotices B1");
-        StatusNet.debug("Valid row found");
-        xmlEntry = rs.fieldByName('atom_entry');
+        var xmlEntry = rs.fieldByName('atom_entry');
 
         // @todo Add background parsing to Desktop
         if (StatusNet.Platform.isMobile()) {
@@ -465,11 +451,9 @@ StatusNet.Timeline.prototype.loadCachedNotices = function() {
 
         rs.next();
     }
-    StatusNet.debug("Timeline.getNotices C");
     rs.close();
-    StatusNet.debug("Timeline.getNotices D");
 
-    StatusNet.debug('Timeline.getNotices out: ' + this._notices.length + ' items.');
+    StatusNet.debug('Timeline.loadCachedNotices loaded ' + n + ' cached notices.');
     return this._notices;
 };
 

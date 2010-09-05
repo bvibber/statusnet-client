@@ -36,6 +36,10 @@ StatusNet.debug = function(msg) {
     Titanium.API.debug(msg);
 };
 
+StatusNet.error = function(msg) {
+    Titanium.API.error(msg);
+};
+
 /**
  * Lazy-open our local storage database.
  * @fixme move table definitions to shared code
@@ -126,7 +130,7 @@ StatusNet.Event.prototype.notify = function(args) {
     if (args) {
         // no JSON on mobile
         //StatusNet.debug("Notify called with arg: " + Titanium.JSON.stringify(args));
-        StatusNet.debug("Notify called with arg: " + args);
+        //StatusNet.debug("Notify called with arg: " + args);
     }
     for (var i = 0; i < this._listeners.length; i++) {
         this._listeners[i].call(this._sender, args);

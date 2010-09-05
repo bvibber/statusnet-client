@@ -36,6 +36,10 @@ StatusNet.debug = function(msg) {
     Titanium.API.debug(msg);
 };
 
+StatusNet.error = function(msg) {
+    Titanium.API.error(msg);
+};
+
 /**
  * Lazy-open our local storage database.
  * @fixme move table definitions to shared code

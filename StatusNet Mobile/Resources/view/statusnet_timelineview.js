@@ -71,13 +71,13 @@ StatusNet.TimelineView = function(client) {
 
     this.timeline.noticeAdded.attach(
         function(args) {
-            StatusNet.debug("TimelineView got noticeAdded event!");
+            //StatusNet.debug("TimelineView got noticeAdded event!");
             if (args) {
                 that.appendTimelineNotice(args.notice);
             } else {
                 StatusNet.debug("noticeAdded event with no args!");
             }
-            StatusNet.debug("TimelineView noticeAdded DONE");
+            //StatusNet.debug("TimelineView noticeAdded DONE");
         }
     );
 
