@@ -452,7 +452,7 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-    $('#notices').prepend('<img id="spinner" src="/images/loading.gif" />');
+    $('#notices').prepend('<img id="spinner" src="theme/default/images/loading.gif" />');
 };
 
 /**

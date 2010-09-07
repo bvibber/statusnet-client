@@ -121,7 +121,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
 
     var td_icon = document.createElement('td');
     var img_icon = document.createElement('img');
-    img_icon.src = "images/icon_processing.gif";
+    img_icon.src = "theme/default/images/icon_processing.gif";
     td_icon.appendChild(img_icon);
     tr.appendChild(td_icon);
 
@@ -249,7 +249,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
             StatusNet.debug("New acct");
             that.workAcct = acct;
             $("#new-save").attr("disabled", "disabled");
-            $("#new-avatar").attr("src", "images/icon_processing.gif");
+            $("#new-avatar").attr("src", "theme/default/images/icon_processing.gif");
 
             that.workAcct.apiGet('account/verify_credentials.xml', function(status, xml) {
                 $("#new-status").text("Login confirmed.");
@@ -294,20 +294,20 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
                             }, function(status, xml) {
                                 $("#new-status").text("Couldn't load site configuration info.");
                                 StatusNet.debug("Couldn't load statusnet/config.xml for site: " + status);
-                                $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+                                $("#new-avatar").attr("src", "theme/default/images/default-avatar-stream.png");
                             }
                         );
 
                     }, function(status, xml) {
                         $("#new-status").text("Error checking version.");
                         StatusNet.debug("Couldn't load statusnet/version.xml for site: " + status);
-                        $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+                        $("#new-avatar").attr("src", "theme/default/images/default-avatar-stream.png");
                     });
                 },
                 function(status, xml) {
                     $("#new-status").text("Bad nickname or password.");
                     StatusNet.debug("We failed to load account info: " + status);
-                    $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+                    $("#new-avatar").attr("src", "theme/default/images/default-avatar-stream.png");
                 }
             );
 
@@ -317,7 +317,7 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
         StatusNet.debug("Bogus acct");
         that.workAcct = null;
         $("#new-save").attr("disabled", "disabled");
-        $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+        $("#new-avatar").attr("src", "theme/default/images/default-avatar-stream.png");
 
     });
 };
@@ -390,6 +390,6 @@ StatusNet.SettingsView.prototype.resetNewAccount = function() {
     $("#new-username").val("");
     $("#new-password").val("");
     $("#new-site").val("");
-    $("#new-avatar").attr("src", "images/default-avatar-stream.png");
+    $("#new-avatar").attr("src", "theme/default/images/default-avatar-stream.png");
     $("#new-save").attr("disabled", "disabled");
 };

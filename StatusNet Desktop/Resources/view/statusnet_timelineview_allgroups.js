@@ -92,11 +92,11 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
 
     html.push('<div id="profile_panel">');
 
-	if (group.stream_logo) {
-    	html.push('<a href="#" class="timeline_link"><img src="' + group.stream_logo + '"/></a>');
-	} else {
-		html.push('<a href="#" class="timeline_link"><img src="images/default-avatar-stream.png"/></a>');
-	}
+    if (group.stream_logo) {
+        html.push('<a href="#" class="timeline_link"><img src="' + group.stream_logo + '"/></a>');
+    } else {
+        html.push('<a href="#" class="timeline_link"><img src="theme/default/images/default-avatar-stream.png"/></a>');
+    }
 
     html.push('<div id="profile_action_links"');
 

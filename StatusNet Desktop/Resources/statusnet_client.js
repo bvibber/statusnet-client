@@ -322,7 +322,7 @@ StatusNet.Client.prototype.init = function() {
     if (this.account.siteLogo) {
         $('#public_img').attr('src', this.account.siteLogo);
     } else {
-        $('#public_img').attr('src', '/images/logo.png');
+        $('#public_img').attr('src', '/theme/default/images/logo.png');
     }
 
     // Add event handlers for buttons
@@ -356,8 +356,8 @@ StatusNet.Client.prototype.init = function() {
         });
 
     // setup sounds
-    this.newNoticesSound = Titanium.Media.createSound('app://sounds/kalimba.wav');
-    this.postNoticeSound = Titanium.Media.createSound('app://sounds/whoosh.wav');
+    this.newNoticesSound = Titanium.Media.createSound('app:///theme/default/sounds/kalimba.wav');
+    this.postNoticeSound = Titanium.Media.createSound('app:///theme/default/sounds/whoosh.wav');
 
 };
 

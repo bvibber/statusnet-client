@@ -3,7 +3,7 @@
 <!-- These values are edited/maintained by Titanium Developer -->
 <id>net.status.desktop.client</id>
 <name>StatusNet Desktop</name>
-<version>1.0</version>
+<version>0.9.1</version>
 <publisher>StatusNet, Inc.</publisher>
 <url>http://status.net</url>
 <icon>logo.png</icon>
