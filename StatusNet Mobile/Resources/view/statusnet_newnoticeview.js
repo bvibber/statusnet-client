@@ -125,10 +125,11 @@ StatusNet.NewNoticeView.prototype.init = function() {
         that.close();
     });
 
-    var updateButton = Titanium.UI.createButton({
-        title: "Send"
+    var sendButton = this.sendButton = Titanium.UI.createButton({
+        title: "Send",
+        enabled: false // gray it out until there's some text!
     });
-    updateButton.addEventListener('click', function() {
+    sendButton.addEventListener('click', function() {
         that.postNotice(that.noticeTextArea.value);
     });
 
@@ -136,9 +137,9 @@ StatusNet.NewNoticeView.prototype.init = function() {
         // Use iPhone-style navbar (as a toolbar under our management)
         // @fixme drop the duped title if we can figure out why it doesn't come through
         var navbar = StatusNet.Platform.createNavBar(window, 'New Notice');
-        updateButton.style = Titanium.UI.iPhone.SystemButtonStyle.DONE;
+        sendButton.style = Titanium.UI.iPhone.SystemButtonStyle.DONE;
         navbar.setLeftNavButton(cancelButton);
-        navbar.setRightNavButton(updateButton);
+        navbar.setRightNavButton(sendButton);
         topMargin = navbar.height;
     } else {
         // Make the dialog look more Android-y... Use native title bar,
@@ -155,11 +156,11 @@ StatusNet.NewNoticeView.prototype.init = function() {
         window.add(buttonBar);
 
         var screenWidth = Titanium.Platform.displayCaps.platformWidth;
-        updateButton.left = margin;
-        updateButton.right = (screenWidth + margin) / 2;
-        updateButton.top = margin;
-        updateButton.bottom = margin;
-        buttonBar.add(updateButton);
+        sendButton.left = margin;
+        sendButton.right = (screenWidth + margin) / 2;
+        sendButton.top = margin;
+        sendButton.bottom = margin;
+        buttonBar.add(sendButton);
 
         cancelButton.left = (screenWidth + margin) / 2;
         cancelButton.right = margin;
@@ -215,8 +216,10 @@ StatusNet.NewNoticeView.prototype.init = function() {
     controlStrip.add(counter);
 
     noticeTextArea.addEventListener('change', function(event) {
-        counter.text = "" + (textLimit - event.value.length);
+        var nChars = event.value.length;
+        counter.text = "" + (textLimit - nChars);
         // @fixme change color or display when negative
+        that.sendButton.enabled = (nChars > 0);
     });
 
     var attachInfo = this.attachInfo = Titanium.UI.createLabel({
@@ -610,6 +613,8 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
         params.media = this.attachment;
     }
 
+    that.noticeTextArea.enabled = false;
+    that.sendButton.enabled = false;
     this.actInd.show();
 
     StatusNet.debug("Sending these post parameters: " + params);
@@ -635,7 +640,9 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
             } else {
                 StatusNet.debug("Error posting notice - " + status + " - " + response);
             }
-            that.close();
+            that.actInd.hide();
+            that.noticeTextArea.enabled = true;
+            that.sendButton.enabled = true;
         }
     );
 }
