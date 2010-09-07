@@ -12,6 +12,8 @@ StatusNet.HttpClient = {};
  * @param mixed    data        any POST data, as either raw string or dictionary of key-value pairs; values that are blobs will be uploaded as attachments
  * @param String   username    optional username for HTTP Basic Auth
  * @param String   password    optional password for HTTP Basic Auth
+ *
+ * @fixme XML vs text parameters on callbacks should be sorted out more cleanly
  */
 StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, username, password, attachment) {
 
@@ -23,7 +25,7 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
         if (Titanium.Network.online == false) {
            StatusNet.debug("No internet.");
-           onError(client, "No Internet connection!");
+           onError(client, null, "No Internet connection!");
            return;
         }
 
@@ -125,7 +127,7 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
     } catch (e) {
         StatusNet.debug('webRequest: HTTP client exception: ' + e);
-        onError(client, e);
+        onError(client, null, e);
     }
 };
 

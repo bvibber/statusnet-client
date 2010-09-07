@@ -596,6 +596,10 @@ StatusNet.NewNoticeView.prototype.niceType = function(type)
 StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
 {
     StatusNet.debug("NewNoticeView.postNotice()");
+    if (Titanium.Network.online == false) {
+        alert("No internet connection!");
+        return;
+    }
 
     var that = this;
     var method = 'statuses/update.xml';
@@ -633,16 +637,27 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
             // Tell the client we've got something fun to do!
             that.sent.notify();
         },
-        function(status, response) {
-            var msg = $(response).find('error').text();
+        function(status, response, responseText) {
+            var msg;
+            if (typeof response == "object") {
+                msg = $(response).find('error').text();
+            } else {
+                msg = responseText;
+            }
             if (msg) {
                 StatusNet.debug("Error posting notice" + " - " + msg);
             } else {
-                StatusNet.debug("Error posting notice - " + status + " - " + response);
+                StatusNet.debug("Error posting notice - " + status + " - " + responseText);
             }
             that.actInd.hide();
+            // In case it didn't take...
+            setTimeout(function() {
+                that.actInd.hide();
+            }, 10);
             that.noticeTextArea.enabled = true;
             that.sendButton.enabled = true;
+
+            alert("Error posting notice.");
         }
     );
 }
