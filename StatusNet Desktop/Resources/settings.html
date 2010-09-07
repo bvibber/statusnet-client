@@ -10,74 +10,88 @@
     </head>
     <body>
 
-  <div id="settings_content">
+      <ul class="tabs">
+          <li><a href="#tab1">Accounts</a></li>
+          <li><a href="#tab2">Misc</a></li>
+      </ul>
 
-  <h1>Select Account</h1>
+      <div class="tab_container">
+        <div id="tab1" class="tab_content">
 
-        <div id="status"></div>
+          <div id="settings_content">
 
-    <div id="accountlist-holder">
-        <table id="accountlist">
-            <tbody></tbody>
-            <tfoot>
-                <tr class="add bottom">
-                    <td colspan="3">
-                        <a href="#" id="add-account">Add account...</a>
-                    </td>
-                    <td class="add"><a href="#"></a></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
+        <h1>Select Account</h1>
 
-        <div id="new-account">
-            <fieldset>
-                <table>
-                    <tr>
-                        <td rowspan="3" class="avatar">
-                            <img id="new-avatar" src="theme/default/images/default-avatar-stream.png">
-                        </td>
-                        <td class="label">
-                            <label for="new-username">Nickname:</label>
-                        </td>
-                        <td>
-                            <input id="new-username">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">
-                            <label for="new-password">Password:</label>
-                        </td>
-                        <td>
-                            <input id="new-password" type="password">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="label">
-                            <label for="new-site">Site:</label>
-                        </td>
-                        <td>
-                            <input id="new-site">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td>
-              <div id="new-status"></div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <input id="new-save" type="submit" value="Save">
-                            <input id="new-cancel" type="button" value="Cancel">
-                        </td>
-                    </tr>
-                </table>
-            </fieldset>
+              <div id="status"></div>
+
+          <div id="accountlist-holder">
+              <table id="accountlist">
+                  <tbody></tbody>
+                  <tfoot>
+                      <tr class="add bottom">
+                          <td colspan="3">
+                              <a href="#" id="add-account">Add account...</a>
+                          </td>
+                          <td class="add"><a href="#"></a></td>
+                      </tr>
+                  </tfoot>
+              </table>
+          </div>
+
+              <div id="new-account">
+                  <fieldset>
+                      <table>
+                          <tr>
+                              <td rowspan="3" class="avatar">
+                                  <img id="new-avatar" src="theme/default/images/default-avatar-stream.png">
+                              </td>
+                              <td class="label">
+                                  <label for="new-username">Nickname:</label>
+                              </td>
+                              <td>
+                                  <input id="new-username">
+                              </td>
+                          </tr>
+                          <tr>
+                              <td class="label">
+                                  <label for="new-password">Password:</label>
+                              </td>
+                              <td>
+                                  <input id="new-password" type="password">
+                              </td>
+                          </tr>
+                          <tr>
+                              <td class="label">
+                                  <label for="new-site">Site:</label>
+                              </td>
+                              <td>
+                                  <input id="new-site">
+                              </td>
+                          </tr>
+                          <tr>
+                              <td></td>
+                              <td></td>
+                              <td>
+                    <div id="new-status"></div>
+                              </td>
+                          </tr>
+                          <tr>
+                              <td></td>
+                              <td></td>
+                              <td>
+                                  <input id="new-save" type="submit" value="Save">
+                                  <input id="new-cancel" type="button" value="Cancel">
+                              </td>
+                          </tr>
+                      </table>
+                  </fieldset>
+              </div>
+          </div>
         </div>
-  </div>
+        <div id="tab2" class="tab_content">
+          <p>Place holder</p>
+        </div>
+      </div>
+
     </body>
 </html>
