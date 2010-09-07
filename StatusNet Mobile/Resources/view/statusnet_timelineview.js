@@ -91,20 +91,12 @@ StatusNet.TimelineView.prototype.init = function() {
 
     StatusNet.debug("TimelineView: adding adding activity indicator -- spinner");
 
-    /*
-    if (StatusNet.Platform.isApple()) {
-        this.act = Titanium.UI.createActivityIndicator();
-        this.act.style = Titanium.UI.iPhone.ActivityIndicatorStyle.PLAIN;
-        this.act.font = {fontFamily:'Helvetica Neue', fontSize:15,fontWeight:'bold'};
-        this.act.color = 'white';
-        this.act.message = 'Loading...';
-    } else {
-    */
         this.act = Titanium.UI.createView({
             bottom: 49, // just above the emulated tab list...?
             left: 0,
             right: 0,
             height: 32,
+            zIndex: 300 //due to various zIndex fiddling...
         });
 
         // Give it a smokey shadow!
@@ -137,7 +129,6 @@ StatusNet.TimelineView.prototype.init = function() {
         }));
         this.client.mainwin.add(this.act);
         this.act.hide();
-    //}
 
     StatusNet.debug("TimelineView: Finished adding activity indicator");
 
@@ -238,9 +229,6 @@ StatusNet.TimelineView.prototype.showHeader = function () {
                            .replace("{site}", this.client.account.getHost());
 
     this.client.setMainWindowTitle(title);
-
-    //$("#header").html("<h1></h1>");
-    //$("#header h1").text(title);
 };
 
 /**
@@ -248,9 +236,6 @@ StatusNet.TimelineView.prototype.showHeader = function () {
  */
 StatusNet.TimelineView.prototype.showSpinner = function() {
     StatusNet.debug("showSpinner");
-    if (StatusNet.Platform.isApple()) {
-        this.client.mainwin.setToolbar([this.act],{animated:true});
-    }
     this.act.show();
 };
 
@@ -260,9 +245,6 @@ StatusNet.TimelineView.prototype.showSpinner = function() {
 StatusNet.TimelineView.prototype.hideSpinner = function() {
     StatusNet.debug("hideSpinner");
     this.act.hide();
-    if (StatusNet.Platform.isApple()) {
-        this.client.mainwin.setToolbar(null,{animated:true});
-    }
 };
 
 /**
