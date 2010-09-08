@@ -118,7 +118,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         that.onClose.notify();
     });
 
-    var cancelButton = Titanium.UI.createButton({
+    var cancelButton = this.cancelButton = Titanium.UI.createButton({
         title: 'Cancel'
     });
     cancelButton.addEventListener('click', function() {
@@ -618,6 +618,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
     }
 
     that.noticeTextArea.enabled = false;
+    that.cancelButton.enabled = false;
     that.sendButton.enabled = false;
     this.actInd.show();
 
@@ -655,6 +656,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
                 that.actInd.hide();
             }, 10);
             that.noticeTextArea.enabled = true;
+            that.cancelButton.enabled = true;
             that.sendButton.enabled = true;
 
             alert("Error posting notice.");
