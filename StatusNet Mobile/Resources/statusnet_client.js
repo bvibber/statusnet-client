@@ -338,10 +338,12 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
         var accountsButton = Titanium.UI.createView({
-            width: 240,
+//          width: 240,
+            width: 250,
             height: 44,
             left: 0,
-            top: 0
+            top: 0,
+            backgroundImage: 'images/account_button_bg.png'
         });
         var selfAvatar = this.selfAvatar = Titanium.UI.createImageView({
             width: 40,
@@ -354,7 +356,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         accountsButton.add(selfAvatar);
         var selfLabel = this.selfLabel = Titanium.UI.createLabel({
             left: 44,
-            right: 0,
+            right: 20,
             top: 0,
             bottom: 0,
             color: "white",
@@ -376,8 +378,12 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         this.navbar.view.add(accountsButton);
 
         var updateButton = Titanium.UI.createButton({
-            title: "New",
-            systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
+//            title: "New",
+            width: 40,
+            height: 40,
+            top: 0,
+            backgroundImage: 'images/new_button_bg.png'
+ //           systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
         });
 
         updateButton.addEventListener('click', function() {
@@ -459,7 +465,7 @@ StatusNet.Client.prototype.setAccountLabel = function() {
     // https://appcelerator.lighthouseapp.com/projects/32238/tickets/1618-label-property-minimumfontsize-not-implemented-on-android
     if (StatusNet.Platform.isAndroid()) {
         var baseSize = 18;
-        var max = 20;
+        var max = 18;
         var fontSize = baseSize;
         if (label.length > max) {
             fontSize = (baseSize * max / label.length);
