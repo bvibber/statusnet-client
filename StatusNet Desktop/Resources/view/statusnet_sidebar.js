@@ -84,7 +84,7 @@ StatusNet.Sidebar.prototype.getUserImage = function() {
 
     // finally fall back to the default
     if (!userImage) {
-        userImage = this.theme.getImage("default-avatar-stream.png");
+        userImage = this.theme.getDefaultUserImage();
     }
 
     return userImage;

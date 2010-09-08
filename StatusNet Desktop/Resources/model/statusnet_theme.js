@@ -56,6 +56,10 @@ StatusNet.Theme.prototype.getDefaultSiteLogo = function() {
     return this.getImage("logo.png");
 };
 
+StatusNet.Theme.prototype.getDefaultUserImage = function() {
+    return this.getImage("default-avatar-stream.png");
+};
+
 StatusNet.Theme.prototype.getSpinner = function() {
     return this.getImage("loading.gif");
 };

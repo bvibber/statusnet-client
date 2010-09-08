@@ -95,7 +95,7 @@ StatusNet.TimelineViewAllGroups.prototype.renderGroup = function(group) {
     if (group.stream_logo) {
         html.push('<a href="#" class="timeline_link"><img src="' + group.stream_logo + '"/></a>');
     } else {
-        html.push('<a href="#" class="timeline_link"><img src="theme/default/images/default-avatar-stream.png"/></a>');
+        html.push('<a href="#" class="timeline_link"><img src="' + this.client.getTheme().getDefaultUserImage() + '"/></a>');
     }
 
     html.push('<div id="profile_action_links"');
