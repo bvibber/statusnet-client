@@ -127,7 +127,7 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
     } catch (e) {
         StatusNet.debug('webRequest: HTTP client exception: ' + e);
-        onError(client, null, e);
+        onError('exception', null, e);
     }
 };
 

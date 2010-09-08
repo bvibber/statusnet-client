@@ -80,7 +80,7 @@ StatusNet.SettingsView.prototype.init = function() {
         StatusNet.debug('Saved!');
 
         // Start closing the current window...
-        view.close();
+        view.closeWindow();
 
         StatusNet.debug('Switching to timeline...');
         view.client.initAccountView(acct);
@@ -101,7 +101,7 @@ StatusNet.SettingsView.prototype.init = function() {
         title: 'Cancel'
     });
     cancel.addEventListener('click', function() {
-        view.close();
+        view.closeWindow();
     });
     this.navbar.setLeftNavButton(cancel);
 
@@ -629,6 +629,10 @@ StatusNet.SettingsView.prototype.open = function() {
     StatusNet.Platform.animatedOpen(this.window, 'down', this.table);
 }
 
-StatusNet.SettingsView.prototype.close = function() {
+StatusNet.SettingsView.prototype.closeWindow = function() {
     StatusNet.Platform.animatedClose(this.window, 'down', this.table);
+}
+
+StatusNet.SettingsView.prototype.close = function() {
+    // Close down shared state; not needed here atm.
 }

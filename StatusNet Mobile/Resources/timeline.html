@@ -453,11 +453,15 @@ showProfileHeader = function(user, extended, authorId) {
         html.push('<dt>Subscribers</dt>');
         html.push('<dd>' + extended.followers_cnt + '</dd>');
 
-        if (user.username === account.username) {
-            html.push('<dt><a href="#" class="profile_subscriptions">Subscriptions</a></dt>');
-        } else {
+        // Put this link back when we have a working subscriptions list on mobile
+        // note: also check to confirm this is a local user; in future we may
+        // support showing profiles for remote users.
+        // 
+        //if (user.username === account.username) {
+        //    html.push('<dt><a href="#" class="profile_subscriptions">Subscriptions</a></dt>');
+        //} else {
             html.push('<dt>Subscriptions</dt>');
-        }
+        //}
 
         html.push('<dd>' + extended.friends_cnt + '</dd>');
         html.push('<dt>Notices</dt>');
