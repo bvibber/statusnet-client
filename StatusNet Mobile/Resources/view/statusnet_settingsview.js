@@ -307,7 +307,7 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         view.fields.password.focus();
     });
     this.fields.password.addEventListener('return', function() {
-        // @fixme trigger save if we're ready
+        save.fireEvent('click', {});
     });
 
     this.fields.status = Titanium.UI.createLabel({
