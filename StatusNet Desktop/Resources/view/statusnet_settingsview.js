@@ -29,6 +29,12 @@ StatusNet.SettingsView = function() {
 };
 
 StatusNet.SettingsView.prototype.init = function() {
+
+    // set theme
+    this.theme = StatusNet.Theme.getTheme();
+    $("link#display").attr("href", this.theme.getDisplayStylesheet());
+    $("link#settings").attr("href", this.theme.getSettingsStylesheet());
+
     $("#new-account").hide();
 
     this.showAccounts();

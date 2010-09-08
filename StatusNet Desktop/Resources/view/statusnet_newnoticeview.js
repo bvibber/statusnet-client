@@ -33,6 +33,11 @@ StatusNet.NewNoticeView.prototype.init = function() {
     var that = this;
     var me = Titanium.UI.getCurrentWindow();
 
+    // set theme
+    this.theme = me.client.getTheme();
+    $("link#display").attr("href", this.theme.getDisplayStylesheet());
+    $("link#new_notice").attr("href", this.theme.getNewNoticeStylesheet());
+
     if (me.replyToUsername) {
         $('textarea#notice_textarea').val('@' + me.replyToUsername + ' ');
         // set cursor position to after the @

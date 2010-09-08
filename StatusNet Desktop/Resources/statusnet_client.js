@@ -321,7 +321,7 @@ StatusNet.Client.prototype.init = function() {
     this.theme = StatusNet.Theme.getTheme();
     this.sidebar = new StatusNet.Sidebar(this);
 
-    $("link[rel=stylesheet]").attr("href", this.theme.getIndexStylesheet());
+    $("link#display").attr("href", this.theme.getDisplayStylesheet());
 
     // make links open in an external browser window
     $('a[rel=external]').live('click', function() {

@@ -32,12 +32,12 @@ StatusNet.Theme.getTheme = function() {
     return new StatusNet.Theme(StatusNet.Config.getConfig().getThemeName());
 }
 
-StatusNet.Theme.prototype.getIndexStylesheet = function() {
+StatusNet.Theme.prototype.getDisplayStylesheet = function() {
     return this.cssPath + "display.css";
 };
 
 StatusNet.Theme.prototype.getNewNoticeStylesheet = function() {
-    return this.cssPath + "new_notices.css";
+    return this.cssPath + "new_notice.css";
 };
 
 StatusNet.Theme.prototype.getSettingsStylesheet = function() {

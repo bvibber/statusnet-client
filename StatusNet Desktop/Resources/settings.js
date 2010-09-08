@@ -23,6 +23,7 @@ $LAB
     .script("model/statusnet_account.js")
     .script("model/statusnet_rsd.js")
     .script("model/statusnet_avatarcache.js")
+    .script("model/statusnet_theme.js")
     .script("view/statusnet_settingsview.js")
     .script("statusnet_client.js")
     .wait(function(){

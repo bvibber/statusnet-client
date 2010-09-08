@@ -33,6 +33,11 @@ StatusNet.DirectMessageView.prototype.init = function() {
     var that = this;
     var me = Titanium.UI.getCurrentWindow();
 
+    // set theme
+    this.theme = me.client.getTheme();
+    $("link#display").attr("href", this.theme.getDisplayStylesheet());
+    $("link#direct_message").attr("href", this.theme.getDirectMessageStylesheet());
+
     $('#send_button').attr('disabled', 'disabled');
 
     $('#send_button').bind('click', function(event) {
