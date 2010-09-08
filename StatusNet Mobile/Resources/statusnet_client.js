@@ -210,6 +210,16 @@ StatusNet.Client.prototype.switchView = function(view) {
         StatusNet.debug('we lost our account somehow');
     }
 
+    if (this.view) {
+        // Tell the current view to stop trying to access the web view.
+        // If it's still loading things in the background, this'll keep
+        // them from stomping over the next-selected view.
+        //
+        // Parsed notices should still get saved into the cache though,
+        // at the lower level.
+        this.view.close();
+    }
+
     var that = this;
 
     switch (view) {

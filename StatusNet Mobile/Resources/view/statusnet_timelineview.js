@@ -27,6 +27,7 @@ StatusNet.TimelineView = function(client) {
     StatusNet.debug("in StatusNet.TimelineView");
     this.client = client;
     this.title = "Timeline on {site}";
+    this.closed = false;
 
     StatusNet.debug("TimelineView constructor");
     // XXX: Woah, it doesn't work to pass the timeline into the constructor!
@@ -42,9 +43,11 @@ StatusNet.TimelineView = function(client) {
 
     this.timeline.updateStart.attach(
         function() {
-            StatusNet.debug("TimelineView got updateStart event!");
-            that.showSpinner();
-            StatusNet.debug("TimelineView updateStart DONE");
+            if (!that.closed) {
+                StatusNet.debug("TimelineView got updateStart event!");
+                that.showSpinner();
+                StatusNet.debug("TimelineView updateStart DONE");
+            }
         }
     );
 
@@ -58,11 +61,14 @@ StatusNet.TimelineView = function(client) {
             //that.show();
 
             StatusNet.debug("TimelineView checking for total number of notices")
-            /*var notices = that.client.timeline.getNotices();*/
-            var notices = that.client.timeline._notices;
-            if (notices.length == 0) {
-                StatusNet.debug("TimelineView: no notices found");
-                that.showEmptyTimeline();
+            if (!that.closed) {
+                // Not even sure this code is right. :)
+                /*var notices = that.client.timeline.getNotices();*/
+                var notices = that.timeline._notices;
+                if (notices.length == 0) {
+                    StatusNet.debug("TimelineView: no notices found");
+                    that.showEmptyTimeline();
+                }
             }
             StatusNet.debug("TimelineView - there are " + notices.length + " notices in timeline");
             StatusNet.debug("TimelineView updateFinished DONE");
@@ -71,13 +77,9 @@ StatusNet.TimelineView = function(client) {
 
     this.timeline.noticeAdded.attach(
         function(args) {
-            //StatusNet.debug("TimelineView got noticeAdded event!");
-            if (args) {
+            if (!that.closed) {
                 that.appendTimelineNotice(args.notice);
-            } else {
-                StatusNet.debug("noticeAdded event with no args!");
             }
-            //StatusNet.debug("TimelineView noticeAdded DONE");
         }
     );
 
@@ -132,6 +134,12 @@ StatusNet.TimelineView.prototype.init = function() {
 
     StatusNet.debug("TimelineView: Finished adding activity indicator");
 
+};
+
+StatusNet.TimelineView.prototype.close = function() {
+    // Tell our event handlers to stop displaying anything that comes through
+    // from background parsing after we've switched away!
+    this.closed = true;
 };
 
 /**
