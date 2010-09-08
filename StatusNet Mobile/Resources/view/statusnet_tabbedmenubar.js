@@ -42,6 +42,19 @@ StatusNet.TabbedMenuBar = function() {
         right: 0,
         backgroundImage: 'images/bg/tab_bg.png'
     });
+
+    if (StatusNet.Platform.dpi >= 240) {
+        // Sammy's hack for higher Android resolution;
+	// Be real nice to get runtime orientation in here too!
+
+        this.tabView = Titanium.UI.createView({
+            height: this.height,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundImage: 'images/bg/tab_bg240.png'
+        });
+    }
 };
 
 StatusNet.createTabbedBar = function(tabInfo, win, initialSelection) {
