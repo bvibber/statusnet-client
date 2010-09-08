@@ -23,21 +23,60 @@
  */
 StatusNet.Theme = function(themePath) {
     this.themePath = "theme/" + themePath + "/";
+    this.defaultThemePath = "theme/default/";
     this.cssPath = this.themePath + "css/";
+    this.defaultCssPath = this.defaultThemePath + "css/";
     this.imagePath = this.themePath + "images/";
+    this.defaultImagePath = this.defaultThemePath + "images/";
     this.soundPath = "app://" + this.themePath + "sounds/";
+    this.defaultSoundPath = "app://" + this.defaultThemePath + "sounds/";
 };
 
 StatusNet.Theme.getTheme = function() {
     return new StatusNet.Theme(StatusNet.Config.getConfig().getThemeName());
 }
 
+StatusNet.Theme.prototype.getStylesheet = function(filename) {
+
+    var themeCss = this.cssPath + filename;
+
+    if (this.existsInTheme(themeCss)) {
+        return themeCss;
+    } else {
+        return this.defaultCssPath + filename;
+    }
+
+    return cssFile;
+};
+
+StatusNet.Theme.prototype.getImage = function(filename) {
+
+    var themeImage = this.imagePath + filename;
+
+    if (this.existsInTheme(themeImage)) {
+        return themeImage;
+    } else {
+        return this.defaultImagePath + filename;
+    }
+};
+
+StatusNet.Theme.prototype.getSound = function(filename) {
+
+    var themeSound = this.soundPath + filename;
+
+    if (this.existsInTheme(themeSound)) {
+        return themeSound;
+    } else {
+        return this.defaultSoundPath + filename;
+    }
+};
+
 StatusNet.Theme.prototype.getDisplayStylesheet = function() {
-    return this.cssPath + "display.css";
+    return this.getStylesheet("display.css");
 };
 
 StatusNet.Theme.prototype.getNewNoticeStylesheet = function() {
-    return this.cssPath + "new_notice.css";
+    return this.getStylesheet("new_notice.css");
 };
 
 StatusNet.Theme.prototype.getSettingsStylesheet = function() {
@@ -48,8 +87,10 @@ StatusNet.Theme.prototype.getDirectMessageStylesheet = function() {
     return this.cssPath + "direct_message.css";
 };
 
-StatusNet.Theme.prototype.getImage = function(filename) {
-    return this.imagePath + filename;
+
+StatusNet.Theme.prototype.existsInTheme = function(filePath) {
+    var themeFile = Titanium.Filesystem.getFile(Titanium.App.appURLToPath("app://" + filePath));
+    return themeFile.exists();
 };
 
 StatusNet.Theme.prototype.getDefaultSiteLogo = function() {
