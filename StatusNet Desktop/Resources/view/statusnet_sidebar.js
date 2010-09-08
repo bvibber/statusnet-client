@@ -114,44 +114,44 @@ StatusNet.Sidebar.prototype.getNavBarImages = function() {
         {
             "id": "#friends_img",
             "timeline": "friends",
-            "deselected": theme.getImage("chat.png"),
-            "selected": theme.getImage("blue/chat.png")
+            "deselected": theme.getImage("sidebar/deselected/friends.png"),
+            "selected": theme.getImage("sidebar/selected/friends.png")
         },
         {
             "id": "#mentions_img",
             "timeline": 'mentions',
-            "deselected": theme.getImage("at.png"),
-            "selected": theme.getImage("blue/at.png")
+            "deselected": theme.getImage("sidebar/deselected/mentions.png"),
+            "selected": theme.getImage("sidebar/selected/mentions.png")
         },
         {
             "id": "favorites_img",
             "timeline": "favorites",
-            "deselected": theme.getImage("star.png"),
-            "selected": theme.getImage("blue/star.ping")
+            "deselected": theme.getImage("sidebar/deselected/favorites.png"),
+            "selected": theme.getImage("sidebar/selected/favorites.png")
         },
         {
-            "id": "inbox_img",
+            "id": "#inbox_img",
             "timeline": "inbox",
-            "deselected": theme.getImage("mail.png"),
-            "selected": theme.getImage("blue/mail.png")
+            "deselected": theme.getImage("sidebar/deselected/inbox.png"),
+            "selected": theme.getImage("sidebar/selected/inbox.png")
         },
         {
             "id": "#allgroups_img",
             "timeline": "allgroups",
-            "deselected": theme.getImage("users.png"),
-            "selected": theme.getImage("blue/users.png")
+            "deselected": theme.getImage("sidebar/deselected/allgroups.png"),
+            "selected": theme.getImage("sidebar/selected/allgroups.png")
         },
         {
             "id": "#search_img",
             "timeline": "search",
-            "deselected": theme.getImage("magnifier.png"),
-            "selected": theme.getImage("blue/magnifier.png")
+            "deselected": theme.getImage("sidebar/deselected/search.png"),
+            "selected": theme.getImage("sidebar/selected/search.png")
         },
         {
             "id": "settings_img",
             "timeline": "settings",
-            "deselected": theme.getImage("settings.png"),
-            "selected": theme.getImage("settings.png")
+            "deselected": theme.getImage("sidebar/deselected/settings.png"),
+            "selected": theme.getImage("sidebar/deselected/settings.png")
         }
     ];
 
