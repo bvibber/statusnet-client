@@ -1,0 +1,14 @@
+# Theme name - corresponds to a directory in Resources/theme
+theme = test
+
+# The icon to use for the site / public timeline icon in the sidebar. 
+# Setting this will override the default behavior which is to use the site's
+# icon, and barring that the application logo. This should go in the theme's 
+# images directory.
+siteLogo = mysite.png
+
+# Set this if you want to put something permanently in the sidebar for the
+# user's timeline icon, instead of the default behavior of showing the
+# avatar from the user's account.
+userImage = funnyface.png
+
