@@ -21,14 +21,12 @@
 /**
  * Constructor for UI manager class for the client.
  *
- * @param StatusNet.Account _account
+ * @param StatusNet.Account account
  * @return StatusNet.Client object
  */
-StatusNet.Client = function(_account) {
+StatusNet.Client = function(account) {
 
-    this.account = _account;
-
-    this.updateAccountAvatar();
+    this.account = account;
 
     this.timeline = new StatusNet.TimelineFriends(this);
     this.view = new StatusNet.TimelineViewFriends(this);
@@ -76,10 +74,6 @@ StatusNet.Client = function(_account) {
     );
 };
 
-StatusNet.Client.prototype.updateAccountAvatar = function() {
-    $('ul.nav li#nav_timeline_profile > img').attr('src', this.account.avatar);
-};
-
 StatusNet.Client.prototype.getActiveTimeline = function() {
     StatusNet.debug("StatusNet.Client.getActiveTimeline - START");
     if (this.timeline) {
@@ -104,6 +98,10 @@ StatusNet.Client.prototype.getActiveAccount = function() {
 
 StatusNet.Client.prototype.getServer = function() {
     return this.server;
+};
+
+StatusNet.Client.prototype.getTheme = function() {
+    return this.theme;
 };
 
 /**
@@ -157,7 +155,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
             throw "Gah wrong timeline";
     }
 
-    StatusNet.Sidebar.setSelectedTimeline(timeline);
+    this.sidebar.setSelectedTimeline(timeline);
 
     clearInterval(this.refresh);
 
@@ -224,7 +222,7 @@ StatusNet.Client.prototype.switchUserTimeline = function(authorId) {
 
     clearInterval(this.refresh);
 
-    StatusNet.Sidebar.setSelectedTimeline(timeline);
+    this.sidebar.setSelectedTimeline(timeline);
 
     var that = this;
 
@@ -319,23 +317,11 @@ StatusNet.Client.prototype.init = function() {
 
     this.server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
 
-    if (this.account.siteLogo) {
-        $('#public_img').attr('src', this.account.siteLogo);
-    } else {
-        $('#public_img').attr('src', '/theme/default/images/logo.png');
-    }
+    // Set theme
+    this.theme = StatusNet.Theme.getTheme();
+    this.sidebar = new StatusNet.Sidebar(this);
 
-    // Add event handlers for buttons
-
-    $('#public_img').bind('click', function() { that.switchTimeline('public'); });
-    $('#friends_img').bind('click', function() { that.switchTimeline('friends'); });
-    $('#user_img').bind('click', function() { that.switchTimeline('user'); });
-    $('#mentions_img').bind('click', function() { that.switchTimeline('mentions'); });
-    $('#favorites_img').bind('click', function() { that.switchTimeline('favorites'); });
-    $('#inbox_img').bind('click', function() { that.switchTimeline('inbox'); });
-    $('#allgroups_img').bind('click', function() { that.switchTimeline('allgroups'); });
-    $('#search_img').bind('click', function() { that.switchTimeline('search'); });
-    $('#settings_img').bind('click', function() { StatusNet.showSettings(); });
+    $("link[rel=stylesheet]").attr("href", this.theme.getIndexStylesheet());
 
     // make links open in an external browser window
     $('a[rel=external]').live('click', function() {
@@ -356,9 +342,8 @@ StatusNet.Client.prototype.init = function() {
         });
 
     // setup sounds
-    this.newNoticesSound = Titanium.Media.createSound('app:///theme/default/sounds/kalimba.wav');
-    this.postNoticeSound = Titanium.Media.createSound('app:///theme/default/sounds/whoosh.wav');
-
+    this.newNoticesSound = this.theme.getNewNoticesSound();
+    this.postNoticeSound = this.theme.getPostNoticeSound();
 };
 
 /**
@@ -367,7 +352,7 @@ StatusNet.Client.prototype.init = function() {
 StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername, onSuccess, onError) {
 
     var win = Titanium.UI.getCurrentWindow().createWindow({
-        url: 'app:///new_notice.html',
+        url: 'app://new_notice.html',
         title: 'New notice',
         width: 420,
         height: 120,
@@ -391,7 +376,7 @@ StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername
  */
 StatusNet.Client.prototype.directMessageDialog = function(nickname, onSuccess, onError) {
     var win = Titanium.UI.getCurrentWindow().createWindow({
-        url: 'app:///direct_message.html',
+        url: 'app://direct_message.html',
         title: 'New Direct Message',
         width: 420,
         height: 120});

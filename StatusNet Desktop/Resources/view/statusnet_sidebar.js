@@ -21,108 +21,167 @@
 /**
  * View class for managing the sidebar
  */
-StatusNet.Sidebar = function() {};
+StatusNet.Sidebar = function(client) {
+
+    this.client = client;
+    this.config = StatusNet.Config.getConfig();
+
+    // handlers for sidebar image buttons
+
+    $('#public_img').bind('click', function() { client.switchTimeline('public'); });
+    $('#friends_img').bind('click', function() { client.switchTimeline('friends'); });
+    $('#user_img').bind('click', function() { client.switchTimeline('user'); });
+    $('#mentions_img').bind('click', function() { client.switchTimeline('mentions'); });
+    $('#favorites_img').bind('click', function() { client.switchTimeline('favorites'); });
+    $('#inbox_img').bind('click', function() { client.switchTimeline('inbox'); });
+    $('#allgroups_img').bind('click', function() { client.switchTimeline('allgroups'); });
+    $('#search_img').bind('click', function() { client.switchTimeline('search'); });
+    $('#settings_img').bind('click', function() { StatusNet.showSettings(); });
+
+    this.theme = StatusNet.Theme.getTheme();
+    this.siteLogo = this.getSiteLogo();
+
+    // set site logo the first time the sidebar is displayed
+    $('#public_img').attr("src", this.siteLogo);
+
+    this.userImage = this.getUserImage();
+
+    // set user timeline img
+    $('#user_img').attr("src", this.userImage);
+
+    this.images = this.getNavBarImages();
+};
+
+StatusNet.Sidebar.prototype.getSiteLogo = function() {
+
+    // check for override in config first
+    var siteLogo = this.config.getSiteLogo();
+
+    // then check the account
+    if (!siteLogo) {
+        var account = this.client.getActiveAccount();
+        siteLogo = account.siteLogo;
+    }
+
+    // finally fall back to the default
+    if (!siteLogo) {
+        siteLogo = this.theme.getDefaultSiteLogo();
+    }
+
+    return siteLogo;
+};
+
+StatusNet.Sidebar.prototype.getUserImage = function() {
+
+    // check for override in config first
+    var userImage = this.config.getUserImage();
+
+    // then check the account
+    if (!userImage) {
+        var account = this.client.getActiveAccount();
+        userImage = account.avatar;
+    }
+
+    // finally fall back to the default
+    if (!userImage) {
+        userImage = this.theme.getImage("default-avatar-stream.png");
+    }
+
+    return userImage;
+};
+
+StatusNet.Sidebar.prototype.getNavBarImages = function() {
+
+    // @todo better generic names for these images and a way to
+    // override via config file
+    var theme = this.theme;
+
+    var images = [
+        {
+            "id": "#public_img",
+            "timeline": "public",
+            "deselected": this.siteLogo,
+            "selected": this.siteLogo,
+            "selected_class": "opaque"
+        },
+        {
+            "id": "#user_img",
+            "timeline": "user",
+            "deselected": this.userImage,
+            "selected": this.userImage,
+            "selected_class": "opaque"
+        },
+        {
+            "id": "#friends_img",
+            "timeline": "friends",
+            "deselected": theme.getImage("chat.png"),
+            "selected": theme.getImage("blue/chat.png")
+        },
+        {
+            "id": "#mentions_img",
+            "timeline": 'mentions',
+            "deselected": theme.getImage("at.png"),
+            "selected": theme.getImage("blue/at.png")
+        },
+        {
+            "id": "favorites_img",
+            "timeline": "favorites",
+            "deselected": theme.getImage("star.png"),
+            "selected": theme.getImage("blue/star.ping")
+        },
+        {
+            "id": "inbox_img",
+            "timeline": "inbox",
+            "deselected": theme.getImage("mail.png"),
+            "selected": theme.getImage("blue/mail.png")
+        },
+        {
+            "id": "#allgroups_img",
+            "timeline": "allgroups",
+            "deselected": theme.getImage("users.png"),
+            "selected": theme.getImage("blue/users.png")
+        },
+        {
+            "id": "#search_img",
+            "timeline": "search",
+            "deselected": theme.getImage("magnifier.png"),
+            "selected": theme.getImage("blue/magnifier.png")
+        },
+        {
+            "id": "settings_img",
+            "timeline": "settings",
+            "deselected": theme.getImage("settings.png"),
+            "selected": theme.getImage("settings.png")
+        }
+    ];
+
+    return images;
+};
 
 /**
  * Class method to higlight the icon associated with the selected timeline
  *
  * @param String timeline   the timeline to highlight
  */
-StatusNet.Sidebar.setSelectedTimeline = function(timeline) {
-
-    switch(timeline) {
-        case 'friends':
-            $('#public_img').attr('class', '');
-            $('#user_img').attr('class', 'rounded');
-            $('#friends_img').attr('src', 'theme/default/images/blue/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/users.png');
-            $('#search_img').attr('src', 'theme/default/images/magnifier.png');
-            break;
-        case 'mentions':
-            $('#public_img').attr('class', '');
-            $('#user_img').attr('class', 'rounded');
-            $('#friends_img').attr('src', 'theme/default/images/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/blue/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/users.png');
-            $('#search_img').attr('src', 'theme/default/images/magnifier.png');
-            break;
-        case 'favorites':
-            $('#public_img').attr('class', '');
-            $('#user_img').attr('class', 'rounded');
-            $('#friends_img').attr('src', 'theme/default/images/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/blue/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/users.png');
-            $('#search_img').attr('src', 'theme/default/images/magnifier.png');
-            break;
-        case 'inbox':
-            $('#public_img').attr('class', '');
-            $('#user_img').attr('class', 'rounded');
-            $('#friends_img').attr('src', 'theme/default/images/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/blue/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/users.png');
-            $('#search_img').attr('src', 'theme/default/images/magnifier.png');
-            break;
-        case 'allgroups':
-            $('#public_img').attr('class', '');
-            $('#user_img').attr('class', 'rounded');
-            $('#friends_img').attr('src', 'theme/default/images/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/blue/users.png');
-            $('#search_img').attr('src', 'theme/default/images/magnifier.png');
-            break;
-        case 'search':
-            $('#public_img').attr('class', '');
-            $('#user_img').attr('class', 'rounded');
-            $('#friends_img').attr('src', 'theme/default/images/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/users.png');
-            $('#search_img').attr('src', 'theme/default/images/blue/magnifier.png');
-            break;
-        case 'user':
-            $('#public_img').attr('class', '');
-            $('#user_img').attr('class', 'rounded opaque');
-            $('#friends_img').attr('src', 'theme/default/images/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/users.png');
-            $('#search_img').attr('src', 'theme/default/images/magnifier.png');
-            break;
-        case 'public':
-            $('#public_img').attr('class', 'opaque');
-            $('#user_img').attr('class', 'rounded');
-            $('#friends_img').attr('src', 'theme/default/images/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/users.png');
-            $('#search_img').attr('src', 'theme/default/images/magnifier.png');
-            break;
-        default:
-            $('#public_img').attr('class', '');
-            $('#user_img').attr('class', 'rounded');
-            $('#friends_img').attr('src', 'theme/default/images/chat.png');
-            $('#mentions_img').attr('src', 'theme/default/images/at.png');
-            $('#favorites_img').attr('src', 'theme/default/images/star.png');
-            $('#inbox_img').attr('src', 'theme/default/images/mail.png');
-            $('#allgroups_img').attr('src', 'theme/default/images/users.png');
-            $('#search_img').attr('src', 'theme/default/images/magnifier.png');
-
-            StatusNet.debug("I don\'t know how to highlight this timeline.");
-            break;
+StatusNet.Sidebar.prototype.setSelectedTimeline = function(timeline) {
+    for (var i = 0; i < this.images.length; i++) {
+        var image = this.images[i]
+        if (image["timeline"] === timeline) {
+            $(image["id"]).attr("src", image["selected"]);
+            if (image["selected_class"]) {
+                $(image["id"]).addClass(image["selected_class"]);
+            }
+            if (image["deselected_class"]) {
+                $(image["id"]).removeClass(image["deselected_class"]);
+            }
+        } else {
+            $(image["id"]).attr("src", image["deselected"]);
+            if (image["selected_class"]) {
+                $(image["id"]).removeClass(image["selected_class"]);
+            }
+            if (image["deselected_class"]) {
+                $(image["id"]).addClass(image["deselected_class"]);
+            }
+        }
     }
-
 };

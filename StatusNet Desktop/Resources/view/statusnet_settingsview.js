@@ -156,7 +156,7 @@ StatusNet.SettingsView.prototype.showAccountRow = function(acct) {
     $(tr).click(function() {
         acct.setDefault(StatusNet.getDB());
         var me = Titanium.UI.getCurrentWindow();
-        me.getParent().setURL("app:///index.html");
+        me.getParent().setURL("app://index.html");
         me.close();
     });
     $("a", td_remove).click(function() {
