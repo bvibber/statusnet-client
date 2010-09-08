@@ -165,7 +165,6 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     // @todo save scroll state
     $("#body").scrollTop(0);
 
-    StatusNet.debug("UPDATE ZZZZZZZZZZZZZZZZZZZZZ");
     this.timeline.update(function() {
         that.timeline.noticeAdded.attach(
             function(args) {
