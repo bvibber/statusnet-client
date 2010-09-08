@@ -346,10 +346,10 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
             backgroundImage: 'images/account_button_bg.png'
         });
         var selfAvatar = this.selfAvatar = Titanium.UI.createImageView({
-            width: 40,
-            height: 40,
-            top: 2,
-            left: 0,
+            width: 36,
+            height: 36,
+            top: 3,
+            left: 3,
             canScale: true,
             enableZoomControls: false
         });
