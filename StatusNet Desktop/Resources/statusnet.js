@@ -270,6 +270,8 @@ StatusNet.Platform.base64encode = function(data) {
     return Titanium.Codec.encodeBase64(data);
 };
 
+StatusNet.config = null;
+
 /**
  * A class representing configuration settings. if a statusnet.config
  * file exists in the Resources directory, the properties set in it
@@ -284,22 +286,28 @@ StatusNet.Config = function(props) {
         this.theme = props.getString("theme", "default");
         this.siteLogo = props.getString("siteLogo", ""); // Note: you have to supply a second argument to getString
         this.userImage = props.getString("userImage", "");
+        this.sourceName = props.getString("sourceName", "");
         StatusNet.info("this.theme = " + this.theme);
     }
 };
 
 StatusNet.Config.getConfig = function() {
 
-    var props;
+    if (StatusNet.config === null) {
 
-    // load config file
-    try {
-        props = Titanium.App.loadProperties(Titanium.App.appURLToPath("app://statusnet.config"));
-    } catch(e) {
-        StatusNet.info("Unable to load statusnet.config: " + e);
+        var props;
+
+        // load config file
+        try {
+            props = Titanium.App.loadProperties(Titanium.App.appURLToPath("app://statusnet.config"));
+        } catch(e) {
+            StatusNet.info("Unable to load statusnet.config: " + e);
+        }
+
+        StatusNet.config = new StatusNet.Config(props);
     }
 
-    return new StatusNet.Config(props);
+    return StatusNet.config;
 };
 
 StatusNet.Config.prototype.getThemeName = function() {
@@ -317,4 +325,8 @@ StatusNet.Config.prototype.getSiteLogo = function() {
 
 StatusNet.Config.prototype.getUserImage = function() {
     return (this.userImage) ? this.userImage : false;
+};
+
+StatusNet.Config.prototype.getSourceName = function() {
+    return (this.sourceName) ? this.sourceName : 'StatusNet Desktop';
 };

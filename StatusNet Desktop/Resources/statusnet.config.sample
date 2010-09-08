@@ -12,3 +12,6 @@ siteLogo = mysite.png
 # avatar from the user's account.
 userImage = funnyface.png
 
+# The client source -- what to show for the source attribution on notices
+# posted via the client
+sourceName = FunCo Client
