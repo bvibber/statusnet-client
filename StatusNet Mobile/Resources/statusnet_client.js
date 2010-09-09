@@ -379,9 +379,16 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         var updateButton = Titanium.UI.createButton({
             width: 40,
             height: 40,
-            top: 0,
-            backgroundImage: 'images/new_button.png'
+            top: 0
         });
+        if (StatusNet.Platform.isApple()) {
+            // iPhone has a nice system icon we can use here...
+            updateButton.systemButton = Titanium.UI.iPhone.SystemButton.COMPOSE;
+        } else {
+            // @fixme check for 240dpi version
+            // @fixme add listeners for click highlight effect
+            updateButton.backgroundImage = 'images/new_button.png';
+        }
 
         updateButton.addEventListener('click', function() {
             that.newNoticeDialog();
