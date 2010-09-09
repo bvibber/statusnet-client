@@ -119,11 +119,11 @@ StatusNet.Theme.prototype.getSpinner = function() {
 // @todo: make the names of these sound files more generic like post_notice.wav
 
 StatusNet.Theme.prototype.getPostNoticeSound = function() {
-    return Titanium.Media.createSound(this.soundPath + "whoosh.wav");
+    return Titanium.Media.createSound(this.getSound("postnotice.wav"));
 };
 
 StatusNet.Theme.prototype.getNewNoticesSound = function() {
-    return Titanium.Media.createSound(this.soundPath + "kalimba.wav");
+    return Titanium.Media.createSound(this.getSound("newnotices.wav"));
 };
 
 StatusNet.Theme.listAvailable = function() {

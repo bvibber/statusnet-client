@@ -43,10 +43,10 @@ Credits
 * Sounds
 
 StatusNet desktop uses the following sound files from Freesound (http://www.freesound.org):
-Kalimba Lam10(C4) Nail(Med).wav (kalimba.wav) courtesy arioke
+Kalimba Lam10(C4) Nail(Med).wav (kalimba.wav) courtesy arioke -- newnotices.wav
 License: Creative Commons Sampling Plus 1.0 License
 
-9509__petenice__whoosh.wav (whoosh.wav) courtesy petenice
+9509__petenice__whoosh.wav (whoosh.wav) courtesy petenice -- postnotice.wav
 License: Creative Commons Sampling Plus 1.0 License
 
 * Graphics
