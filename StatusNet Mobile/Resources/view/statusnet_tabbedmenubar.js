@@ -222,22 +222,70 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
         left: Math.round(left + space) - padding,
         top: 0,
         height: cellSize,
-        width: cellSize,
-        borderTopCap: 0,
-        borderLeftCap: 0
+        width: cellSize
     });
+
+    var glowy = new StatusNet.Glowy(this.tabView, touchTarget,
+                                    touchTarget.left + cellSize / 2, cellSize / 2);
 
     var that = this;
     touchTarget.addEventListener('click', function() {
         that.setSelectedTab(args.index);
     });
-    touchTarget.addEventListener('touchstart', function() {
-        touchTarget.backgroundImage = 'images/fx/glow.png';
-    });
-    touchTarget.addEventListener('touchend', function() {
-        touchTarget.backgroundImage = null;
-    });
 
     this.tabView.add(touchTarget);
     return minitab;
 };
+
+
+
+StatusNet.Glowy = function(parent, target, x, y) {
+    this.parent = parent;
+    this.target = target;
+    this.width = 64;
+    this.height = 64;
+    this.live = false;
+    this.fade = null;
+    this.view = Titanium.UI.createView({
+       left: x - this.width / 2,
+       top: y - this.width / 2,
+       width: this.width,
+       height: this.height,
+       backgroundImage: 'images/fx/glow.png'
+    });
+
+    var that = this;
+    target.addEventListener('touchstart', function() {
+        that.show();
+    });
+    target.addEventListener('touchend', function() {
+        that.hide();
+    });
+    target.addEventListener('touchcancel', function() {
+        that.hide();
+    });
+}
+
+StatusNet.Glowy.prototype.show = function() {
+    if (!this.live) {
+        this.live = true;
+        if (this.fade) {
+            clearTimeout(this.fade);
+        }
+        var center = this.target.center;
+        this.view.x = center.x - this.width / 2;
+        this.view.y = center.y - this.height / 2;
+        this.parent.add(this.view);
+    }
+}
+
+StatusNet.Glowy.prototype.hide = function() {
+    if (this.live && !this.fade) {
+        var that = this;
+        setTimeout(function() {
+            that.parent.remove(that.view);
+            that.live = false;
+            that.fade = null;
+        }, 250);
+    }
+}

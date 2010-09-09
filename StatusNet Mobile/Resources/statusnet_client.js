@@ -388,6 +388,9 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
             // @fixme check for 240dpi version
             // @fixme add listeners for click highlight effect
             updateButton.backgroundImage = 'images/new_button.png';
+            var glowy = new StatusNet.Glowy(this.navbar.view, updateButton);
+            updateButton.addEventListener('fakefakefake', function() {
+            });
         }
 
         updateButton.addEventListener('click', function() {

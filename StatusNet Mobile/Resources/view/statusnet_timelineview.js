@@ -65,7 +65,7 @@ StatusNet.TimelineView = function(client) {
                 // Not even sure this code is right. :)
                 /*var notices = that.client.timeline.getNotices();*/
                 var notices = that.timeline._notices;
-                if (notices.length == 0) {
+                if (notices && notices.length == 0) {
                     StatusNet.debug("TimelineView: no notices found");
                     that.showEmptyTimeline();
                 }
