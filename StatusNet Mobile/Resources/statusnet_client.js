@@ -338,12 +338,11 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         this.navbar = StatusNet.Platform.createNavBar(this.mainwin);
 
         var accountsButton = Titanium.UI.createView({
-//          width: 240,
             width: 250,
             height: 44,
             left: 0,
             top: 0,
-            backgroundImage: 'images/account_button_bg.png'
+            backgroundImage: 'images/bg/account_button_bg.png'
         });
         var selfAvatar = this.selfAvatar = Titanium.UI.createImageView({
             width: 36,
@@ -356,7 +355,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         accountsButton.add(selfAvatar);
         var selfLabel = this.selfLabel = Titanium.UI.createLabel({
             left: 44,
-            right: 20,
+            right: 30,
             top: 0,
             bottom: 0,
             color: "white",
@@ -378,12 +377,10 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         this.navbar.view.add(accountsButton);
 
         var updateButton = Titanium.UI.createButton({
-//            title: "New",
             width: 40,
             height: 40,
             top: 0,
-            backgroundImage: 'images/new_button_bg.png'
- //           systemButton: Titanium.UI.iPhone.SystemButton.COMPOSE
+            backgroundImage: 'images/new_button.png'
         });
 
         updateButton.addEventListener('click', function() {
