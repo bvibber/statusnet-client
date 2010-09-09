@@ -38,6 +38,13 @@ StatusNet.NewNoticeView.prototype.init = function() {
     $("link#display").attr("href", this.theme.getDisplayStylesheet());
     $("link#new_notice").attr("href", this.theme.getNewNoticeStylesheet());
 
+    // Add in a theme specific stylesheet if any
+    var themeCss = this.theme.getThemeStylesheet();
+    if (themeCss) {
+        $('<link id="theme" rel="stylesheet" href="' + themeCss +
+            '" type="text/css" charset="utf-8">').insertAfter($("link#display"));
+    }
+
     if (me.replyToUsername) {
         $('textarea#notice_textarea').val('@' + me.replyToUsername + ' ');
         // set cursor position to after the @

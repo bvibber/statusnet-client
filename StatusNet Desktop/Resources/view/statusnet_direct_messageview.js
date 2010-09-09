@@ -38,6 +38,13 @@ StatusNet.DirectMessageView.prototype.init = function() {
     $("link#display").attr("href", this.theme.getDisplayStylesheet());
     $("link#direct_message").attr("href", this.theme.getDirectMessageStylesheet());
 
+    // Add in a theme specific stylesheet if any
+    var themeCss = this.theme.getThemeStylesheet();
+    if (themeCss) {
+        $('<link id="theme" rel="stylesheet" href="' + themeCss +
+            '" type="text/css" charset="utf-8">').insertAfter($("link#display"));
+    }
+
     $('#send_button').attr('disabled', 'disabled');
 
     $('#send_button').bind('click', function(event) {

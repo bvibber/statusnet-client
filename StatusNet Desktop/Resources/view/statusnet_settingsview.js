@@ -36,6 +36,13 @@ StatusNet.SettingsView.prototype.init = function() {
     $("link#display").attr("href", this.theme.getDisplayStylesheet());
     $("link#settings").attr("href", this.theme.getSettingsStylesheet());
 
+    // Add in a theme specific stylesheet if any
+    var themeCss = this.theme.getThemeStylesheet();
+    if (themeCss) {
+        $('<link id="theme" rel="stylesheet" href="' + themeCss +
+            '" type="text/css" charset="utf-8">').insertAfter($("link#display"));
+    }
+
     $("#new-account").hide();
 
     this.showAccounts();
