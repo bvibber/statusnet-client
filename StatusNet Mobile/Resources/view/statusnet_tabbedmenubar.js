@@ -222,14 +222,22 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
         left: Math.round(left + space) - padding,
         top: 0,
         height: cellSize,
-        width: cellSize
+        width: cellSize,
+        borderTopCap: 0,
+        borderLeftCap: 0
     });
-    this.tabView.add(touchTarget);
 
     var that = this;
     touchTarget.addEventListener('click', function() {
         that.setSelectedTab(args.index);
     });
+    touchTarget.addEventListener('touchstart', function() {
+        touchTarget.backgroundImage = 'images/fx/glow.png';
+    });
+    touchTarget.addEventListener('touchend', function() {
+        touchTarget.backgroundImage = null;
+    });
 
+    this.tabView.add(touchTarget);
     return minitab;
 };
