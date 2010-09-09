@@ -256,9 +256,8 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
                 StatusNet.AtomParser.parse(responseText, onEntry, onSuccess, onFailure);
             }
         },
-        function(client, msg) {
-            StatusNet.debug("Something went wrong retrieving timeline: " + msg);
-            StatusNet.Infobar.flashMessage("Couldn't update timeline: " + msg);
+        function(status, xml, msg) {
+            StatusNet.showNetworkError(status, xml, msg, "Couldn't update timeline: ");;
             that.updateFinished.notify();
         }
     );

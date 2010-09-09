@@ -330,3 +330,22 @@ StatusNet.Config.prototype.getUserImage = function() {
 StatusNet.Config.prototype.getSourceName = function() {
     return (this.sourceName) ? this.sourceName : 'StatusNet Desktop';
 };
+
+StatusNet.showNetworkError = function(status, xml, text, prefix) {
+    var msg;
+    if (xml != null && typeof xml == "object") {
+        msg = $(xml).find('error').text();
+    } else if (status == "exception") {
+        msg = text;
+    } else if (status == 401) {
+        msg = 'Authorization error. If your password has changed, remove and recreate the account.';
+    } else if (status == 0) {
+        msg = 'Unknown network error.';
+    } else if (status) {
+        msg = 'HTTP ' + status + ' error.';
+    } else {
+        msg = "Unknown error: " + text;
+    }
+    StatusNet.error(prefix + msg);
+    StatusNet.Infobar.flashMessage(prefix + msg);
+};

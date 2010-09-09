@@ -639,16 +639,6 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
             that.sent.notify();
         },
         function(status, response, responseText) {
-            var msg;
-            if (typeof response == "object") {
-                msg = $(response).find('error').text();
-            } else if (status == "exception") {
-                msg = responseText;
-            } else {
-                msg = 'HTTP ' + status + ' error';
-            }
-            StatusNet.error("Error posting notice: " + msg);
-
             that.actInd.hide();
             // In case it didn't take...
             setTimeout(function() {
@@ -658,7 +648,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
             that.cancelButton.enabled = true;
             that.sendButton.enabled = true;
 
-            alert("Error posting notice: " + msg);
+            StatusNet.showNetworkError(status, response, responseText, "Error posting notice: ");
         }
     );
 }

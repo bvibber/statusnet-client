@@ -25,7 +25,7 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
 
         if (Titanium.Network.online == false) {
            StatusNet.debug("No internet.");
-           onError(client, null, "No Internet connection!");
+           onError('exception', null, "No Internet connection!");
            return;
         }
 
@@ -84,7 +84,7 @@ StatusNet.HttpClient.webRequest = function(url, onSuccess, onError, data, userna
         // XXX: client.onerror is only called by mobile's HTTPClient
         client.onerror = function(e) {
             StatusNet.debug("webRequest: failure!");
-            onError(client.status, "Error: " + e.error);
+            onError(client.status, null, "Error: " + e.error);
         };
 
         if (data) {
