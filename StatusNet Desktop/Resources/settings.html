@@ -12,12 +12,12 @@
     <body>
 
       <ul class="tabs">
-          <li><a href="#tab1">Accounts</a></li>
-          <li><a href="#tab2">Misc</a></li>
+          <li><a href="#accounts_tab">Accounts</a></li>
+          <li><a href="#misc_tab">Misc</a></li>
       </ul>
 
       <div class="tab_container">
-        <div id="tab1" class="tab_content">
+        <div id="accounts_tab" class="tab_content">
 
           <div id="settings_content">
 
@@ -89,8 +89,16 @@
               </div>
           </div>
         </div>
-        <div id="tab2" class="tab_content">
-          <p>Place holder</p>
+        <div id="misc_tab" class="tab_content">
+          <fieldset>
+            <legend>Sounds</legend>
+            <input type="checkbox" name="play_sounds_cbox" value="newnotices_sound"/> Play a sounds<br/>
+            <input type="checkbox" name="newnotices_sound_cbox" value="newnotices_sound"/> Play a sound when new notices arrive<br/>
+            <input type="checkbox" name="postnotice_sound_cbox" value="newnotices_sound"/> Play a sound when posting a notice<br/>
+            <div class="settings_controls">
+              <input id="misc-save" type="submit" value="Save"/>
+            </div>
+          </fieldset>
         </div>
       </div>
 

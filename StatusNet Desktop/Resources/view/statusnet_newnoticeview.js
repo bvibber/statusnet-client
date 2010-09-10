@@ -30,6 +30,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     // post a new notice
     StatusNet.debug("NewNoticeView.init");
 
+    this.config = StatusNet.Config.getConfig();
     var that = this;
     var me = Titanium.UI.getCurrentWindow();
 
@@ -126,7 +127,9 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
         function(status, response) {
             var id = $(response).find('status > id').text()
             if (id) {
-                me.client.postNoticeSound.play();
+                if (that.config.playSounds() && !that.config.getSetting("postnotice_sound_off")) {
+                    me.client.postNoticeSound.play();
+                }
                 StatusNet.debug("Posted notice " + id);
                 me.client.getActiveTimeline().update(null, false);
                 if (me.onSuccess) {
