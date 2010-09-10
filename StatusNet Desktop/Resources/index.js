@@ -27,6 +27,7 @@
  */
 $LAB
     .script("statusnet.js").wait()
+    .script("model/statusnet_config.js").wait()
     .script("model/statusnet_httpclient.js").wait()
     .script("model/statusnet_account.js").wait()
     .script("view/statusnet_sidebar.js").wait()
