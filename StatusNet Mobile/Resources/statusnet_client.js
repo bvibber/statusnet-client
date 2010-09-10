@@ -409,8 +409,19 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         } else {
             // @fixme check for 240dpi version
             updateButton.backgroundImage = 'images/new_button.png';
+            updateButton.backgroundSelectedImage = 'images/new_button-on.png';
             var glowy = new StatusNet.Glowy(this.navbar.view, updateButton);
-            updateButton.addEventListener('fakefakefake', function() {
+
+            // backgroundSelectedImage seems to be broken by our touch handlers
+            // for the glowy effect, so let's add more to fake it. :D
+            updateButton.addEventListener('touchstart', function() {
+                updateButton.backgroundImage = 'images/new_button-on.png';
+            });
+            updateButton.addEventListener('touchend', function() {
+                updateButton.backgroundImage = 'images/new_button.png';
+            });
+            updateButton.addEventListener('touchcancel', function() {
+                updateButton.backgroundImage = 'images/new_button.png';
             });
         }
 
