@@ -61,16 +61,18 @@ StatusNet.TimelineView = function(client) {
             //that.show();
 
             StatusNet.debug("TimelineView checking for total number of notices")
-            if (!that.closed) {
+            if (!that.closed && args.notice_count !== undefined) {
                 // Not even sure this code is right. :)
-                /*var notices = that.client.timeline.getNotices();*/
-                var notices = that.timeline._notices;
-                if (notices.length == 0) {
+                var notices = that.timeline.getNotices();
+                if (notices.length + args.notice_count == 0) {
+                    // notices will contain any cached or new notices already parsed
+                    // args.notice_count will count how many notices we've parsed
+                    // in the update. Really some combination of these should be useful. :)
                     StatusNet.debug("TimelineView: no notices found");
                     that.showEmptyTimeline();
                 }
+                StatusNet.debug("TimelineView - there are " + notices.length + " notices in timeline");
             }
-            StatusNet.debug("TimelineView - there are " + notices.length + " notices in timeline");
             StatusNet.debug("TimelineView updateFinished DONE");
         }
     );

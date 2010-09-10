@@ -245,7 +245,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
                 // if parse failure
                 StatusNet.debug("Something went wrong retrieving timeline: " + msg);
                 StatusNet.Infobar.flashMessage("Couldn't get timeline: " + msg);
-                that.updateFinished.notify();
+                that.updateFinished.notify({notice_count: entryCount});
             };
 
             // @todo Background processing for Desktop
@@ -258,7 +258,7 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
         },
         function(status, xml, msg) {
             StatusNet.showNetworkError(status, xml, msg, "Couldn't update timeline: ");;
-            that.updateFinished.notify();
+            that.updateFinished.notify({error: msg});
         }
     );
     StatusNet.debug('Timeline.update EXITED: waiting for data return.');

@@ -42,6 +42,19 @@ StatusNet.TabbedMenuBar = function() {
         right: 0,
         backgroundImage: 'images/bg/tab_bg.png'
     });
+
+    if (StatusNet.Platform.dpi >= 240) {
+        // Sammy's hack for higher Android resolution;
+	// Be real nice to get runtime orientation in here too!
+
+        this.tabView = Titanium.UI.createView({
+            height: this.height,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            backgroundImage: 'images/bg/tab_bg240.png'
+        });
+    }
 };
 
 StatusNet.createTabbedBar = function(tabInfo, win, initialSelection) {
@@ -211,12 +224,73 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
         height: cellSize,
         width: cellSize
     });
-    this.tabView.add(touchTarget);
+
+    var glowy = new StatusNet.Glowy(this.tabView, touchTarget,
+                                    touchTarget.left + cellSize / 2, cellSize / 2);
 
     var that = this;
     touchTarget.addEventListener('click', function() {
         that.setSelectedTab(args.index);
     });
 
+    this.tabView.add(touchTarget);
     return minitab;
 };
+
+
+
+StatusNet.Glowy = function(parent, target) {
+    this.parent = parent;
+    this.target = target;
+    this.width = 64;
+    this.height = 64;
+    this.live = false;
+    this.fade = null;
+    this.view = Titanium.UI.createView({
+       left: 0,
+       top: 0,
+       width: this.width,
+       height: this.height,
+       backgroundImage: 'images/fx/glow.png'
+    });
+
+    var that = this;
+    target.addEventListener('touchstart', function() {
+        that.show();
+    });
+    target.addEventListener('touchend', function() {
+        that.hide();
+    });
+    target.addEventListener('touchcancel', function() {
+        that.hide();
+    });
+}
+
+StatusNet.Glowy.prototype.show = function() {
+    if (!this.live) {
+        this.live = true;
+        if (this.fade) {
+            clearTimeout(this.fade);
+        }
+        var center = this.target.center;
+        if (center) {
+            this.view.left = center.x - this.width / 2;
+            this.view.top = center.y - this.height / 2;
+            this.parent.add(this.view);
+        } else {
+            // https://appcelerator.lighthouseapp.com/projects/32238-titanium-mobile/tickets/1775-tiuiview-center-property-not-implemented-on-android-no-warning-in-documentation
+            StatusNet.error("Can't show glowy touch effect because View.center is missing; need patch for Titanium bug #1775")
+        }
+    }
+}
+
+StatusNet.Glowy.prototype.hide = function() {
+    if (this.live && !this.fade) {
+        var that = this;
+        setTimeout(function() {
+            that.parent.remove(that.view);
+            that.live = false;
+            that.fade = null;
+        }, 250);
+    }
+}
