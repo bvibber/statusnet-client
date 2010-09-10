@@ -19,13 +19,13 @@
  */
 $LAB
     .script("statusnet.js").wait()
-    .script("model/statusnet_httpclient.js")
-    .script("model/statusnet_account.js")
-    .script("model/statusnet_rsd.js")
-    .script("model/statusnet_avatarcache.js")
-    .script("model/statusnet_theme.js")
-    .script("view/statusnet_settingsview.js")
-    .script("statusnet_client.js")
+    .script("model/statusnet_httpclient.js").wait()
+    .script("model/statusnet_account.js").wait()
+    .script("model/statusnet_rsd.js").wait()
+    .script("model/statusnet_avatarcache.js").wait()
+    .script("model/statusnet_theme.js").wait()
+    .script("view/statusnet_settingsview.js").wait()
+    .script("statusnet_client.js").wait()
     .wait(function(){
     
     $(function() {
