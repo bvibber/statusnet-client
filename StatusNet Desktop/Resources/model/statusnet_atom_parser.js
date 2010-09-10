@@ -377,12 +377,12 @@ StatusNet.AtomParser.parseSubject = function(subject) {
 
     author.link = $(subject).find('id').text();
 
-    var result = author.link.match(/(\d)+$/);
+    var result = author.link.match(/(\d+)$/);
     if (result) {
         author.id = result[0];
     } else {
         // try for group id
-        result = author.link.match(/group\/(\d)+\/id$/);
+        result = author.link.match(/group\/(\d+)\/id$/);
         if (result) {
             author.id = result[1];
         }
