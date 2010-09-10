@@ -79,11 +79,20 @@ StatusNet.SettingsView.prototype.init = function() {
         acct.setDefault(StatusNet.getDB());
         StatusNet.debug('Saved!');
 
-        // Start closing the current window...
-        view.closeWindow();
+        if (StatusNet.Platform.isAndroid()) {
+            // Closing the window first seems to exacerbate synch bugs.
+            // Blergh.
+            StatusNet.debug('Switching to timeline...');
+            view.table.enabled = false;
+            view.client.initAccountView(acct);
+            view.closeWindow();
+        } else {
+            // Start closing the current window...
+            view.closeWindow();
 
-        StatusNet.debug('Switching to timeline...');
-        view.client.initAccountView(acct);
+            StatusNet.debug('Switching to timeline...');
+            view.client.initAccountView(acct);
+        }
     });
     this.table.addEventListener('delete', function(event) {
         // deleted a row
