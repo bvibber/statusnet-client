@@ -1,0 +1,60 @@
+This directory contains some helper bits for building the iPhone packages
+for StatusNet Mobile.
+
+To build:
+* make a simulator build from the Titanium Developer GUI (or manually with the SDK tools)
+* open build/iphone/StatusNet Mobile.xcodeproj in XCode
+* follow Apple's directions for prepping a distribution build:
+ - on project settings, clone the 'Release' config as 'Distribution'
+ - make sure it's set to use the iPhone 4.0 SDK (*not* the iPhone Simulator SDK!)
+ - if it says i386 as arch, you've got it wrong still ;) You want to see armv6 and armv7
+ - pick your Ad-hoc or App Store distribution provision as the 'code signing identity'
+   in the Distribution build settings on the project
+ - double-check that it says the same on the 'StatusNet Mobile' target
+ - add an 'Entitlements' file to your project; default contents seem ok
+ - double-check that it's set as the entitlements file on the 'StatusNet Mobile' target
+* Select 'Distribution' build config
+* 'Build' -> 'Clean all'
+* 'Build' -> 'Build'
+* Move or copy build/iphone/build/Distribution-iphoneos/StatusNet Mobile.app over here
+ - if copying, make sure you preserve internal symbolic links.
+ - yes you heard right, symbolic links in an app bundle. Cause Apple just hates file
+   formats that can be copied to other filesystems intact :)
+* ./build.sh
+
+The build.sh script is a little funky atm but does:
+* creates a flattened .ipa file containing the application plus an icon for iTunes
+* tweaks permissions of any .mobileprovision files you copied in
+* also renames an app.apk if you had an Android build in here
+
+
+== General notes ==
+
+The Apple code signing requires that you have your keys set up matching the application
+ID (Java-style package name; ours is net.status.client.mobile). If you're making a
+custom build, be sure you've updated that app ID in the Titanium project, and confirm
+that the resulting XCode project is also set correctly.
+
+== Ad-hoc distribution ==
+
+For ad-hoc distribution (such as for beta releases, or just sharing a custom version
+with some buddies) you'll need to register the devices that it's allowed to run on
+in Apple's iPhone provisioning portal, and create an Ad-hoc distribution provision
+profile listing all those devices and the correct app ID.
+
+End-users will need both the .mobileprovision file and the .ipa to install.
+
+== App store distribution ==
+
+You'll need to make an app store distribution profile matching your custom app ID and
+build with that. To actually push it up for store review, you'll need to go through
+Apple's magic process to set up your app's name, description, icon, screen shots,
+ratings info, etc. Then pull up their 'Application Loader' app and run the .ipa
+through it.
+
+If the loader tool doesn't barf at some technical thing in the app, Apple folks
+will review your version of the app and may or may not give you feedback. :)
+
+Make sure that you use your own app ID, name, branding etc and be very clear that
+you're a custom fork of the main StatusNet app, with open-source licensing on the
+core software blah blah to make sure they don't think you're too suspicious.
