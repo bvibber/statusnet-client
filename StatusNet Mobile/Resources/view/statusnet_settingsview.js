@@ -112,7 +112,6 @@ StatusNet.SettingsView.prototype.init = function() {
     cancel.addEventListener('click', function() {
         view.closeWindow();
     });
-    this.navbar.setLeftNavButton(cancel);
 
     if (StatusNet.Platform.isApple()) {
         // @fixme perhaps just use the native thingy here?
@@ -159,17 +158,18 @@ StatusNet.SettingsView.prototype.init = function() {
         // We do the slide-up animation manually rather than
         // doing this as a modal, since that confuses things
         // when we open another modal later.
+        this.navbar.setLeftNavButton(cancel);
         this.open();
     } else {
         // Leave the main accounts window hidden until later...
-        this.showAddAccount();
+        this.showAddAccount(true);
     }
 };
 
 /**
  * Open the add-new-account modal dialog
  */
-StatusNet.SettingsView.prototype.showAddAccount = function() {
+StatusNet.SettingsView.prototype.showAddAccount = function(noCancel) {
     var view = this;
     var window = Titanium.UI.createWindow({
         title: "Add Account",
@@ -233,7 +233,9 @@ StatusNet.SettingsView.prototype.showAddAccount = function() {
         });
     });
 
-    navbar.setLeftNavButton(cancel);
+    if (!noCancel) {
+        navbar.setLeftNavButton(cancel);
+    }
     navbar.setRightNavButton(save);
 
     var workArea = Titanium.UI.createView({
