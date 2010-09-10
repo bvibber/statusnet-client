@@ -528,17 +528,6 @@ StatusNet.Platform.base64encode = function(data) {
     return Titanium.Utils.base64encode(data);
 }
 
-StatusNet.Platform.openURL = function(url) {
-    if (StatusNet.Platform.isApple()) {
-        // @fixme have a config for this -- some will prefer use of Safari
-        // or a custom browser, which would require tweaking the URL.
-        var browser = new StatusNet.Browser();
-        browser.init(url);
-        return;
-    }
-    Titanium.Platform.openURL(url);
-}
-
 StatusNet.showNetworkError = function(status, xml, text, prefix) {
     var msg;
     if (xml != null && typeof xml == "object") {
