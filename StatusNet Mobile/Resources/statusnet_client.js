@@ -115,9 +115,8 @@ StatusNet.Client.prototype.initInternalListeners = function() {
     });
 
     Ti.App.addEventListener('StatusNet_externalLink', function(event) {
-        // Open external links in system default browser...
-        // Note: on iPhone this will launch Safari and may cause us to close.
-        Titanium.Platform.openURL(event.url);
+        // Open external links in configured or default browser...
+        StatusNet.Platform.openURL(event.url);
     });
 
     Ti.App.addEventListener('StatusNet_switchUserTimeline', function(event) {
