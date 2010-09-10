@@ -409,7 +409,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         } else {
             // @fixme check for 240dpi version
             updateButton.backgroundImage = 'images/new_button.png';
-            updateButton.backgroundSelectedImage = 'images/new_button-on.png';
+            //updateButton.backgroundSelectedImage = 'images/new_button-on.png';
             var glowy = new StatusNet.Glowy(this.navbar.view, updateButton);
 
             // backgroundSelectedImage seems to be broken by our touch handlers

@@ -372,8 +372,10 @@ if (StatusNet.Platform.isApple()) {
                 }
                 if (button) {
                     button.left = 4;
-                    button.top = 4;
-                    button.bottom = 4;
+                    if (!button.height) {
+                        button.top = 4;
+                        button.bottom = 4;
+                    }
                     if (!button.width) {
                         button.width = 75;
                     }
@@ -387,8 +389,10 @@ if (StatusNet.Platform.isApple()) {
                 }
                 if (button) {
                     button.right = 4;
-                    button.top = 4;
-                    button.bottom = 4;
+                    if (!button.height) {
+                        button.top = 4;
+                        button.bottom = 4;
+                    }
                     if (!button.width) {
                         button.width = 50;
                     }
