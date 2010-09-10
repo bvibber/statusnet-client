@@ -239,7 +239,7 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
 
 
 
-StatusNet.Glowy = function(parent, target, x, y) {
+StatusNet.Glowy = function(parent, target) {
     this.parent = parent;
     this.target = target;
     this.width = 64;
@@ -247,8 +247,8 @@ StatusNet.Glowy = function(parent, target, x, y) {
     this.live = false;
     this.fade = null;
     this.view = Titanium.UI.createView({
-       left: x - this.width / 2,
-       top: y - this.width / 2,
+       left: 0,
+       top: 0,
        width: this.width,
        height: this.height,
        backgroundImage: 'images/fx/glow.png'
@@ -273,9 +273,14 @@ StatusNet.Glowy.prototype.show = function() {
             clearTimeout(this.fade);
         }
         var center = this.target.center;
-        this.view.x = center.x - this.width / 2;
-        this.view.y = center.y - this.height / 2;
-        this.parent.add(this.view);
+        if (center) {
+            this.view.left = center.x - this.width / 2;
+            this.view.top = center.y - this.height / 2;
+            this.parent.add(this.view);
+        } else {
+            // https://appcelerator.lighthouseapp.com/projects/32238-titanium-mobile/tickets/1775-tiuiview-center-property-not-implemented-on-android-no-warning-in-documentation
+            StatusNet.error("Can't show glowy touch effect because View.center is missing; need patch for Titanium bug #1775")
+        }
     }
 }
 
