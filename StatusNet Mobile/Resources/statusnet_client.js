@@ -401,7 +401,7 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
         var updateButton = Titanium.UI.createButton({
             width: 40,
             height: 40,
-            top: 0
+            top: 2
         });
         if (StatusNet.Platform.isApple()) {
             // iPhone has a nice system icon we can use here...
