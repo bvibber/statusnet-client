@@ -22,6 +22,7 @@
  * Constructor
  */
 StatusNet.Theme = function(themePath) {
+    this.themeName = themePath; // @todo Have a better way of establishing a name
     this.themePath = "theme/" + themePath + "/";
     this.defaultThemePath = "theme/default/";
     this.cssPath = this.themePath + "css/";
@@ -71,6 +72,17 @@ StatusNet.Theme.prototype.getSound = function(filename) {
     }
 };
 
+StatusNet.Theme.prototype.getThemeStylesheet = function() {
+
+    var themeCss = this.cssPath + this.themeName + ".css"
+
+    if (this.existsInTheme(themeCss)) {
+        return themeCss;
+    } else {
+        return false;
+    }
+};
+
 StatusNet.Theme.prototype.getDisplayStylesheet = function() {
     return this.getStylesheet("display.css");
 };
@@ -86,7 +98,6 @@ StatusNet.Theme.prototype.getSettingsStylesheet = function() {
 StatusNet.Theme.prototype.getDirectMessageStylesheet = function() {
     return this.cssPath + "direct_message.css";
 };
-
 
 StatusNet.Theme.prototype.existsInTheme = function(filePath) {
     var themeFile = Titanium.Filesystem.getFile(Titanium.App.appURLToPath("app://" + filePath));
@@ -108,11 +119,11 @@ StatusNet.Theme.prototype.getSpinner = function() {
 // @todo: make the names of these sound files more generic like post_notice.wav
 
 StatusNet.Theme.prototype.getPostNoticeSound = function() {
-    return Titanium.Media.createSound(this.soundPath + "whoosh.wav");
+    return Titanium.Media.createSound(this.getSound("postnotice.wav"));
 };
 
 StatusNet.Theme.prototype.getNewNoticesSound = function() {
-    return Titanium.Media.createSound(this.soundPath + "kalimba.wav");
+    return Titanium.Media.createSound(this.getSound("newnotices.wav"));
 };
 
 StatusNet.Theme.listAvailable = function() {

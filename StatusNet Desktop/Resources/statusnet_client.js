@@ -318,9 +318,17 @@ StatusNet.Client.prototype.init = function() {
 
     // Set theme
     this.theme = StatusNet.Theme.getTheme();
-    this.sidebar = new StatusNet.Sidebar(this);
 
     $("link#display").attr("href", this.theme.getDisplayStylesheet());
+
+    // Add in a theme specific stylesheet if any
+    var themeCss = this.theme.getThemeStylesheet();
+    if (themeCss) {
+        $('<link id="theme" rel="stylesheet" href="' + themeCss +
+            '" type="text/css" charset="utf-8">').insertAfter($("link#display"));
+    }
+
+    this.sidebar = new StatusNet.Sidebar(this);
 
     // make links open in an external browser window
     $('a[rel=external]').live('click', function() {
