@@ -32,6 +32,7 @@ StatusNet.SettingsView.prototype.init = function() {
 
     // set theme
     this.theme = StatusNet.Theme.getTheme();
+    this.config = StatusNet.Config.getConfig();
 
     $("link#display").attr("href", this.theme.getDisplayStylesheet());
     $("link#settings").attr("href", this.theme.getSettingsStylesheet());
@@ -43,6 +44,24 @@ StatusNet.SettingsView.prototype.init = function() {
             '" type="text/css" charset="utf-8">').insertAfter($("link#display"));
     }
 
+    this.initAccountsTab();
+    this.initMiscTab();
+
+    // tabbed menu stuff
+    $(".tab_content").hide();
+    $("ul.tabs li:first").addClass("active").show();
+    $(".tab_content:first").show();
+    $("ul.tabs li").click(function() {
+        $("ul.tabs li").removeClass("active");
+        $(this).addClass("active");
+        $(".tab_content").hide();
+        var activeTab = $(this).find("a").attr("href");
+        $(activeTab).fadeIn();
+        return false;
+    });
+};
+
+StatusNet.SettingsView.prototype.initAccountsTab = function() {
     $("#new-account").hide();
 
     this.showAccounts();
@@ -79,19 +98,52 @@ StatusNet.SettingsView.prototype.init = function() {
     $("#new-cancel").click(function() {
         that.hideAddAccount();
     });
+};
 
-    // tabbed menu stuff
-    $(".tab_content").hide();
-    $("ul.tabs li:first").addClass("active").show();
-    $(".tab_content:first").show();
-    $("ul.tabs li").click(function() {
-        $("ul.tabs li").removeClass("active");
-        $(this).addClass("active");
-        $(".tab_content").hide();
-        var activeTab = $(this).find("a").attr("href");
-        $(activeTab).fadeIn();
-        return false;
-    });
+StatusNet.SettingsView.prototype.initMiscTab = function() {
+
+    if (!this.config.getSetting("newnotices_sound_off")) {
+        $('input[name=newnotices_sound_cbox]').attr("checked", "true");
+    }
+
+    if (!this.config.getSetting("postnotice_sound_off")) {
+        $('input[name=postnotice_sound_cbox]').attr("checked", "true");
+    }
+
+    var that = this;
+
+    $('input#misc-save').click(function() {
+        that.saveMiscSettings(
+            function() {
+                alert("Settings saved.");
+            },
+            function(msg) {
+                alert("Coudn't save settings! " + msg);
+            })
+        });
+};
+
+StatusNet.SettingsView.prototype.saveMiscSettings = function(onSuccess, onError) {
+
+    try {
+
+        if ($('input[name=newnotices_sound_cbox]').attr('checked')) {
+            this.config.saveSetting("newnotices_sound_off", false);
+        } else {
+            this.config.saveSetting("newnotices_sound_off", true);
+        }
+
+        if ($('input[name=postnotice_sound_cbox]').attr('checked')) {
+            this.config.saveSetting("postnotice_sound_off", false);
+        } else {
+            this.config.saveSetting("postnotice_sound_off", true);
+        }
+
+    } catch(e) {
+        onError(e);
+    }
+
+    onSuccess();
 };
 
 StatusNet.SettingsView.prototype.formComplete = function() {

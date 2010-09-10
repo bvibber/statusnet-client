@@ -319,6 +319,40 @@ StatusNet.Config.prototype.getThemeName = function() {
     }
 };
 
+StatusNet.Config.prototype.getSetting = function(key) {
+
+    var value = Titanium.App.Properties.getString(key, "");
+
+    // hack to use empty string as boolean store
+    if (value === "") {
+        return false;
+    } else if (value === "true") {
+        return true;
+    } else {
+        return value;
+    }
+};
+
+StatusNet.Config.prototype.saveSetting = function(key, value) {
+
+    if (value === "true" || value === "false") {
+        throw "You can't use the strings 'true' or 'false' as values, use booleans instead.";
+    }
+
+    var realValue;
+
+    // hack to use empty string as boolean store
+    if (value === false) {
+        realValue = "";
+    } else if (value === true) {
+        realValue = "true";
+    } else {
+        realValue = value;
+    }
+
+    Titanium.App.Properties.setString(key, realValue);
+};
+
 StatusNet.Config.prototype.getSiteLogo = function() {
     return (this.siteLogo) ? this.siteLogo : false;
 };

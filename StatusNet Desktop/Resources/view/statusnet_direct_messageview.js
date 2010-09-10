@@ -30,6 +30,7 @@ StatusNet.DirectMessageView.prototype.init = function() {
     // post a new notice
     StatusNet.debug("DirectMessageView.init()");
 
+    this.config = StatusNet.Config.getConfig();
     var that = this;
     var me = Titanium.UI.getCurrentWindow();
 
@@ -108,7 +109,9 @@ StatusNet.DirectMessageView.prototype.send = function()
 
     me.client.getActiveAccount().apiPost(method, params,
         function(status, response) {
-            me.client.postNoticeSound.play();
+            if (!that.config.getSetting("postnotice_sound_off")) {
+                me.client.postNoticeSound.play();
+            }
             var msg = "Direct message to " + me.nickname + " sent";
             StatusNet.debug(msg);
             if (me.onSuccess) {

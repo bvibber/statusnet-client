@@ -64,7 +64,9 @@ StatusNet.Client = function(account) {
                             + " new notices in "
                             + that.timeline.timeline_name
                         );
-                        that.newNoticesSound.play();
+                        if (!that.config.getSetting("newnotices_sound_off")) {
+                            that.newNoticesSound.play();
+                        }
                     }
                 },
                 true
@@ -186,7 +188,9 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
                             + " new notices in "
                             + that.timeline.timeline_name
                         );
-                        that.newNoticesSound.play();
+                        if (!that.config.getSetting("newnotices_sound_off")) {
+                            that.newNoticesSound.play();
+                        }
                     }
                 },
                 true)
@@ -315,6 +319,8 @@ StatusNet.Client.prototype.init = function() {
     var that = this;
 
     this.server = this.account.apiroot.substr(0, this.account.apiroot.length - 4); // hack for now
+
+    this.config = StatusNet.Config.getConfig();
 
     // Set theme
     this.theme = StatusNet.Theme.getTheme();
