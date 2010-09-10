@@ -312,6 +312,9 @@ if (StatusNet.Platform.isApple()) {
             navbar._right = button;
             navbar.updateItems();
         },
+        setTitle: function(str) {
+            label.text = str;
+        },
         tweakStyle: function(button) {
             if (!button.style) {
                 button.style = Titanium.UI.iPhone.SystemButtonStyle.BORDERED;
@@ -399,6 +402,9 @@ if (StatusNet.Platform.isApple()) {
                     navbar.view.add(button);
                 }
                 navbar._right = button;
+            },
+            setTitle: function(str) {
+                label.text = str;
             }
         };
 

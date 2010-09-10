@@ -45,13 +45,15 @@ StatusNet.Browser = function(client) {
 
     // Bottom toolbar: web navigation controls
     var back = this.back = Ti.UI.createButton({
-        systemButton: Titanium.UI.iPhone.SystemButton.REWIND // @fixme use a real icon
+        systemButton: Titanium.UI.iPhone.SystemButton.REWIND, // @fixme use a real icon
+        enabled: false
     });
     var forward = this.forward = Ti.UI.createButton({
-        systemButton: Titanium.UI.iPhone.SystemButton.FAST_FORWARD // @fixme use a real icon
+        systemButton: Titanium.UI.iPhone.SystemButton.FAST_FORWARD, // @fixme use a real icon
+        enabled: false
     });
     var reload = this.reload = Ti.UI.createButton({
-        systemButton: Titanium.UI.iPhone.SystemButton.RELOAD
+        systemButton: Titanium.UI.iPhone.SystemButton.REFRESH
     });
     var open = this.open = Ti.UI.createButton({
         systemButton: Titanium.UI.iPhone.SystemButton.ACTION
@@ -119,6 +121,25 @@ StatusNet.Browser = function(client) {
         });
         dialog.show();
     });
+
+    // Stuff for getting state from webview...
+    var updateButtonState = function() {
+        back.enabled = webview.canGoBack();
+        forward.enabled = webview.canGoForward();
+    };
+    webview.addEventListener('beforeload', function(event) {
+        navbar.setTitle('Loading...');
+        updateButtonState();
+    });
+    webview.addEventListener('load', function(event) {
+        // @fixme get the page title
+        navbar.setTitle('Loaded!');
+        updateButtonState();
+    });
+    webview.addEventListener('error', function(event) {
+        navbar.setTitle('Error');
+        updateButtonState();
+    })
 };
 
 /**
