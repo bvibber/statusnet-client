@@ -364,3 +364,11 @@ StatusNet.Config.prototype.getUserImage = function() {
 StatusNet.Config.prototype.getSourceName = function() {
     return (this.sourceName) ? this.sourceName : 'StatusNet Desktop';
 };
+
+StatusNet.Config.prototype.playSounds = function() {
+    if (!this.getSetting('sounds_off')) {
+        return true;
+    } else {
+        return false;
+    }
+};

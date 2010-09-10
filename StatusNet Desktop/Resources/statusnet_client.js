@@ -64,7 +64,7 @@ StatusNet.Client = function(account) {
                             + " new notices in "
                             + that.timeline.timeline_name
                         );
-                        if (!that.config.getSetting("newnotices_sound_off")) {
+                        if (that.config.playSounds() && !that.config.getSetting("newnotices_sound_off")) {
                             that.newNoticesSound.play();
                         }
                     }
@@ -188,7 +188,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
                             + " new notices in "
                             + that.timeline.timeline_name
                         );
-                        if (!that.config.getSetting("newnotices_sound_off")) {
+                        if (that.config.playSounds() && !that.config.getSetting("newnotices_sound_off")) {
                             that.newNoticesSound.play();
                         }
                     }

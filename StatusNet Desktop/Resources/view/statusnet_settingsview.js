@@ -102,12 +102,34 @@ StatusNet.SettingsView.prototype.initAccountsTab = function() {
 
 StatusNet.SettingsView.prototype.initMiscTab = function() {
 
+    var $playSoundsChk = $('input[name=play_sounds_cbox]');
+    var $newNoticesSndChk = $('input[name=newnotices_sound_cbox]');
+    var $postNoticeSndChk = $('input[name=postnotice_sound_cbox]');
+
+    if (!this.config.getSetting("sounds_off")) {
+        $playSoundsChk.attr("checked", "true");
+    } else {
+        $newNoticesSndChk.attr("disabled", "true");
+        $postNoticeSndChk.attr("disabled", "true");
+    }
+
+    $playSoundsChk.click(
+        function() {
+            if ($playSoundsChk.attr("checked")) {
+                $newNoticesSndChk.removeAttr("disabled");
+                $postNoticeSndChk.removeAttr("disabled");
+            } else {
+                $newNoticesSndChk.attr("disabled", "true");
+                $postNoticeSndChk.attr("disabled", "true");
+            }
+        });
+
     if (!this.config.getSetting("newnotices_sound_off")) {
-        $('input[name=newnotices_sound_cbox]').attr("checked", "true");
+        $newNoticesSndChk.attr("checked", "true");
     }
 
     if (!this.config.getSetting("postnotice_sound_off")) {
-        $('input[name=postnotice_sound_cbox]').attr("checked", "true");
+        $postNoticeSndChk.attr("checked", "true");
     }
 
     var that = this;
@@ -126,6 +148,12 @@ StatusNet.SettingsView.prototype.initMiscTab = function() {
 StatusNet.SettingsView.prototype.saveMiscSettings = function(onSuccess, onError) {
 
     try {
+
+        if ($('input[name=play_sounds_cbox]').attr('checked')) {
+            this.config.saveSetting('sounds_off', false);
+        } else {
+            this.config.saveSetting('sounds_off', true);
+        }
 
         if ($('input[name=newnotices_sound_cbox]').attr('checked')) {
             this.config.saveSetting("newnotices_sound_off", false);

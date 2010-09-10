@@ -127,7 +127,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
         function(status, response) {
             var id = $(response).find('status > id').text()
             if (id) {
-                if (!that.config.getSetting("postnotice_sound_off")) {
+                if (that.config.playSounds() && !that.config.getSetting("postnotice_sound_off")) {
                     me.client.postNoticeSound.play();
                 }
                 StatusNet.debug("Posted notice " + id);

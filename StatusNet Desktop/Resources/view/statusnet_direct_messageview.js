@@ -109,7 +109,7 @@ StatusNet.DirectMessageView.prototype.send = function()
 
     me.client.getActiveAccount().apiPost(method, params,
         function(status, response) {
-            if (!that.config.getSetting("postnotice_sound_off")) {
+            if (that.config.playSounds() && !that.config.getSetting("postnotice_sound_off")) {
                 me.client.postNoticeSound.play();
             }
             var msg = "Direct message to " + me.nickname + " sent";
