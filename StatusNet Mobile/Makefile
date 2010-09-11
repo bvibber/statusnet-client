@@ -9,3 +9,9 @@ all:
 	rsync -av "$(BASE)/model/" "$(DEST)/model/"
 	rsync -av "$(HEYQUERY)/sizzle.js" "$(DEST)/sizzle.js"
 	rsync -av "$(HEYQUERY)/heyQuery.js" "$(DEST)/heyQuery.js"
+
+clean:
+	rm -rf "$(DEST)/lib"
+	rm -rf "$(DEST)/model"
+	rm -f "$(DEST)/sizzle.js"
+	rm -f "$(DEST)/heyQuery.js"

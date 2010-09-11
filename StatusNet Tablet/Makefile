@@ -11,3 +11,7 @@ all:
 	rsync -av "$(SHARED)/model/" "$(DEST)/model/"
 	rsync -av "$(HEYQUERY)/sizzle.js" "$(DEST)/sizzle.js"
 	rsync -av "$(HEYQUERY)/heyQuery.js" "$(DEST)/heyQuery.js"
+
+
+clean:
+	rm -rf "$(DEST)/"
