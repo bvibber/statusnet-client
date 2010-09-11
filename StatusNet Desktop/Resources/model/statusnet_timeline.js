@@ -170,13 +170,18 @@ StatusNet.Timeline.prototype.refreshNotice = function(noticeId) {
  * adds it to the notice cache, and notifies the view to display it.
  *
  * @param object  notice              the parsed form of the notice as a dict
+ * @param object options dict of args: cache = true/false (defaults true)
  *
  */
-StatusNet.Timeline.prototype.addNotice = function(notice) {
+StatusNet.Timeline.prototype.addNotice = function(notice, options) {
     //StatusNet.debug('Timeline.addNotice enter:');
     if (notice === null || typeof notice !== "object") {
         throw "Invalid notice passed to addNotice.";
     }
+    if (!options) {
+        options = {};
+    }
+    if (options.cache === undefined) options.cache = true;
 
     // Dedupe here?
     for (i = 0; i < this._notices.length; i++) {
@@ -187,7 +192,7 @@ StatusNet.Timeline.prototype.addNotice = function(notice) {
     }
 
     if (notice.id !== undefined && notice.xmlString !== undefined) {
-        if (this.cacheable()) {
+        if (options.cache && this.cacheable()) {
             StatusNet.debug("encached notice: " + notice.id);
             this.encacheNotice(notice.id, notice.xmlString);
         }
@@ -440,11 +445,15 @@ StatusNet.Timeline.prototype.loadCachedNotices = function() {
         // @todo Add background parsing to Desktop
         if (StatusNet.Platform.isMobile()) {
             StatusNet.AtomParser.backgroundParse(xmlEntry, function(notice) {
-                that.addNotice(notice);
+                that.addNotice(notice, {
+                    cache: false
+                });
             });
         } else {
             StatusNet.AtomParser.parse(xmlEntry, function(notice) {
-                that.addNotice(notice);
+                that.addNotice(notice, {
+                    cache: false
+                });
             });
         }
 
