@@ -22,13 +22,15 @@
  * Todo more: work also on Android so can be used in tablet mode
  */
 StatusNet.Browser = function(client) {
+    var that = this;
     this.client = client;
+    this.url = '';
 
     // The window!
     // We're not using fully native toolbar/navbar so this can be
     // extended to Android tablets in future.
     var window = this.window = Ti.UI.createWindow({
-       backgroundColor: 'white'
+        backgroundColor: 'white'
     });
 
     // Top navbar: app navigation controls
@@ -87,7 +89,7 @@ StatusNet.Browser = function(client) {
         window.close();
     });
     share.addEventListener('click', function() {
-        client.newNoticeDialog(null, null, webview.url);
+        client.newNoticeDialog(null, null, that.url);
     });
 
     // Setup funcs for bottom toolbar...
@@ -101,7 +103,11 @@ StatusNet.Browser = function(client) {
         webview.reload();
     });
     open.addEventListener('click', function() {
-        var url = webview.url;
+        // Todo: add options to open in some alternate browsers?
+        // Possibly make those configurable for power users :D
+        // Todo: add copy link to clipboard option.
+        // Would help if there were support for the clipboard. WTF?!
+        var url = that.url;
         var options = ['Open in Safari', 'Post link', 'Cancel'];
         var dialog = Ti.UI.createOptionDialog({
             title: url,
@@ -128,16 +134,21 @@ StatusNet.Browser = function(client) {
         forward.enabled = webview.canGoForward();
     };
     webview.addEventListener('beforeload', function(event) {
-        navbar.setTitle('Loading...');
+        // trigger a spinner?
         updateButtonState();
     });
     webview.addEventListener('load', function(event) {
-        // @fixme get the page title
-        navbar.setTitle('Loaded!');
+        var url = that.url = event.url;
+        var title = webview.evalJS("document.title");
+        if (title) {
+            navbar.setTitle(title);
+        } else {
+            navbar.setTitle(url);
+        }
         updateButtonState();
     });
     webview.addEventListener('error', function(event) {
-        navbar.setTitle('Error');
+        alert(event.message);
         updateButtonState();
     })
 };
@@ -148,7 +159,12 @@ StatusNet.Browser = function(client) {
 StatusNet.Browser.prototype.init = function(url) {
     StatusNet.debug('StatusNet.Browser.init: ' + url);
 
+    // Save the initial URL so we've got it available for forwarding
+    // or separate opening before a successful load.
+    this.url = url;
+
     this.webview.url = url;
+
     // @todo a slide transition may be best here
     this.window.open();
 };

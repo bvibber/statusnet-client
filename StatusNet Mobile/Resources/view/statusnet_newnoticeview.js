@@ -191,6 +191,14 @@ StatusNet.NewNoticeView.prototype.init = function() {
         //    me.replyToUsername.length + 2
         //);
     }
+    if (data.initialText) {
+        var current = noticeTextArea.value;
+        if (current != '') {
+            noticeTextArea.value = current + ' ' + data.initialText;
+        } else {
+            noticeTextArea.value = data.initialText;
+        }
+    }
     window.add(noticeTextArea);
 
     // Horizontal control strip that should live between the textarea

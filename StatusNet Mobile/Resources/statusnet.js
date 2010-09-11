@@ -285,6 +285,7 @@ if (StatusNet.Platform.isApple()) {
         label = Titanium.UI.createLabel({
             text: title,
             font: {fontSize: fontSize, fontWeight: 'bold'},
+            minimumFontSize: 12, // only works on iOS currently
             textAlign: 'center',
             top: 4,
             height: height - 8,
