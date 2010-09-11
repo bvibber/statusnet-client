@@ -239,7 +239,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     });
     controlStrip.add(attachInfo);
 
-    var moreButton = Titanium.UI.createButton({
+    var attachButton = this.attachButton = Titanium.UI.createButton({
         title: 'Attach...',
         top: 0,
         left: 0,
@@ -247,7 +247,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         height: controlStripHeight
     });
 
-    moreButton.addEventListener('click', function() {
+    attachButton.addEventListener('click', function() {
         var options = [];
         var callbacks = [];
         var destructive = -1;
@@ -298,7 +298,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         });
         dialog.show();
     });
-    controlStrip.add(moreButton);
+    controlStrip.add(attachButton);
 
     this.actInd = Titanium.UI.createActivityIndicator();
     this.actInd.message = 'Sending...';
@@ -625,9 +625,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
         params.media = this.attachment;
     }
 
-    that.noticeTextArea.enabled = false;
-    that.cancelButton.enabled = false;
-    that.sendButton.enabled = false;
+    this.enableControls(false);
     this.actInd.show();
 
     StatusNet.debug("Sending these post parameters: " + params);
@@ -652,9 +650,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
             setTimeout(function() {
                 that.actInd.hide();
             }, 10);
-            that.noticeTextArea.enabled = true;
-            that.cancelButton.enabled = true;
-            that.sendButton.enabled = true;
+            that.enableControls(true);
 
             StatusNet.showNetworkError(status, response, responseText, "Error posting notice: ");
         }
@@ -671,3 +667,11 @@ StatusNet.NewNoticeView.prototype.focus = function()
 {
     this.noticeTextArea.focus(); // open keyboard
 }
+
+StatusNet.NewNoticeView.prototype.enableControls = function(enabled)
+{
+    this.noticeTextArea.enabled = enabled;
+    this.cancelButton.enabled = enabled;
+    this.sendButton.enabled = enabled;
+    this.attachButton.enabled = enabled;
+};
