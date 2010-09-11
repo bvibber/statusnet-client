@@ -285,6 +285,7 @@ if (StatusNet.Platform.isApple()) {
         label = Titanium.UI.createLabel({
             text: title,
             font: {fontSize: fontSize, fontWeight: 'bold'},
+            minimumFontSize: 12, // only works on iOS currently
             textAlign: 'center',
             top: 4,
             height: height - 8,
@@ -311,6 +312,9 @@ if (StatusNet.Platform.isApple()) {
             navbar.tweakStyle(button);
             navbar._right = button;
             navbar.updateItems();
+        },
+        setTitle: function(str) {
+            label.text = str;
         },
         tweakStyle: function(button) {
             if (!button.style) {
@@ -399,6 +403,9 @@ if (StatusNet.Platform.isApple()) {
                     navbar.view.add(button);
                 }
                 navbar._right = button;
+            },
+            setTitle: function(str) {
+                label.text = str;
             }
         };
 

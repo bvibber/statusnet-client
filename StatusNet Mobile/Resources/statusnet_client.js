@@ -115,9 +115,8 @@ StatusNet.Client.prototype.initInternalListeners = function() {
     });
 
     Ti.App.addEventListener('StatusNet_externalLink', function(event) {
-        // Open external links in system default browser...
-        // Note: on iPhone this will launch Safari and may cause us to close.
-        Titanium.Platform.openURL(event.url);
+        // Open external links in configured or default browser...
+        that.openURL(event.url);
     });
 
     Ti.App.addEventListener('StatusNet_switchUserTimeline', function(event) {
@@ -518,11 +517,12 @@ StatusNet.Client.prototype.setAccountLabel = function() {
 /**
  * Show notice input dialog
  */
-StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername) {
+StatusNet.Client.prototype.newNoticeDialog = function(replyToId, replyToUsername, initialText) {
     if (!this.newNoticeView) {
         var view = this.newNoticeView = new StatusNet.NewNoticeView({
             replyToId: replyToId,
-            replyToUsername: replyToUsername
+            replyToUsername: replyToUsername,
+            initialText: initialText
         });
         var that = this;
         view.sent.attach(function() {
@@ -862,4 +862,15 @@ StatusNet.Client.prototype.showSettingsView = function()
         });
         view.init();
     }
+}
+
+StatusNet.Client.prototype.openURL = function(url) {
+    if (StatusNet.Platform.isApple()) {
+        // @fixme have a config for this -- some will prefer use of Safari
+        // or a custom browser, which would require tweaking the URL.
+        var browser = new StatusNet.Browser(this);
+        browser.init(url);
+        return;
+    }
+    Titanium.Platform.openURL(url);
 }
