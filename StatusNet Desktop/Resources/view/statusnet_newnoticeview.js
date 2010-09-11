@@ -133,6 +133,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function()
                 StatusNet.debug("Posted notice " + id);
                 me.client.getActiveTimeline().update(null, false);
                 if (me.onSuccess) {
+                    var msg;
                     if (me.replyToId) {
                         msg = "Posted reply to notice " + me.replyToId;
                     } else {
