@@ -507,7 +507,7 @@ StatusNet.Client.prototype.setAccountLabel = function() {
     // https://appcelerator.lighthouseapp.com/projects/32238/tickets/1618-label-property-minimumfontsize-not-implemented-on-android
     if (StatusNet.Platform.isAndroid()) {
         var baseSize = 18;
-        var max = 18;
+        var max = 20;
         var fontSize = baseSize;
         if (label.length > max) {
             fontSize = (baseSize * max / label.length);
