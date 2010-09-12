@@ -137,16 +137,15 @@ StatusNet.Client.prototype.initInternalListeners = function() {
         StatusNet.debug('Event: ' + event.name);
         that.unFaveNotice(event.noticeId);
     });
-/*
     Ti.App.addEventListener('StatusNet_repeatNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
         that.repeatNotice(event.noticeId);
     });
-*/
     Ti.App.addEventListener('StatusNet_shareNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
         that.shareNotice(event.noticeId);
     });
+    Ti.App.addEventListener('fakefakefake', function() {}); // sigh... heisenbug
 
     Ti.App.addEventListener('StatusNet_deleteNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
