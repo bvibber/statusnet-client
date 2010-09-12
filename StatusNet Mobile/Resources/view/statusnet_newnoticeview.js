@@ -178,7 +178,10 @@ StatusNet.NewNoticeView.prototype.init = function() {
         bottom: keyboardMargin + margin + controlStripHeight,
         value: '',
         font: {fontSize: 16},
-        returnKeyType: Titanium.UI.RETURNKEY_SEND
+        returnKeyType: Titanium.UI.RETURNKEY_SEND,
+        keyboardType: Titanium.UI.KEYBOARD_DEFAULT,
+        autocapitalization: Titanium.UI.TEXT_AUTOCAPITALIZATION_SENTENCES,
+        autocorrect: true
     });
     noticeTextArea.addEventListener('return', function() {
         that.postNotice(noticeTextArea.value);
