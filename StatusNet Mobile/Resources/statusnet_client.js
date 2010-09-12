@@ -137,10 +137,15 @@ StatusNet.Client.prototype.initInternalListeners = function() {
         StatusNet.debug('Event: ' + event.name);
         that.unFaveNotice(event.noticeId);
     });
-
+/*
     Ti.App.addEventListener('StatusNet_repeatNotice', function(event) {
         StatusNet.debug('Event: ' + event.name);
         that.repeatNotice(event.noticeId);
+    });
+*/
+    Ti.App.addEventListener('StatusNet_shareNotice', function(event) {
+        StatusNet.debug('Event: ' + event.name);
+        that.shareNotice(event.noticeId);
     });
 
     Ti.App.addEventListener('StatusNet_deleteNotice', function(event) {
@@ -692,6 +697,55 @@ StatusNet.Client.prototype.repeatNotice = function(noticeId, linkDom)
             }
         }
     );
+};
+
+/**
+ * Repeat a notice
+ *
+ * @param int noticeId  the ID of the notice to delete
+ *
+ * On success, removes the repeat link and refreshes the notice entry
+ * in the cache so it has the right state.
+ */
+StatusNet.Client.prototype.shareNotice = function(noticeId)
+{
+    var notice = this.timeline.getNotice(noticeId);
+
+    var msg = $('<div>' + notice.content + '</div>').text();
+    var text = 'RT @' + notice.author + ' ' + msg;
+
+    if (StatusNet.Platform.isAndroid()) {
+        // Use our custom function to offer text sharing to any app taking text...
+        // @fixme when android_native_refactor branch lands, use this.
+        if (typeof Titanium.Statusnet != "undefined" && typeof Titanium.Statusnet.shareText != "undefined") {
+            Titanium.Statusnet.shareText("Share", text);
+        } else {
+            // Email dialog will at least present all email clients.
+            var dialog = Ti.UI.createEmailDialog({
+                messageBody: text
+            });
+            dialog.open();
+        }
+    } else if (StatusNet.Platform.isApple()) {
+        var encText = encodeURIComponent(text);
+        var picker = new StatusNet.Picker({
+            title: "Share"
+        });
+        picker.add('Mail', function() {
+            var dialog = Ti.UI.createEmailDialog({
+                messageBody: text
+            });
+            dialog.open();
+        });
+        picker.add('Seesmic', function() {
+            Ti.Platform.openURL('x-seesmic://update?status=' + encText);
+        });
+        picker.add('Twitter', function() {
+            Ti.Platform.openURL('tweetie:///post?message=' + encText);
+        });
+        picker.addCancel()
+        picker.show();
+    }
 };
 
 /**

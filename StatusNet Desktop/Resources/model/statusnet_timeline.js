@@ -414,6 +414,16 @@ StatusNet.Timeline.prototype.getNotices = function() {
     return this._notices;
 };
 
+StatusNet.Timeline.prototype.getNotice = function(id) {
+    var notices = this._notices;
+    for (var i = 0; i < notices.length; i++) {
+        if (notices[i].id == id) {
+            return notices[i];
+        }
+    }
+    throw "Notice ID " + id + " not on current timeline.";
+};
+
 /**
  * Loads and triggers display of cached notices on this timeline.
  * Accessor for notices

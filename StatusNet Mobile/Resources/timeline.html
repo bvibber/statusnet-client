@@ -263,6 +263,7 @@ renderNotice = function(notice, user) {
             html.push(' <button class="notice_repeat">Repeat</button>');
         }
     }
+    html.push(' <button class="notice_share">Share</button>');
 
     html.push('<div>');
     html.push('</div></div></div>');
@@ -332,6 +333,11 @@ enableNoticeControls = function(noticeDom) {
 
     $notice.delegate('button.notice_delete', 'click', function(event) {
         Titanium.App.fireEvent("StatusNet_deleteNotice", {noticeId: noticeId});
+        return false;
+    });
+
+    $notice.delegate('button.notice_share', 'click', function(event) {
+        Titanium.App.fireEvent("StatusNet_shareNotice", {noticeId: noticeId});
         return false;
     });
 
