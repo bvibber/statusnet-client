@@ -117,6 +117,11 @@ StatusNet.Browser = function(client) {
         picker.add('Post link', function() {
             share.fireEvent('click');
         });
+        if (typeof Titanium.UI.Clipboard != 'undefined') {
+            picker.add('Copy', function() {
+                Titanium.UI.Clipboard.setText(url);
+            });
+        }
         picker.addCancel();
         picker.show();
     });
