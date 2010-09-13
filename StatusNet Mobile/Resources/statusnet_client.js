@@ -730,6 +730,11 @@ StatusNet.Client.prototype.shareNotice = function(noticeId)
         var picker = new StatusNet.Picker({
             title: "Share"
         });
+        if (typeof Titanium.UI.Clipboard != 'undefined') {
+            picker.add('Copy', function() {
+               Titanium.UI.Clipboard.setText(text); 
+            });
+        }
         picker.add('Mail', function() {
             var dialog = Ti.UI.createEmailDialog({
                 messageBody: text
