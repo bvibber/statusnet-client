@@ -108,24 +108,17 @@ StatusNet.Browser = function(client) {
         // Todo: add copy link to clipboard option.
         // Would help if there were support for the clipboard. WTF?!
         var url = that.url;
-        var options = ['Open in Safari', 'Post link', 'Cancel'];
-        var dialog = Ti.UI.createOptionDialog({
-            title: url,
-            options: options,
-            cancel: options.length - 1
+        var picker = new StatusNet.Picker({
+            title: url
         });
-        dialog.addEventListener('click', function(event) {
-            if (event.index == 0) {
-                // Open in Safari
-                Titanium.Platform.openURL(url);
-            } else if (event.index == 1) {
-                // Post link
-                share.fireEvent('click');
-            } else if (event.index == 2) {
-                // Cancel
-            }
+        picker.add('Open in Safari', function() {
+            Titanium.Platform.openURL(url);
         });
-        dialog.show();
+        picker.add('Post link', function() {
+            share.fireEvent('click');
+        });
+        picker.addCancel();
+        picker.show();
     });
 
     // Stuff for getting state from webview...
