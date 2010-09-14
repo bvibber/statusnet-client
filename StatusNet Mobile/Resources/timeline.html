@@ -93,13 +93,12 @@ var insertNoticeHandler = function(event) {
 Titanium.App.addEventListener("StatusNet_prependTimelineNotice", insertNoticeHandler);
 Titanium.App.addEventListener("StatusNet_appendTimelineNotice", insertNoticeHandler);
 
-
 Titanium.App.addEventListener("StatusNet_appendUserTimelineNotice", function(event) {
     var notice = objectOrJson(event.notice);
     var user = objectOrJson(event.user);
     $("#notices").append(renderNotice(notice, user));
     enableNoticeControls(document.getElementById('notice-' + notice.id));
-})
+});
 Titanium.App.addEventListener("StatusNet_faveNoticeComplete", function(event) {
     $('#notice-' + event.noticeId).find('button.notice_fave').
         removeClass('notice_fave').
@@ -140,7 +139,11 @@ Titanium.App.addEventListener("StatusNet_showEmptyTimelineMsg", function(event) 
     Titanium.API.debug("webview got event: " + JSON.stringify(event));
     showEmptyTimeline();
 });
-
+Titanium.App.addEventListener("StatusNet_appendDirectMessage", function(event) {
+    var dm = objectOrJson(event.dm);
+    $("#notices").append(renderDirectMessage(dm));
+    enableDirectMessageControls(dm);
+});
 // Update relative timestamps when resuming app from sleep
 Titanium.App.addEventListener("resume", function(event) {
     Titanium.API.debug("webview got event: " + JSON.stringify(event));
@@ -377,6 +380,58 @@ enableNoticeControls = function(noticeDom) {
             activeNotice = noticeDom;
         }
         lastClickTime = Date.now();
+    });
+
+};
+
+renderDirectMessage = function(dm) {
+
+    var html = [];
+
+    html.push('<div class="notice" id="direct_message-' + dm.id +'">');
+    html.push('   <div class="avatar"><a href="' + dm.authorUri + '"><img src="' + dm.avatar + '"/></a></div>');
+    html.push('   <div><a class="author" name="author" href="' +  dm.authorUri + '">' + dm.nickname + '</a>');
+    html.push('   <div class="content">'+ dm.content +'</div>');
+    html.push('   </div><div class="date_link"><a href="' + dm.link + '" rel="external" title="View this message in browser">' + humane_date(dm.updated) + '</a></div>');
+    html.push('<div class="notice_links">');
+    html.push('<button class="direct_message_reply">Reply</button>');
+    html.push('</div></div>');
+    html.push('<div class="clear"></div>');
+
+    return html.join('');
+};
+
+enableDirectMessageControls = function(dm) {
+
+    var that = this;
+    var $dm = $(document.getElementById('direct_message-' + dm.id));
+
+    // XXX: We need a the authorId (sender) to change to in-client user timelines.
+    // And there's no way to get the that (reliably) from the Atom feed
+    // for DMs!
+
+    /*
+    // Override links to external web view of the notice timelines
+    // with click event handlers to display user timelines within the client
+
+    if (isLocalAuthor(dm.authorUri)) {
+
+        $dm.find('div a.author').bind('click', function(event) {
+            Titanium.App.fireEvent("StatusNet_switchUserTimeline", {authorId: dm.authorId});
+            return false;
+        });
+
+        $dm.find('div.avatar').bind('click', function(event) {
+            Titanium.App.fireEvent("StatusNet_switchUserTimeline", {authorId: dm.authorId});
+            return false;
+        });
+    }
+   */
+
+    // Direct message reply
+    $dm.click(function(event) {
+        Titanium.App.fireEvent("StatusNet_sendDirectMessage", {recipient: dm.nickname});
+        return false;
     });
 
 };
