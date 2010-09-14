@@ -86,11 +86,45 @@ StatusNet.AtomParser.prepBackgroundParse = function(callback)
     // context into; this'll run on another thread, so can
     // run parsing while the UI thread is working. It'll
     // post events back to the main thread to display.
-    var onReady = function() {
-        Titanium.App.removeEventListener('StatusNet.background.ready', onReady);
-        callback();
-    };
-    Titanium.App.addEventListener('StatusNet.background.ready', onReady);
+
+    // To reduce the chance of hitting poorly-guarded race conditions
+    // adjusting the application events hash maps, we're setting up
+    // global events and storing the callbacks for each parse request
+    // in a map while we work.
+    StatusNet.AtomParser.callbacks = {};
+    var callbacks = StatusNet.AtomParser.callbacks;
+
+    Titanium.App.addEventListener('SN.backgroundParse.entry', function(event) {
+        // Triggered in main context for each entry from bg context...
+        var cb = callbacks[event.key];
+        if (cb && cb.onEntry) {
+            cb.onEntry.call(event.notice, event.notice);
+        }
+    });
+    Titanium.App.addEventListener('SN.backgroundParse.success', function(event) {
+        // Triggered in main context after the processing is complete...
+        var cb = callbacks[event.key];
+        callbacks[event.key] = undefined;
+        if (cb && cb.onSuccess) {
+            cb.onSuccess.call();
+        }
+    });
+    Titanium.App.addEventListener('SN.backgroundParse.fail', function(event) {
+        // Triggered in main context if XML parsing failed...
+        var cb = callbacks[event.key];
+        callbacks[event.key] = undefined;
+        if (cb && cb.onFail) {
+            cb.onFail.call(event.msg);
+        }
+    });
+
+    // The application will need to wait until the BG context is set up...
+    Titanium.App.addEventListener('StatusNet.background.ready', function() {
+        if (callback) {
+            callback();
+            callback = null;
+        }
+    });
     var window = Titanium.UI.createWindow({
         url: 'statusnet_background_parser.js',
         zIndex: -100
@@ -122,48 +156,14 @@ StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onSuccess, o
     // it post back to this context so we can call the callbacks.
 
     var key = Math.random();
-    var entryKey = 'SN.backgroundParse.entry' + key;
-    var successKey = 'SN.backgroundParse.success' + key;
-    var failKey = 'SN.backgroundParse.fail' + key;
-
-    var cleanupCallbacks;
-
-    var entryCallback = function(event) {
-        // Triggered in main context for each entry from bg context...
-        if (onEntry) {
-            onEntry.call(event.notice, event.notice);
-        }
-    };
-    var successCallback = function(event) {
-        // Triggered in main context after the processing is complete...
-        cleanupCallbacks();
-        if (onSuccess) {
-            onSuccess.call();
-        }
-    };
-    var failCallback = function(event) {
-        // Triggered in main context if XML parsing failed...
-        cleanupCallbacks();
-        if (onFail) {
-            onFail.call(event.msg);
-        }
-    };
-
-    Titanium.App.addEventListener(entryKey, entryCallback);
-    Titanium.App.addEventListener(successKey, successCallback);
-    Titanium.App.addEventListener(failKey, failCallback);
-
-    cleanupCallbacks = function() {
-        Titanium.App.removeEventListener(entryKey, entryCallback);
-        Titanium.App.removeEventListener(successKey, successCallback);
-        Titanium.App.removeEventListener(failKey, failCallback);
-    };
-
+    StatusNet.AtomParser.callbacks[key] = {
+        onEntry: onEntry,
+        onSuccess: onSuccess,
+        onFail: onFail
+    }
     Titanium.App.fireEvent('StatusNet.background.process', {
         xmlString: xmlString,
-        onEntry: entryKey,
-        onSuccess: successKey,
-        onFail: failKey
+        key: key
     });
 };
 
