@@ -56,6 +56,11 @@ StatusNet.AvatarCache.getCacheDirectory = function() {
  */
 StatusNet.AvatarCache.getAvatarFile = function(filename) {
 
+    if (typeof filename != "string") {
+        // Already a File object? Should be fine then.
+        return filename;
+    }
+
     var avatarFile;
 
     var cacheDir = StatusNet.AvatarCache.getCacheDirectory();
@@ -84,6 +89,7 @@ StatusNet.AvatarCache.getAvatarNativePath = function(file) {
  * a Date obj on Android and a property on iPhone and Desktop
  */
 StatusNet.AvatarCache.getAvatarTimestamp = function(file) {
+    //Titanium.API.info("AvatarCache.getAvatarTimestamp: " + StatusNet.AvatarCache.getAvatarNativePath(file));
     var modts = file.modificationTimestamp();
     return (typeof modts == "object") ? modts.getTime() : modts;
 };
@@ -122,6 +128,8 @@ StatusNet.AvatarCache.trimAvatarCache = function() {
             var avatarFile;
 
             for (i = 0; i < dirList.length; i++) {
+                //Titanium.API.info('trimAvatarCache: dirList item: ' + typeof dirList[i]);
+                //Titanium.API.info('trimAvatarCache: dirList item: ' + dirList[i]);
                 avatarFile = StatusNet.AvatarCache.getAvatarFile(dirList[i]);
                 avatars.push(avatarFile);
             }
@@ -140,6 +148,7 @@ StatusNet.AvatarCache.trimAvatarCache = function() {
 
                     var nativePath = StatusNet.AvatarCache.getAvatarNativePath(avatars[i]);
 
+                    //Titanium.API.info("AvatarCache.trimAvatarCache: deleting " + StatusNet.AvatarCache.getAvatarNativePath(avatars[i]));
                     if (avatars[i].deleteFile()) {
                         StatusNet.debug("trimAvatarCache - deleted " + nativePath);
                     } else {
@@ -201,6 +210,7 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss, relative) {
 
     //StatusNet.debug('AvatarCache.lookupAvatar G - looking up avatar: ' + nativePath);
 
+    //Titanium.API.info("AvatarCache.lookupAvatar: checking " + StatusNet.AvatarCache.getAvatarNativePath(avatarFile));
     if (avatarFile.exists()) {
         //StatusNet.debug("AvatarCache.lookupAvatar H - Yay, avatar cache hit");
         if (onHit) {

@@ -146,6 +146,8 @@ StatusNet.HttpClient.fetchFile = function(url, file, onSuccess, onError) {
         client.onreadystatechange = function() {
             if (client.readyState == 4) {
                 // XXX: write() always returns false on iPhone 1.4.1 SDK. Works Okay on Android.
+                //Titanium.API.info("HttpClient.fetchFile: writing " + StatusNet.AvatarCache.getAvatarNativePath(file));
+
                 file.write(client.responseData)
 
                 var nativePath = StatusNet.AvatarCache.getAvatarNativePath(file);
