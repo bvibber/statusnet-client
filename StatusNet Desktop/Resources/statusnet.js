@@ -26,6 +26,7 @@ function StatusNet() {};
  * @access private
  */
 StatusNet.db = null;
+StatusNet.settingsDialog = null; // used to ensure we have a singleton settings dialog
 
 /**
  * Abstracted debug interface; for Desktop version calls Titanium's debug func.
@@ -123,15 +124,26 @@ StatusNet.rowCount = function(rs) {
 
 /**
  * Show settings dialog
- * @fixme make sure it's a singleton!
  */
 StatusNet.showSettings = function() {
-    var win = Titanium.UI.getCurrentWindow().createWindow({
-        url: 'app://settings.html',
-        title: 'Settings',
-        width: 400,
-        height: 500});
-    win.open();
+    // open a new settings dialog only if one isn't already open
+    if (StatusNet.settingsDialog === null) {
+        StatusNet.settingsDialog = Titanium.UI.getCurrentWindow().createWindow({
+            url: 'app://settings.html',
+            title: 'Settings',
+            width: 400,
+            height: 500});
+
+        StatusNet.settingsDialog.addEventListener(
+            'close',
+            function() {
+                StatusNet.settingsDialog = null;
+            }, false
+        );
+        StatusNet.settingsDialog.open();
+    } else {
+        StatusNet.info("Settings dialog already open.");
+    }
 };
 
 /**
