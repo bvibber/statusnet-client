@@ -77,7 +77,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         // And a fake window as a view within that of the proper
         // size for a form sheet.
         window = Titanium.UI.createView({
-           title: 'New Notice',
+           title: this.title(),
            width: 620,
            height: 540,
            backgroundColor: StatusNet.Platform.dialogBackground()
@@ -95,7 +95,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     } else {
         // Nice regular window. :D
         window = this.window = Titanium.UI.createWindow({
-            title: 'New Notice',
+            title: this.title(),
             backgroundColor: StatusNet.Platform.dialogBackground(),
             // Need to set this value to trigger a heavyweight window... needed
             // to make back button and soft input mode work correctly.
@@ -136,7 +136,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
     if (StatusNet.Platform.isApple()) {
         // Use iPhone-style navbar (as a toolbar under our management)
         // @fixme drop the duped title if we can figure out why it doesn't come through
-        var navbar = StatusNet.Platform.createNavBar(window, 'New Notice');
+        var navbar = StatusNet.Platform.createNavBar(window, this.title());
         sendButton.style = Titanium.UI.iPhone.SystemButtonStyle.DONE;
         navbar.setLeftNavButton(cancelButton);
         navbar.setRightNavButton(sendButton);
@@ -233,6 +233,32 @@ StatusNet.NewNoticeView.prototype.init = function() {
         that.sendButton.enabled = (nChars > 0);
     });
 
+    this.addAttachmentControls(controlStrip);
+
+    this.actInd = Titanium.UI.createActivityIndicator();
+    this.actInd.message = 'Sending...';
+
+    if (StatusNet.Platform.isApple()) {
+        // iPhone specific activity indicator niceties
+        this.actInd.style = Titanium.UI.iPhone.ActivityIndicatorStyle.BIG;
+    }
+
+    window.add(this.actInd);
+
+    StatusNet.Platform.setInitialFocus(this.window, noticeTextArea);
+    StatusNet.Platform.animatedOpen(this.window);
+
+    StatusNet.debug("NewNoticeView.init END");
+};
+
+StatusNet.NewNoticeView.prototype.title = function()
+{
+    return 'New Notice';
+};
+
+StatusNet.NewNoticeView.prototype.addAttachmentControls = function(controlStrip)
+{
+    var that = this;
     var attachInfo = this.attachInfo = Titanium.UI.createLabel({
         text: '',
         top: 0,
@@ -247,7 +273,7 @@ StatusNet.NewNoticeView.prototype.init = function() {
         top: 0,
         left: 0,
         width: 80,
-        height: controlStripHeight
+        height: controlStrip.height
     });
 
     attachButton.addEventListener('click', function() {
@@ -302,21 +328,6 @@ StatusNet.NewNoticeView.prototype.init = function() {
         dialog.show();
     });
     controlStrip.add(attachButton);
-
-    this.actInd = Titanium.UI.createActivityIndicator();
-    this.actInd.message = 'Sending...';
-
-    if (StatusNet.Platform.isApple()) {
-        // iPhone specific activity indicator niceties
-        this.actInd.style = Titanium.UI.iPhone.ActivityIndicatorStyle.BIG;
-    }
-
-    window.add(this.actInd);
-
-    StatusNet.Platform.setInitialFocus(this.window, noticeTextArea);
-    StatusNet.Platform.animatedOpen(this.window);
-
-    StatusNet.debug("NewNoticeView.init END");
 };
 
 StatusNet.NewNoticeView.prototype.openAttachment = function(source, callback)
