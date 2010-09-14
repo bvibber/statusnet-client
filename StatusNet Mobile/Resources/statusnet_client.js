@@ -113,11 +113,6 @@ StatusNet.Client.prototype.init = function() {
 StatusNet.Client.prototype.initInternalListeners = function() {
     var that = this;
 
-    Ti.App.addEventListener('StatusNet_timelineReady', function(event) {
-        StatusNet.debug('YAY GOT StatusNet_timelineReady EVENT! ' + event);
-        that.webViewReady = true;
-    });
-
     Ti.App.addEventListener('StatusNet_externalLink', function(event) {
         // Open external links in configured or default browser...
         that.openURL(event.url);
