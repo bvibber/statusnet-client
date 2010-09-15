@@ -219,6 +219,12 @@ StatusNet.Client.prototype.switchView = function(view) {
         StatusNet.debug('we lost our account somehow');
     }
 
+    if (view == "developer") {
+        // Special-case developer tools!
+        this.showDeveloperTools();
+        return;
+    }
+
     if (this.view) {
         // Tell the current view to stop trying to access the web view.
         // If it's still loading things in the background, this'll keep
@@ -449,6 +455,14 @@ StatusNet.Client.prototype.initAccountView = function(acct) {
             'inbox': {deselectedImage: 'images/tabs/new/inbox.png', selectedImage: 'images/tabs/new/inbox_on.png', name: 'inbox'}
            // 'search': {deselectedImage: 'images/tabs/new/search.png', selectedImage: 'images/tabs/new/search_on.png', name: 'search'}
         };
+        if (Ti.Platform.model == "Simulator") {
+            // Some developer goodies when running in iPhone simulator. :)
+            tabinfo.developer = {
+                deselectedImage: null,
+                selectedImage: null,
+                name: "developer"
+            };
+        }
 
         this.toolbar = StatusNet.createTabbedBar(tabinfo, this.mainwin, 1);
 
@@ -956,4 +970,20 @@ StatusNet.Client.prototype.openURL = function(url) {
         return;
     }
     Titanium.Platform.openURL(url);
+}
+
+StatusNet.Client.prototype.showDeveloperTools = function()
+{
+    var that = this;
+    var dialog = new StatusNet.Picker({
+        title: "Developer goodies"
+    });
+    dialog.add('Blank timeline', function() {
+        that.selfAvatar.image = null;
+        that.selfLabel.text = '';
+        that.toolbar.highlightTab(-1);
+        that.view.clearTimelineView();
+    });
+    dialog.addCancel();
+    dialog.show();
 }
