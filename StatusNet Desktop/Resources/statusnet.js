@@ -246,8 +246,12 @@ StatusNet.Platform.nativeNotifications = function() {
     } else if (Titanium.Platform.name === "Windows NT") {
         // XXX: Pretty brain-dead check for whether Snarl is installed.
         // but better than nothing.
-        var snarl = Titanium.Filesystem.getFile("c:", "Program Files", "Snarl", "snarl.exe");
-        return snarl.exist();
+        var snarl = Titanium.Filesystem.getFile("c:", "Program Files", "full phat", "Snarl", "snarl.exe");
+        if (snarl) {
+            return snarl.exist();
+        } else {
+            return false;
+        }
     }
 
     // Must be some unknown platform from outer space
