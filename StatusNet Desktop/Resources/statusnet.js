@@ -239,16 +239,16 @@ StatusNet.Platform.nativeNotifications = function() {
         } else {
             return false;
         }
-    // We don't know whether the given Linux desktop supports it or not. 
-    // XXX: Can we come up with some kind of check here? 
+    // We don't know whether the given Linux desktop supports it or not.
+    // XXX: Can we come up with some kind of check here?
     } else if (Titanium.Platform.name === "Linux") {
         return false;
     } else if (Titanium.Platform.name === "Windows NT") {
         // XXX: Pretty brain-dead check for whether Snarl is installed.
         // but better than nothing.
-        var snarl = Titanium.Filesystem.getFile("c:", "Program Files", "full phat", "Snarl", "snarl.exe");
-        if (snarl) {
-            return snarl.exist();
+        var snarl = Titanium.Filesystem.getFile(Titanium.Filesystem.getProgramsDirectory(), "full phat", "Snarl", "snarl.exe");
+        if (snarl.isExecutable()) { // XXX: exists() bombs out here for some reason
+            return true;
         } else {
             return false;
         }
