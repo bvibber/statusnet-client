@@ -106,7 +106,7 @@ StatusNet.AtomParser.prepBackgroundParse = function(callback)
         var cb = callbacks[event.key];
         callbacks[event.key] = undefined;
         if (cb && cb.onSuccess) {
-            cb.onSuccess.call();
+            cb.onSuccess();
         }
     });
     Titanium.App.addEventListener('SN.backgroundParse.fail', function(event) {
@@ -114,7 +114,7 @@ StatusNet.AtomParser.prepBackgroundParse = function(callback)
         var cb = callbacks[event.key];
         callbacks[event.key] = undefined;
         if (cb && cb.onFail) {
-            cb.onFail.call(event.msg);
+            cb.onFail(event.msg);
         }
     });
 
