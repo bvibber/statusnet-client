@@ -29,8 +29,8 @@ StatusNet.Theme = function(themePath) {
     this.defaultCssPath = this.defaultThemePath + "css/";
     this.imagePath = this.themePath + "images/";
     this.defaultImagePath = this.defaultThemePath + "images/";
-    this.soundPath = "app://" + this.themePath + "sounds/";
-    this.defaultSoundPath = "app://" + this.defaultThemePath + "sounds/";
+    this.soundPath = this.themePath + "sounds/";
+    this.defaultSoundPath = this.defaultThemePath + "sounds/";
 };
 
 StatusNet.Theme.getTheme = function() {
@@ -63,10 +63,10 @@ StatusNet.Theme.prototype.getImage = function(filename) {
 
 StatusNet.Theme.prototype.getSound = function(filename) {
 
-    var themeSound = this.soundPath + filename;
+    var themeSoundPath = this.soundPath + filename;
 
-    if (this.existsInTheme(themeSound)) {
-        return themeSound;
+    if (this.existsInTheme(themeSoundPath)) {
+        return themeSoundPath;
     } else {
         return this.defaultSoundPath + filename;
     }
@@ -119,11 +119,13 @@ StatusNet.Theme.prototype.getSpinner = function() {
 // @todo: make the names of these sound files more generic like post_notice.wav
 
 StatusNet.Theme.prototype.getPostNoticeSound = function() {
-    return Titanium.Media.createSound(this.getSound("postnotice.wav"));
+    var soundPath = "app://" + this.getSound("postnotice.wav");
+    return Titanium.Media.createSound(soundPath);
 };
 
 StatusNet.Theme.prototype.getNewNoticesSound = function() {
-    return Titanium.Media.createSound(this.getSound("newnotices.wav"));
+    var soundPath = "app://" + this.getSound("newnotices.wav");
+    return Titanium.Media.createSound(soundPath);
 };
 
 StatusNet.Theme.listAvailable = function() {
