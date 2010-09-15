@@ -17,7 +17,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 StatusNet.config = null;
 
 /**
@@ -28,15 +28,34 @@ StatusNet.config = null;
  * pesist between multiple runs of the app.
  */
 StatusNet.Config = function(props) {
+    this.defaults = StatusNet.Config.getDefaults();
     this.props = props;
 
     if (props) {
-        this.theme = props.getString("theme", "default");
+        this.themeName = props.getString("theme", "default");
         this.siteLogo = props.getString("siteLogo", ""); // Note: you have to supply a second argument to getString
         this.userImage = props.getString("userImage", "");
         this.sourceName = props.getString("sourceName", "");
-        StatusNet.info("this.theme = " + this.theme);
+        StatusNet.info("this.theme = " + this.themeName);
     }
+};
+
+StatusNet.Config.getDefaults = function() {
+
+    // Defined default settings here
+    var defaults = {
+        "theme": "default",
+        "play_sounds": true,
+        "new_notices_sound": true,
+        "post_notice_sound": true,
+        "notifications": true
+    };
+
+    // Special cases
+
+    // @todo: If we're on Windows, check to see if we can detect Snarl
+
+    return defaults;
 };
 
 StatusNet.Config.getConfig = function() {
@@ -60,8 +79,8 @@ StatusNet.Config.getConfig = function() {
 
 StatusNet.Config.prototype.getThemeName = function() {
 
-    if (this.theme) {
-        return this.theme;
+    if (this.themeName) {
+        return this.themeName;
     } else {
         return Titanium.App.Properties.getString("theme", "default");
     }
@@ -69,11 +88,20 @@ StatusNet.Config.prototype.getThemeName = function() {
 
 StatusNet.Config.prototype.getSetting = function(key) {
 
+    // Check to see if there's a user saved setting
     var value = Titanium.App.Properties.getString(key, "");
 
-    // hack to use empty string as boolean store
+    // Hack: use empty string as boolean store
     if (value === "") {
-        return false;
+        // Check to see if there's a property set in the config file
+        if (this.props.getString(key, "") !== "") {
+            return this.props[key];
+        // Check to see if there's a default setting
+        } else if (this.defaults[key] !== undefined) {
+            return this.defaults[key];
+        } else {
+            return false;
+        }
     } else if (value === "true") {
         return true;
     } else {
@@ -113,8 +141,9 @@ StatusNet.Config.prototype.getSourceName = function() {
     return (this.sourceName) ? this.sourceName : 'StatusNet Desktop';
 };
 
+// Little helper. Maybe we don't need.
 StatusNet.Config.prototype.playSounds = function() {
-    if (!this.getSetting('sounds_off')) {
+    if (this.getSetting('play_sounds')) {
         return true;
     } else {
         return false;

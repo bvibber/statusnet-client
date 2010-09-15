@@ -1,17 +1,29 @@
 # Theme name - corresponds to a directory in Resources/theme
-theme = test
+#theme = test
 
-# The icon to use for the site / public timeline icon in the sidebar. 
+# The icon to use for the site / public timeline icon in the sidebar.
 # Setting this will override the default behavior which is to use the site's
-# icon, and barring that the application logo. This should go in the theme's 
+# icon, and barring that the application logo. This should go in the theme's
 # images directory.
-siteLogo = mysite.png
+#siteLogo = mysite.png
 
 # Set this if you want to put something permanently in the sidebar for the
 # user's timeline icon, instead of the default behavior of showing the
 # avatar from the user's account.
-userImage = funnyface.png
+#userImage = funnyface.png
 
 # The client source -- what to show for the source attribution on notices
 # posted via the client
-sourceName = FunCo Client
+#sourceName = FunCo Client
+
+# Play sounds by default?
+#play_sounds = true
+
+# Play a sound when new notices arrive by default?
+#new_notices_sound = true
+
+# Play a sound when posting a notice or sending a direct message by default?
+#post_notice_sound = true
+
+# Show system notifications by default?
+#notifications = true

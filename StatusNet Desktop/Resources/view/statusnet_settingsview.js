@@ -106,7 +106,7 @@ StatusNet.SettingsView.prototype.initMiscTab = function() {
     var $newNoticesSndChk = $('input[name=newnotices_sound_cbox]');
     var $postNoticeSndChk = $('input[name=postnotice_sound_cbox]');
 
-    if (!this.config.getSetting("sounds_off")) {
+    if (this.config.getSetting("play_sounds")) {
         $playSoundsChk.attr("checked", "true");
     } else {
         $newNoticesSndChk.attr("disabled", "true");
@@ -124,11 +124,11 @@ StatusNet.SettingsView.prototype.initMiscTab = function() {
             }
         });
 
-    if (!this.config.getSetting("newnotices_sound_off")) {
+    if (this.config.getSetting("new_notices_sound")) {
         $newNoticesSndChk.attr("checked", "true");
     }
 
-    if (!this.config.getSetting("postnotice_sound_off")) {
+    if (this.config.getSetting("post_notice_sound")) {
         $postNoticeSndChk.attr("checked", "true");
     }
 
@@ -150,21 +150,21 @@ StatusNet.SettingsView.prototype.saveMiscSettings = function(onSuccess, onError)
     try {
 
         if ($('input[name=play_sounds_cbox]').attr('checked')) {
-            this.config.saveSetting('sounds_off', false);
+            this.config.saveSetting('play_sounds', true);
         } else {
-            this.config.saveSetting('sounds_off', true);
+            this.config.saveSetting('play_sounds', false);
         }
 
         if ($('input[name=newnotices_sound_cbox]').attr('checked')) {
-            this.config.saveSetting("newnotices_sound_off", false);
+            this.config.saveSetting("new_notices_sound", true);
         } else {
-            this.config.saveSetting("newnotices_sound_off", true);
+            this.config.saveSetting("new_notices_sound", false);
         }
 
         if ($('input[name=postnotice_sound_cbox]').attr('checked')) {
-            this.config.saveSetting("postnotice_sound_off", false);
+            this.config.saveSetting("post_notice_sound", true);
         } else {
-            this.config.saveSetting("postnotice_sound_off", true);
+            this.config.saveSetting("post_notice_sound", false);
         }
 
     } catch(e) {
