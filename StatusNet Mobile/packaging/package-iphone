@@ -1,0 +1,16 @@
+#!/bin/sh
+
+BASE="/Users/brion/src/StatusNet/client"
+SRCDIR="$BASE/statusnet-client/StatusNet Mobile"
+
+BUILDDIR="$SRCDIR/build/iphone/build/Distribution-iphoneos"
+
+APP="StatusNet_Mobile"
+SRCAPP="StatusNet Mobile"
+
+if [ -e 'Payload' ]; then rm -rf Payload; fi && \
+if [ -e 'iTunesArtwork' ]; then rm -rf iTunesArtwork; fi && \
+mkdir 'Payload' && \
+cp -pR "$BUILDDIR/$SRCAPP.app" "Payload/$SRCAPP.app" && \
+cp -f 'iTunesArtwork.jpg' 'iTunesArtwork' && \
+zip --symlinks -r "$APP.ipa" 'Payload' 'iTunesArtwork'

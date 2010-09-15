@@ -1,0 +1,20 @@
+#!/bin/bash
+
+BASE="/Users/brion/src/StatusNet/client"
+SRCDIR="$BASE/statusnet-client/StatusNet Mobile"
+
+KEYDIR="$BASE/keys"
+KEYALIAS="statusnet"
+
+APP="StatusNet_Mobile"
+
+cp \
+  "$SRCDIR/build/android/bin/app-unsigned.apk" \
+  "$APP-unaligned.apk" && \
+jarsigner -verbose \
+  -keystore "$KEYDIR/android/statusnet.keystore" \
+  "$APP-unaligned.apk" \
+  "$KEYALIAS" && \
+zipalign -v 4 \
+  "$APP-unaligned.apk" \
+  "$APP.apk"
