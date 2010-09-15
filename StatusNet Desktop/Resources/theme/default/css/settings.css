@@ -1,5 +1,5 @@
 #settings_content {
-	padding: 10px;
+	padding: 0px;
 	overflow-x: hidden;
 }
 
@@ -129,7 +129,7 @@ html ul.tabs li.active, html ul.tabs li.active a:hover  { /*--Makes sure that th
 .tab_container {
     border: 1px solid #999;
     border-top: none;
-    overflow: hidden;
+    overflow: auto;
     clear: both;
     /*float: left; width: 100%;*/
     margin-left: auto;
@@ -143,4 +143,20 @@ html ul.tabs li.active, html ul.tabs li.active a:hover  { /*--Makes sure that th
     padding: 20px;
     font-size: 1.2em;
 }
+
+
+/* Add account overlay */
+
+#new-account {
+    position: fixed;
+    left: 30px;
+    top: 200px;
+    width: 330px;
+    padding: 20px 0px 30px 10px;
+    background-color:rgba(16, 16, 16, 0.98);
+    -webkit-border-radius:10px;
+    -webkit-box-shadow: 1px 0px 5px #fff;
+}	
+
+
 
