@@ -105,6 +105,7 @@ StatusNet.SettingsView.prototype.initMiscTab = function() {
     var $playSoundsChk = $('input[name=play_sounds_cbox]');
     var $newNoticesSndChk = $('input[name=newnotices_sound_cbox]');
     var $postNoticeSndChk = $('input[name=postnotice_sound_cbox]');
+    var $notificationsChk = $('input[name=notifications_cbox]');
 
     if (this.config.getSetting("play_sounds")) {
         $playSoundsChk.attr("checked", "true");
@@ -130,6 +131,10 @@ StatusNet.SettingsView.prototype.initMiscTab = function() {
 
     if (this.config.getSetting("post_notice_sound")) {
         $postNoticeSndChk.attr("checked", "true");
+    }
+
+    if (this.config.getSetting("notifications")) {
+        $notificationsChk.attr("checked", "true");
     }
 
     var that = this;
@@ -165,6 +170,12 @@ StatusNet.SettingsView.prototype.saveMiscSettings = function(onSuccess, onError)
             this.config.saveSetting("post_notice_sound", true);
         } else {
             this.config.saveSetting("post_notice_sound", false);
+        }
+
+        if ($('input[name=notifications_cbox]').attr('checked')) {
+            this.config.saveSetting("notifications", true);
+        } else {
+            this.config.saveSetting("notifications", false);
         }
 
     } catch(e) {

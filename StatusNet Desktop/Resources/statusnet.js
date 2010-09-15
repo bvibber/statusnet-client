@@ -232,14 +232,25 @@ StatusNet.Platform.nativeNotifications = function() {
     // Snow Lep has notifications
     if (Titanium.Platform.name === "Darwin") {
 
-        // XXX: @byosko says notifications don't work on 10.6.3
+        // XXX: @byosko says notifications don't work on 10.6.3, Should
+        // we return false in that case?
         if (Titanium.Platform.version.substr(0, 4) === "10.6") {
             return true;
+        } else {
+            return false;
         }
+    // We don't know whether the given Linux desktop supports it or not. 
+    // XXX: Can we come up with some kind of check here? 
     } else if (Titanium.Platform.name === "Linux") {
-        return true;
+        return false;
+    } else if (Titanium.Platform.name === "Windows NT") {
+        // XXX: Pretty brain-dead check for whether Snarl is installed.
+        // but better than nothing.
+        var snarl = Titanium.Filesystem.getFile("c:", "Program Files", "Snarl", "snarl.exe");
+        return snarl.exist();
     }
 
+    // Must be some unknown platform from outer space
     StatusNet.debug("Name = " + Titanium.Platform.name);
     StatusNet.debug("Architecture = " + Titanium.Platform.architecture);
     StatusNet.debug("OS type = " + Titanium.Platform.ostype);

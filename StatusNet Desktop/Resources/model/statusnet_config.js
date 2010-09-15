@@ -48,12 +48,10 @@ StatusNet.Config.getDefaults = function() {
         "play_sounds": true,
         "new_notices_sound": true,
         "post_notice_sound": true,
-        "notifications": true
+        "notifications": StatusNet.Platform.nativeNotifications()
     };
 
-    // Special cases
-
-    // @todo: If we're on Windows, check to see if we can detect Snarl
+    // Add any special case stuff here
 
     return defaults;
 };
