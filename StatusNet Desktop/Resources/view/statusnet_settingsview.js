@@ -107,14 +107,20 @@ StatusNet.SettingsView.prototype.initMiscTab = function() {
     var $postNoticeSndChk = $('input[name=postnotice_sound_cbox]');
     var $notificationsChk = $('input[name=notifications_cbox]');
 
-    // Special note about
-    if (Titanium.Platform.name === "Windows NT") {
-        var msg = '<b>Note</b>: you must have <a href="http://www.fullphat.net/" rel="external">Snarl</a> ' +
+    var msg;
+
+    // Special note about Snarl
+    if (Titanium.Platform.name === "Windows NT" && !StatusNet.Platform.nativeNotifications()) {
+        msg = '<b>Note</b>: you must have <a id="snarl-link" href="#" rel="external">Snarl</a> ' +
             'installed for notifications to work. StatusNet Desktop will not function correctly if this is ' +
             'checked and Snarl is not installed.';
         $('#notifications_note').append(msg);
+        $('#notifications_note a#snarl-link').click(function() {
+            Titanium.Desktop.openURL("http://www.fullphat.net/");
+        });
+    // Special note to tell Linux people they need a notifications system
     } else if (Titanium.Platform.name === "Linux") {
-        var msg = 'Note: your desktop environment must have a notifications service for notifications to work.';
+        msg = 'Note: your desktop environment must have a notifications service for notifications to work.';
         $('#notifications_note').append(msg);
     } else {
         $('#notifications_note').hide();
