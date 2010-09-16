@@ -70,11 +70,14 @@ fieldset {
 #accountlist .name {
     font-size: 150%;
     font-weight: bold;
-    padding-right: 16px;
+    max-width: 115px;
+    word-wrap: break-word;
+
 }
 #accountlist .site {
     color: #444;
-    padding-left: 16px;
+    max-width: 115px;
+    word-wrap: break-word;
 }
 
 /* Tabbed menu stuff */
