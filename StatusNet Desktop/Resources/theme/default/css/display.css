@@ -228,8 +228,17 @@ h1 {
 }
 
 #infobar {
-	float: right;
-	margin-left: 5px;
+    display: none;
+    position: fixed;
+    bottom: 5px;
+    right: 5px;
+    font-size: 0.95em;
+    width: 335px;
+    padding: 2px 5px 2px 5px;
+    background-color:rgba(16, 16, 16, 0.94);
+    text-shadow: 0px 1px 0px #000;
+    -webkit-border-radius:6px;
+    -webkit-box-shadow: 1px 1px 1px #ccc;
 }
 
 a#new_notice {
