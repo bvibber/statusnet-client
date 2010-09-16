@@ -1,1 +1,13 @@
-Place your change log text here.  This file will be incorporated with your app at package time.
+New in 0.9.1
+============
+- Avatar caching - for improved performance
+- User avatars display in new notice notifications
+- New button on the sidebar to view all groups on a site
+- Long Infobar messages now display properly
+- Improved, more intelligent account discovery
+- New sounds for posting notices and direct messages
+- A theming system (ability to switch between different icons, css, and sound files)
+- A configuration system, including a statusnet.config file for controlling default behavior
+- A settings panel for controlling sounds and notifications
+- Stability improvements
+- Lots of bug fixes
