@@ -1,4 +1,4 @@
-This is StatusNet Desktop 0.9a <http://status.net/desktop>, a
+This is StatusNet Desktop 0.9.1 <http://status.net/desktop>, a
 cross-platform StatusNet client developed using Appcelerator
 Titanium Desktop 1.2.1. It runs on Linux, Mac OS X, and Windows
 (Win2K/XP/Win7). StatusNet Desktop is Copyright 2010, StatusNet, Inc.
@@ -18,6 +18,10 @@ Partial Feature list:
 - Post new notices and @-replies
 - Notice search
 - Notice caching
+- Avatar caching
+- View all groups on a site
+- Play sounds when new notices arrive and sending a notice
+- Theming (use custom CSS and icons)
 
 Bug tracker: http://status.net/open-source/issues
 
