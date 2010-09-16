@@ -18,7 +18,7 @@
  * limitations under the License.
  */
 /** StatusNet Namespace -- maybe we should just use SN? */
-function StatusNet() {};
+function StatusNet() {}
 
 /**
  * Live database connection for local storage, if opened.
@@ -247,7 +247,7 @@ StatusNet.Platform.nativeNotifications = function() {
         // XXX: Pretty brain-dead check for whether Snarl is installed.
         // but better than nothing.
         var snarl = Titanium.Filesystem.getFile(Titanium.Filesystem.getProgramsDirectory(), "full phat", "Snarl", "snarl.exe");
-        if (snarl.isExecutable()) { // XXX: exists() bombs out here for some reason
+        if (snarl.exists() && snarl.isExecutable()) {
             return true;
         } else {
             return false;
