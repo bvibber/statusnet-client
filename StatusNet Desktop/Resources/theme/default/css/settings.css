@@ -170,3 +170,7 @@ html ul.tabs li.active, html ul.tabs li.active a:hover  { /*--Makes sure that th
     background-color: rgba(80, 80, 80, 0.7);
     -webkit-border-radius:6px;
 }
+
+#notifications_note a {
+    color: #fff;
+}
