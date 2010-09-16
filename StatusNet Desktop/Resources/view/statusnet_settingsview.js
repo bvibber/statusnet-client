@@ -116,6 +116,8 @@ StatusNet.SettingsView.prototype.initMiscTab = function() {
     } else if (Titanium.Platform.name === "Linux") {
         var msg = 'Note: your desktop environment must have a notifications service for notifications to work.';
         $('#notifications_note').append(msg);
+    } else {
+        $('#notifications_note').hide();
     }
 
     if (this.config.getSetting("play_sounds")) {
