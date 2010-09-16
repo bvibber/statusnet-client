@@ -626,7 +626,7 @@ StatusNet.NewNoticeView.prototype.postNotice = function(noticeText)
     var that = this;
     var method = 'statuses/update.xml';
     var params = {status: noticeText,
-                  source: 'StatusNet Mobile'};
+                  source: StatusNet.Platform.defaultSourceName()};
 
     var data = this.data;
 

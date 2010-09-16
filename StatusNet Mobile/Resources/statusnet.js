@@ -535,6 +535,17 @@ StatusNet.Platform.base64encode = function(data) {
     return Titanium.Utils.base64encode(data);
 }
 
+StatusNet.Platform.defaultSourceName = function() {
+    if (StatusNet.Platform.isApple()) {
+        return 'StatusNet iPhone';
+    } else if (StatusNet.Platform.isAndroid()) {
+        return 'StatusNet Android';
+    } else {
+        // Mystery platform...?!?! :D
+        return 'StatusNet Mobile';
+    }
+}
+
 StatusNet.showNetworkError = function(status, xml, text, prefix) {
     var msg;
     if (xml != null && typeof xml == "object") {
