@@ -97,6 +97,7 @@ StatusNet.AtomParser.prepBackgroundParse = function(callback)
     Titanium.App.addEventListener('SN.backgroundParse.entry', function(event) {
         // Triggered in main context for each entry from bg context...
         var cb = callbacks[event.key];
+        //Titanium.API.info("SN.backgroundParse.entry for key " + event.key + " " + cb);
         if (cb && cb.onEntry) {
             cb.onEntry.call(event.notice, event.notice);
         }
@@ -105,6 +106,7 @@ StatusNet.AtomParser.prepBackgroundParse = function(callback)
         // Triggered in main context after the processing is complete...
         var cb = callbacks[event.key];
         callbacks[event.key] = undefined;
+        //Titanium.API.info("SN.backgroundParse.success for key " + event.key + " " + cb);
         if (cb && cb.onSuccess) {
             cb.onSuccess();
         }
@@ -113,6 +115,7 @@ StatusNet.AtomParser.prepBackgroundParse = function(callback)
         // Triggered in main context if XML parsing failed...
         var cb = callbacks[event.key];
         callbacks[event.key] = undefined;
+        //Titanium.API.info("SN.backgroundParse.fail for key " + event.key + " " + cb);
         if (cb && cb.onFail) {
             cb.onFail(event.msg);
         }
@@ -155,12 +158,16 @@ StatusNet.AtomParser.backgroundParse = function(xmlString, onEntry, onSuccess, o
     // so we have to pass the source XML string into the parser's queue and let
     // it post back to this context so we can call the callbacks.
 
-    var key = Math.random();
+    // When making a random key ID, make sure it's a string.
+    // Just using Math.random() is unsafe, as floats may change
+    // when moving across contexts!
+    var key = Date.now() + ':' + Math.round(Math.random() * 1000000000);
     StatusNet.AtomParser.callbacks[key] = {
         onEntry: onEntry,
         onSuccess: onSuccess,
         onFail: onFail
     }
+    //Titanium.API.info("Background parse registered key " + key);
     Titanium.App.fireEvent('StatusNet.background.process', {
         xmlString: xmlString,
         key: key
