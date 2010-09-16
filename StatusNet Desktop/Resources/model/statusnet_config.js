@@ -89,7 +89,6 @@ StatusNet.Config.prototype.getSetting = function(key) {
     // Check to see if there's a user saved setting
     var value = Titanium.App.Properties.getString(key, "");
 
-    // Hack: use empty string as boolean store
     if (value === "") {
         // Check to see if there's a property set in the config file
         if (this.props.getString(key, "") !== "") {
@@ -102,6 +101,8 @@ StatusNet.Config.prototype.getSetting = function(key) {
         }
     } else if (value === "true") {
         return true;
+    } else if (value === "false") {
+        return false;
     } else {
         return value;
     }
@@ -109,6 +110,7 @@ StatusNet.Config.prototype.getSetting = function(key) {
 
 StatusNet.Config.prototype.saveSetting = function(key, value) {
 
+    // Hack: use strings as boolean store
     if (value === "true" || value === "false") {
         throw "You can't use the strings 'true' or 'false' as values, use booleans instead.";
     }
@@ -117,7 +119,7 @@ StatusNet.Config.prototype.saveSetting = function(key, value) {
 
     // hack to use empty string as boolean store
     if (value === false) {
-        realValue = "";
+        realValue = "false";
     } else if (value === true) {
         realValue = "true";
     } else {
