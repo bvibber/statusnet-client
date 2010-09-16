@@ -162,4 +162,11 @@ html ul.tabs li.active, html ul.tabs li.active a:hover  { /*--Makes sure that th
 }	
 
 
+/* Notifications info note */
 
+#notifications_note {
+    margin: 8px 0px 4px 0px;
+    padding: 4px 20px 4px 20px;
+    background-color: rgba(80, 80, 80, 0.7);
+    -webkit-border-radius:6px;
+}
