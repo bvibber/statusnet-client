@@ -257,7 +257,6 @@ StatusNet.Timeline.prototype.update = function(onFinish, notifications) {
             if (StatusNet.Platform.isMobile()) {
                 StatusNet.AtomParser.backgroundParse(responseText, onEntry, onSuccess, onFailure);
             } else {
-                StatusNet.debug("gonna parse this");
                 StatusNet.AtomParser.parse(responseText, onEntry, onSuccess, onFailure);
             }
         },

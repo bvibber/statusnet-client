@@ -46,8 +46,7 @@ StatusNet.Client = function(account) {
                 } else {
                     StatusNet.debug("noticeAdded event with no args!");
                 }
-            },
-            false
+            }
         );
     });
 
@@ -68,8 +67,7 @@ StatusNet.Client = function(account) {
                             that.newNoticesSound.play();
                         }
                     }
-                },
-                true
+                }
             );
         },
         60000
@@ -170,10 +168,15 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
     this.timeline.update(function() {
         that.timeline.noticeAdded.attach(
             function(args) {
-                that.view.notifyNewNotice(args.notice);
+
+                // Only show desktop notifications for timelines that refresh in the
+                // background, and only if the notifications setting is on
+                if (that.timeline.autoRefresh() && that.config.getSetting("notifications")) {
+                    that.view.notifyNewNotice(args.notice);
+                }
             }
         );
-    }, false);
+    });
 
     // @todo multiple timeline auto-refresh
 
@@ -192,8 +195,7 @@ StatusNet.Client.prototype.switchTimeline = function(timeline) {
                             that.newNoticesSound.play();
                         }
                     }
-                },
-                true)
+                })
             },
             60000 // @todo Make this configurable
         );
@@ -283,8 +285,7 @@ StatusNet.Client.prototype.showGroupTimeline = function(groupId) {
             that.view.showHeader();
             that.view.show();
             $("#body").scrollTop(0);
-        },
-        false
+        }
     );
 };
 
@@ -306,8 +307,7 @@ StatusNet.Client.prototype.showTagTimeline = function(tag) {
             that.view.showHeader();
             that.view.show();
             $("#body").scrollTop(0);
-        },
-        false
+        }
     );
 };
 
