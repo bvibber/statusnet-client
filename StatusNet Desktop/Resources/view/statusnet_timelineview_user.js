@@ -52,8 +52,8 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
                     html.push('<a href="#" class="profile_subscribe">Subscribe</a>');
                 } else {
                     html.push('<a href="#" class="profile_unsubscribe">Unsubscribe</a>');
-                    html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
                 }
+                html.push('<a href="#" class="profile_direct_message">Direct Message</a>');
                 html.push('<a href="#" class="profile_block">Block</a>');
             } else {
                 html.push('<a href="#" class="profile_unblock">Unblock</a>');
@@ -117,17 +117,25 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
     html.push('</div>');
     $('#header').append(html.join(''));
 
+    $dmButton = $('a.profile_direct_message:first');
+
+    // Hide this unless the user is actually following; we'll use it later in case they sub
+    if (extended.following === "false") {
+        $dmButton.hide();
+    }
+
     // XXX: sucks that I have to pass client back in so I can use it here -Z
     // Hmm... use toggle() instead?
     $('a.profile_subscribe').bind('click', function(event) {
-        client.subscribe(user.id, function() {
-            $('a.profile_direct_message').show();
+        client.subscribe(user.id, this, function() {
+            $dmButton.show();
         });
+        return false;
     });
 
     $('a.profile_unsubscribe').bind('click', function(event) {
         client.unsubscribe(user.id, this, function() {
-            $('a.profile_direct_message').hide();
+            $dmButton.hide();
         });
     });
 
@@ -139,27 +147,31 @@ StatusNet.TimelineViewUser.prototype.showProfileInfo = function (user, extended,
             function(msg) {
                 StatusNet.Infobar.flashMessage(msg);
         });
+        return false;
     });
 
     $('a.profile_block').bind('click', function(event) {
         var r = confirm("Really block this user?");
         if (r) {
             client.block(user.id, this, function() {
-                $('a.profile_direct_message').hide();
+                $dmButton.hide();
                 $('a.profile_unsubscribe').hide();
             });
         }
+        return false;
     });
 
     $('a.profile_unblock').bind('click', function(event) {
          client.unblock(user.id, this, function() {
-             $('a.profile_direct_message').hide();
+             $dmButton.hide();
          });
+         return false;
     });
 
     // Show subscriptions view button
     $('a.profile_subscriptions').bind('click', function(event) {
          client.showSubscriptions(user.id);
+         return false;
     });
 };
 
