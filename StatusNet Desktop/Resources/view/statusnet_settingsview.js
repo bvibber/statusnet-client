@@ -220,7 +220,7 @@ StatusNet.SettingsView.prototype.formComplete = function() {
 StatusNet.SettingsView.prototype.showAddAccount = function() {
     this.resetNewAccount();
     $("#new-account").show();
-    $("#new-username").focus();
+    $("#new-site").focus();
 };
 
 StatusNet.SettingsView.prototype.hideAddAccount = function() {
