@@ -248,7 +248,7 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
             if (relativePath.match(/^(http|file)/)) {
                 // if it's a full URL it means the avatar isn't cached for some reason
                 StatusNet.debug("notifyNewNotice - we got a non-relative URL. Bummer.");
-                notification.setIcon("app://logo.png");
+                notification.setIcon("app://theme/default/images/default-avatar-stream.png");
             } else {
                 StatusNet.debug("Setting icon to app://" + relativePath);
                 notification.setIcon("app://" + relativePath);
@@ -262,7 +262,7 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
             notification.show();
         },
         function(avatarUrl) {
-            notification.setIcon("app://logo.png");
+            notification.setIcon("app://theme/default/images/default-avatar-stream.png");
         },
         true
     );
