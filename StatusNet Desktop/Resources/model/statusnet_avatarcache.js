@@ -30,24 +30,24 @@ StatusNet.AvatarCache.getCacheDirectory = function() {
 
     if (StatusNet.Platform.isMobile()) {
         appDirName = Titanium.Filesystem.applicationDataDirectory;
-        cacheDir = Titanium.Filesystem.getFile(appDirName, 'avatar_cache');
     } else {
-
-        // XXX: Technically we should noto be using the application resources directory
-        // for caching our avatar files, however, Titanium notifications cannot resolve
-        // file:/// URLs currently. So we need to give them app:// URLs, which refer to
-        // the application resources directory. The resources directory is theoretically
-        // read-only, even though it's not really. But we have not guarantee that it will
-        // stay writable going forward.
-
-        //appDirName = Titanium.Filesystem.getApplicationDataDirectory().nativePath();
-
-        var rdir = Titanium.Filesystem.getResourcesDirectory();
-        var separator = Titanium.Filesystem.getSeparator();
-        cacheDir = Titanium.Filesystem.getFile(rdir + separator + 'avatar_cache');
+        appDirName = Titanium.Filesystem.getApplicationDataDirectory();
     }
 
+    cacheDir = Titanium.Filesystem.getFile(appDirName, 'avatar_cache');
+
     return cacheDir;
+};
+
+/**
+ * Returns the separator. How you get it, is not the same across Titanium Mobile and Titanium Desktop.
+ */
+StatusNet.AvatarCache.getSeparator = function() {
+    if (StatusNet.Platform.isMobile()) {
+        return Titanium.Filesystem.separator;
+    } else {
+        return Titanium.Filesystem.getSeparator();
+    }
 };
 
 /**
@@ -68,8 +68,8 @@ StatusNet.AvatarCache.getAvatarFile = function(filename) {
     if (StatusNet.Platform.isMobile()) {
         avatarFile = Titanium.Filesystem.getFile(cacheDir.nativePath, filename);
     } else {
-        var separator = Titanium.Filesystem.getSeparator();
-        avatarFile = Titanium.Filesystem.getFile(cacheDir + separator + filename);
+//        var separator = Titanium.Filesystem.getSeparator();
+        avatarFile = Titanium.Filesystem.getFile(cacheDir, filename);
     }
 
     return avatarFile;
@@ -206,7 +206,8 @@ StatusNet.AvatarCache.lookupAvatar = function(url, onHit, onMiss, relative) {
 
     var avatarFile = StatusNet.AvatarCache.getAvatarFile(filename);
     var nativePath = StatusNet.AvatarCache.getAvatarNativePath(avatarFile);
-    var relativePath = 'avatar_cache/' + filename;
+    var separator = StatusNet.AvatarCache.getSeparator();
+    var relativePath = 'avatar_cache' + separator + filename;
 
     //StatusNet.debug('AvatarCache.lookupAvatar G - looking up avatar: ' + nativePath);
 

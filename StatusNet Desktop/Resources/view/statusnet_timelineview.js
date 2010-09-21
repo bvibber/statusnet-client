@@ -241,6 +241,9 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
 
     StatusNet.debug('notifyNewNotice - looking up avatar: ' + notice.avatar);
 
+    var appDataDir = Titanium.Filesystem.getApplicationDataDirectory();
+    var separator = Titanium.Filesystem.getSeparator();
+
     StatusNet.AvatarCache.lookupAvatar(notice.avatar,
         function(relativePath) {
             StatusNet.debug('notifyNewNotice - finished looking up avatar');
@@ -250,8 +253,8 @@ StatusNet.TimelineView.prototype.notifyNewNotice = function(notice) {
                 StatusNet.debug("notifyNewNotice - we got a non-relative URL. Bummer.");
                 notification.setIcon("app://theme/default/images/default-avatar-stream.png");
             } else {
-                StatusNet.debug("Setting icon to app://" + relativePath);
-                notification.setIcon("app://" + relativePath);
+                StatusNet.debug("Setting icon to " + appDataDir + separator + relativePath);
+                notification.setIcon(appDataDir + separator + relativePath);
             }
 
             notification.setDelay(5000);
