@@ -62,6 +62,9 @@ StatusNet.SettingsView.prototype.init = function() {
 };
 
 StatusNet.SettingsView.prototype.initAccountsTab = function() {
+
+    $("label").inFieldLabels();
+
     $("#new-account").hide();
 
     this.showAccounts();

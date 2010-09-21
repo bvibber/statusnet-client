@@ -27,6 +27,7 @@ $LAB
     .script("model/statusnet_theme.js").wait()
     .script("view/statusnet_settingsview.js").wait()
     .script("statusnet_client.js").wait()
+    .script("lib/jquery.infieldlabel.min.js").wait()
     .wait(function(){
     
     $(function() {

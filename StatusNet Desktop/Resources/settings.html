@@ -46,39 +46,30 @@
                             <td rowspan="3" class="avatar">
                                 <img id="new-avatar" src="theme/default/images/default-avatar-stream.png" name="new-avatar">
                             </td>
-                            <td class="label">
-                                <label for="new-site">Servername</label>
-                            </td>
                             <td>
-                                <input id="new-site" type="text" name="new-site" value="">
+                                Server
+                                <p>
+                                    <label for="new-site">example.status.net</label>
+                                    <input id="new-site" type="text" name="new-site" value="">
+                                </p>
+                                Username
+                                <p>
+                                    <label for="new-username">username</label>
+                                    <input id="new-username" type="text" name="new-username" value="">
+                                </p>
+                                Password
+                                <p>
+                                    <label for="new-password">password</label>
+                                    <input id="new-password" type="password" name="new-password" value="">
+                                </p>
                             </td>
                         </tr>
                         <tr>
-                            <td class="label">
-                                <label for="new-username">Username</label>
-                            </td>
-                            <td>
-                                <input id="new-username" type="text" name="new-username" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="label">
-                                <label for="new-password">Password</label>
-                            </td>
-                            <td>
-                                <input id="new-password" type="password" name="new-password" value="">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td></td>
                             <td>
                                 <div id="new-status"></div>
                             </td>
                         </tr>
                         <tr>
-                            <td></td>
-                            <td></td>
                             <td>
                                 <input id="new-save" type="submit" value="Save"> <input id="new-cancel" type="button" value="Cancel">
                             </td>
@@ -100,7 +91,7 @@
             <legend>Notifications</legend>
             <input type="checkbox" name="notifications_cbox" value="notifications"/> Show notifications as new notices arrive<br/>
             <div id="notifications_note"></div>
-          </fieldset> 
+          </fieldset>
           <div class="settings_controls">
             <input id="misc-save" type="submit" value="Save"/>
           </div>

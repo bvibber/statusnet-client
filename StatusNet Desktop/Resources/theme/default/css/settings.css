@@ -21,12 +21,6 @@ h1 {
 	border-color: transparent;
 }
 
-fieldset {
-	border: none;
-	padding: 8px 0px;
-	margin-top: 8px;
-}
-
 #accountlist {
 	width: 100%;
     border-collapse: collapse;
@@ -174,3 +168,57 @@ html ul.tabs li.active, html ul.tabs li.active a:hover  { /*--Makes sure that th
 #notifications_note a {
     color: #fff;
 }
+
+/** stuff for In-Field-Labels-jQuery-Plugin **/
+
+table {
+    margin-left:auto; margin-right:auto;
+}
+
+td.avatar {
+    padding-top: 10px;
+    padding-right: 8px;
+}
+
+fieldset {
+	border: none;
+	padding: 8px 0px;
+	margin-top: 8px;
+}
+
+fieldset input, fieldset textarea, label {
+    font-family: Helvetica, Arial;
+    font-size: 11pt;
+}
+
+fieldset td { vertical-align:top; text-align:left; }
+
+fieldset td p { position: relative; margin: 2px 0;}
+fieldset td p label { position: absolute; top: 0; left: 0;}
+fieldset td p br {display: none;}
+
+fieldset p input,
+fieldset p textarea {
+    display: block;
+    padding: 4px;
+    width: 200px;
+    margin: 0;
+}
+
+fieldset p label {
+    width: 180px;
+    display: block;
+    margin: 5px 5px 5px 6px;
+    padding: 0;
+}
+
+fieldset p textarea,
+fieldset p input {
+    border: solid 1px #ccc;
+}
+
+fieldset p label {
+    color: #777;
+}
+
+
