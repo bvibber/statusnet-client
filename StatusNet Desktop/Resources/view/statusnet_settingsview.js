@@ -470,9 +470,9 @@ StatusNet.SettingsView.prototype.updateNewAccount = function() {
  * @param onError function()
  */
 StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onError) {
-    var username = $("#new-username").val();
+    var username = $.trim($("#new-username").val());
     var password = $("#new-password").val();
-    var site = $("#new-site").val();
+    var site = $.trim($("#new-site").val());
 
     if (this.workAcct != null &&
         username == this.lastUsername &&
