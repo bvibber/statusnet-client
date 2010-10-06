@@ -225,8 +225,10 @@ renderNotice = function(notice, user) {
 
     html.push('<div class="' + classes.join(" ") + '" id="notice-' + notice.id +'" name="notice-' + notice.id +'">');
     if (!user) {
-        html.push('<div class="avatar"><a href="' + notice.authorUri + '" rel="external"><img src="' + avatar + '"/></a>');
-        html.push('</div>');
+        var avdiv = $('<div><div class="avatar"><a rel="external"><img></a></div></div>').
+            find('a').attr('href', notice.authorUri).end().
+            find('img').attr('src', avatar).attr('title', author).end();
+        html.push(avdiv.html());
     }
     html.push('<div>');
     html.push('<div class="date_link">' + humane_date(notice.updated) + '</div>');
@@ -389,7 +391,10 @@ renderDirectMessage = function(dm) {
     var html = [];
 
     html.push('<div class="notice" id="direct_message-' + dm.id +'">');
-    html.push('   <div class="avatar"><a href="' + dm.authorUri + '"><img src="' + dm.avatar + '"/></a></div>');
+    var avdiv = $('<div><div class="avatar"><a rel="external"><img></a></div></div>').
+        find('a').attr('href', dm.authorUri).end().
+        find('img').attr('src', dm.avatar).attr('title', dm.nickname).end();
+    html.push(avdiv.html());
     html.push('   <div><a class="author" name="author" href="' +  dm.authorUri + '">' + dm.nickname + '</a>');
     html.push('   <div class="content">'+ dm.content +'</div>');
     html.push('   </div><div class="date_link"><a href="' + dm.link + '" rel="external" title="View this message in browser">' + humane_date(dm.updated) + '</a></div>');
