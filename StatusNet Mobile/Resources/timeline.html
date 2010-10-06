@@ -566,6 +566,11 @@ showProfileHeader = function(user, extended, authorId) {
         Titanium.App.fireEvent("StatusNet_unblock", {userId: user.id});
         return false;
     });
+
+    $('a.profile_direct_message').live('click', function(event) {
+        Titanium.App.fireEvent("StatusNet_sendDirectMessage", {recipient: user.username});
+        return false;
+    });
 };
 
 
