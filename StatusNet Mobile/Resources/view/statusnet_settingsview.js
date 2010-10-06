@@ -580,9 +580,9 @@ StatusNet.SettingsView.prototype.verifyAccount = function(onSuccess, onError) {
  * @param onError function()
  */
 StatusNet.SettingsView.prototype.discoverNewAccount = function(onSuccess, onError) {
-    var username = this.fields.username.value;
+    var username = $.trim(this.fields.username.value);
     var password = this.fields.password.value;
-    var site = this.fields.site.value;
+    var site = $.trim(this.fields.site.value);
 
     if (username == '' || password == '' || site == '') {
         onError();

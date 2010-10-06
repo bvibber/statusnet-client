@@ -247,4 +247,14 @@ heyQuery.quickTagMatch = /^[A-Za-z0-9_-]+$/;
 heyQuery.quickTagMatch2 = /^\[nodeName=([A-Za-z0-9_:-]+)\]$/;
 heyQuery.quickTagAttribMatch = /^([A-Za-z0-9_-]+)\[([A-Za-z0-9_-]+)=([A-Za-z0-9_:-]+)\]$/;
 
+/**
+ * jQuery public API compat
+ * Trim a string
+ *
+ */
+heyQuery.trim = function(str)
+{
+    return str.replace(/^\s*|\s*$/gm, '');
+}
+
 var $ = jQuery = heyQuery;

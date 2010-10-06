@@ -26,7 +26,7 @@ StatusNet.RSD = {};
  */
 StatusNet.RSD.discoverTwitterApi = function(url, onSuccess, onError) {
 
-    StatusNet.debug("in discoverTwitterApi");
+    StatusNet.debug("in discoverTwitterApi: " + url);
 
     StatusNet.HttpClient.webRequest(url,
         function(status, xml) {

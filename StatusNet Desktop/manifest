@@ -1,7 +1,7 @@
 #appname:StatusNet Desktop
 #appid:net.status.desktop.client
 #publisher:StatusNet, Inc.
-#image:logo.png
+#image:default_app_logo.png
 #url:http://status.net
 #guid:2eab0839-4028-46f9-9058-701930d85558
 #desc:StatusNet Desktop Client
