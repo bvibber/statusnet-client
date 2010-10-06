@@ -218,11 +218,17 @@ StatusNet.TabbedMenuBar.prototype.createMiniTab = function(args) {
     //
     // Using a label instead of generic View due to bug on Android:
     // https://appcelerator.lighthouseapp.com/projects/32238/tickets/1625-events-attached-to-a-view-not-working-in-android
-    var touchTarget = Ti.UI.createLabel({
+    var touchTarget = Ti.UI.createButton({
         left: Math.round(left + space) - padding,
         top: 0,
         height: cellSize,
-        width: cellSize
+        width: cellSize,
+        title: minitab.name,
+        //opacity: 0.1
+        style: Ti.UI.iPhone.SystemButtonStyle.PLAIN,
+        color: 'rgba(0,0,0,0)',
+        backgroundColor: 'rgba(0,0,0,0)',
+        selectedColor: 'rgba(0,0,0,0)'
     });
 
     var glowy = new StatusNet.Glowy(this.tabView, touchTarget,
