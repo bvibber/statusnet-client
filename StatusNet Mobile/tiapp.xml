@@ -2,7 +2,7 @@
 <ti:app xmlns:ti="http://ti.appcelerator.org">
 <id>net.status.client.mobile</id>
 <name>StatusNet Mobile</name>
-<version>1.0.2</version>
+<version>1.0.3</version>
 <publisher>StatusNet, Inc.</publisher>
 <url>http://status.net/</url>
 <description>StatusNet Mobile Client</description>
