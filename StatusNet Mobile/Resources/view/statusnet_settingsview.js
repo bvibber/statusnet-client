@@ -64,7 +64,7 @@ StatusNet.SettingsView.prototype.init = function() {
     this.table.addEventListener('click', function(event) {
         // Selected an account
 
-        if (event.rowData.acct == "add-stub") {
+        if (typeof event.rowData.acct == "string" && event.rowData.acct == "add-stub") {
             // Special case!
             view.showAddAccount();
             return;
