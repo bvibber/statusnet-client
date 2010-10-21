@@ -74,9 +74,20 @@ StatusNet.AtomParser.mapOverElementsHelper = function(parent, map) {
 /**
  * Use our optimized native version of the loop if available...
  */
-if (typeof Titanium.Statusnet != "undefined") {
+/*if (typeof Titanium.Statusnet != "undefined") {
     if (typeof Titanium.Statusnet.mapOverElementsHelper != "undefined") {
         StatusNet.AtomParser.mapOverElementsHelper = Titanium.Statusnet.mapOverElementsHelper;
+    }
+}*/
+if (StatusNet.Platform.isAndroid()) {
+    try {
+        var StatusnetModule = require('net.status.client.mobile.titanium');
+        Titanium.API.info("Loaded StatusNet helper module! ");
+        Titanium.API.info("StatusnetModule: " + StatusnetModule);
+        Titanium.API.info("StatusnetModule.mapOverElementsHelper: " + StatusnetModule.mapOverElementsHelper);
+        StatusNet.AtomParser.mapOverElementsHelper = StatusnetModule.mapOverElementsHelper;
+    } catch (e) {
+        Titanium.API.error("Unable to load custom StatusNet helper modules: " + e);
     }
 }
 
