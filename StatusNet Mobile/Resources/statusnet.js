@@ -354,6 +354,10 @@ if (StatusNet.Platform.isApple()) {
         window.add(view);
 
         title = title || window.title;
+        if (!title) {
+            // In 1.5 things get whingy if we don't pass a string.
+            title = '';
+        }
         var label = Titanium.UI.createLabel({
             text: title,
             font: {fontSize: height / 2, fontWeight: 'bold'},
