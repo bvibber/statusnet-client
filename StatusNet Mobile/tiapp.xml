@@ -14,4 +14,7 @@
     <statusbar-hidden>false</statusbar-hidden>
 <guid>cca143fb-473f-4e8c-9bcb-91b02a08e548</guid>
 <analytics>false</analytics>
+<modules>
+    <module version="0.1">net.status.client.mobile.titanium</module>
+</modules>
 </ti:app>

@@ -3,10 +3,10 @@
 # during compilation, packaging, distribution, etc.
 #
 version: 0.1
-description: My module
-author: Your Name
-license: Specify your license
-copyright: Copyright (c) 2010 by Your Company
+description: StatusNet custom functions for Android
+author: Brion Vibber <brion@status.net>
+license: Apache license
+copyright: Copyright (c) 2010 by StatusNet, Inc
 
 
 # these should not be edited
