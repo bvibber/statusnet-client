@@ -84,7 +84,7 @@ if (StatusNet.Platform.isAndroid()) {
         var StatusnetModule = require('net.status.client.mobile.titanium');
         Titanium.API.info("Loaded StatusNet helper module! ");
         Titanium.API.info("StatusnetModule: " + StatusnetModule);
-        Titanium.API.info("StatusnetModule.mapOverElementsHelper: " + StatusnetModule.mapOverElementsHelper);
+        //Titanium.API.info("StatusnetModule.mapOverElementsHelper: " + StatusnetModule.mapOverElementsHelper);
         StatusNet.AtomParser.mapOverElementsHelper = StatusnetModule.mapOverElementsHelper;
     } catch (e) {
         Titanium.API.error("Unable to load custom StatusNet helper modules: " + e);
